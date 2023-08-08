@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.header {
+  min-height: 60px;
+  background: #175898;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.container-header {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  column-gap: 10px;
+
+  &__container-logo {
+    padding-left: 25px;
+  }
+  &__img {
+    height: 27px;
+  }
+  &__menu-user {
+    margin-left: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+  &__username {
+    display: inline-block;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 4px;
+  }
+}
+
+.footer {
+  background: #00a9e7;
+  width: 100vw;
+}
+
+@media only screen and (max-width: 650px) {
+  .header {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media only screen and (max-width: 550px) {
+  .desktop-mode {
+    display: none !important;
+  }
+
+  .container-header__username {
+    max-width: 100px;
+  }
+
+  #mui-component-select-language span {
+    display: none !important;
+  }
+}
+
+@media only screen and (max-width: 440px) {
+  .container-header__username {
+    max-width: 85px;
+  }
+}
+
+@media only screen and (max-width: 420px) {
+  .container-header__username {
+    max-width: 75px;
+  }
+}
+
+@media only screen and (max-width: 405px) {
+  .container-header__username {
+    max-width: 70px;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .container-header__username {
+    max-width: 63px;
+  }
+}
+
+@media only screen and (max-width: 390px) {
+  .container-header__username {
+    max-width: 60px;
+  }
+
+  .header {
+    padding-left: 17px;
+    padding-right: 17px;
+  }
+}
+
+@media only screen and (max-width: 380px) {
+  .container-header__username {
+    max-width: 57px;
+  }
+
+  .header {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+@media only screen and (max-width: 370px) {
+  .container-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 4px;
+  }
+
+  .container-header__username {
+    max-width: 55px;
+  }
+}
+
+@media only screen and (min-width: 551px) {
+  .mobile-mode {
+    display: none !important;
+  }
+}
+

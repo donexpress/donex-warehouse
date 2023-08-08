@@ -1,0 +1,33 @@
+import { StaticImageData } from "next/image";
+
+export type Languages = 'es' | 'en';
+
+export type LanguageObj = {
+  code: string;
+  name: string;
+  flag: StaticImageData | string;
+}
+
+export type UserProfile = {
+  id: number;
+  username: string;
+  fullname: string;
+  profile_image: string;
+  phone_number: string;
+  email: string;
+};
+
+export type MessageOpts = {
+  type?: TypeOptions;
+  position?: TypePositions;
+  autoClose?: number;
+  hideProgressBar?: boolean;
+  closeOnClick?: boolean;
+  pauseOnHover?: boolean;
+  draggable?: boolean;
+  theme?: TypeThemes;
+};
+
+export type TypeOptions = "success" | "error" | "info" | "warning";
+export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
+export type TypeThemes = "light" | "dark";

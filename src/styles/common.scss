@@ -1,0 +1,39 @@
+.selected-language {
+    margin-top: 0 !important;
+
+    #mui-component-select-language {
+        padding: 0 24px 0 0 !important;
+        color: white !important;
+
+        img {
+            display: inline-block !important;
+            margin-bottom: 4px;
+        }
+    }
+
+    .MuiSelect-icon {
+        color: white !important;
+    }
+}
+
+.MuiInput-underline {
+    border-bottom: none !important;
+
+    &::before {
+        border-bottom: none !important;
+    }
+
+    &:hover {
+        border-bottom: none !important;
+    }
+
+    &::after {
+        border-bottom: none !important;
+    }
+}
+
+@media only screen and (min-width: 641px) {
+    .cmp-inside-layout {
+        margin-left: 250px !important;
+    }
+}
