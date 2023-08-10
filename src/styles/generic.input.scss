@@ -1,4 +1,4 @@
-.genericInput {
+.generic-input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -6,7 +6,7 @@
     width: 100%;
 }
   
-.inputError {
+.input-error {
     border-color: #ff0000;
 }
   
@@ -19,13 +19,35 @@ input[type="daterange"] {
     width: 100%;
 }
   
-.inputContainer {
-    margin-bottom: 10px;
+.input-container {
+    position: relative;
 }
   
-.errorText {
+.error-text {
     color: #ff0000;
-    font-size: 14px;
-    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1;
+    padding: 4px 0 8px;
+}
+
+.input-with-left-icon {
+    padding-right: 50px;
+}
+
+.without-error {
+    height: 25px;
+}
+
+.container-eyes {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 42px;
+    width: 50px;
+}
+
+.eye-icon {
+    cursor: pointer;
+    height: 18px;
 }
   

@@ -1,4 +1,14 @@
 {
 	"localeFullName": "English",
-	"title": "Test"
+	"title": "Test",
+	"login": "Login",
+	"sending": "Sending ...",
+	"username": "Username",
+	"password": "Password",
+	"required": "Required field",
+	"initialLength": "Must be at least ",
+	"finalLength": " characters",
+	"wmsLoginNoteMain": "Note:",
+	"wmsLoginNoteSecondary": "You will log in with an employee account.",
+	"selectOption": "Select an option"
 }

@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.black-label {
+  color: #333;
+}
+
 .header {
   min-height: 60px;
   background: #175898;
@@ -38,6 +42,84 @@
 .footer {
   background: #00a9e7;
   width: 100vw;
+}
+
+.custom-background {
+  background-image: url('../src/assets/icons/background-login.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}
+
+.scrollable-hidden {
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+  ​ &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 0px; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+
+.elements-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.elements-start-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.elements-end-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.elements-center-start {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.elements-center-end {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.elements-row-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.elements-row-start {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.elements-row-end {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 @media only screen and (max-width: 650px) {

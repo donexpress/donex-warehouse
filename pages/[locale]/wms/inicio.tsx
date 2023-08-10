@@ -14,7 +14,7 @@ const Inicio = ({ profileData } : HomeProps) => {
   const intl = useIntl()
 
   const showMessage = () => {
-    showMsg('Aqui estoy');
+    showMsg('Mostrando mensaje');
   }
   
   return <Layout>
@@ -22,9 +22,12 @@ const Inicio = ({ profileData } : HomeProps) => {
     <title>Don Express Warehouse</title>
     <link rel="icon" href="/icon_favicon.png" />
   </Head>
-  <div>{ intl.formatMessage({ id: 'title' }) }</div>
-  <FormattedMessage id="title"/>
-  <div className="app" onClick={showMessage}>Testeando PRO <FaSearch /></div>
+  <div style={{ background: '#ffeeee' }}>
+    <span>Ejemplos de traducciones:</span>
+    <div>{ intl.formatMessage({ id: 'title' }) }</div>
+    <FormattedMessage id="title"/>
+  </div>
+  <div className="app" onClick={showMessage}>Dame click para mostrar mensaje <FaSearch /></div>
   <div className="app">{profileData.fullname}</div>
   <style jsx>{`
     .app {

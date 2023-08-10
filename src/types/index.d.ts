@@ -28,6 +28,12 @@ export type MessageOpts = {
   theme?: TypeThemes;
 };
 
+export type LoginProps = {
+  inWMS: boolean;
+  inOMS: boolean;
+};
+
 export type TypeOptions = "success" | "error" | "info" | "warning";
 export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
 export type TypeThemes = "light" | "dark";
+export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search';

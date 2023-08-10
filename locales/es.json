@@ -1,4 +1,14 @@
 {
 	"localeFullName": "Español",
-	"title": "Prueba"
+	"title": "Prueba",
+	"login": "Iniciar sesión",
+	"sending": "Enviando ...",
+	"username": "Nombre de usuario",
+	"password": "Contraseña",
+	"required": "Campo obligatorio",
+	"initialLength": "Debe tener al menos ",
+	"finalLength": " caracteres",
+	"wmsLoginNoteMain": "Nota:",
+	"wmsLoginNoteSecondary": "Iniciarás sesión con una cuenta de empleado.",
+	"selectOption": "Selecciona una opción"
 }
