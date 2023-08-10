@@ -3,7 +3,6 @@ import '../../../styles/login.scss';
 import Image from 'next/image';
 import uCorreosLogo from '../../../assets/icons/uCorreosLogo.jpg';
 import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import GenericInput from './GenericInput';
 import { useIntl } from 'react-intl';
 import { LoginProps } from '../../../types';
