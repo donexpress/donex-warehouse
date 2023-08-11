@@ -8,7 +8,7 @@ const generateValidationSchema = (intl: IntlShape) => {
       .min(2, intl.formatMessage({ id: 'initialLength' }) + '2' + intl.formatMessage({ id: 'finalLength' }))
       .required(intl.formatMessage({ id: 'required' })),
     password: Yup.string()
-      .min(6, intl.formatMessage({ id: 'initialLength' }) + '6' + intl.formatMessage({ id: 'finalLength' }))
+      .min(2, intl.formatMessage({ id: 'initialLength' }) + '2' + intl.formatMessage({ id: 'finalLength' }))
       .required(intl.formatMessage({ id: 'required' })),
   });
 };

@@ -1,6 +1,6 @@
 {
 	"localeFullName": "Español",
-	"title": "Prueba",
+	"exitApp": "Salir",
 	"login": "Iniciar sesión",
 	"sending": "Enviando ...",
 	"username": "Nombre de usuario",
@@ -10,5 +10,8 @@
 	"finalLength": " caracteres",
 	"wmsLoginNoteMain": "Nota:",
 	"wmsLoginNoteSecondary": "Iniciarás sesión con una cuenta de empleado.",
-	"selectOption": "Selecciona una opción"
+	"selectOption": "Selecciona una opción",
+	"successLoginMsg": "¡Bienvenido! Has iniciado sesión correctamente",
+	"unknownStatusErrorMsg": "Ha ocurrido un error al intentar ejecutar la acción, por favor, intente de nuevo",
+	"dontExistUserPasswordMsg": "Usuario o contraseña incorrecta, por favor, intente de nuevo"
 }

@@ -1,6 +1,6 @@
 {
 	"localeFullName": "English",
-	"title": "Test",
+	"exitApp": "Exit",
 	"login": "Login",
 	"sending": "Sending ...",
 	"username": "Username",
@@ -10,5 +10,8 @@
 	"finalLength": " characters",
 	"wmsLoginNoteMain": "Note:",
 	"wmsLoginNoteSecondary": "You will log in with an employee account.",
-	"selectOption": "Select an option"
+	"selectOption": "Select an option",
+	"successLoginMsg": "Welcome! You have successfully logged in",
+	"unknownStatusErrorMsg":"An error occurred while trying to execute the action, please try again",
+	"dontExistUserPasswordMsg": "User or password incorrect, please try again"
 }

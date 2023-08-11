@@ -5,22 +5,46 @@ import uCorreosLogo from '../../../assets/icons/uCorreosLogo.jpg';
 import { Formik, Form } from 'formik';
 import GenericInput from './GenericInput';
 import { useIntl } from 'react-intl';
-import { LoginProps } from '../../../types';
+import { LoginProps, LoginBody, LoginResponse } from '../../../types';
 import '../../../styles/common.scss';
 import SelectLanguage from './SelectLanguage';
 import generateValidationSchema from '../../../validation/generateValidationSchema';
-
+import { login } from '../../../services/api.users';
+import { setCookie } from '../../../helpers/cookieUtils';
+import { showMsg } from '../../../helpers';
+import { useRouter } from 'next/router'
 
 const LoginBody = ({ inWMS, inOMS }: LoginProps) => {
+    const router = useRouter();
     const intl = useIntl()
 
-    const initialValues = {
+    const initialValues: LoginBody = {
       username: '',
       password: '',
     };
   
-    const handleSubmit = (values: any) => {
-      console.log(values);
+    const handleSubmit = async (values: LoginBody) => {
+      const response: LoginResponse = await login(values);
+      const { locale } = router.query;
+      if (response.status >= 200 && response.status <= 299 && response.token !== undefined) {
+        showMsg(intl.formatMessage({ id: 'successLoginMsg' }), { type: "success" });
+        
+        if (inWMS) {
+          setCookie('tokenWMS', response.token);
+          setCookie('profileWMS', JSON.stringify({username: values.username}));
+          router.push(`/${locale}/wms`);
+        } else {
+          setCookie('tokenOMS', response.token);
+          setCookie('profileOMS', JSON.stringify({username: values.username}));
+          router.push(`/${locale}/oms`);
+        }
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        if (response.status === 401) {
+          message = intl.formatMessage({ id: 'dontExistUserPasswordMsg' });
+        }
+        showMsg(message, { type: "error" });
+      }
     };
 
     return (

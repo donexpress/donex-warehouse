@@ -9,12 +9,12 @@ export type LanguageObj = {
 }
 
 export type UserProfile = {
-  id: number;
+  id?: number;
   username: string;
-  fullname: string;
-  profile_image: string;
-  phone_number: string;
-  email: string;
+  fullname?: string;
+  profile_image?: string;
+  phone_number?: string;
+  email?: string;
 };
 
 export type MessageOpts = {
@@ -31,6 +31,16 @@ export type MessageOpts = {
 export type LoginProps = {
   inWMS: boolean;
   inOMS: boolean;
+};
+
+export type LoginBody = {
+  username: string;
+  password: string;
+};
+
+export type LoginResponse = {
+  status: number;
+  token?: string;
 };
 
 export type TypeOptions = "success" | "error" | "info" | "warning";

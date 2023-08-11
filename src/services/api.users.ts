@@ -1,6 +1,28 @@
 import axios from 'axios';
-import { getProfilePath } from '../backend';
-import { UserProfile } from '../types/index';
+import { 
+  getProfilePath,
+  loginPath
+ } from '../backend';
+import { LoginBody, LoginResponse, UserProfile } from '../types/index';
+
+export const login = async (values: LoginBody): Promise<LoginResponse> => {
+  const path = loginPath();
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    const response = await axios.post(path, values, config);
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {...response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
 
 export const indexProfile = async (): Promise<UserProfile | null> => {
   const path = getProfilePath();

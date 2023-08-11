@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router'
 import Image from 'next/image';
 import MenuIcon from '@material-ui/icons/Menu';
 import { MenuItem, IconButton, Popover, } from "@material-ui/core";
@@ -6,13 +7,21 @@ import logoUCorreos from '../../../assets/icons/logo-ucorreos.png';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SelectLanguage from './SelectLanguage';
+import { removeAllCookies, getCookie } from '../../../helpers/cookieUtils';
+import { UserProfile } from '../../../types';
+import { useIntl } from 'react-intl';
+import { isOMS, isWMS} from '../../../helpers';
 
 interface HeaderProps {
     onToggleSidebar: () => void;
 }
 
 const Header = ({ onToggleSidebar }: HeaderProps) => {
+    const intl = useIntl()
+    const router = useRouter();
+    const { locale } = router.query;
     const [anchorEl, setAnchorEl] = useState(null);
+    const [profile, setProfile] = useState<UserProfile>({username: ''})
   
     const handleMenuOpen = (event: any) => {
       setAnchorEl(event.currentTarget);
@@ -21,8 +30,31 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
     const handleMenuClose = () => {
       setAnchorEl(null);
     };
+  
+    const exitApp = () => {
+      setAnchorEl(null);
+      removeAllCookies();
+
+      if (isWMS()) {
+        router.push(`/${locale}/wms/login`);
+      } else {
+        router.push(`/${locale}/oms/login`);
+      }
+    };
 
     useEffect(() => {
+      if (isWMS()) {
+        const data = getCookie('profileWMS');
+        if (data !== undefined) {
+          setProfile(data);
+        }
+      } 
+      if (isOMS() !== undefined) {
+        const data = getCookie('profileOMS');
+        if (data) {
+          setProfile(data);
+        }
+      }
 
     }, []);
     
@@ -48,7 +80,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
                     <IconButton color="inherit" style={{ padding: '0px 5px 0px 0px', marginBottom: '2px', height: '26px', width: '26px'}}>
                       <AccountCircleIcon style={{ height: '24px', width: '24px' }} />
                     </IconButton>
-                    <span className='container-header__username'>Nombre de Usuario</span>
+                    <span className='container-header__username'>{profile.username}</span>
                   </div>
 
                   <Popover
@@ -69,9 +101,9 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
                       },
                     }}
                   >
-                    <MenuItem onClick={handleMenuClose}>
+                    <MenuItem onClick={exitApp}>
                       <ExitToAppIcon style={{ marginRight: '8px' }} />
-                      Salir
+                      { intl.formatMessage({ id: 'exitApp' }) }
                     </MenuItem>
                   </Popover>
                 </div>

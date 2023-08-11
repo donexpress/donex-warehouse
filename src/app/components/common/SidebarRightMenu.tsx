@@ -5,14 +5,17 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import Collapse from '@material-ui/core/Collapse';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
-import 'styles/sidebar.scss'
+import 'styles/sidebar.scss';
 
 interface SidebarProps {
   isOpen: boolean;
   isDesktop: boolean;
   onClose: () => void;
+  inOms: boolean;
+  inWms: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -40,19 +43,19 @@ const useStyles = makeStyles((theme: Theme) =>
     toolbar: theme.mixins.toolbar,
     '@global': {
       '*::-webkit-scrollbar': {
-        width: '0.4em', // Ajusta el ancho de la barra de desplazamiento
+        width: '0.4em',
       },
       '*::-webkit-scrollbar-track': {
-        background: 'transparent', // Cambia este color si deseas que la barra sea visible
+        background: 'transparent',
       },
       '*::-webkit-scrollbar-thumb': {
-        background: 'transparent', // Cambia este color si deseas que la barra sea visible
+        background: 'transparent',
       },
     },
   }),
 );
 
-const SidebarRightMenu = ({ isOpen, isDesktop, onClose }: SidebarProps) => {
+const SidebarRightMenu = ({ isOpen, isDesktop, onClose, inOms, inWms }: SidebarProps) => {
   const classes = useStyles();
 
   return (
@@ -71,14 +74,47 @@ const SidebarRightMenu = ({ isOpen, isDesktop, onClose }: SidebarProps) => {
           }
       }}
     >
+      {inWms && (
       <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon className={classes.iconStyle} /> : <MailIcon className={classes.iconStyle} />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
+        <ListItem button>
+          <ListItemIcon><InboxIcon className={classes.iconStyle} /></ListItemIcon>
+          <ListItemText primary="Inbox" />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><MailIcon className={classes.iconStyle} /></ListItemIcon>
+          <ListItemText primary="Starred" />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><InboxIcon className={classes.iconStyle} /></ListItemIcon>
+          <ListItemText primary="Send email" />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><MailIcon className={classes.iconStyle} /></ListItemIcon>
+          <ListItemText primary="Drafts" />
+        </ListItem>
       </List>
+      )}
+
+      {inOms && (
+      <List>
+        <ListItem button>
+          <ListItemIcon><InboxIcon className={classes.iconStyle} /></ListItemIcon>
+          <ListItemText primary="InboxOms" />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><MailIcon className={classes.iconStyle} /></ListItemIcon>
+          <ListItemText primary="StarredOms" />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><InboxIcon className={classes.iconStyle} /></ListItemIcon>
+          <ListItemText primary="Send emailOms" />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><MailIcon className={classes.iconStyle} /></ListItemIcon>
+          <ListItemText primary="DraftsOms" />
+        </ListItem>
+      </List>
+      )}
     </Drawer>
   );
 };
