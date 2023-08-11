@@ -32,6 +32,10 @@
     }
 }
 
+.body-background {
+    background: #f6f6f6;
+    height: calc(100vh - 118px);
+}
 @media only screen and (min-width: 641px) {
     .cmp-inside-layout {
         margin-left: 250px !important;

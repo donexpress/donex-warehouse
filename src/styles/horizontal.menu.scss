@@ -1,0 +1,136 @@
+.menu {
+    padding: 2px 0 0;
+    width: 100%;
+    max-width: calc(100vw - 475px);
+    scrollbar-width: none;
+    overflow: inherit;
+  
+    ul {
+        list-style: none;
+        margin-top: 0;
+        margin-botton: 0;
+        padding-left: 0;
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+  
+      li {
+        //flex: auto;
+        position: relative;
+  
+        div {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 2px 20px;
+            cursor: pointer;
+            position: relative;
+  
+            &:hover {
+              color: #ccc;
+            }
+        }
+  
+        ul {
+            padding-left: 0px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            align-items: flex-start;
+            list-style: none;
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 160px;
+            z-index: 100;
+  
+          li {
+            background-color: #f6f6f6;
+            cursor: pointer;
+
+            a {
+                display: block;
+                line-height: 1.1;
+                padding: 12px 10px;
+                font-size: 15px;
+                text-decoration: none;
+                text-align: left;
+                color: #999;
+                font-weight: bolder;
+                border-left: solid 2px transparent;
+  
+              &:hover {
+                color: #fff;
+                background-color: #444;
+                border-left: solid 2px #00a9e7;
+              }
+            }
+
+            div {
+                cursor: pointer;
+                position: relative;
+                line-height: 1.1;
+                padding: 12px 10px;
+                font-size: 15px;
+                text-align: left;
+                color: #999;
+                font-weight: bolder;
+                border-left: solid 2px transparent;
+      
+                &:hover {
+                    color: #fff;
+                    background-color: #444;
+                    border-left: solid 2px #00a9e7;
+                }
+            }
+
+            ul {
+                padding-left: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                align-items: flex-start;
+                list-style: none;
+                display: none;
+                position: absolute;
+                top: 0;
+                left: 100%;
+                min-width: 160px;
+                z-index: 100;
+      
+              li {
+                background-color: #f6f6f6;
+                cursor: pointer;
+    
+                a {
+                    display: block;
+                    line-height: 1.1;
+                    padding: 12px 10px;
+                    font-size: 15px;
+                    text-decoration: none;
+                    text-align: left;
+                    color: #999;
+                    font-weight: bolder;
+                    background: #f6f6f6;
+      
+                  &:hover {
+                    color: #fff;
+                    background-color: #555;
+                  }
+                }
+            }
+  
+            &:hover > ul {
+                display: block;
+            }
+        }
+
+
+          }
+        }
+  
+        &:hover > ul {
+            display: block;
+        }
+      }
+    }
+  }

@@ -44,18 +44,20 @@ export const isWMS = (context?: any): boolean => {
   if (context) {
     const pathname = context.req.url;
     return pathname.includes('/wms');
-  } else {
+  } else if (typeof window !== 'undefined') {
     const pathname = window.location.pathname;
     return pathname.includes('/wms');
   }
+  return false;
 };
 
 export const isOMS = (context?: any): boolean => {
   if (context) {
     const pathname = context.req.url;
     return pathname.includes('/oms');
-  } else {
+  } else if (typeof window !== 'undefined') {
     const pathname = window.location.pathname;
     return pathname.includes('/oms');
   }
+  return false;
 };

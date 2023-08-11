@@ -7,7 +7,7 @@ export default function Home() {
   useEffect(() => {
     // Redirigir a la página de inicio de inglés por defecto
     const timer = setTimeout(() => {
-      router.push('/en/oms');
+      router.push('/es/oms');
     }, 1000);
 
     // Limpiar el temporizador cuando el componente se desmonte

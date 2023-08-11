@@ -1,11 +1,11 @@
 import React from 'react';
 import '../../../styles/login.scss';
 import Image from 'next/image';
-import uCorreosLogo from '../../../assets/icons/uCorreosLogo.jpg';
+import uCorreosLogo from '../../../assets/icons/uCorreosLogo2.jpg';
 import { Formik, Form } from 'formik';
 import GenericInput from './GenericInput';
 import { useIntl } from 'react-intl';
-import { LoginProps, LoginBody, LoginResponse } from '../../../types';
+import { AppProps, LoginBody, LoginResponse } from '../../../types';
 import '../../../styles/common.scss';
 import SelectLanguage from './SelectLanguage';
 import generateValidationSchema from '../../../validation/generateValidationSchema';
@@ -14,7 +14,7 @@ import { setCookie } from '../../../helpers/cookieUtils';
 import { showMsg } from '../../../helpers';
 import { useRouter } from 'next/router'
 
-const LoginBody = ({ inWMS, inOMS }: LoginProps) => {
+const LoginBody = ({ inWMS, inOMS }: AppProps) => {
     const router = useRouter();
     const intl = useIntl()
 
@@ -54,13 +54,13 @@ const LoginBody = ({ inWMS, inOMS }: LoginProps) => {
             </div>
             <div className='login-body__container'>
                 <div className='elements-center'>
-                  <Image
+                  {/* <Image
                     src={uCorreosLogo}
                     alt=''
                     className='login-body__logo'
-                  />
+                  /> */}
                   <div className='black-label login-body__enterprise-name'>
-                    Don Express Warehouse
+                    Don Express Warehouse {inWMS && "WMS"}{inOMS && "OMS"}
                   </div>
                 </div>
                 {

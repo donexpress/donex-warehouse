@@ -15,12 +15,9 @@
 
 .container-header {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 140px 1fr 260px;
   column-gap: 10px;
 
-  &__container-logo {
-    padding-left: 25px;
-  }
   &__img {
     height: 27px;
   }
@@ -40,15 +37,16 @@
 }
 
 .footer {
-  background: #00a9e7;
+  background: #175898;
   width: 100vw;
 }
 
 .custom-background {
-  background-image: url('../src/assets/icons/background-login.jpg');
-  background-size: cover;
-  background-position: center;
+  //background-image: url('../src/assets/icons/background-login.jpg');
+  //background-size: cover;
+  //background-position: center;
   height: 100vh;
+  background: #175898;
 }
 
 .scrollable-hidden {

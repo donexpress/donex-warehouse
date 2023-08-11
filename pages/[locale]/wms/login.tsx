@@ -3,9 +3,9 @@ import '../../../styles/globals.scss';
 import LoginBody from '../../../src/app/components/common/LoginBody';
 import { GetServerSidePropsContext } from 'next';
 import { isWMS, isOMS } from '../../../src/helpers';
-import { LoginProps } from '../../../src/types';
+import { AppProps } from '../../../src/types';
 
-const Login = ({ inWMS, inOMS}: LoginProps) => {
+const Login = ({ inWMS, inOMS}: AppProps) => {
   
   return <div className='custom-background scrollable-hidden'>
         <Head>

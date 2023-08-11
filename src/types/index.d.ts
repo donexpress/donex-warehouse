@@ -1,4 +1,5 @@
 import { StaticImageData } from "next/image";
+import internal from "stream";
 
 export type Languages = 'es' | 'en';
 
@@ -28,7 +29,7 @@ export type MessageOpts = {
   theme?: TypeThemes;
 };
 
-export type LoginProps = {
+export type AppProps = {
   inWMS: boolean;
   inOMS: boolean;
 };
@@ -38,9 +39,42 @@ export type LoginBody = {
   password: string;
 };
 
+export type StaffForm = {
+  fullname: string;
+  username: string;
+  label_code: string;
+  password: string;
+  payment_method: number;
+  state: number;
+  contact_person: string;
+  company: string;
+  email: string;
+  phone_number_mobile: string;
+  phone_number: string;
+  qq: string;
+  user_level: number;
+  credits: string;
+  financial: number;
+  service_client: number;
+  sales: number;
+  source_sales: number;
+  subsidiary: number;
+  reception_area: number;
+  site: number;
+  instructions: string;
+  actions: number[];
+};
+
 export type LoginResponse = {
   status: number;
   token?: string;
+};
+
+export type MenuOption = {
+  label: string;
+  items?: MenuOption[];
+  action?: number;
+  route?: string;
 };
 
 export type TypeOptions = "success" | "error" | "info" | "warning";

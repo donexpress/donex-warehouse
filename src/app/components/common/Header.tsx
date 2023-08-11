@@ -11,12 +11,10 @@ import { removeAllCookies, getCookie } from '../../../helpers/cookieUtils';
 import { UserProfile } from '../../../types';
 import { useIntl } from 'react-intl';
 import { isOMS, isWMS} from '../../../helpers';
+import HorizontalMenu from './HorizontalMenu';
+import '../../../styles/horizontal.menu.scss';
 
-interface HeaderProps {
-    onToggleSidebar: () => void;
-}
-
-const Header = ({ onToggleSidebar }: HeaderProps) => {
+const Header = () => {
     const intl = useIntl()
     const router = useRouter();
     const { locale } = router.query;
@@ -62,16 +60,14 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
         <header className="bg-gray-800 text-white py-4 header">
           <div className="container-header">
             <div className='flex flex-row justify-start'>
-                <button onClick={onToggleSidebar}>
-                  <MenuIcon />
-                </button>
-                <div className='container-header__container-logo'>
-                  <Image
-                    src={logoUCorreos}
-                    alt=''
-                    className='container-header__img'
-                  />
-                </div>
+                <Image
+                  src={logoUCorreos}
+                  alt=''
+                  className='container-header__img'
+                />
+            </div>
+            <div>
+              <HorizontalMenu inOMS={isOMS()}  inWMS={isWMS()} />
             </div>
             <div className='flex justify-end items-center'>
                 <SelectLanguage/>

@@ -13,7 +13,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const { locale } = router.query;
   const { asPath } = router;
-  const [language, setLanguage] = useState<string | undefined>('en');
+  const [language, setLanguage] = useState<string | undefined>('es');
 
   useEffect(() => {
     if (locale !== undefined) {
@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   
       // Si el idioma no está en la URL, redirecciona a la URL con el idioma
       if (!(isTypeOfLanguages(language))) {
-        router.push('/en/oms');
+        router.push('/es/oms');
       }
     }
   }, [locale]);

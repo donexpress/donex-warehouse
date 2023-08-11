@@ -9,8 +9,9 @@ import { useIntl } from 'react-intl';
 
 type GenericInputProps = {
   label?: string;
+  selectLabel?: string;
   type: TypeField;
-  options?: { value: string; label: string }[];
+  options?: { value: string | number; label: string }[];
   customClass?: string;
 } & InputHTMLAttributes<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -18,6 +19,7 @@ type GenericInputProps = {
 
 const GenericInput: React.FC<GenericInputProps> = ({
   label,
+  selectLabel,
   type,
   options,
   customClass,
@@ -47,7 +49,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
       {
         type === 'select' &&
         <select {...field} {...props} className={inputClassName}>
-          <option value="" label={intl.formatMessage({ id: 'selectOption' })} />
+          <option value="" label={ selectLabel ? selectLabel : intl.formatMessage({ id: 'selectOption' })} />
           {options &&
             options.map((option) => (
               <option key={option.value} value={option.value}>
