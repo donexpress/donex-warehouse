@@ -6,9 +6,9 @@ import { generateValidationSchemaUser } from '../../../validation/generateValida
 import { Formik, Form } from 'formik';
 import GenericInput from '../common/GenericInput';
 import { useIntl } from 'react-intl';
-import { StaffForm } from '../../../types';
+import { UserForm } from '../../../types';
 
-const StaffFormBody = () => {
+const UserFormBody = () => {
     const router = useRouter();
     const intl = useIntl();
     const paymentMethods = [
@@ -45,7 +45,7 @@ const StaffFormBody = () => {
         }
     ];
     
-    const initialValues: StaffForm = {
+    const initialValues: UserForm = {
         fullname: '',
         username: '',
         label_code: '',
@@ -71,13 +71,13 @@ const StaffFormBody = () => {
         actions: []
       };
   
-      const handleSubmit = async (values: StaffForm) => {
+      const handleSubmit = async (values: UserForm) => {
           
       };
     return (
         <div className='elements-start-center user-form scrollable-hidden'>
             <div className='user-form-body'>
-                <div className='user-form-body__title black-label'><b>Insertar personal</b></div>
+                <div className='user-form-body__title black-label'><b>Insertar usuario</b></div>
                 <div className='user-form-body__container'>
                 <Formik
                   initialValues={initialValues}
@@ -253,4 +253,4 @@ const StaffFormBody = () => {
     );
 };
   
-export default StaffFormBody;
+export default UserFormBody;

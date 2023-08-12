@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Layout from '../../../src/app/layout';
 import ProtectedRoute from '../../../src/app/components/common/ProtectedRoute';
-import StaffFormBody from '../../../src/app/components/wms/StaffFormBody';
+import UserFormBody from '../../../src/app/components/wms/UserFormBody';
 
 const InsertUser = () => {
   
@@ -12,7 +12,7 @@ const InsertUser = () => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StaffFormBody/>
+        <UserFormBody/>
       </Layout>
     </ProtectedRoute>
     );

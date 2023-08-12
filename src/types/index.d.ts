@@ -39,7 +39,7 @@ export type LoginBody = {
   password: string;
 };
 
-export type StaffForm = {
+export type UserForm = {
   fullname: string;
   username: string;
   label_code: string;
