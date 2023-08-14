@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import Layout from '../../../src/app/layout';
 import ProtectedRoute from '../../../src/app/components/common/ProtectedRoute';
+import UserLevelFormBody from '../../../src/app/components/wms/UserLevelFormBody';
 
-const Inicio = () => {
-  
+const InsertUserLevel = () => {
   return (
   <ProtectedRoute>
       <Layout>
@@ -11,10 +11,10 @@ const Inicio = () => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <div></div>
+        <UserLevelFormBody />
       </Layout>
     </ProtectedRoute>
     );
 };
 
-export default Inicio;
+export default InsertUserLevel;

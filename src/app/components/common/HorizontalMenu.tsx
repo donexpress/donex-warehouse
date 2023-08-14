@@ -62,11 +62,29 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                         },
                         {
                             label: intl.formatMessage({ id: 'userLevel' }),
-                            route: '#'
+                            items: [
+                                {
+                                    label: intl.formatMessage({ id: 'insertUserLevel' }),
+                                    route: RouteMenu.INSERT_USER_LEVEL
+                                },
+                                {
+                                    label: intl.formatMessage({ id: 'listUserLevels' }),
+                                    route: RouteMenu.LIST_USER_LEVELS
+                                }
+                            ]
                         },
                         {
                             label: intl.formatMessage({ id: 'paymentMethod' }),
-                            route: '#'
+                            items: [
+                                {
+                                    label: intl.formatMessage({ id: 'insertPaymentMethod' }),
+                                    route: RouteMenu.INSERT_PAYMENT_METHOD
+                                },
+                                {
+                                    label: intl.formatMessage({ id: 'listPaymentMethods' }),
+                                    route: RouteMenu.LIST_PAYMENT_METHODS
+                                }
+                            ]
                         }
                     ]
                 },
@@ -91,7 +109,16 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                         },
                         {
                             label: intl.formatMessage({ id: 'warehouseStation' }),
-                            route: '#'
+                            items: [
+                                {
+                                    label: intl.formatMessage({ id: 'insertCargoTerminal' }),
+                                    route: RouteMenu.INSERT_WAREHOUSE_CARGO_STATION
+                                },
+                                {
+                                    label: intl.formatMessage({ id: 'listCargoTerminal' }),
+                                    route: RouteMenu.LIST_WAREHOUSE_CARGO_STATION
+                                }
+                            ]
                         }
                     ]
                 },

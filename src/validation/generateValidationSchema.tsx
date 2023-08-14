@@ -48,4 +48,22 @@ export const generateValidationSchemaUser = (intl: IntlShape) => {
   });
 };
 
+export const generateValidationSchemaPaymentMethod = (intl: IntlShape) => {
+  return Yup.object({
+    code: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+    name: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+  });
+};
+
+export const generateValidationSchemaUserLevel = (intl: IntlShape) => {
+  return Yup.object({
+    name: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+    designated_service: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+  });
+};
+
 export default generateValidationSchema;
