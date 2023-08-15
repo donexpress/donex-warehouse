@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Layout from '../../../src/app/layout';
 import ProtectedRoute from '../../../src/app/components/common/ProtectedRoute';
-import PaymentMethodFormBody from '../../../src/app/components/wms/paymentMethodFormBody';
+import PaymentMethodFormBody from '../../../src/app/components/wms/PaymentMethodFormBody';
 
 const InsertPaymentMethod = () => {
   return (
