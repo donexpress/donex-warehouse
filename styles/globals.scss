@@ -21,11 +21,13 @@
   &__img {
     height: 27px;
   }
+
   &__menu-user {
     margin-left: 10px;
     cursor: pointer;
     position: relative;
   }
+
   &__username {
     display: inline-block;
     max-width: 140px;
@@ -51,8 +53,11 @@
 
 .scrollable-hidden {
   overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+
+  /* IE 10+ */
   ​ &::-webkit-scrollbar {
     width: 0;
     height: 0;
@@ -60,8 +65,10 @@
 }
 
 ::-webkit-scrollbar {
-  width: 0px; /* Remove scrollbar space */
-  background: transparent; /* Optional: just make scrollbar invisible */
+  width: 0px;
+  /* Remove scrollbar space */
+  background: transparent;
+  /* Optional: just make scrollbar invisible */
 }
 
 .elements-center {
@@ -118,6 +125,52 @@
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
+}
+
+.wrapper {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.confirmation_container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .confirmation_backdrop {
+    position: absolute;
+    background-color: #3333335d;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+  }
+
+  .confirmation_card {
+    z-index: 1000;
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    
+    .confirmation_card_header {
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    .confirmation_card_body {
+      font-size: 14px;
+    }
+
+    .confirmation_card_actions {
+      margin-top: 10px;
+      display: flex;
+    }
+  }
 }
 
 @media only screen and (max-width: 650px) {
@@ -204,4 +257,3 @@
     display: none !important;
   }
 }
-

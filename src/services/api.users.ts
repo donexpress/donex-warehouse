@@ -1,9 +1,14 @@
 import axios from 'axios';
 import { 
   getProfilePath,
-  loginPath
+  loginPath,
+  removeUserPath,
+  userPath,
+  userStatePath
  } from '../backend';
 import { LoginBody, LoginResponse, UserProfile } from '../types/index';
+import { User } from '../types/user';
+import { UserState } from '@/types/user_stateerege1992';
 
 export const login = async (values: LoginBody): Promise<LoginResponse> => {
   const path = loginPath();
@@ -42,3 +47,33 @@ export const indexProfile = async (): Promise<UserProfile | null> => {
     return null;
   }
 };
+
+export const getUsers = async(): Promise<User[]> => {
+  const response = await axios.get(userPath())
+  return response.data
+}
+
+export const getUserStates = async(): Promise<UserState[]> => {
+  const response = await axios.get(userStatePath())
+  return response.data
+}
+
+export const removeUser = async(id: number) => {
+  const response = await axios.delete(removeUserPath(id))
+  return response.data
+}
+
+export const createUser = async(data) => {
+  const response = await axios.post(userPath(), data)
+  return response.data
+}
+
+export const getUserById = async(id:number): Promise<User> => {
+  const response = await axios.get(removeUserPath(id))
+  return response.data
+}
+
+export const updateUser = async(id:number, data) => {
+  const response = await axios.put(removeUserPath(id), data)
+  return response.data
+}

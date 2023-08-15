@@ -15,7 +15,7 @@ const generateValidationSchema = (intl: IntlShape) => {
 
 export const generateValidationSchemaUser = (intl: IntlShape) => {
   return Yup.object({
-    fullname: Yup.string()
+    nickname: Yup.string()
       .min(2, intl.formatMessage({ id: 'initialLength' }) + '2' + intl.formatMessage({ id: 'finalLength' }))
       .required(intl.formatMessage({ id: 'required' })),
     username: Yup.string()
@@ -27,7 +27,7 @@ export const generateValidationSchemaUser = (intl: IntlShape) => {
     password: Yup.string()
       .min(2, intl.formatMessage({ id: 'initialLength' }) + '2' + intl.formatMessage({ id: 'finalLength' }))
       .required(intl.formatMessage({ id: 'required' })),
-    contact_person: Yup.string()
+    contact: Yup.string()
       .min(2, intl.formatMessage({ id: 'initialLength' }) + '2' + intl.formatMessage({ id: 'finalLength' }))
       .required(intl.formatMessage({ id: 'required' })),
     payment_method: Yup.string()
@@ -41,7 +41,7 @@ export const generateValidationSchemaUser = (intl: IntlShape) => {
       .typeError('Debe ser un valor numérico')
       .test('longitud', 'Debe tener 10 caracteres', val => Number(val).toString().length === 10)
       .required(intl.formatMessage({ id: 'required' })),
-    phone_number: Yup.number()
+    phone: Yup.number()
       .typeError('Debe ser un valor numérico')
       .test('longitud', 'Debe tener 10 caracteres', val => Number(val).toString().length === 10)
       .required(intl.formatMessage({ id: 'required' })),
