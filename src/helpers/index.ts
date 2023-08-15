@@ -1,5 +1,7 @@
 import { toast } from 'react-toastify';
 import { MessageOpts, TypeOptions } from '../types';
+import { getCookie } from './cookieUtils';
+import { AxiosRequestConfig, RawAxiosRequestHeaders, AxiosHeaders } from 'axios';
 
 const baseMessageOpts: Pick<MessageOpts, 'type' | 'position' | 'autoClose' | 'hideProgressBar' | 'closeOnClick' | 'pauseOnHover' | 'draggable' | 'theme'> = {
   type: 'success',
@@ -61,3 +63,30 @@ export const isOMS = (context?: any): boolean => {
   }
   return false;
 };
+
+export const getHeaders = (context?: any) => {
+  let configs: AxiosRequestConfig = {
+    headers: {
+    'Content-Type': 'application/json',
+  }};
+  const tokenWMS = getCookie('tokenWMS');
+  const tokenOMS = getCookie('tokenOMS');
+  if (isWMS(context) && (tokenWMS !== undefined)) {
+    configs = {
+      headers: {
+        ...configs.headers,
+        Authorization: `Bearer ${tokenWMS}`,
+      }
+    }
+  }
+  if (isOMS(context) && (tokenOMS !== undefined)) {
+    configs = {
+      headers: {
+        ...configs.headers,
+        Authorization: `Bearer ${tokenOMS}`,
+      }
+    }
+  }
+
+  return configs;
+}

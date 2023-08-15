@@ -1,9 +1,10 @@
 import Head from 'next/head';
 import Layout from '../../../src/app/layout';
 import ProtectedRoute from '../../../src/app/components/common/ProtectedRoute';
+import { CargoStationWarehouseProps } from '../../../src/types';
+import { indexStateWarehouse } from '../../../src/services/api.warehouse';
 
-const InicioWMS = () => {
-  
+const WarehouseCargoStation = ({ states }: CargoStationWarehouseProps) => {
   return (
   <ProtectedRoute>
       <Layout>
@@ -17,4 +18,14 @@ const InicioWMS = () => {
     );
 };
 
-export default InicioWMS;
+export async function getServerSideProps() {
+  const states = await indexStateWarehouse();
+
+  return {
+    props: {
+      states
+    }
+  }
+}
+
+export default WarehouseCargoStation;

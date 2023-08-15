@@ -9,9 +9,11 @@
         border-radius: 5px;
         max-width: 90vw;
         box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 10;
     }
     &__logo {
-        max-height: 110px;
+        max-height: 80px;
         max-width: 80%;
         width: auto;
     }
@@ -27,18 +29,40 @@
         position: absolute;
         top: 10px;
         right: 0;
+        z-index: 100;
+    }
+    &__background {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #f6f6f6;
+    }
+    &__stuffed {
+        height: 100%;
+        position: relative;
+    }
+    &__low-background {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: #ffcdc8;
     }
 }
 
 .login-button {
     outline: none;
-    border-radius: 5px;
+    border-radius: 19px;
     font-size: 15px;
     text-transform: uppercase;
     font-weight: 600;
     text-align: center;
     padding: 8px;
-    background: linear-gradient(to right, #175898, #00a9e7);
+    background: linear-gradient(to right,#ff7811,#f3412f);
     width: 100%;
     margin-top: 10px;
     color: white;

@@ -65,9 +65,74 @@ export type UserForm = {
   actions: number[];
 };
 
+export type CargoStationWarehouseForm = {
+  name: string;
+  english_name: string;
+  receiving_area: string;
+  principal: string;
+  contact_phone: string;
+  stateId: number;
+  address: string;
+  city: string;
+  province: string;
+  country: string;
+  cp: string;
+  shared_warehouse_system_code: string;
+  shared_warehouse_docking_code: string;
+  customer_order_number_rules: string;
+};
+
+export type PaymentMethodForm = {
+  code: string;
+  name: string;
+};
+
+export type UserLevelForm = {
+  name: string;
+  designated_service: number;
+  instructions: string;
+};
+
+export type StateWarehouse = {
+  id: number;
+  name: string;
+}
+
+export type CargoStationWarehouseProps = {
+  states: StateWarehouse[];
+  countries: Country[];
+};
+
+export type ValueSelect = { 
+  value: string | number; 
+  label: string 
+};
+
 export type LoginResponse = {
   status: number;
   token?: string;
+};
+
+export type Country = {
+  name: string;
+  native: string;
+  phone: string;
+  continent: string;
+  capital: string;
+  currency: string;
+  languages: string[];
+  emoji: string;
+  emojiU: string;
+};
+
+export type CargoStationWarehouseResponse = {
+  status: number;
+  warehouse?: CargoStationWarehouseForm;
+};
+
+export type Response = {
+  status: number;
+  data?: any;
 };
 
 export type MenuOption = {

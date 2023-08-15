@@ -2,12 +2,15 @@ import axios from 'axios';
 import { 
   getProfilePath,
   loginPath,
+  paymentMethodPath,
   removeUserPath,
+  userLevelPath,
   userPath,
   userStatePath
  } from '../backend';
-import { LoginBody, LoginResponse, UserProfile } from '../types/index';
-import { User } from '../types/user';
+import { LoginBody, LoginResponse, UserProfile, UserLevelForm, PaymentMethodForm, Response } from '../types/index';
+import { getHeaders } from '../helpers';
+import { User } from '@/types/usererege1992';
 import { UserState } from '@/types/user_stateerege1992';
 
 export const login = async (values: LoginBody): Promise<LoginResponse> => {
@@ -19,6 +22,34 @@ export const login = async (values: LoginBody): Promise<LoginResponse> => {
       },
     };
     const response = await axios.post(path, values, config);
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {...response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const createPaymentMethod = async (values: PaymentMethodForm): Promise<Response> => {
+  const path = paymentMethodPath();
+  try {
+    const response = await axios.post(path, values, getHeaders());
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {...response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const createUserLevel = async (values: UserLevelForm): Promise<Response> => {
+  const path = userLevelPath();
+  try {
+    const response = await axios.post(path, values, getHeaders());
     
     if (response.status && (response.status >= 200 && response.status <= 299)) {
       return {...response.data, status: response.status};
@@ -63,7 +94,7 @@ export const removeUser = async(id: number) => {
   return response.data
 }
 
-export const createUser = async(data) => {
+export const createUser = async(data: any) => {
   const response = await axios.post(userPath(), data)
   return response.data
 }
@@ -73,7 +104,7 @@ export const getUserById = async(id:number): Promise<User> => {
   return response.data
 }
 
-export const updateUser = async(id:number, data) => {
+export const updateUser = async(id:number, data: any) => {
   const response = await axios.put(removeUserPath(id), data)
   return response.data
 }

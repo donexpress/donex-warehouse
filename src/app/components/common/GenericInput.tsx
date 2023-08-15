@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { TypeField } from '../../../types';
 import dontShowPasswordIcon from '../../../assets/icons/dont_see_passwd.svg';
 import showPasswordIcon from '../../../assets/icons/see_passwd.svg';
+import passwordIcon from '../../../assets/icons/login/password.svg';
+import userIcon from '../../../assets/icons/login/user.svg';
 import { useIntl } from 'react-intl';
 
 type GenericInputProps = {
@@ -13,6 +15,9 @@ type GenericInputProps = {
   type: TypeField;
   options?: { value: string | number; label: string }[];
   customClass?: string;
+  hasRepresentativeIcon?: boolean;
+  isUserField?: boolean;
+  isPasswordField?: boolean;
 } & InputHTMLAttributes<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 >;
@@ -23,6 +28,9 @@ const GenericInput: React.FC<GenericInputProps> = ({
   type,
   options,
   customClass,
+  hasRepresentativeIcon,
+  isUserField,
+  isPasswordField,
   ...props
 }) => {
   // @ts-ignore
@@ -30,7 +38,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const intl = useIntl()
 
-  const inputClassName = `generic-input${type === 'password' ? ' input-with-left-icon' : ''} ${customClass} ${
+  const inputClassName = `generic-input${type === 'password' ? ' input-with-right-icon' : ''}${hasRepresentativeIcon ? ' input-with-left-icon' : ''} ${customClass} ${
     meta.touched && meta.error ? 'input-error' : ''
   }`;
 
@@ -65,6 +73,28 @@ const GenericInput: React.FC<GenericInputProps> = ({
       {
         type !== 'select' && type !== 'textarea' && 
         <input {...field} {...props} type={getTypeField(type)} className={inputClassName} />
+      }
+      {
+        hasRepresentativeIcon && (
+          <div className='container-icon-left elements-center'>
+            {
+              isUserField && 
+              <Image
+                src={userIcon}
+                alt=''
+                className='icon-left'
+              />
+            }
+            {
+              isPasswordField && 
+              <Image
+                src={passwordIcon}
+                alt=''
+                className='icon-left'
+              />
+            }
+          </div>
+        )
       }
       {
         type === 'password' && (

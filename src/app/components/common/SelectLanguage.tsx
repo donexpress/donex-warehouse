@@ -8,11 +8,16 @@ import enFlag from '../../../assets/flags/en.png';
 import esFlag from '../../../assets/flags/es.png';
 import defaultFlag from '../../../assets/flags/default.png';
 
-const SelectLanguage = () => {
+type LanguageProps = {
+  isFromLogin?: boolean;
+};
+
+const SelectLanguage = ({ isFromLogin }: LanguageProps) => {
     const router = useRouter();
     const [language, setLanguage] = useState<Languages>("" as Languages);
     const [languages, setLanguages] = useState<LanguageObj[]>([]);
     const { locale } = router.query;
+    
 
     useEffect(() => {
       if (locale !== undefined) {
@@ -74,7 +79,7 @@ const SelectLanguage = () => {
               },
               getContentAnchorEl: null,
             }}
-            className="selected-language"
+            className={ isFromLogin ? 'selected-language-login' : 'selected-language'}
           >
             {languages.length === 0 &&
               <MenuItem value="">

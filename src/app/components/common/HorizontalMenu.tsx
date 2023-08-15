@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import '../../../styles/horizontal.menu.scss';
 import { AppProps, MenuOption } from '../../../types';
 import { RouteMenu } from '../../../helpers/enums';
+import { FaAngleRight } from 'react-icons/fa';
 
 const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
     const intl = useIntl();
@@ -62,11 +63,29 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                         },
                         {
                             label: intl.formatMessage({ id: 'userLevel' }),
-                            route: '#'
+                            items: [
+                                {
+                                    label: intl.formatMessage({ id: 'insertUserLevel' }),
+                                    route: RouteMenu.INSERT_USER_LEVEL
+                                },
+                                {
+                                    label: intl.formatMessage({ id: 'listUserLevels' }),
+                                    route: RouteMenu.LIST_USER_LEVELS
+                                }
+                            ]
                         },
                         {
                             label: intl.formatMessage({ id: 'paymentMethod' }),
-                            route: '#'
+                            items: [
+                                {
+                                    label: intl.formatMessage({ id: 'insertPaymentMethod' }),
+                                    route: RouteMenu.INSERT_PAYMENT_METHOD
+                                },
+                                {
+                                    label: intl.formatMessage({ id: 'listPaymentMethods' }),
+                                    route: RouteMenu.LIST_PAYMENT_METHODS
+                                }
+                            ]
                         }
                     ]
                 },
@@ -91,7 +110,16 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                         },
                         {
                             label: intl.formatMessage({ id: 'warehouseStation' }),
-                            route: '#'
+                            items: [
+                                {
+                                    label: intl.formatMessage({ id: 'insertCargoTerminal' }),
+                                    route: RouteMenu.INSERT_WAREHOUSE_CARGO_STATION
+                                },
+                                {
+                                    label: intl.formatMessage({ id: 'listCargoTerminal' }),
+                                    route: RouteMenu.LIST_WAREHOUSE_CARGO_STATION
+                                }
+                            ]
                         }
                     ]
                 },
@@ -199,7 +227,14 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                                                 }
                                                 {
                                                     subOption.items && (subOption.items.length > 0) && (
-                                                        <div>{subOption.label}</div>
+                                                        <div className='sub-option'>
+                                                            <span>
+                                                                {subOption.label}
+                                                            </span>
+                                                            <span className='elements-center'>
+                                                                <FaAngleRight size={14} />
+                                                            </span>
+                                                        </div>
                                                     )
                                                 }
                                                 {

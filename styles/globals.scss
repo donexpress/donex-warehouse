@@ -8,7 +8,7 @@
 
 .header {
   min-height: 60px;
-  background: #175898;
+  background: linear-gradient(to right,#ff7811,#f3412f);
   padding-left: 25px;
   padding-right: 25px;
 }
@@ -18,8 +18,16 @@
   grid-template-columns: 140px 1fr 260px;
   column-gap: 10px;
 
+  &__image-content {
+    height: 44px;
+    width: 100%;
+  }
   &__img {
-    height: 27px;
+    height: 43px;
+    cursor: pointer;
+  }
+  &__icon {
+    height: 28px;
   }
 
   &__menu-user {
@@ -35,12 +43,22 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-bottom: 4px;
+    font-size: 15px;
   }
 }
 
+.section-right {
+  padding: 16px 0;
+}
+
+.section-left {
+  padding: 8px 0;
+}
+
 .footer {
-  background: #175898;
+  background: linear-gradient(to right,#ff7811,#f3412f);
   width: 100vw;
+  font-size: 15px;
 }
 
 .custom-background {
@@ -48,7 +66,7 @@
   //background-size: cover;
   //background-position: center;
   height: 100vh;
-  background: #175898;
+  background: white;
 }
 
 .scrollable-hidden {
@@ -171,6 +189,10 @@
       display: flex;
     }
   }
+}
+
+.general-gradient {
+  background: linear-gradient(to right,#ff7811,#f3412f);
 }
 
 @media only screen and (max-width: 650px) {

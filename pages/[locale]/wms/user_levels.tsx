@@ -2,8 +2,7 @@ import Head from 'next/head';
 import Layout from '../../../src/app/layout';
 import ProtectedRoute from '../../../src/app/components/common/ProtectedRoute';
 
-const InicioWMS = () => {
-  
+const UserLevels = () => {
   return (
   <ProtectedRoute>
       <Layout>
@@ -17,4 +16,4 @@ const InicioWMS = () => {
     );
 };
 
-export default InicioWMS;
+export default UserLevels;
