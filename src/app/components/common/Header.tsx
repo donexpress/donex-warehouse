@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
 import Image from 'next/image';
-import MenuIcon from '@material-ui/icons/Menu';
 import { MenuItem, IconButton, Popover, } from "@material-ui/core";
-import logoUCorreos from '../../../assets/icons/logo-ucorreos.png';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import logoDE from '../../../assets/icons/logo_desktop.svg';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SelectLanguage from './SelectLanguage';
 import { removeAllCookies, getCookie } from '../../../helpers/cookieUtils';
@@ -13,6 +11,7 @@ import { useIntl } from 'react-intl';
 import { isOMS, isWMS} from '../../../helpers';
 import HorizontalMenu from './HorizontalMenu';
 import '../../../styles/horizontal.menu.scss';
+import userIcon from '../../../assets/icons/user.svg';
 
 const Header = () => {
     const intl = useIntl()
@@ -39,6 +38,14 @@ const Header = () => {
         router.push(`/${locale}/oms/login`);
       }
     };
+  
+    const goHome = () => {
+      if (isWMS()) {
+        router.push(`/${locale}/wms`);
+      } else {
+        router.push(`/${locale}/oms`);
+      }
+    };
 
     useEffect(() => {
       if (isWMS()) {
@@ -57,25 +64,32 @@ const Header = () => {
     }, []);
     
     return (
-        <header className="bg-gray-800 text-white py-4 header">
+        <header className="bg-gray-800 text-white header">
           <div className="container-header">
-            <div className='flex flex-row justify-start'>
+            <div className='flex flex-row justify-start section-left'>
+              <div className='container-header__image-content'>
                 <Image
-                  src={logoUCorreos}
+                  src={logoDE}
                   alt=''
                   className='container-header__img'
+                  onClick={()=>{ goHome() }}
                 />
+              </div>
             </div>
             <div>
               <HorizontalMenu inOMS={isOMS()}  inWMS={isWMS()} />
             </div>
-            <div className='flex justify-end items-center'>
+            <div className='flex justify-end items-center section-right'>
                 <SelectLanguage/>
                 <div className='container-header__menu-user'>
                   <div onClick={handleMenuOpen} className='flex justify-start items-center'>
-                    <IconButton color="inherit" style={{ padding: '0px 5px 0px 0px', marginBottom: '2px', height: '26px', width: '26px'}}>
-                      <AccountCircleIcon style={{ height: '24px', width: '24px' }} />
-                    </IconButton>
+                    <div style={{ padding: '0px 6px 0px 0px', marginTop: '-4px'}}>
+                      <Image
+                        src={userIcon}
+                        alt=''
+                        className='container-header__icon'
+                      />
+                    </div>
                     <span className='container-header__username'>{profile.username}</span>
                   </div>
 

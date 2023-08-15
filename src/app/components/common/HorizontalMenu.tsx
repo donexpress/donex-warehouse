@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import '../../../styles/horizontal.menu.scss';
 import { AppProps, MenuOption } from '../../../types';
 import { RouteMenu } from '../../../helpers/enums';
+import { FaAngleRight } from 'react-icons/fa';
 
 const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
     const intl = useIntl();
@@ -226,7 +227,14 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                                                 }
                                                 {
                                                     subOption.items && (subOption.items.length > 0) && (
-                                                        <div>{subOption.label}</div>
+                                                        <div className='sub-option'>
+                                                            <span>
+                                                                {subOption.label}
+                                                            </span>
+                                                            <span className='elements-center'>
+                                                                <FaAngleRight size={14} />
+                                                            </span>
+                                                        </div>
                                                     )
                                                 }
                                                 {

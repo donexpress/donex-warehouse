@@ -31,8 +31,12 @@ input[type="daterange"] {
     padding: 4px 0 8px;
 }
 
-.input-with-left-icon {
+.input-with-right-icon {
     padding-right: 50px;
+}
+
+.input-with-left-icon {
+    padding-left: 37px;
 }
 
 .without-error {
@@ -45,6 +49,18 @@ input[type="daterange"] {
     right: 0;
     height: 42px;
     width: 50px;
+}
+
+.container-icon-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 38px;
+    width: 37px;
+}
+
+.icon-left {
+    height: 20px;
 }
 
 .eye-icon {

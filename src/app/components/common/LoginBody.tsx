@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../../styles/login.scss';
 import Image from 'next/image';
-import uCorreosLogo from '../../../assets/icons/uCorreosLogo2.jpg';
+import logoDE from '../../../assets/icons/logo_desktop.png';
 import { Formik, Form } from 'formik';
 import GenericInput from './GenericInput';
 import { useIntl } from 'react-intl';
@@ -49,16 +49,21 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
 
     return (
         <div className='login-body scrollable-hidden elements-center'>
+            <div className='login-body__background'>
+              <div className='login-body__stuffed'>
+                <div className='login-body__low-background'></div>
+              </div>
+            </div>
             <div className='login-body__container-language'>
-                <SelectLanguage/>
+                <SelectLanguage isFromLogin={true}/>
             </div>
             <div className='login-body__container'>
                 <div className='elements-center'>
-                  {/* <Image
-                    src={uCorreosLogo}
+                  <Image
+                    src={logoDE}
                     alt=''
                     className='login-body__logo'
-                  /> */}
+                  />
                   <div className='black-label login-body__enterprise-name'>
                     Don Express Warehouse {inWMS && "WMS"}{inOMS && "OMS"}
                   </div>
@@ -82,12 +87,16 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
                         name="username"
                         placeholder={intl.formatMessage({ id: 'username' })}
                         customClass="custom-input"
+                        hasRepresentativeIcon={true}
+                        isUserField={true}
                       />
                       <GenericInput
                         type="password"
                         name="password"
                         placeholder={intl.formatMessage({ id: 'password' })}
                         customClass="custom-input"
+                        hasRepresentativeIcon={true}
+                        isPasswordField={true}
                       />
                       <button
                         type="submit"

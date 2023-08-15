@@ -1,14 +1,16 @@
 .menu {
-    padding: 2px 0 0;
+    padding: 0;
     width: 100%;
     max-width: calc(100vw - 475px);
     scrollbar-width: none;
     overflow: inherit;
+    font-size: 14px;
+    padding-left: 40px;
   
     ul {
         list-style: none;
         margin-top: 0;
-        margin-botton: 0;
+        margin-bottom: 0;
         padding-left: 0;
         display: flex;
         justify-content: flex-start;
@@ -17,18 +19,13 @@
       li {
         //flex: auto;
         position: relative;
+        color: #fff;
   
         div {
-            color: #fff;
             text-decoration: none;
-            font-weight: 600;
-            padding: 2px 20px;
+            padding: 20px;
             cursor: pointer;
             position: relative;
-  
-            &:hover {
-              color: #ccc;
-            }
         }
   
         ul {
@@ -43,26 +40,26 @@
             left: 0;
             min-width: 160px;
             z-index: 100;
+            box-shadow: 3px 3px 10px #ddd;
   
           li {
-            background-color: #f6f6f6;
+            background-color: white;
             cursor: pointer;
 
             a {
                 display: block;
                 line-height: 1.1;
                 padding: 12px 10px;
-                font-size: 15px;
+                font-size: 14px;
                 text-decoration: none;
                 text-align: left;
-                color: #999;
-                font-weight: bolder;
+                color: #545a6d;
                 border-left: solid 2px transparent;
   
               &:hover {
-                color: #fff;
-                background-color: #444;
-                border-left: solid 2px #00a9e7;
+                color: #f4492a;
+                background-color: rgb(255, 231, 227);
+                border-left: solid 2px #f4492a;
               }
             }
 
@@ -71,16 +68,15 @@
                 position: relative;
                 line-height: 1.1;
                 padding: 12px 10px;
-                font-size: 15px;
+                font-size: 14px;
                 text-align: left;
-                color: #999;
-                font-weight: bolder;
+                color: #545a6d;
                 border-left: solid 2px transparent;
       
                 &:hover {
-                    color: #fff;
-                    background-color: #444;
-                    border-left: solid 2px #00a9e7;
+                  color: #f4492a;
+                  background-color: rgb(255, 231, 227);
+                  border-left: solid 2px #f4492a;
                 }
             }
 
@@ -96,25 +92,25 @@
                 left: 100%;
                 min-width: 160px;
                 z-index: 100;
+                box-shadow: 0 0 10px #ddd;
       
               li {
-                background-color: #f6f6f6;
+                background-color: white;
                 cursor: pointer;
     
                 a {
                     display: block;
                     line-height: 1.1;
                     padding: 12px 10px;
-                    font-size: 15px;
+                    font-size: 14px;
                     text-decoration: none;
                     text-align: left;
-                    color: #999;
-                    font-weight: bolder;
-                    background: #f6f6f6;
+                    color: #545a6d;
+                    background: white;
       
                   &:hover {
-                    color: #fff;
-                    background-color: #555;
+                    color: #f4492a;
+                    background-color: rgb(255, 231, 227);
                   }
                 }
             }
@@ -131,6 +127,17 @@
         &:hover > ul {
             display: block;
         }
+  
+        &:hover {
+            background: white;
+            color: #333;
+        }
       }
     }
+  }
+
+  .sub-option {
+    display: grid;
+    grid-template-columns: 1fr 15px;
+    column-gap: 5px;
   }

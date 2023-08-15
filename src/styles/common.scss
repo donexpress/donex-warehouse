@@ -4,6 +4,7 @@
     #mui-component-select-language {
         padding: 0 24px 0 0 !important;
         color: white !important;
+        font-size: 15px;
 
         img {
             display: inline-block !important;
@@ -13,6 +14,25 @@
 
     .MuiSelect-icon {
         color: white !important;
+    }
+}
+
+.selected-language-login {
+    margin-top: 0 !important;
+
+    #mui-component-select-language {
+        padding: 0 24px 0 0 !important;
+        color: #333 !important;
+        font-size: 15px;
+
+        img {
+            display: inline-block !important;
+            margin-bottom: 4px;
+        }
+    }
+
+    .MuiSelect-icon {
+        color: #333 !important;
     }
 }
 
