@@ -62,7 +62,9 @@ export type UserForm = {
   regional_division_id: number;
   warehouse_id: number;
   instructions: string;
-  actions: number[];
+  shipping_control: boolean;
+  hidde_transfer_order: boolean;
+  reset_password: boolean;
 };
 
 export type CargoStationWarehouseForm = {
@@ -145,4 +147,4 @@ export type MenuOption = {
 export type TypeOptions = "success" | "error" | "info" | "warning";
 export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
 export type TypeThemes = "light" | "dark";
-export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search';
+export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search' | 'checkbox';

@@ -8,7 +8,7 @@
 
 .header {
   min-height: 60px;
-  background: linear-gradient(to right,#ff7811,#f3412f);
+  background: linear-gradient(to right, #ff7811, #f3412f);
   padding-left: 25px;
   padding-right: 25px;
 }
@@ -22,10 +22,12 @@
     height: 44px;
     width: 100%;
   }
+
   &__img {
     height: 43px;
     cursor: pointer;
   }
+
   &__icon {
     height: 28px;
   }
@@ -56,7 +58,7 @@
 }
 
 .footer {
-  background: linear-gradient(to right,#ff7811,#f3412f);
+  background: linear-gradient(to right, #ff7811, #f3412f);
   width: 100vw;
   font-size: 15px;
 }
@@ -174,7 +176,7 @@
     background: #fff;
     padding: 20px;
     border-radius: 20px;
-    
+
     .confirmation_card_header {
       font-weight: 500;
       font-size: 16px;
@@ -192,7 +194,39 @@
 }
 
 .general-gradient {
-  background: linear-gradient(to right,#ff7811,#f3412f);
+  background: linear-gradient(to right, #ff7811, #f3412f);
+}
+
+.card_section {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dashboard_card {
+  padding: 15px;
+  width: 19%;
+  margin-right: 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #ff7811;
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .04), 0 1px 1px 0 rgba(213, 211, 211, .06), 0 1px 35px 0 rgba(0, 0, 0, .12) !important;
+
+  .dashboard_card_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ff7811;
+    font-size: 17px;
+  }
+
+  .dashboard_card_body {
+    font-size: 40px;
+    font-weight: 500;
+    color: #ff7811;
+    text-align: center;
+  }
 }
 
 @media only screen and (max-width: 650px) {

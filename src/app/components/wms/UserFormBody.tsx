@@ -3,7 +3,7 @@ import '../../../styles/wms/user.form.scss';
 import { showMsg } from '../../../helpers';
 import { useRouter } from 'next/router'
 import { generateValidationSchemaUser } from '../../../validation/generateValidationSchema';
-import { Formik, Form } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import GenericInput from '../common/GenericInput';
 import { useIntl } from 'react-intl';
 import { UserForm } from '../../../types';
@@ -83,7 +83,9 @@ const UserFormBody = ({id}:Props) => {
     regional_division_id: 0,
     warehouse_id: 0,
     instructions: '',
-    actions: []
+    shipping_control: false,
+    hidde_transfer_order: false,
+    reset_password: false
   };
 
   useEffect(()=> {
@@ -110,6 +112,9 @@ const UserFormBody = ({id}:Props) => {
       initialValues.subsidiary_id = user.subsidiary_id
       initialValues.regional_division_id = user.regional_division_id
       initialValues.warehouse_id = user.warehouse_id
+      initialValues.shipping_control = user.shipping_control
+      initialValues.hidde_transfer_order = user.hidde_transfer_order
+      initialValues.reset_password = user.reset_password
       // initialValues = {initialValues, ...user}
       console.log(initialValues)
     }
@@ -287,6 +292,9 @@ const UserFormBody = ({id}:Props) => {
                   placeholder="Observaciones"
                   customClass="custom-input"
                 />
+                <GenericInput type='checkbox' name="shipping_control" placeholder='Control de Envío' customClass='custom-input'/>
+                <GenericInput type='checkbox' name="hidde_transfer_order" placeholder='Ocultar Orden de Transferencia' customClass='custom-input '/>
+                <GenericInput type='checkbox' name="reset_password" placeholder='Reinciar Contraseña' customClass='custom-input '/>
                 <div className='user-form-body__buttons'>
                   <div>
                     <button

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { 
+  countUsersPath,
   getProfilePath,
   loginPath,
   paymentMethodPath,
@@ -81,6 +82,11 @@ export const indexProfile = async (): Promise<UserProfile | null> => {
 
 export const getUsers = async(): Promise<User[]> => {
   const response = await axios.get(userPath())
+  return response.data
+}
+
+export const countUsers = async(): Promise<{count: number}> => {
+  const response = await axios.get(countUsersPath())
   return response.data
 }
 

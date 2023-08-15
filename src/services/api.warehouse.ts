@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { 
   WarehousePath,
+    countWarehousePath,
     getStateWarehousePath, warehousePath
    } from '../backend';
 import { StateWarehouse, CargoStationWarehouseForm, CargoStationWarehouseResponse } from '../types/index';
@@ -35,5 +36,10 @@ export const createCargoTerminal = async (values: CargoStationWarehouseForm): Pr
 
 export const getWarehouses = async ():Promise<Warehouse[]> => {
   const response = await axios.get(WarehousePath())
+  return response.data
+}
+
+export const countWarehouse = async():Promise<{count: number}> => {
+  const response = await axios.get(countWarehousePath())
   return response.data
 }

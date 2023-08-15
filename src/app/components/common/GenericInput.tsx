@@ -1,5 +1,5 @@
 import React, { InputHTMLAttributes, useState } from 'react';
-import { useField } from 'formik';
+import { Field, useField } from 'formik';
 import '../../../styles/generic.input.scss';
 import Image from 'next/image';
 import { TypeField } from '../../../types';
@@ -71,7 +71,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
         <textarea {...field} {...props} className={inputClassName} />
       }
       {
-        type !== 'select' && type !== 'textarea' && 
+        type !== 'select' && type !== 'textarea' && type !== 'checkbox' && 
         <input {...field} {...props} type={getTypeField(type)} className={inputClassName} />
       }
       {
@@ -115,6 +115,14 @@ const GenericInput: React.FC<GenericInputProps> = ({
                 onClick={() => setShowPassword(true)}
               />
             }
+          </div>
+        )
+      }
+      {
+        type === 'checkbox' && (
+          <div>
+            <Field type="checkbox" {...props} />
+            <span style={{marginLeft: '5px'}}>{props.placeholder}</span>
           </div>
         )
       }
