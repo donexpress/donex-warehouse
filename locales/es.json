@@ -75,5 +75,9 @@
 	"subsidiary": "Subsidiario",
 	"regional_division": "Division Regional",
 	"warehouse": "Almacén",
-	"company": "Compañia"
+	"company": "Compañia",
+	"name": "Nombre",
+	"principal": "Principal",
+	"receiving_area": "Área de recepción",
+	"country": "Nación"
 }

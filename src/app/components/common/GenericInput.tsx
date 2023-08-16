@@ -1,5 +1,5 @@
 import React, { InputHTMLAttributes, useState } from 'react';
-import { useField } from 'formik';
+import { Field, useField } from 'formik';
 import '../../../styles/generic.input.scss';
 import Image from 'next/image';
 import { TypeField } from '../../../types';
@@ -18,6 +18,7 @@ type GenericInputProps = {
   hasRepresentativeIcon?: boolean;
   isUserField?: boolean;
   isPasswordField?: boolean;
+  disabled?: boolean;
 } & InputHTMLAttributes<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 >;
@@ -31,6 +32,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
   hasRepresentativeIcon,
   isUserField,
   isPasswordField,
+  disabled = false,
   ...props
 }) => {
   // @ts-ignore
@@ -56,7 +58,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
       }
       {
         type === 'select' &&
-        <select {...field} {...props} className={inputClassName}>
+        <select {...field} {...props} className={inputClassName} disabled={disabled}>
           <option value="" label={ selectLabel ? selectLabel : intl.formatMessage({ id: 'selectOption' })} />
           {options &&
             options.map((option) => (
@@ -68,11 +70,11 @@ const GenericInput: React.FC<GenericInputProps> = ({
       }
       {
         type === 'textarea' &&
-        <textarea {...field} {...props} className={inputClassName} />
+        <textarea {...field} {...props} className={inputClassName} disabled={disabled} />
       }
       {
-        type !== 'select' && type !== 'textarea' && 
-        <input {...field} {...props} type={getTypeField(type)} className={inputClassName} />
+        type !== 'select' && type !== 'textarea' && type !== 'checkbox' && 
+        <input {...field} {...props} type={getTypeField(type)} className={inputClassName} disabled={disabled} />
       }
       {
         hasRepresentativeIcon && (
@@ -115,6 +117,14 @@ const GenericInput: React.FC<GenericInputProps> = ({
                 onClick={() => setShowPassword(true)}
               />
             }
+          </div>
+        )
+      }
+      {
+        type === 'checkbox' && (
+          <div>
+            <Field type="checkbox" {...props}  disabled={disabled} />
+            <span style={{marginLeft: '5px', color: `${ disabled ? '#757575' : '#333' }`}}>{props.placeholder}</span>
           </div>
         )
       }

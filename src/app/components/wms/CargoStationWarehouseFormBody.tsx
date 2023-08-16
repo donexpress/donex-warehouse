@@ -6,39 +6,29 @@ import { generateValidationSchemaWarehouse } from '../../../validation/generateV
 import { Formik, Form } from 'formik';
 import GenericInput from '../common/GenericInput';
 import { useIntl } from 'react-intl';
-import { CargoStationWarehouseForm, Country, StateWarehouse, CargoStationWarehouseProps, ValueSelect, CargoStationWarehouseResponse } from '../../../types';
-import { createCargoTerminal } from '../../../services/api.warehouse';
+import { CargoStationWarehouseForm, Country, StateWarehouse, CargoStationWarehouseProps, ValueSelect, Response } from '../../../types';
+import { createCargoTerminal, updateWarehouseById } from '../../../services/api.warehouse';
 
-const CargoStationWarehouseFormBody = ({ states, countries }: CargoStationWarehouseProps) => {
+const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, warehouse, isFromDetails }: CargoStationWarehouseProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
-    const receptionAreas = [
-        {
-            value: 'Almacen 1',
-            label: 'Almacen 1',
-        },
-        {
-            value: 'Almacen 2',
-            label: 'Almacen 2',
-        }
-    ];
     
     const initialValues: CargoStationWarehouseForm = {
-      name: '',
-      english_name: '',
-      receiving_area: '',
-      principal: '',
-      contact_phone: '',
-      stateId: 0,
-      address: '',
-      city: '',
-      province: '',
-      country: '',
-      cp: '',
-      shared_warehouse_system_code: '',
-      shared_warehouse_docking_code: '',
-      customer_order_number_rules: '',
+      name: (id && warehouse) ? warehouse.name : '',
+      english_name: (id && warehouse) ? warehouse.english_name : '',
+      receiving_area: (id && warehouse) ? warehouse.receiving_area : '',
+      principal: (id && warehouse) ? warehouse.principal : '',
+      contact_phone: (id && warehouse) ? warehouse.contact_phone : '',
+      state_id: (id && warehouse) ? warehouse.state_id : null,
+      address: (id && warehouse) ? warehouse.address : '',
+      city: (id && warehouse) ? warehouse.city : '',
+      province: (id && warehouse) ? warehouse.province : '',
+      country: (id && warehouse) ? warehouse.country : '',
+      cp: (id && warehouse) ? warehouse.cp : '',
+      shared_warehouse_system_code: (id && warehouse) ? warehouse.shared_warehouse_system_code : '',
+      shared_warehouse_docking_code: (id && warehouse) ? warehouse.shared_warehouse_docking_code : '',
+      customer_order_number_rules: (id && warehouse) ? warehouse.customer_order_number_rules : '',
     };
 
     const getStatesFormatted = (statesAll: StateWarehouse[]): ValueSelect[] => {
@@ -71,23 +61,42 @@ const CargoStationWarehouseFormBody = ({ states, countries }: CargoStationWareho
   
       const handleSubmit = async (values: CargoStationWarehouseForm) => {
           if (isWMS()) {
-              const response: CargoStationWarehouseResponse = await createCargoTerminal(values);
-              const { locale } = router.query;
-              if (response.status >= 200 && response.status <= 299) {
-                showMsg("Terminal de carga creada de manera satisfactoria.", { type: "success" });
-                
-                router.push(`/${locale}/wms/warehouse_cargo_station`);
-              } else {
-                let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
-                
-                showMsg(message, { type: "error" });
-              }
+            if (id) {
+              await modify(id, values);
+            } else {
+              await create(values);
+            }
           }
       };
+
+  const create = async (values: CargoStationWarehouseForm) => {
+    const response: Response = await createCargoTerminal(values)
+    treatmentToResponse(response);
+  }
+
+  const modify = async (warehouseId: number, values: CargoStationWarehouseForm) => {
+    const response: Response = await updateWarehouseById(warehouseId, values)
+    treatmentToResponse(response);
+  }
+
+  const treatmentToResponse = (response: Response) => {
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg("Terminal de carga " + (id ? "modificada" : "creada") + " de manera satisfactoria.", { type: "success" });
+      router.push(`/${locale}/wms/warehouse_cargo_station`);
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
+  }
+
+  const goToEdit = () => {
+    router.push(`/${locale}/wms/warehouse_cargo_station/${id}/update`)
+  };
+
     return (
         <div className='elements-start-center user-form scrollable-hidden'>
             <div className='user-form-body'>
-                <div className='user-form-body__title black-label'><b>Insertar terminal de carga</b></div>
+                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? "Visualizar" : "Modificar") : "Insertar"} terminal de carga</b></div>
                 <div className='user-form-body__container'>
                 <Formik
                   initialValues={initialValues}
@@ -102,12 +111,14 @@ const CargoStationWarehouseFormBody = ({ states, countries }: CargoStationWareho
                             name="name"
                             placeholder="Nombre del sitio"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="english_name"
                             placeholder="Nombre del sitio (inglés)"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="select"
@@ -115,43 +126,50 @@ const CargoStationWarehouseFormBody = ({ states, countries }: CargoStationWareho
                             selectLabel="Seleccione el área de recepción"
                             options={receptionAreas}
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="principal"
                             placeholder="Principal"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="contact_phone"
                             placeholder="Teléfono de contacto"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="select"
-                            name="stateId"
+                            name="state_id"
                             selectLabel="Seleccione el estado"
                             options={getStatesFormatted(states)}
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="address"
                             placeholder="Dirección 1"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="city"
                             placeholder="Ciudad"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="province"
                             placeholder="Provincia / Estado"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="select"
@@ -159,41 +177,62 @@ const CargoStationWarehouseFormBody = ({ states, countries }: CargoStationWareho
                             selectLabel="Seleccione la Nación"
                             options={getStatesFormattedCountries(countries)}
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="cp"
                             placeholder="Código Postal"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="shared_warehouse_system_code"
                             placeholder="Código del sistema de almacén compartido"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="shared_warehouse_docking_code"
                             placeholder="Código de atraque de almacén compartido"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="customer_order_number_rules"
                             placeholder="Reglas de número de orden de cliente"
                             customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                       </div>
                       <div className='user-form-body__buttons'>
                         <div>
-                          <button
-                            type="submit"
-                            className='user-form-body__accept_button'
-                            disabled={isSubmitting || !isValid}
-                          >
-                            {isSubmitting ? intl.formatMessage({ id: 'sending' }) : 'Crear'}
-                          </button>
+                          {
+                            !isFromDetails &&
+                            (
+                              <button
+                                type="submit"
+                                className='user-form-body__accept_button'
+                                disabled={isSubmitting || !isValid}
+                              >
+                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : 'Crear'}
+                              </button>
+                            )
+                          }
+                          {
+                            isFromDetails && id && (
+                              <button
+                                type="button"
+                                className='user-form-body__accept_button'
+                                onClick={()=>goToEdit()}
+                              >
+                                Ir a edición
+                              </button>
+                            )
+                          }
                         </div>
                         <div>
                           <button

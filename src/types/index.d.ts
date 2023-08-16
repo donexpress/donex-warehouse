@@ -45,26 +45,27 @@ export type UserForm = {
   username: string;
   label_code: string;
   password: string;
-  payment_method_id: number;
-  state_id: number;
+  payment_method_id: number | null;
+  state_id: number | null;
   contact: string;
   company: string;
   email: string;
   phone_number_mobile: string;
   phone: string;
   qq: string;
-  user_level_id: number;
+  user_level_id: number | null;
   credits: string;
-  finantial_representative: number;
-  client_service_representative: number;
-  sales_representative: number;
-  sales_source: number;
-  subsidiary_id: number;
-  regional_division_id: number;
-  warehouse_id: number;
+  finantial_representative: number | null;
+  client_service_representative: number | null;
+  sales_representative: number | null;
+  sales_source: number | null;
+  subsidiary_id: number | null;
+  regional_division_id: number | null;
+  warehouse_id: number | null;
   observations: string;
-  actions: number[];
-  observations: string;
+  shipping_control: boolean;
+  hidde_transfer_order: boolean;
+  reset_password: boolean;
 };
 
 export type CargoStationWarehouseForm = {
@@ -74,7 +75,7 @@ export type CargoStationWarehouseForm = {
   receiving_area: string;
   principal: string;
   contact_phone: string;
-  stateId: number;
+  state_id: number | null;
   address: string;
   city: string;
   province: string;
@@ -102,8 +103,12 @@ export type StateWarehouse = {
 }
 
 export type CargoStationWarehouseProps = {
+  id?: number;
+  warehouse?: CargoStationWarehouseForm;
+  isFromDetails?: boolean;
   states: StateWarehouse[];
   countries: Country[];
+  receptionAreas: any[];
 };
 
 export type UserLevelProps = {
@@ -117,6 +122,7 @@ export type UsersProps = {
 export type UserFormProps = {
   id?: number;
   user?: User;
+  isFromShowUser?: boolean;
   staffList: any[];
   subsidiarieList: any[];
   regionalDivisionList: any[];
@@ -130,7 +136,7 @@ export type WarehouseListProps = {
   warehouseList: CargoStationWarehouseForm[];
 };
 
-export type ValueSelect = { 
+export type ValueSelect = {
   value: string | number; 
   label: string 
 };
@@ -172,4 +178,4 @@ export type MenuOption = {
 export type TypeOptions = "success" | "error" | "info" | "warning";
 export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
 export type TypeThemes = "light" | "dark";
-export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search';
+export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search' | 'checkbox';

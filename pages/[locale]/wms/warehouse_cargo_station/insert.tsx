@@ -7,7 +7,7 @@ import { indexStateWarehouse } from '../../../../src/services/api.warehouse';
 import { indexCountries } from '../../../../src/services/api.countries';
 import { GetServerSidePropsContext } from 'next';
 
-const InsertWarehouseCargoStation = ({ states, countries }: CargoStationWarehouseProps) => {
+const InsertWarehouseCargoStation = ({ states, countries, receptionAreas }: CargoStationWarehouseProps) => {
   
   return (
   <ProtectedRoute>
@@ -16,7 +16,7 @@ const InsertWarehouseCargoStation = ({ states, countries }: CargoStationWarehous
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <CargoStationWarehouseFormBody states={states} countries={countries}/>
+        <CargoStationWarehouseFormBody states={states ? states : []} countries={countries ? countries : []} receptionAreas={receptionAreas}/>
       </Layout>
     </ProtectedRoute>
     );
@@ -25,11 +25,22 @@ const InsertWarehouseCargoStation = ({ states, countries }: CargoStationWarehous
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const states = await indexStateWarehouse(context);
   const countries = await indexCountries(context);
+  const receptionAreas = [
+      {
+          value: 'Almacen 1',
+          label: 'Almacen 1',
+      },
+      {
+          value: 'Almacen 2',
+          label: 'Almacen 2',
+      }
+  ];
 
   return {
     props: {
       states,
-      countries
+      countries,
+      receptionAreas
     }
   }
 }

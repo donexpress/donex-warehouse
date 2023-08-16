@@ -1,7 +1,8 @@
 import { toast } from 'react-toastify';
 import { MessageOpts, TypeOptions } from '../types';
 import { getCookie } from './cookieUtils';
-import { AxiosRequestConfig, RawAxiosRequestHeaders, AxiosHeaders } from 'axios';
+import { AxiosRequestConfig } from 'axios';
+import { parse } from 'cookie';
 
 const baseMessageOpts: Pick<MessageOpts, 'type' | 'position' | 'autoClose' | 'hideProgressBar' | 'closeOnClick' | 'pauseOnHover' | 'draggable' | 'theme'> = {
   type: 'success',
@@ -69,8 +70,17 @@ export const getHeaders = (context?: any) => {
     headers: {
     'Content-Type': 'application/json',
   }};
-  const tokenWMS = getCookie('tokenWMS');
-  const tokenOMS = getCookie('tokenOMS');
+  let tokenWMS = getCookie('tokenWMS');
+  let tokenOMS = getCookie('tokenOMS');
+  if (context) {
+    const { req } = context;
+    const cookies = parse(req.headers.cookie || '');
+    tokenWMS = cookies.tokenWMS || '';;
+    tokenOMS = cookies.tokenOMS || '';;
+  } else if (typeof window !== 'undefined') {
+    tokenWMS = getCookie('tokenWMS');
+    tokenOMS = getCookie('tokenOMS');
+  }
   if (isWMS(context) && (tokenWMS !== undefined)) {
     configs = {
       headers: {

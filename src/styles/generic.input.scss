@@ -5,6 +5,10 @@
     font-size: 14px;
     width: 100%;
 }
+
+.generic-input:disabled {
+    color: #757575;
+}
   
 .input-error {
     border-color: #ff0000;

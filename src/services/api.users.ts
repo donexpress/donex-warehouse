@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { 
+  countUsersPath,
   getProfilePath,
   loginPath,
   paymentMethodPath,
@@ -109,6 +110,11 @@ export const getUsers = async(context?: GetServerSidePropsContext): Promise<User
   return response.data
 }
 
+export const countUsers = async(): Promise<{count: number}> => {
+  const response = await axios.get(countUsersPath())
+  return response.data
+}
+
 export const getUserStates = async(context?: GetServerSidePropsContext): Promise<UserState[]> => {
   const response = await axios.get(userStatePath(), getHeaders(context))
   return response.data
@@ -119,9 +125,18 @@ export const removeUser = async(id: number) => {
   return response.data
 }
 
-export const createUser = async(data: any) => {
-  const response = await axios.post(userPath(), data)
-  return response.data
+export const createUser = async(data: any): Promise<Response> => {
+  const path = userPath();
+  try {
+    const response = await axios.post(path, data, getHeaders());
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {...response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
 }
 
 export const getUserById = async(id:number, context?: GetServerSidePropsContext): Promise<User> => {
@@ -129,7 +144,16 @@ export const getUserById = async(id:number, context?: GetServerSidePropsContext)
   return response.data
 }
 
-export const updateUser = async(id:number, data: any) => {
-  const response = await axios.put(removeUserPath(id), data)
-  return response.data
+export const updateUser = async(id:number, data: any): Promise<Response> => {
+  const path = removeUserPath(id);
+  try {
+    const response = await axios.put(path, data, getHeaders());
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {...response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
 }

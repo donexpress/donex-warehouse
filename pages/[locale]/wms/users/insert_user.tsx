@@ -25,9 +25,9 @@ const InsertUser = ({ staffList, subsidiarieList, regionalDivisionList, warehous
 };
 
 export async function getServerSideProps(context: any) {
-  const staffList = await getStaff();
-  const subsidiarieList = await getSubsidiary();
-  const regionalDivisionList = await getRegionalDivision();
+  const staffList = await getStaff(context);
+  const subsidiarieList = await getSubsidiary(context);
+  const regionalDivisionList = await getRegionalDivision(context);
   const warehouseList = await getWarehouses(context);
   const userLevelList = await getUserLevels(context);
   const paymentMethodList = await getPaymentMethods(context);

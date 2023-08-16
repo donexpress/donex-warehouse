@@ -75,5 +75,9 @@
 	"subsidiary": "Subsidiary",
 	"regional_division": "Regional Division",
 	"warehouse": "Warehouse",
-	"company": "Company"
+	"company": "Company",
+	"name": "Name",
+	"principal": "Main",
+	"receiving_area": "Receiving area",
+	"country": "Country"
 }

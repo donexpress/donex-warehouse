@@ -4,9 +4,10 @@ import ProtectedRoute from '../../../../src/app/components/common/ProtectedRoute
 import { WarehouseListProps } from '../../../../src/types';
 import { getWarehouses } from '../../../../src/services/api.warehouse';
 import { GetServerSidePropsContext } from 'next';
+import TableWarehouse from '../../../../src/app/components/wms/warehouse/TableWarehouse';
 
 const WarehouseCargoStation = ({ warehouseList }: WarehouseListProps) => {
-  console.log(warehouseList)
+  
   return (
   <ProtectedRoute>
       <Layout>
@@ -14,7 +15,7 @@ const WarehouseCargoStation = ({ warehouseList }: WarehouseListProps) => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <div></div>
+        <TableWarehouse warehouseList={warehouseList ? warehouseList : []} />
       </Layout>
     </ProtectedRoute>
     );

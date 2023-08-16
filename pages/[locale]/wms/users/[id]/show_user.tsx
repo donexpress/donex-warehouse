@@ -1,24 +1,17 @@
-import ProtectedRoute from "@/app/components/common/ProtectedRouteerege1992";
-import Info from "@/app/components/wms/user/Infoerege1992";
-import Layout from "@/app/layouterege1992";
-import { getUserById } from "@/services/api.userserege1992";
-import { User } from "@/types/usererege1992";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import ProtectedRoute from "@/app/components/common/ProtectedRouteerege1992"
+import UserFormBody from "@/app/components/wms/UserFormBodyerege1992"
+import Layout from "@/app/layouterege1992"
+import Head from "next/head"
+import { getUserById } from '../../../../../src/services/api.users';
+import { UserFormProps } from '../../../../../src/types';
+import { getStaff } from '@/services/api.stafferege1992';
+import { getSubsidiary } from '@/services/api.subsidiaryerege1992';
+import { getRegionalDivision } from '@/services/api.regional_divisionerege1992';
+import { getWarehouses } from '@/services/api.warehouseerege1992';
+import { getPaymentMethods, getUserLevels, getUserStates } from '../../../../../src/services/api.users';
 
-const ShowUser = () => {
-    const router = useRouter();
-    const { id } = router.query;
-    const [user, setUser] = useState<User | null>(null)
-    useEffect(() => {
-        setup()
-    }, [])
+const ShowUser = ({ user, id, staffList, subsidiarieList, regionalDivisionList, warehouseList, userLevelList, paymentMethodList, userStateList }: UserFormProps) => {
 
-    const setup = async () => {
-        const user = await getUserById(Number(id))
-        setUser(user)
-    }
     return (
         <ProtectedRoute>
             <Layout>
@@ -26,12 +19,36 @@ const ShowUser = () => {
                     <title>Don Express Warehouse</title>
                     <link rel="icon" href="/icon_favicon.png" />
                 </Head>
-                {user && (
-                    <Info user={user}/>
-                )}
+                <UserFormBody id={Number(id)} user={user} staffList={staffList} subsidiarieList={subsidiarieList} regionalDivisionList={regionalDivisionList} warehouseList={warehouseList} userLevelList={userLevelList} paymentMethodList={paymentMethodList} userStateList={userStateList} isFromShowUser={true} />
             </Layout>
         </ProtectedRoute>
     )
+}
+
+export async function getServerSideProps(context: any) {
+  const { id } = context.params;
+  const user = await getUserById(id, context);
+  const staffList = await getStaff(context);
+  const subsidiarieList = await getSubsidiary(context);
+  const regionalDivisionList = await getRegionalDivision(context);
+  const warehouseList = await getWarehouses(context);
+  const userLevelList = await getUserLevels(context);
+  const paymentMethodList = await getPaymentMethods(context);
+  const userStateList = await getUserStates(context);
+
+  return {
+    props: {
+        user,
+        id,
+        staffList,
+        subsidiarieList,
+        regionalDivisionList,
+        warehouseList,
+        userLevelList,
+        paymentMethodList,
+        userStateList
+    }
+  }
 }
 
 export default ShowUser;
