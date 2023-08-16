@@ -55,6 +55,10 @@
   padding: 8px 0;
 }
 
+.custom-popover {
+  margin-top: 50px;
+}
+
 .footer {
   background: linear-gradient(to right,#ff7811,#f3412f);
   width: 100vw;
@@ -172,12 +176,12 @@
   .confirmation_card {
     z-index: 1000;
     background: #fff;
-    padding: 20px;
-    border-radius: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
     
     .confirmation_card_header {
-      font-weight: 500;
       font-size: 16px;
+      padding-bottom: 5px;
     }
 
     .confirmation_card_body {
@@ -185,7 +189,7 @@
     }
 
     .confirmation_card_actions {
-      margin-top: 10px;
+      margin-top: 20px;
       display: flex;
     }
   }

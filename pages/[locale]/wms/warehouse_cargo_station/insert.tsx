@@ -1,14 +1,14 @@
 import Head from 'next/head';
-import Layout from '../../../src/app/layout';
-import ProtectedRoute from '../../../src/app/components/common/ProtectedRoute';
-import CargoStationWarehouseFormBody from '../../../src/app/components/wms/CargoStationWarehouseFormBody';
-import { CargoStationWarehouseProps } from '../../../src/types';
-import { indexStateWarehouse } from '../../../src/services/api.warehouse';
-import { indexCountries } from '../../../src/services/api.countries';
+import Layout from '../../../../src/app/layout';
+import ProtectedRoute from '../../../../src/app/components/common/ProtectedRoute';
+import CargoStationWarehouseFormBody from '../../../../src/app/components/wms/CargoStationWarehouseFormBody';
+import { CargoStationWarehouseProps } from '../../../../src/types';
+import { indexStateWarehouse } from '../../../../src/services/api.warehouse';
+import { indexCountries } from '../../../../src/services/api.countries';
 import { GetServerSidePropsContext } from 'next';
 
 const InsertWarehouseCargoStation = ({ states, countries }: CargoStationWarehouseProps) => {
-  console.log(countries)
+  
   return (
   <ProtectedRoute>
       <Layout>

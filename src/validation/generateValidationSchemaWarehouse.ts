@@ -7,7 +7,7 @@ export const generateValidationSchemaWarehouse = (intl: IntlShape) => {
         .required(intl.formatMessage({ id: 'required' })),
       english_name: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
-      receiving_area: Yup.string()
+      /* receiving_area: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
       principal: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
@@ -34,6 +34,6 @@ export const generateValidationSchemaWarehouse = (intl: IntlShape) => {
       shared_warehouse_docking_code: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
       customer_order_number_rules: Yup.string()
-        .required(intl.formatMessage({ id: 'required' })),
+        .required(intl.formatMessage({ id: 'required' })), */
     });
   };

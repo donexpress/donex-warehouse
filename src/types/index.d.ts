@@ -1,5 +1,6 @@
 import { StaticImageData } from "next/image";
-import internal from "stream";
+import { Service } from './service';
+import { User } from './user';
 
 export type Languages = 'es' | 'en';
 
@@ -61,11 +62,13 @@ export type UserForm = {
   subsidiary_id: number;
   regional_division_id: number;
   warehouse_id: number;
-  instructions: string;
+  observations: string;
   actions: number[];
+  observations: string;
 };
 
 export type CargoStationWarehouseForm = {
+  id?: number;
   name: string;
   english_name: string;
   receiving_area: string;
@@ -101,6 +104,30 @@ export type StateWarehouse = {
 export type CargoStationWarehouseProps = {
   states: StateWarehouse[];
   countries: Country[];
+};
+
+export type UserLevelProps = {
+  services: Service[];
+};
+
+export type UsersProps = {
+  userList: User[];
+};
+
+export type UserFormProps = {
+  id?: number;
+  user?: User;
+  staffList: any[];
+  subsidiarieList: any[];
+  regionalDivisionList: any[];
+  warehouseList: any[];
+  userLevelList: any[];
+  paymentMethodList: any[];
+  userStateList: any[];
+};
+
+export type WarehouseListProps = {
+  warehouseList: CargoStationWarehouseForm[];
 };
 
 export type ValueSelect = { 

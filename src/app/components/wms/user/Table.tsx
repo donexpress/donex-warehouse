@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react';
 import { getUsers, removeUser } from '@/services/api.userserege1992';
 import { User } from '@/types/usererege1992';
 import ConfirmationDialog from '../../common/ConfirmationDialog';
-const UserTable = () => {
+import { UsersProps } from '../../../../types';
+const UserTable = ({ userList }: UsersProps) => {
     const intl = useIntl();
     const router = useRouter();
     const { locale } = router.query;
@@ -16,7 +17,7 @@ const UserTable = () => {
     const [deleteElement, setDeleteElemtent] = useState<number>(-1)
 
     useEffect(() => {
-        loadUsers()
+        setUsers(userList);
     }, [])
 
     const loadUsers = async () => {
@@ -61,7 +62,7 @@ const UserTable = () => {
                             <button className='table_search_button'><FaSearch /></button>
                         </div>
                         <div className="table_actions">
-                            <a href={`/${locale}/wms/users/insert_user`} className='accent_button' style={{display: 'flex', width: '100px', justifyContent: 'space-around', alignItems: 'center'}}>
+                            <a href={`/${locale}/wms/users/insert_user`} className='accent_button' style={{display: 'flex', width: '120px', justifyContent: 'space-around', alignItems: 'center'}}>
                                <FaCirclePlus /> {intl.formatMessage({ id: 'create' })}
                             </a>
                         </div>

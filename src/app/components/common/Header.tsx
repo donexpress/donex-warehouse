@@ -10,7 +10,6 @@ import { UserProfile } from '../../../types';
 import { useIntl } from 'react-intl';
 import { isOMS, isWMS} from '../../../helpers';
 import HorizontalMenu from './HorizontalMenu';
-import '../../../styles/horizontal.menu.scss';
 import userIcon from '../../../assets/icons/user.svg';
 
 const Header = () => {
@@ -108,6 +107,7 @@ const Header = () => {
                     PaperProps={{
                       style: {
                         minWidth: '160px',
+                        marginTop: '18px',
                       },
                     }}
                   >

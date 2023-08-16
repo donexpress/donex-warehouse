@@ -8,21 +8,13 @@ import GenericInput from '../common/GenericInput';
 import { useIntl } from 'react-intl';
 import { UserLevelForm, Response } from '../../../types';
 import { createUserLevel } from '../../../services/api.users';
+import { UserLevelProps, ValueSelect } from '../../../types';
+import { Service } from '../../../types/service';
 
-const UserLevelFormBody = () => {
+const UserLevelFormBody = ({ services }: UserLevelProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
-    const services = [
-        {
-            value: 1,
-            label: 'Service 1',
-        },
-        {
-            value: 2,
-            label: 'Service 2',
-        }
-    ];
     
     const initialValues: UserLevelForm = {
       name: '',
@@ -34,6 +26,17 @@ const UserLevelFormBody = () => {
           if (isWMS()) {
             router.push(`/${locale}/wms/user_levels`);
           }
+      };
+
+      const getServicesFormatted = (servicesAll: Service[]): ValueSelect[] => {
+        let response: ValueSelect[] = [];
+        servicesAll.forEach((service) => {
+          response.push({
+            value: service.id,
+            label: service.name
+          });
+        })
+        return response;
       };
   
       const handleSubmit = async (values: UserLevelForm) => {
@@ -74,7 +77,7 @@ const UserLevelFormBody = () => {
                             type="select"
                             name="designated_service"
                             selectLabel="Seleccione el servicio designado"
-                            options={services}
+                            options={getServicesFormatted(services)}
                             customClass="custom-input"
                           />
                       </div>

@@ -71,3 +71,7 @@ export const countUserLevelPath = () => {
 export const countriesPath = () => {
   return BASE_URL + '/api/v1/countries';
 }
+
+export const servicePath = () => {
+  return BASE_URL + '/api/v1/service';
+}

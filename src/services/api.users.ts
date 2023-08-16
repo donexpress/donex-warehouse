@@ -12,6 +12,9 @@ import { LoginBody, LoginResponse, UserProfile, UserLevelForm, PaymentMethodForm
 import { getHeaders } from '../helpers';
 import { User } from '@/types/usererege1992';
 import { UserState } from '@/types/user_stateerege1992';
+import { UserLevel } from '../types/user_levels';
+import { PaymentMethod } from '../types/payment_methods';
+import { GetServerSidePropsContext } from 'next';
 
 export const login = async (values: LoginBody): Promise<LoginResponse> => {
   const path = loginPath();
@@ -60,6 +63,28 @@ export const createUserLevel = async (values: UserLevelForm): Promise<Response> 
   }
 };
 
+export const getUserLevels = async (context?: GetServerSidePropsContext):Promise<UserLevel[] | null> => {
+  const path = userLevelPath();
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export const getPaymentMethods = async (context?: GetServerSidePropsContext):Promise<PaymentMethod[] | null> => {
+  const path = paymentMethodPath();
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 export const indexProfile = async (): Promise<UserProfile | null> => {
   const path = getProfilePath();
   try {
@@ -79,13 +104,13 @@ export const indexProfile = async (): Promise<UserProfile | null> => {
   }
 };
 
-export const getUsers = async(): Promise<User[]> => {
-  const response = await axios.get(userPath())
+export const getUsers = async(context?: GetServerSidePropsContext): Promise<User[]> => {
+  const response = await axios.get(userPath(), getHeaders(context))
   return response.data
 }
 
-export const getUserStates = async(): Promise<UserState[]> => {
-  const response = await axios.get(userStatePath())
+export const getUserStates = async(context?: GetServerSidePropsContext): Promise<UserState[]> => {
+  const response = await axios.get(userStatePath(), getHeaders(context))
   return response.data
 }
 
@@ -99,8 +124,8 @@ export const createUser = async(data: any) => {
   return response.data
 }
 
-export const getUserById = async(id:number): Promise<User> => {
-  const response = await axios.get(removeUserPath(id))
+export const getUserById = async(id:number, context?: GetServerSidePropsContext): Promise<User> => {
+  const response = await axios.get(removeUserPath(id), getHeaders(context))
   return response.data
 }
 

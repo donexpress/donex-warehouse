@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { 
-  WarehousePath,
     getStateWarehousePath, warehousePath
    } from '../backend';
 import { StateWarehouse, CargoStationWarehouseForm, CargoStationWarehouseResponse } from '../types/index';
@@ -33,7 +32,43 @@ export const createCargoTerminal = async (values: CargoStationWarehouseForm): Pr
   }
 };
 
-export const getWarehouses = async ():Promise<Warehouse[]> => {
-  const response = await axios.get(WarehousePath())
-  return response.data
+export const getWarehouseById = async (warehouseId: number, context?: GetServerSidePropsContext):Promise<Warehouse | null> => {
+  const path = warehousePath() + `/${warehouseId}`;
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export const updateWarehouseById = async (warehouse: CargoStationWarehouseForm):Promise<Warehouse | null> => {
+  const path = warehousePath() + `/${warehouse.id}`;
+  try {
+    const response = await axios.put(path, warehouse, getHeaders());
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export const removeWarehouseById = async (warehouseId: number):Promise<any | null> => {
+  const path = warehousePath() + `/${warehouseId}`;
+  try {
+    const response = await axios.delete(path, getHeaders());
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export const getWarehouses = async (context?: GetServerSidePropsContext):Promise<Warehouse[] | null> => {
+  const path = warehousePath();
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }

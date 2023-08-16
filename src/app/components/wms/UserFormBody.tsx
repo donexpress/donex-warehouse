@@ -7,18 +7,10 @@ import { Formik, Form } from 'formik';
 import GenericInput from '../common/GenericInput';
 import { useIntl } from 'react-intl';
 import { UserForm } from '../../../types';
-import { createUser, getUserById } from '@/services/api.userserege1992';
-import { Staff } from '@/types/stafferege1992';
-import { getStaff } from '@/services/api.stafferege1992';
-import { getSubsidiary } from '@/services/api.subsidiaryerege1992';
-import { getRegionalDivision } from '@/services/api.regional_divisionerege1992';
-import { getWarehouses } from '@/services/api.warehouseerege1992';
+import { createUser, updateUser } from '@/services/api.userserege1992';
+import { UserFormProps } from '../../../types';
 
-interface Props {
-  id?: number
-}
-
-const UserFormBody = ({id}:Props) => {
+const UserFormBody = ({ id, user, staffList, regionalDivisionList, subsidiarieList, warehouseList, userLevelList, paymentMethodList, userStateList }: UserFormProps) => {
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
@@ -26,109 +18,65 @@ const UserFormBody = ({id}:Props) => {
   const [subsidiaries, setSubsidiaries] = useState<{value: number, label: string}[]>([])
   const [regionalDivisions, setRegionalDivisions] = useState<{value: number, label: string}[]>([])
   const [warehouses, setWarehouses] = useState<{value: number, label: string}[]>([])
-  const paymentMethods = [
-    {
-      value: 1,
-      label: 'Mastercard',
-    },
-    {
-      value: 2,
-      label: 'Visa',
-    }
-  ];
-
-  const states = [
-    {
-      value: 1,
-      label: 'Pendiente de revisión',
-    },
-    {
-      value: 2,
-      label: 'Certificado',
-    },
-    {
-      value: 3,
-      label: 'Sin certificación',
-    },
-    {
-      value: 4,
-      label: 'Para ser presentado para la certificación',
-    },
-    {
-      value: 5,
-      label: 'Rechazado',
-    }
-  ];
+  const [userLevels, setUserLevels] = useState<{value: number, label: string}[]>([])
+  const [paymentMethods, setPaymentMethods] = useState<{value: number, label: string}[]>([])
+  const [userStates, setUserStates] = useState<{value: number, label: string}[]>([])
 
   let initialValues: UserForm = {
-    nickname: '',
-    username: '',
-    label_code: '',
+    nickname: (id && user) ? user.nickname : '',
+    username: (id && user) ? user.username : '',
+    label_code: (id && user) ? user.label_code : '',
     password: '',
-    payment_method_id: 0,
-    state_id: 0,
-    contact: '',
-    company: '',
-    email: '',
-    phone_number_mobile: '',
-    phone: '',
-    qq: '',
-    user_level_id: 0,
+    payment_method_id: (id && user) ? (user.payment_method_id !== null ? user.payment_method_id : 0) : 0,
+    state_id: (id && user) ? (user.state_id !== null ? user.state_id : 0) : 0,
+    contact: (id && user) ? user.contact : '',
+    company: (id && user) ? user.company : '',
+    email: (id && user) ? user.email : '',
+    phone_number_mobile: (id && user) ? user.phone : '',
+    phone: (id && user) ? user.phone : '',
+    qq: (id && user) ? user.qq : '',
+    user_level_id: (id && user) ? (user.user_level_id !== null ? user.user_level_id : 0) : 0,
     credits: '',
-    finantial_representative: 0,
-    client_service_representative: 0,
-    sales_representative: 0,
-    sales_source: 0,
-    subsidiary_id: 0,
-    regional_division_id: 0,
-    warehouse_id: 0,
-    instructions: '',
+    finantial_representative: (id && user) ? (user.finantial_representative !== null ? user.finantial_representative : 0) : 0,
+    client_service_representative: (id && user) ? (user.client_service_representative !== null ? user.client_service_representative : 0) : 0,
+    sales_representative: (id && user) ? (user.sales_representative !== null ? user.sales_representative : 0) : 0,
+    sales_source: (id && user) ? (user.sales_source !== null ? user.sales_source : 0) : 0,
+    subsidiary_id: (id && user) ? (user.subsidiary_id !== null ? user.subsidiary_id : 0) : 0,
+    regional_division_id: (id && user) ? (user.regional_division_id !== null ? user.regional_division_id : 0) : 0,
+    warehouse_id: (id && user) ? (user.warehouse_id !== null ? user.warehouse_id : 0) : 0,
+    observations: (id && user) ? user.observations : '',
     actions: []
   };
 
   useEffect(()=> {
-    setup()
-  }, [])
-
-  const setup = async() => {
-    if(id) {
-      const user = await getUserById(id)
-      initialValues.nickname = user.nickname
-      initialValues.username = user.username
-      initialValues.label_code = user.label_code
-      initialValues.state_id = user.state_id
-      initialValues.contact = user.contact
-      initialValues.company = user.company
-      initialValues.email = user.email
-      initialValues.phone = user.phone
-      initialValues.qq = user.qq
-      initialValues.credits = user.credits
-      initialValues.finantial_representative = user.finantial_representative
-      initialValues.client_service_representative = user.client_service_representative
-      initialValues.sales_representative = user.sales_representative
-      initialValues.sales_source = user.sales_source
-      initialValues.subsidiary_id = user.subsidiary_id
-      initialValues.regional_division_id = user.regional_division_id
-      initialValues.warehouse_id = user.warehouse_id
-      // initialValues = {initialValues, ...user}
-      console.log(initialValues)
-    }
-    const staff = await getStaff();
-    setStaff(staff.map(el => {return {value: el.id, label: el.chinesse_name}}));
-
-    const subsidiaries = await getSubsidiary();
-    setSubsidiaries(subsidiaries.map(el => {return {value: el.id, label: el.name}}));
-
-    const regional_divisions = await getRegionalDivision();
-    setRegionalDivisions(regional_divisions.map(el => {return {value: el.id, label: el.name}}))
-
-    // const warehouses = await getWarehouses();
-    // setWarehouses(warehouses.map(el => {return {value: el.id, label: el.name}}))
-
-  }
+    setStaff(staffList.map(el => {return {value: el.id, label: el.chinesse_name}}));
+    setSubsidiaries(subsidiarieList.map(el => {return {value: el.id, label: el.name}}));
+    setRegionalDivisions(regionalDivisionList.map(el => {return {value: el.id, label: el.name}}))
+    setWarehouses(warehouseList.map(el => {return {value: el.id, label: el.name}}))
+    setPaymentMethods(paymentMethodList.map(el => {return {value: el.id, label: el.name}}))
+    setUserLevels(userLevelList.map(el => {return {value: el.id, label: el.name}}))
+    setUserStates(userStateList.map(el => {return {value: el.id, label: el.name}}))
+  }, []);
 
   const handleSubmit = async (values: UserForm) => {
+    if (id) {
+      await modify(id, values);
+    } else {
+      await create(values);
+    }
+  };
+
+  const create = async (values: UserForm) => {
     const response = await createUser(values)
+    router.push(`/${locale}/wms/users`)
+  }
+
+  const modify = async (userId: number, values: UserForm) => {
+    const response = await updateUser(userId, values)
+    router.push(`/${locale}/wms/users`)
+  }
+  
+  const cancelSend = () => {
     router.push(`/${locale}/wms/users`)
   };
   return (
@@ -179,7 +127,7 @@ const UserFormBody = ({id}:Props) => {
                     type="select"
                     name="state_id"
                     selectLabel="Seleccione el estado"
-                    options={states}
+                    options={userStates}
                     customClass="custom-input"
                   />
                   <GenericInput
@@ -222,7 +170,7 @@ const UserFormBody = ({id}:Props) => {
                     type="select"
                     name="user_level_id"
                     selectLabel="Seleccione el nivel de usuario"
-                    options={[]}
+                    options={userLevels}
                     customClass="custom-input"
                   />
                   <GenericInput
@@ -277,13 +225,13 @@ const UserFormBody = ({id}:Props) => {
                     type="select"
                     name="warehouse_id"
                     selectLabel="Seleccione el sitio"
-                    options={[]}
+                    options={warehouses}
                     customClass="custom-input"
                   />
                 </div>
                 <GenericInput
                   type="textarea"
-                  name="instructions"
+                  name="observations"
                   placeholder="Observaciones"
                   customClass="custom-input"
                 />
@@ -298,7 +246,13 @@ const UserFormBody = ({id}:Props) => {
                     </button>
                   </div>
                   <div>
-
+                    <button
+                      type="button"
+                      className='user-form-body__cancel'
+                      onClick={()=>cancelSend()}
+                    >
+                      Cancelar
+                    </button>
                   </div>
                 </div>
               </Form>

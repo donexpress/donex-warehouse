@@ -11,10 +11,10 @@ const ConfirmationDialog = ({close, confirm}: Params) => {
         <div className="confirmation_container">
             <div className="confirmation_backdrop" onClick={close}></div>
             <div className="confirmation_card">
-                <div className="confirmation_card_header">
-                    {intl.formatMessage({ id: "confirmation_header" })}
+                <div className="confirmation_card_header black-label">
+                    <strong>{intl.formatMessage({ id: "confirmation_header" })}</strong>
                 </div>
-                <div className="confirmation_card_body">
+                <div className="confirmation_card_body  black-label">
                     {intl.formatMessage({ id: "confirmation_text" })}
                 </div>
                 <div className="confirmation_card_actions">
