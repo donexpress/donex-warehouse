@@ -113,14 +113,69 @@
                     background-color: rgb(255, 231, 227);
                   }
                 }
-            }
+
+                div {
+                    cursor: pointer;
+                    position: relative;
+                    line-height: 1.1;
+                    padding: 12px 10px;
+                    font-size: 14px;
+                    text-align: left;
+                    color: #545a6d;
+                    border-left: solid 2px transparent;
+          
+                    &:hover {
+                      color: #f4492a;
+                      background-color: rgb(255, 231, 227);
+                      border-left: solid 2px #f4492a;
+                    }
+                }
+    
+                ul {
+                    padding-left: 0px;
+                    margin-top: 0px;
+                    margin-bottom: 0px;
+                    align-items: flex-start;
+                    list-style: none;
+                    display: none;
+                    position: absolute;
+                    top: 0;
+                    left: 100%;
+                    min-width: 160px;
+                    z-index: 100;
+                    box-shadow: 0 0 10px #ddd;
+          
+                  li {
+                    background-color: white;
+                    cursor: pointer;
+        
+                    a {
+                        display: block;
+                        line-height: 1.1;
+                        padding: 12px 10px;
+                        font-size: 14px;
+                        text-decoration: none;
+                        text-align: left;
+                        color: #545a6d;
+                        background: white;
+          
+                      &:hover {
+                        color: #f4492a;
+                        background-color: rgb(255, 231, 227);
+                      }
+                    }
+                  }
+      
+                  &:hover > ul {
+                    display: block;
+                  }
+                }
+              }
   
-            &:hover > ul {
+              &:hover > ul {
                 display: block;
+              }
             }
-        }
-
-
           }
         }
   

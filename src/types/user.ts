@@ -1,7 +1,7 @@
 import { RegionalDivision } from "./regional_division";
 import { Staff } from "./staff";
 import { Subsidiary } from "./subsidiary";
-import { Warehouse } from "./warehouse";
+import { CargoStationWarehouseForm } from "./index";
 
 export type User = {
     id: number;
@@ -26,7 +26,7 @@ export type User = {
     shipping_control: boolean;
     hidde_transfer_order: boolean;
     reset_password: boolean;
-    warehouses: Warehouse;
+    warehouses: CargoStationWarehouseForm;
     regional_divisions: RegionalDivision;
     subsidiaries: Subsidiary;
     finantial_representatives: Staff | null;

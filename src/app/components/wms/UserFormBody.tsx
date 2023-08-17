@@ -67,14 +67,30 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
       await create(values);
     }
   };
+  
+  const formatBody = (values: UserForm): UserForm => {
+    return {
+            ...values, 
+            payment_method_id: values.payment_method_id ? Number(values.payment_method_id) : null, 
+            state_id: values.state_id ? Number(values.state_id) : null, 
+            user_level_id: values.user_level_id ? Number(values.user_level_id) : null, 
+            finantial_representative: values.finantial_representative ? Number(values.finantial_representative) : null, 
+            client_service_representative: values.client_service_representative ? Number(values.client_service_representative) : null, 
+            sales_representative: values.sales_representative ? Number(values.sales_representative) : null, 
+            sales_source: values.sales_source ? Number(values.sales_source) : null, 
+            subsidiary_id: values.subsidiary_id ? Number(values.subsidiary_id) : null, 
+            regional_division_id: values.regional_division_id ? Number(values.regional_division_id) : null, 
+            warehouse_id: values.warehouse_id ? Number(values.warehouse_id) : null
+          };
+  }
 
   const create = async (values: UserForm) => {
-    const response: Response = await createUser(values)
+    const response: Response = await createUser(formatBody(values))
     treatmentToResponse(response);
   }
 
   const modify = async (userId: number, values: UserForm) => {
-    const response: Response = await updateUser(userId, values)
+    const response: Response = await updateUser(userId, formatBody(values))
     treatmentToResponse(response);
   }
 
@@ -114,6 +130,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                     placeholder="Apodo"
                     customClass="custom-input"
                     disabled={ isFromShowUser }
+                    required
                   />
                   <GenericInput
                     type="text"
@@ -121,6 +138,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                     placeholder={intl.formatMessage({ id: 'username' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
+                    required
                   />
                   <GenericInput
                     type="password"
@@ -128,6 +146,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                     placeholder={intl.formatMessage({ id: 'password' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
+                    required={ !id }
                   />
                   <GenericInput
                     type="text"

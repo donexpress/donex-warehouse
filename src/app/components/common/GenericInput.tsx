@@ -77,6 +77,11 @@ const GenericInput: React.FC<GenericInputProps> = ({
         <input {...field} {...props} type={getTypeField(type)} className={inputClassName} disabled={disabled} />
       }
       {
+        props.placeholder && (
+          <div className='label-up'>{props.required && (<span className='label-up__required'>* </span>)}{props.placeholder}</div>
+        )
+      }
+      {
         hasRepresentativeIcon && (
           <div className='container-icon-left elements-center'>
             {

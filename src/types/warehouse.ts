@@ -1,21 +1,29 @@
+import { Country } from './index';
+
 export type Warehouse = {
-    id: number;
+    id?: number;
+    code: string;
     name: string;
-    english_name: string;
-    receiving_area: string;
-    principal: string;
-    contact_phone: string;
+    contact_person: string;
+    company: string;
+    country: string;
     address: string;
+    address2: string;
     city: string;
     province: string;
-    country: string;
     cp: string;
-    shared_warehouse_system_code: string;
-    shared_warehouse_docking_code: string;
-    customer_order_number_rules: string;
-    stateId: number;
-    states: {
-        id: number;
-        name: string;
-    }
+    phone: string;
+    email: string;
+    observations: string;
 }
+
+export type WarehouseProps = {
+  id?: number;
+  warehouse?: Warehouse;
+  isFromDetails?: boolean;
+  countries: Country[];
+};
+
+export type WHListProps = {
+  warehouseList: Warehouse[];
+};

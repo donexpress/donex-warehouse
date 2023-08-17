@@ -41,19 +41,19 @@ export const RegionalDivisionPath = () => {
 };
 
 export const WarehousePath = () => {
-  return BASE_URL + '/api/v1/warehouse';
+  return BASE_URL + '/api/v1/cargo_station';
 };
 
 export const getStateWarehousePath = () => {
-  return BASE_URL + '/api/v1/warehouse_state';
+  return BASE_URL + '/api/v1/cargo_station_state';
 };
 
 export const warehousePath = () => {
-  return BASE_URL + '/api/v1/warehouse';
+  return BASE_URL + '/api/v1/cargo_station';
 };
 
 export const countWarehousePath = () => {
-  return BASE_URL + '/api/v1/warehouse/count';
+  return BASE_URL + '/api/v1/cargo_station/count';
 };
 
 export const paymentMethodPath = () => {
@@ -90,4 +90,12 @@ export const countOrganizationPath = () => {
 
 export const countServicePath = () => {
   return BASE_URL + '/api/v1/service/count';
+}
+
+export const whPath = () => {
+  return BASE_URL + '/api/v1/wh';
+}
+
+export const countWhPath = () => {
+  return BASE_URL + '/api/v1/wh/count';
 }

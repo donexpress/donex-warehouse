@@ -79,5 +79,8 @@
 	"name": "Nombre",
 	"principal": "Principal",
 	"receiving_area": "Área de recepción",
-	"country": "Nación"
+	"country": "Nación",
+	"warehouse_code": "Código de almacén",
+	"address": "Dirección",
+	"postal_code": "Código postal"
 }

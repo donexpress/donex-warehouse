@@ -31,7 +31,16 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                                 },
                                 {
                                     label: intl.formatMessage({ id: 'warehouseManagement' }),
-                                    route: RouteMenu.WAREHOUSE_MANAGEMENT
+                                    items:[
+                                        {
+                                            label: 'Insertar almacen',
+                                            route: RouteMenu.INSERT_WAREHOUSE
+                                        },
+                                        {
+                                            label: 'Listar almacenes',
+                                            route: RouteMenu.WAREHOUSE_MANAGEMENT
+                                        }
+                                    ]
                                 },
                                 {
                                     label: intl.formatMessage({ id: 'operatingInstructions' }),
@@ -243,7 +252,36 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                                                             {
                                                                 subOption.items.map((finalOption, index3) => (
                                                                     <li key={index3}>
-                                                                        <a href={`/${locale}/${inOMS ? 'oms' : ''}${inWMS ? 'wms' : ''}/${finalOption.route}`}>{finalOption.label}</a>
+                                                                        {
+                                                                            finalOption.route && (
+                                                                                <a href={`/${locale}/${inOMS ? 'oms' : ''}${inWMS ? 'wms' : ''}/${finalOption.route}`}>{finalOption.label}</a>
+                                                                            )
+                                                                        }
+                                                                        {
+                                                                            finalOption.items && (finalOption.items.length > 0) && (
+                                                                                <div className='sub-option'>
+                                                                                    <span>
+                                                                                        {finalOption.label}
+                                                                                    </span>
+                                                                                    <span className='elements-center'>
+                                                                                        <FaAngleRight size={14} />
+                                                                                    </span>
+                                                                                </div>
+                                                                            )
+                                                                        }
+                                                                        {
+                                                                            finalOption.items && (finalOption.items.length > 0) && (
+                                                                                <ul>
+                                                                                    {
+                                                                                        finalOption.items.map((ultimate, index4) => (
+                                                                                            <li key={index4}>
+                                                                                                <a href={`/${locale}/${inOMS ? 'oms' : ''}${inWMS ? 'wms' : ''}/${ultimate.route}`}>{ultimate.label}</a>
+                                                                                            </li>
+                                                                                        ))
+                                                                                    }
+                                                                                </ul>
+                                                                            )
+                                                                        }
                                                                     </li>
                                                                 ))
                                                             }

@@ -5,6 +5,7 @@ import CargoStationWarehouseFormBody from '../../../../src/app/components/wms/Ca
 import { CargoStationWarehouseProps } from '../../../../src/types';
 import { indexStateWarehouse } from '../../../../src/services/api.warehouse';
 import { indexCountries } from '../../../../src/services/api.countries';
+import { getRegionalDivision } from '../../../../src/services/api.regional_division';
 import { GetServerSidePropsContext } from 'next';
 
 const InsertWarehouseCargoStation = ({ states, countries, receptionAreas }: CargoStationWarehouseProps) => {
@@ -25,16 +26,7 @@ const InsertWarehouseCargoStation = ({ states, countries, receptionAreas }: Carg
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const states = await indexStateWarehouse(context);
   const countries = await indexCountries(context);
-  const receptionAreas = [
-      {
-          value: 'Almacen 1',
-          label: 'Almacen 1',
-      },
-      {
-          value: 'Almacen 2',
-          label: 'Almacen 2',
-      }
-  ];
+  const receptionAreas = await getRegionalDivision(context);
 
   return {
     props: {

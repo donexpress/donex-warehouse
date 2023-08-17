@@ -1,7 +1,8 @@
 export enum RouteMenu {
     STORAGE_PLAN = 'storage_plan',
     EXIT_PLAN = 'exit_plan',
-    WAREHOUSE_MANAGEMENT = 'warehouse_management',
+    WAREHOUSE_MANAGEMENT = 'warehouses',
+    INSERT_WAREHOUSE = 'warehouses/insert',
     OPERATING_INSTRUCTIONS = 'operating_instructions',
     OPERATIONS_RECORD = 'operations_record',
     INSERT_USER = 'users/insert_user',
