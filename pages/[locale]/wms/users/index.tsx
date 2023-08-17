@@ -6,7 +6,7 @@ import { UsersProps } from '../../../../src/types';
 import { getUsers } from '../../../../src/services/api.users';
 import { GetServerSidePropsContext } from 'next';
 
-const Index = ({ userList }: UsersProps) => {console.log(userList)
+const Index = ({ userList }: UsersProps) => {
     return (
         <ProtectedRoute>
             <Layout>

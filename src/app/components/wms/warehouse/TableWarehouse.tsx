@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { getWarehouses, removeWarehouseById } from '../../../../services/api.warehouse';
 import ConfirmationDialog from '../../common/ConfirmationDialog';
 import { WarehouseListProps, CargoStationWarehouseForm } from '../../../../types';
+
 const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
     const intl = useIntl();
     const router = useRouter();
@@ -82,7 +83,7 @@ const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
                             <span className='table_data'>{el.name}</span>
                             <span className='table_data'>{el.principal}</span>
                             <span className='table_data'>{el.receiving_area}</span>
-                            <span className='table_data'>{el.stateId}</span>
+                            <span className='table_data'>{el.state_id}</span>
                             <span className='table_data'>{el.country}</span>
                             <div className='table_data table_action_container'>
                                 <button className='table_action_button' style={{color: '#ff7811'}} onClick={() => handleShow(Number(el.id))}><FaEye /></button>

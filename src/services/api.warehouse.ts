@@ -66,7 +66,7 @@ export const removeWarehouseById = async (warehouseId: number):Promise<any | nul
   }
 }
 
-export const getWarehouses = async (context?: GetServerSidePropsContext):Promise<Warehouse[] | null> => {
+export const getWarehouses = async (context?: GetServerSidePropsContext):Promise<CargoStationWarehouseForm[] | null> => {
   const path = warehousePath();
   try {
     const response = await axios.get(path, getHeaders(context));
