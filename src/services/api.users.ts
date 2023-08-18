@@ -9,7 +9,7 @@ import {
   userPath,
   userStatePath
  } from '../backend';
-import { LoginBody, LoginResponse, UserProfile, UserLevelForm, PaymentMethodForm, Response } from '../types/index';
+import { LoginBody, LoginResponse, UserProfile, Response } from '../types/index';
 import { getHeaders } from '../helpers';
 import { User } from '@/types/usererege1992';
 import { UserState } from '@/types/user_stateerege1992';
@@ -26,34 +26,6 @@ export const login = async (values: LoginBody): Promise<LoginResponse> => {
       },
     };
     const response = await axios.post(path, values, config);
-    
-    if (response.status && (response.status >= 200 && response.status <= 299)) {
-      return {...response.data, status: response.status};
-    }
-    return { status: response.status ? response.status : 0 };
-  } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
-  }
-};
-
-export const createPaymentMethod = async (values: PaymentMethodForm): Promise<Response> => {
-  const path = paymentMethodPath();
-  try {
-    const response = await axios.post(path, values, getHeaders());
-    
-    if (response.status && (response.status >= 200 && response.status <= 299)) {
-      return {...response.data, status: response.status};
-    }
-    return { status: response.status ? response.status : 0 };
-  } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
-  }
-};
-
-export const createUserLevel = async (values: UserLevelForm): Promise<Response> => {
-  const path = userLevelPath();
-  try {
-    const response = await axios.post(path, values, getHeaders());
     
     if (response.status && (response.status >= 200 && response.status <= 299)) {
       return {...response.data, status: response.status};

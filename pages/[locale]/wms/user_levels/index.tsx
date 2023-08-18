@@ -1,12 +1,12 @@
 import Head from 'next/head';
 import Layout from '../../../../src/app/layout';
 import ProtectedRoute from '../../../../src/app/components/common/ProtectedRoute';
-import { WHListProps} from '../../../../src/types/warehouse';
-import { getWhs } from '../../../../src/services/api.wh';
+import { UserLevelListProps } from '../../../../src/types/user_levels';
+import { getUserLevels } from '../../../../src/services/api.user_level';
 import { GetServerSidePropsContext } from 'next';
-import WhTable from '../../../../src/app/components/wms/wh/TableWh';
+import UserLevelTable from '../../../../src/app/components/wms/userLevel/UserLevelTable';
 
-const WarehouseIndex = ({ warehouseList }: WHListProps) => {
+const UserLevel = ({ userLevelList }: UserLevelListProps) => {
   
   return (
   <ProtectedRoute>
@@ -15,20 +15,20 @@ const WarehouseIndex = ({ warehouseList }: WHListProps) => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <WhTable warehouseList={warehouseList ? warehouseList : []} />
+        <UserLevelTable userLevelList={userLevelList ? userLevelList : []} />
       </Layout>
     </ProtectedRoute>
     );
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const warehouseList = await getWhs(context);
+  const userLevelList = await getUserLevels(context);
 
   return {
     props: {
-      warehouseList
+        userLevelList
     }
   }
 }
 
-export default WarehouseIndex;
+export default UserLevel;

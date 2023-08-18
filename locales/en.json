@@ -82,5 +82,8 @@
 	"country": "Country",
 	"warehouse_code": "Warehouse code",
 	"address": "Address",
-	"postal_code": "Postal code"
+	"postal_code": "Postal code",
+	"code": "Code",
+	"designated_service": "Designated service",
+	"customer_number": "Customer number"
 }

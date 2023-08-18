@@ -58,7 +58,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
       }
       {
         type === 'select' &&
-        <select {...field} {...props} className={inputClassName} disabled={disabled}>
+        <select {...field} {...props} className={inputClassName} disabled={disabled} autoComplete='on'>
           <option value="" label={ selectLabel ? selectLabel : intl.formatMessage({ id: 'selectOption' })} />
           {options &&
             options.map((option) => (

@@ -7,6 +7,8 @@ export const generateValidationSchemaWarehouse = (intl: IntlShape) => {
         .required(intl.formatMessage({ id: 'required' })),
       english_name: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
+      state_id: Yup.string()
+        .required(intl.formatMessage({ id: 'required' })),
       /* receiving_area: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
       principal: Yup.string()
@@ -14,8 +16,6 @@ export const generateValidationSchemaWarehouse = (intl: IntlShape) => {
       contact_phone: Yup.number()
         .typeError('Debe ser un valor numérico')
         .test('longitud', 'Debe tener 10 caracteres', val => Number(val).toString().length === 10)
-        .required(intl.formatMessage({ id: 'required' })),
-      stateId: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
       address: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),

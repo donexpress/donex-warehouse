@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Layout from '../../../../../src/app/layout';
 import ProtectedRoute from '../../../../../src/app/components/common/ProtectedRoute';
-import CargoStationWarehouseFormBody from '../../../../../src/app/components/wms/CargoStationWarehouseFormBody';
+import CargoStationWarehouseFormBody from '../../../../../src/app/components/wms/warehouse/CargoStationWarehouseFormBody';
 import { CargoStationWarehouseProps } from '../../../../../src/types';
 import { indexStateWarehouse, getWarehouseById } from '../../../../../src/services/api.warehouse';
 import { indexCountries } from '../../../../../src/services/api.countries';

@@ -1,10 +1,10 @@
 import Head from 'next/head';
-import Layout from '../../../src/app/layout';
-import ProtectedRoute from '../../../src/app/components/common/ProtectedRoute';
-import UserLevelFormBody from '../../../src/app/components/wms/UserLevelFormBody';
-import { indexServices } from '../../../src/services/api.services';
+import Layout from '../../../../src/app/layout';
+import ProtectedRoute from '../../../../src/app/components/common/ProtectedRoute';
+import UserLevelFormBody from '../../../../src/app/components/wms/userLevel/UserLevelFormBody';
+import { indexServices } from '../../../../src/services/api.services';
 import { GetServerSidePropsContext } from 'next';
-import { UserLevelProps } from '../../../src/types';
+import { UserLevelProps } from '../../../../src/types/user_levels';
 
 const InsertUserLevel = ({ services }: UserLevelProps) => {
   return (

@@ -18,11 +18,11 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
     const initialValues: Warehouse = {
       code: (id && warehouse) ? warehouse.code : '',
       name: (id && warehouse) ? warehouse.name : '',
-      contact_person: (id && warehouse) ? warehouse.contact_person : '',
+      contact: (id && warehouse) ? warehouse.contact : '',
       company: (id && warehouse) ? warehouse.company : '',
       country: (id && warehouse) ? warehouse.country : '',
-      address: (id && warehouse) ? warehouse.address : '',
-      address2: (id && warehouse) ? warehouse.address2 : '',
+      address_1: (id && warehouse) ? warehouse.address_1 : '',
+      address_2: (id && warehouse) ? warehouse.address_2 : '',
       city: (id && warehouse) ? warehouse.city : '',
       province: (id && warehouse) ? warehouse.province : '',
       cp: (id && warehouse) ? warehouse.cp : '',
@@ -36,7 +36,7 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
       countriesAll.forEach((country) => {
         response.push({
           value: country.name,
-          label: country.name
+          label: country.emoji + ' ' + country.name
         });
       })
       return response;
@@ -113,7 +113,7 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                           />
                           <GenericInput
                             type="text"
-                            name="contact_person"
+                            name="contact"
                             placeholder="Persona de contacto"
                             customClass="custom-input"
                             disabled={ isFromDetails }
@@ -135,14 +135,14 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                           />
                           <GenericInput
                             type="text"
-                            name="address"
+                            name="address_1"
                             placeholder="Dirección 1"
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
-                            name="address2"
+                            name="address_2"
                             placeholder="Dirección 2"
                             customClass="custom-input"
                             disabled={ isFromDetails }
@@ -200,7 +200,7 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                                 className='user-form-body__accept_button'
                                 disabled={isSubmitting || !isValid}
                               >
-                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : 'Crear'}
+                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? "Modificar" :'Adicionar')}
                               </button>
                             )
                           }

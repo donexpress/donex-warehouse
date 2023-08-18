@@ -89,6 +89,7 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
                         customClass="custom-input"
                         hasRepresentativeIcon={true}
                         isUserField={true}
+                        required
                       />
                       <GenericInput
                         type="password"
@@ -97,6 +98,7 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
                         customClass="custom-input"
                         hasRepresentativeIcon={true}
                         isPasswordField={true}
+                        required
                       />
                       <button
                         type="submit"

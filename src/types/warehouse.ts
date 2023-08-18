@@ -4,11 +4,11 @@ export type Warehouse = {
     id?: number;
     code: string;
     name: string;
-    contact_person: string;
+    contact: string;
     company: string;
     country: string;
-    address: string;
-    address2: string;
+    address_1: string;
+    address_2: string;
     city: string;
     province: string;
     cp: string;

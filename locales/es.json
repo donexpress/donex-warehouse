@@ -82,5 +82,8 @@
 	"country": "Nación",
 	"warehouse_code": "Código de almacén",
 	"address": "Dirección",
-	"postal_code": "Código postal"
+	"postal_code": "Código postal",
+	"code": "Código",
+	"designated_service": "Servicio designado",
+	"customer_number": "Número del cliente"
 }

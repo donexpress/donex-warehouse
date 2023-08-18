@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Layout from '../../../../src/app/layout';
 import ProtectedRoute from '../../../../src/app/components/common/ProtectedRoute';
-import UserFormBody from '../../../../src/app/components/wms/UserFormBody';
+import UserFormBody from '../../../../src/app/components/wms/user/UserFormBody';
 import { UserFormProps } from '../../../../src/types';
 import { getStaff } from '@/services/api.stafferege1992';
 import { getSubsidiary } from '@/services/api.subsidiaryerege1992';

@@ -1,28 +1,28 @@
 import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 import '../../../../styles/wms/user.table.scss'
-import { FaSearch, FaEye, FaPen, FaTrash } from 'react-icons/fa';
+import { FaSearch, FaEye, FaPen } from 'react-icons/fa';
 import { FaCirclePlus, FaTrashCan } from 'react-icons/fa6';
 import { useEffect, useState } from 'react';
-import { getUsers, removeUser } from '@/services/api.userserege1992';
-import { User } from '@/types/usererege1992';
+import { getUserLevels, removeUserLevelById } from '../../../../services/api.user_level';
 import ConfirmationDialog from '../../common/ConfirmationDialog';
-import { UsersProps } from '../../../../types';
-const UserTable = ({ userList }: UsersProps) => {
+import { UserLevel, UserLevelListProps } from '../../../../types/user_levels';
+
+const UserLevelTable = ({ userLevelList }: UserLevelListProps) => {
     const intl = useIntl();
     const router = useRouter();
     const { locale } = router.query;
-    const [users, setUsers] = useState<User[]>([])
+    const [userLevels, setUserLevels] = useState<UserLevel[]>([])
     const [showConfirm, setShowConfirm] = useState<boolean>(false)
     const [deleteElement, setDeleteElemtent] = useState<number>(-1)
 
     useEffect(() => {
-        setUsers(userList);
+        setUserLevels(userLevelList);
     }, [])
 
-    const loadUsers = async () => {
-        const users = await getUsers();
-        setUsers(users);
+    const loadWarehouses = async () => {
+        const pms = await getUserLevels();
+        setUserLevels(pms ? pms : []);
     }
 
     const handleDelete = (id: number) => {
@@ -31,11 +31,11 @@ const UserTable = ({ userList }: UsersProps) => {
     }
 
     const handleEdit = (id: number) => {
-        router.push(`/${locale}/wms/users/${id}/update_user`)
+        router.push(`/${locale}/wms/user_levels/${id}/update`)
     }
 
     const handleShow = (id: number) => {
-        router.push(`/${locale}/wms/users/${id}/show_user`)
+        router.push(`/${locale}/wms/user_levels/${id}/show`)
     }
 
     const close = () => {
@@ -44,9 +44,9 @@ const UserTable = ({ userList }: UsersProps) => {
     }
 
     const confirm = async() => {
-        const reponse = await removeUser(deleteElement)
+        const reponse = await removeUserLevelById(deleteElement)
         close()
-        await loadUsers()
+        await loadWarehouses()
     }
 
     return (
@@ -54,7 +54,7 @@ const UserTable = ({ userList }: UsersProps) => {
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
-                        <div className="table_title">Usuarios</div>
+                        <div className="table_title">Niveles de usuario</div>
                     </div>
                     <div className="table_row table_menu" style={{ marginTop: '10px', justifyContent: 'space-between' }}>
                         <div className="search">
@@ -62,7 +62,7 @@ const UserTable = ({ userList }: UsersProps) => {
                             <button className='table_search_button'><FaSearch /></button>
                         </div>
                         <div className="table_actions">
-                            <a href={`/${locale}/wms/users/insert_user`} className='accent_button' style={{display: 'flex', width: '120px', justifyContent: 'space-around', alignItems: 'center'}}>
+                            <a href={`/${locale}/wms/user_levels/insert`} className='accent_button' style={{display: 'flex', width: '120px', justifyContent: 'space-around', alignItems: 'center'}}>
                                <FaCirclePlus /> {intl.formatMessage({ id: 'create' })}
                             </a>
                         </div>
@@ -71,24 +71,24 @@ const UserTable = ({ userList }: UsersProps) => {
                 </div>
                 <div className="table_body">
                     <div className="table_body_header table_columns">
-                        <span>{intl.formatMessage({ id: 'customer_number' })}</span>
-                        <span>{intl.formatMessage({ id: 'username' })}</span>
-                        <span>{intl.formatMessage({ id: 'contact' })}</span>
-                        <span>{intl.formatMessage({ id: 'payment_method' })}</span>
-                        <span>{intl.formatMessage({ id: 'state' })}</span>
+                        <span>{intl.formatMessage({ id: 'name' })}</span>
+                        <span>{intl.formatMessage({ id: 'designated_service' })}</span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
                         <span>{intl.formatMessage({ id: 'actions' })}</span>
                     </div>
-                    { users.map((el, index) => (
+                    { userLevels.map((el, index) => (
                         <div className={`${(index %2 === 0) ? '' : 'table_stripe'} table_columns`} key={index} style={{marginTop: '5px'}}>
-                            <span className='table_data'>{el.customer_number}</span>
-                            <span className='table_data'>{el.username}</span>
-                            <span className='table_data'>{el.contact}</span>
-                            <span className='table_data'>{el.payment_method_id}</span>
-                            <span className='table_data'>{el.state_id}</span>
+                            <span className='table_data'>{el.name}</span>
+                            <span className='table_data'>{el.service_id}</span>
+                            <span className='table_data'></span>
+                            <span className='table_data'></span>
+                            <span className='table_data'></span>
                             <div className='table_data table_action_container'>
-                                <button className='table_action_button' style={{color: '#ff7811'}} onClick={() => handleShow(el.id)}><FaEye /></button>
-                                <button className='table_action_button' style={{color: '#ff7811'}} onClick={()=> handleEdit(el.id)}><FaPen /></button>
-                                {/* <button className='table_action_button' style={{color: '#f3412f'}} onClick={() => handleDelete(el.id)}><FaTrashCan /></button> */}
+                                <button className='table_action_button' style={{color: '#ff7811'}} onClick={() => handleShow(Number(el.id))}><FaEye /></button>
+                                <button className='table_action_button' style={{color: '#ff7811'}} onClick={()=> handleEdit(Number(el.id))}><FaPen /></button>
+                                <button className='table_action_button' style={{color: '#f3412f'}} onClick={() => handleDelete(Number(el.id))}><FaTrashCan /></button>
                             </div>
                         </div>
                     ))}
@@ -101,4 +101,4 @@ const UserTable = ({ userList }: UsersProps) => {
     )
 }
 
-export default UserTable
+export default UserLevelTable

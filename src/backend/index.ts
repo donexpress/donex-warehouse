@@ -93,9 +93,9 @@ export const countServicePath = () => {
 }
 
 export const whPath = () => {
-  return BASE_URL + '/api/v1/wh';
+  return BASE_URL + '/api/v1/aos_warehouse';
 }
 
 export const countWhPath = () => {
-  return BASE_URL + '/api/v1/wh/count';
+  return BASE_URL + '/api/v1/aos_warehouse/count';
 }

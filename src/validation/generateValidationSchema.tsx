@@ -72,8 +72,8 @@ export const generateValidationSchemaUserLevel = (intl: IntlShape) => {
   return Yup.object({
     name: Yup.string()
       .required(intl.formatMessage({ id: 'required' })),
-    designated_service: Yup.string()
-      .required(intl.formatMessage({ id: 'required' })),
+    /* designated_service: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })), */
   });
 };
 

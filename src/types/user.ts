@@ -11,6 +11,7 @@ export type User = {
     contact: string;
     company: string;
     email: string;
+    phone_number: string;
     phone: string;
     qq: string;
     credits: string;
@@ -34,5 +35,6 @@ export type User = {
     sales_representatives: Staff | null;
     sales_sources: Staff | null;
     payment_method_id: number | null;
-    user_level_id: number | null
+    user_level_id: number | null;
+    customer_number?: string;
 }

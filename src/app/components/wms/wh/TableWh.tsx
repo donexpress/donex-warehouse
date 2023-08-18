@@ -83,7 +83,7 @@ const WhTable = ({ warehouseList }: WHListProps) => {
                             <span className='table_data'>{el.name}</span>
                             <span className='table_data'>{el.code}</span>
                             <span className='table_data'>{el.country}</span>
-                            <span className='table_data'>{el.address}</span>
+                            <span className='table_data'>{el.address_1}</span>
                             <span className='table_data'>{el.cp}</span>
                             <div className='table_data table_action_container'>
                                 <button className='table_action_button' style={{color: '#ff7811'}} onClick={() => handleShow(Number(el.id))}><FaEye /></button>

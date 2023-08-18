@@ -11,8 +11,8 @@ export enum RouteMenu {
     LIST_STAFF = 'staff',
     INSERT_WAREHOUSE_CARGO_STATION = 'warehouse_cargo_station/insert',
     LIST_WAREHOUSE_CARGO_STATION = 'warehouse_cargo_station',
-    INSERT_PAYMENT_METHOD = 'insert_payment_method',
+    INSERT_PAYMENT_METHOD = 'payment_methods/insert',
     LIST_PAYMENT_METHODS = 'payment_methods',
-    INSERT_USER_LEVEL = 'insert_user_level',
+    INSERT_USER_LEVEL = 'user_levels/insert',
     LIST_USER_LEVELS = 'user_levels',
 };

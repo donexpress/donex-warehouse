@@ -1,12 +1,12 @@
 import Head from 'next/head';
 import Layout from '../../../../src/app/layout';
 import ProtectedRoute from '../../../../src/app/components/common/ProtectedRoute';
-import { WHListProps} from '../../../../src/types/warehouse';
-import { getWhs } from '../../../../src/services/api.wh';
+import { PaymentMethodListProps } from '../../../../src/types/payment_methods';
+import { getPaymentMethods } from '../../../../src/services/api.payment_method';
 import { GetServerSidePropsContext } from 'next';
-import WhTable from '../../../../src/app/components/wms/wh/TableWh';
+import PaymentMethodTable from '../../../../src/app/components/wms/paymentMethod/PaymentMethodTable';
 
-const WarehouseIndex = ({ warehouseList }: WHListProps) => {
+const PaymentMethod = ({ paymentMethodList }: PaymentMethodListProps) => {
   
   return (
   <ProtectedRoute>
@@ -15,20 +15,20 @@ const WarehouseIndex = ({ warehouseList }: WHListProps) => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <WhTable warehouseList={warehouseList ? warehouseList : []} />
+        <PaymentMethodTable paymentMethodList={paymentMethodList ? paymentMethodList : []} />
       </Layout>
     </ProtectedRoute>
     );
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const warehouseList = await getWhs(context);
+  const paymentMethodList = await getPaymentMethods(context);
 
   return {
     props: {
-      warehouseList
+        paymentMethodList
     }
   }
 }
 
-export default WarehouseIndex;
+export default PaymentMethod;

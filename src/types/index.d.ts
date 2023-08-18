@@ -50,7 +50,7 @@ export type UserForm = {
   contact: string;
   company: string;
   email: string;
-  phone_number_mobile: string;
+  phone_number: string;
   phone: string;
   qq: string;
   user_level_id: number | null;
@@ -66,6 +66,7 @@ export type UserForm = {
   shipping_control: boolean;
   hidde_transfer_order: boolean;
   reset_password: boolean;
+  customer_number?: string;
 };
 
 export type CargoStationWarehouseForm = {
@@ -86,17 +87,6 @@ export type CargoStationWarehouseForm = {
   customer_order_number_rules: string;
 };
 
-export type PaymentMethodForm = {
-  code: string;
-  name: string;
-};
-
-export type UserLevelForm = {
-  name: string;
-  designated_service: number;
-  instructions: string;
-};
-
 export type StateWarehouse = {
   id: number;
   name: string;
@@ -109,10 +99,6 @@ export type CargoStationWarehouseProps = {
   states: StateWarehouse[];
   countries: Country[];
   receptionAreas: any[];
-};
-
-export type UserLevelProps = {
-  services: Service[];
 };
 
 export type UsersProps = {

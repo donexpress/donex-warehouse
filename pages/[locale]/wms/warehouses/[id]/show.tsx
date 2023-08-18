@@ -22,23 +22,8 @@ const ShowWarehouse = ({ countries, warehouse, id }: WarehouseProps) => {
   
   export async function getServerSideProps(context: any) {
     const { id } = context.params;
-    //const warehouse = await getWhById(id, context);
+    const warehouse = await getWhById(id, context);
     const countries = await indexCountries(context);
-    const warehouse  = {
-      code: '',
-      name: '',
-      contact_person: '',
-      company: '',
-      country: '',
-      address: '',
-      address2: '',
-      city: '',
-      province: '',
-      cp: '',
-      phone: '',
-      email: '',
-      observations: '',
-    };
   
     return {
       props: {

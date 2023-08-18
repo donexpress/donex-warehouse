@@ -1,5 +1,5 @@
 import ProtectedRoute from "@/app/components/common/ProtectedRouteerege1992"
-import UserFormBody from "@/app/components/wms/UserFormBodyerege1992"
+import UserFormBody from "@/app/components/wms/user/UserFormBodyerege1992"
 import Layout from "@/app/layouterege1992"
 import Head from "next/head"
 import { getUserById } from '../../../../../src/services/api.users';

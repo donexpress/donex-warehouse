@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import '../../../styles/wms/user.form.scss';
-import { showMsg } from '../../../helpers';
+import '../../../../styles/wms/user.form.scss';
+import { showMsg } from '../../../../helpers';
 import { useRouter } from 'next/router'
-import { generateValidationSchemaUser, generateValidationSchemaUserModify } from '../../../validation/generateValidationSchema';
+import { generateValidationSchemaUser, generateValidationSchemaUserModify } from '../../../../validation/generateValidationSchema';
 import { Formik, Form } from 'formik';
-import GenericInput from '../common/GenericInput';
+import GenericInput from '../../common/GenericInput';
 import { useIntl } from 'react-intl';
-import { UserForm, Response } from '../../../types';
+import { UserForm, Response } from '../../../../types';
 import { createUser, updateUser } from '@/services/api.userserege1992';
-import { UserFormProps } from '../../../types';
+import { UserFormProps } from '../../../../types';
 
 const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionList, subsidiarieList, warehouseList, userLevelList, paymentMethodList, userStateList }: UserFormProps) => {
   const router = useRouter();
@@ -32,7 +32,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
     contact: (id && user) ? user.contact : '',
     company: (id && user) ? user.company : '',
     email: (id && user) ? user.email : '',
-    phone_number_mobile: (id && user) ? user.phone : '',
+    phone_number: (id && user) ? user.phone_number : '',
     phone: (id && user) ? user.phone : '',
     qq: (id && user) ? user.qq : '',
     user_level_id: (id && user) ? (user.user_level_id !== null ? user.user_level_id : null) : null,
@@ -194,7 +194,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   />
                   <GenericInput
                     type="text"
-                    name="phone_number_mobile"
+                    name="phone_number"
                     placeholder="Teléfono móvil"
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -305,7 +305,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                           className='user-form-body__accept_button'
                           disabled={isSubmitting || !isValid}
                         >
-                          {isSubmitting ? intl.formatMessage({ id: 'sending' }) : id ? "Modificar" :'Crear'}
+                          {isSubmitting ? intl.formatMessage({ id: 'sending' }) : id ? "Modificar" :'Adicionar'}
                         </button>
                       )
                     }

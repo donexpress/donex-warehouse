@@ -1,13 +1,13 @@
 import React from 'react';
-import '../../../styles/wms/user.form.scss';
-import { showMsg, isOMS, isWMS } from '../../../helpers';
+import '../../../../styles/wms/user.form.scss';
+import { showMsg, isOMS, isWMS } from '../../../../helpers';
 import { useRouter } from 'next/router'
-import { generateValidationSchemaWarehouse } from '../../../validation/generateValidationSchemaWarehouse';
+import { generateValidationSchemaWarehouse } from '../../../../validation/generateValidationSchemaWarehouse';
 import { Formik, Form } from 'formik';
-import GenericInput from '../common/GenericInput';
+import GenericInput from '../../common/GenericInput';
 import { useIntl } from 'react-intl';
-import { CargoStationWarehouseForm, Country, StateWarehouse, CargoStationWarehouseProps, ValueSelect, Response } from '../../../types';
-import { createCargoTerminal, updateWarehouseById } from '../../../services/api.warehouse';
+import { CargoStationWarehouseForm, Country, StateWarehouse, CargoStationWarehouseProps, ValueSelect, Response } from '../../../../types';
+import { createCargoTerminal, updateWarehouseById } from '../../../../services/api.warehouse';
 
 const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, warehouse, isFromDetails }: CargoStationWarehouseProps) => {
     const router = useRouter();
@@ -47,7 +47,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
       countriesAll.forEach((country) => {
         response.push({
           value: country.name,
-          label: country.name
+          label: country.emoji + ' ' + country.name
         });
       })
       return response;
@@ -130,6 +130,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                             placeholder="Nombre del sitio"
                             customClass="custom-input"
                             disabled={ isFromDetails }
+                            required
                           />
                           <GenericInput
                             type="text"
@@ -137,6 +138,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                             placeholder="Nombre del sitio (inglés)"
                             customClass="custom-input"
                             disabled={ isFromDetails }
+                            required
                           />
                           <GenericInput
                             type="select"
@@ -236,7 +238,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                                 className='user-form-body__accept_button'
                                 disabled={isSubmitting || !isValid}
                               >
-                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : 'Crear'}
+                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? "Modificar" :'Adicionar')}
                               </button>
                             )
                           }
@@ -265,6 +267,19 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                     </Form>
                   )}
                 </Formik>
+                {
+                  !isFromDetails && (
+                    <div style={{ fontSize: '14px', color: '#757575', paddingTop: '20px' }}>
+                      <div style={{ fontWeight: 600 }}>Formato de número único</div>
+                      <div>
+                        <div>•	{"{shipment_id}"}: Número de seguimiento del sistema</div>
+                        <div>•	{"{client_reference}"}: Número de pedido del cliente</div>
+                        <div>•	{"{ext_numbers}"}: Números impares extendidos</div>
+                        <div>•	{"{self_reference}"}: Número de seguimiento asociado</div>
+                      </div>
+                    </div>
+                  )
+                }
                 </div>
             </div>
         </div>
