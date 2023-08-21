@@ -8,7 +8,7 @@ import { getWhs, removeWhById } from '../../../../services/api.wh';
 import ConfirmationDialog from '../../common/ConfirmationDialog';
 import { Warehouse, WHListProps } from '../../../../types/warehouse';
 
-const WhTable = ({ warehouseList }: WHListProps) => {
+const WhTable = ({ warehouseList, countries }: WHListProps) => {
     const intl = useIntl();
     const router = useRouter();
     const { locale } = router.query;
@@ -19,6 +19,16 @@ const WhTable = ({ warehouseList }: WHListProps) => {
     useEffect(() => {
         setWarehouses(warehouseList);
     }, [])
+
+    const getCountryLabel = (countryId: string) => {
+        if (countryId !== null && countries.length > 0) {
+            const filter = countries.filter(country => country.name === countryId);
+            if (filter.length > 0) {
+                return filter[0].emoji + ' ' + filter[0].name;
+            }
+        }
+        return countryId;
+    }
 
     const loadWarehouses = async () => {
         const whs = await getWhs();
@@ -50,7 +60,7 @@ const WhTable = ({ warehouseList }: WHListProps) => {
     }
 
     return (
-        <div className='wrapper'>
+        <div className='list-elements scrollable-hidden'>
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
@@ -71,7 +81,7 @@ const WhTable = ({ warehouseList }: WHListProps) => {
                 </div>
                 <div className="table_body">
                     <div className="table_body_header table_columns">
-                        <span>{intl.formatMessage({ id: 'name' })}</span>
+                        <span>{intl.formatMessage({ id: 'warehouse_name' })}</span>
                         <span>{intl.formatMessage({ id: 'warehouse_code' })}</span>
                         <span>{intl.formatMessage({ id: 'country' })}</span>
                         <span>{intl.formatMessage({ id: 'address' })}</span>
@@ -82,7 +92,7 @@ const WhTable = ({ warehouseList }: WHListProps) => {
                         <div className={`${(index %2 === 0) ? '' : 'table_stripe'} table_columns`} key={index} style={{marginTop: '5px'}}>
                             <span className='table_data'>{el.name}</span>
                             <span className='table_data'>{el.code}</span>
-                            <span className='table_data'>{el.country}</span>
+                            <span className='table_data'>{getCountryLabel(el.country)}</span>
                             <span className='table_data'>{el.address_1}</span>
                             <span className='table_data'>{el.cp}</span>
                             <div className='table_data table_action_container'>

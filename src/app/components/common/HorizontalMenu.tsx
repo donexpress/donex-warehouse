@@ -23,7 +23,12 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                             items: [
                                 {
                                     label: intl.formatMessage({ id: 'storagePlan' }),
-                                    route: RouteMenu.STORAGE_PLAN
+                                    items: [
+                                        {
+                                            label: intl.formatMessage({ id: 'insertStoragePlan' }),
+                                            route: RouteMenu.INSERT_STORAGE_PLAN
+                                        }
+                                    ]
                                 },
                                 {
                                     label: intl.formatMessage({ id: 'exitPlan' }),

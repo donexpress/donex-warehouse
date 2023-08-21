@@ -10,6 +10,13 @@
     }
 }
 
+.list-elements {
+    height: calc(100vh - 115px);
+    overflow-y: scroll;
+    padding: 20px 0;
+    width: 100%;
+}
+
 .table_row {
     width: 100%;
     display: flex;

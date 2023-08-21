@@ -8,7 +8,7 @@ import { getWarehouses, removeWarehouseById } from '../../../../services/api.war
 import ConfirmationDialog from '../../common/ConfirmationDialog';
 import { WarehouseListProps, CargoStationWarehouseForm } from '../../../../types';
 
-const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
+const WarehouseTable = ({ warehouseList, states, countries, receptionAreas }: WarehouseListProps) => {
     const intl = useIntl();
     const router = useRouter();
     const { locale } = router.query;
@@ -19,6 +19,36 @@ const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
     useEffect(() => {
         setWarehouses(warehouseList);
     }, [])
+
+    const getStateLabel = (stateId: number | null) => {
+        if (stateId !== null && states.length > 0) {
+            const filter = states.filter(state => state.id === stateId);
+            if (filter.length > 0) {
+                return filter[0].name;
+            }
+        }
+        return stateId;
+    }
+
+    const getCountryLabel = (countryId: string) => {
+        if (countryId !== null && countries.length > 0) {
+            const filter = countries.filter(country => country.name === countryId);
+            if (filter.length > 0) {
+                return filter[0].emoji + ' ' + filter[0].name;
+            }
+        }
+        return countryId;
+    }
+
+    const getReceptionAreaLabel = (receptionAreaId: string) => {
+        if (receptionAreaId !== null && receptionAreas.length > 0) {
+            const filter = receptionAreas.filter(receptionArea => receptionArea.name === receptionAreaId);
+            if (filter.length > 0) {
+                return filter[0].name;
+            }
+        }
+        return receptionAreaId;
+    }
 
     const loadWarehouses = async () => {
         const whs = await getWarehouses();
@@ -50,7 +80,7 @@ const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
     }
 
     return (
-        <div className='wrapper'>
+        <div className='list-elements scrollable-hidden'>
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
@@ -82,9 +112,9 @@ const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
                         <div className={`${(index %2 === 0) ? '' : 'table_stripe'} table_columns`} key={index} style={{marginTop: '5px'}}>
                             <span className='table_data'>{el.name}</span>
                             <span className='table_data'>{el.principal}</span>
-                            <span className='table_data'>{el.receiving_area}</span>
-                            <span className='table_data'>{el.state_id}</span>
-                            <span className='table_data'>{el.country}</span>
+                            <span className='table_data'>{getReceptionAreaLabel(el.receiving_area)}</span>
+                            <span className='table_data'>{getStateLabel(el.state_id)}</span>
+                            <span className='table_data'>{getCountryLabel(el.country)}</span>
                             <div className='table_data table_action_container'>
                                 <button className='table_action_button' style={{color: '#ff7811'}} onClick={() => handleShow(Number(el.id))}><FaEye /></button>
                                 <button className='table_action_button' style={{color: '#ff7811'}} onClick={()=> handleEdit(Number(el.id))}><FaPen /></button>

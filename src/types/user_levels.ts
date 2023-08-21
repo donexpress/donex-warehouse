@@ -16,4 +16,5 @@ export type UserLevelProps = {
 
 export type UserLevelListProps = {
   userLevelList: UserLevel[];
+  servicesList: Service[];
 };

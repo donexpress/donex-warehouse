@@ -72,6 +72,14 @@ export const countUserLevelPath = () => {
   return BASE_URL + '/api/v1/user_level/count';
 };
 
+export const storagePlanPath = () => {
+  return BASE_URL + '/api/v1/storage_plan';
+};
+
+export const countStoragePlanPath = () => {
+  return BASE_URL + '/api/v1/storage_plan/count';
+};
+
 export const countriesPath = () => {
   return BASE_URL + '/api/v1/countries';
 }

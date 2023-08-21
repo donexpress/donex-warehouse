@@ -1,13 +1,13 @@
 import Head from 'next/head';
 import Layout from '../../../../src/app/layout';
 import ProtectedRoute from '../../../../src/app/components/common/ProtectedRoute';
-import { WHListProps} from '../../../../src/types/warehouse';
+import StoragePlanFormBody from '../../../../src/app/components/wms/storagePlan/StoragePlanFormBody';
+import { StoragePlanProps } from '../../../../src/types/storage_plan';
+import { getUsers } from '../../../../src/services/api.users';
 import { getWhs } from '../../../../src/services/api.wh';
 import { GetServerSidePropsContext } from 'next';
-import WhTable from '../../../../src/app/components/wms/wh/TableWh';
-import { indexCountries } from '../../../../src/services/api.countries';
 
-const WarehouseIndex = ({ warehouseList, countries }: WHListProps) => {
+const InsertStoragePlan = ({ warehouses, users }: StoragePlanProps) => {
   
   return (
   <ProtectedRoute>
@@ -16,22 +16,22 @@ const WarehouseIndex = ({ warehouseList, countries }: WHListProps) => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <WhTable warehouseList={warehouseList ? warehouseList : []} countries={countries ? countries : []} />
+        <StoragePlanFormBody warehouses={warehouses ? warehouses : []} users={users ? users : []} />
       </Layout>
     </ProtectedRoute>
     );
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const warehouseList = await getWhs(context);
-  const countries = await indexCountries(context);
+  const users = await getUsers(context);
+  const warehouses = await getWhs(context);
 
   return {
     props: {
-      warehouseList,
-      countries
+        warehouses,
+        users,
     }
   }
 }
 
-export default WarehouseIndex;
+export default InsertStoragePlan;

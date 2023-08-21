@@ -7,5 +7,11 @@ export const generateValidationSchemaWH = (intl: IntlShape) => {
         .required(intl.formatMessage({ id: 'required' })),
       name: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
+      contact: Yup.string()
+        .required(intl.formatMessage({ id: 'required' })),
+      country: Yup.string()
+        .required(intl.formatMessage({ id: 'required' })),
+      address_1: Yup.string()
+        .required(intl.formatMessage({ id: 'required' })),
     });
   };

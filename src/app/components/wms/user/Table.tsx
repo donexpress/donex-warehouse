@@ -8,7 +8,7 @@ import { getUsers, removeUser } from '@/services/api.userserege1992';
 import { User } from '@/types/usererege1992';
 import ConfirmationDialog from '../../common/ConfirmationDialog';
 import { UsersProps } from '../../../../types';
-const UserTable = ({ userList }: UsersProps) => {
+const UserTable = ({ userList, paymentMethodList, userStateList }: UsersProps) => {
     const intl = useIntl();
     const router = useRouter();
     const { locale } = router.query;
@@ -23,6 +23,26 @@ const UserTable = ({ userList }: UsersProps) => {
     const loadUsers = async () => {
         const users = await getUsers();
         setUsers(users);
+    }
+
+    const getPaymentMethodLabel = (paymentMethodId: number | null) => {
+        if (paymentMethodId !== null && paymentMethodList.length > 0) {
+            const filter = paymentMethodList.filter(paymentMethod => paymentMethod.id === paymentMethodId);
+            if (filter.length > 0) {
+                return filter[0].name;
+            }
+        }
+        return paymentMethodId;
+    }
+
+    const getUserStateLabel = (userStateId: number | null) => {
+        if (userStateId !== null && userStateList.length > 0) {
+            const filter = userStateList.filter(userState => userState.id === userStateId);
+            if (filter.length > 0) {
+                return filter[0].name;
+            }
+        }
+        return userStateId;
     }
 
     const handleDelete = (id: number) => {
@@ -50,7 +70,7 @@ const UserTable = ({ userList }: UsersProps) => {
     }
 
     return (
-        <div className='wrapper'>
+        <div className='list-elements scrollable-hidden'>
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
@@ -83,8 +103,8 @@ const UserTable = ({ userList }: UsersProps) => {
                             <span className='table_data'>{el.customer_number}</span>
                             <span className='table_data'>{el.username}</span>
                             <span className='table_data'>{el.contact}</span>
-                            <span className='table_data'>{el.payment_method_id}</span>
-                            <span className='table_data'>{el.state_id}</span>
+                            <span className='table_data'>{getPaymentMethodLabel(el.payment_method_id)}</span>
+                            <span className='table_data'>{getUserStateLabel(el.state_id)}</span>
                             <div className='table_data table_action_container'>
                                 <button className='table_action_button' style={{color: '#ff7811'}} onClick={() => handleShow(el.id)}><FaEye /></button>
                                 <button className='table_action_button' style={{color: '#ff7811'}} onClick={()=> handleEdit(el.id)}><FaPen /></button>

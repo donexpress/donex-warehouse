@@ -294,7 +294,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                 />
                 <GenericInput type='checkbox' name="shipping_control" placeholder='Control de Envío' customClass='custom-input' disabled={ isFromShowUser }/>
                 <GenericInput type='checkbox' name="hidde_transfer_order" placeholder='Ocultar Orden de Transferencia' customClass='custom-input ' disabled={ isFromShowUser }/>
-                <GenericInput type='checkbox' name="reset_password" placeholder='Reinciar Contraseña' customClass='custom-input ' disabled={ isFromShowUser }/>
+                <GenericInput type='checkbox' name="reset_password" placeholder='Reiniciar Contraseña' customClass='custom-input ' disabled={ isFromShowUser }/>
                 <div className='user-form-body__buttons'>
                   <div>
                     {

@@ -169,6 +169,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                             options={getStatesFormatted(states)}
                             customClass="custom-input"
                             disabled={ isFromDetails }
+                            required
                           />
                           <GenericInput
                             type="text"
@@ -192,11 +193,11 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                             disabled={ isFromDetails }
                           />
                           <GenericInput
-                            type="select"
+                            type="select-filter"
                             name="country"
-                            selectLabel="Seleccione la Nación"
+                            placeholder="Seleccione la Nación"
                             options={getStatesFormattedCountries(countries)}
-                            customClass="custom-input"
+                            customClass="select-filter"
                             disabled={ isFromDetails }
                           />
                           <GenericInput

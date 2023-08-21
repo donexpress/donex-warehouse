@@ -26,4 +26,5 @@ export type WarehouseProps = {
 
 export type WHListProps = {
   warehouseList: Warehouse[];
+  countries: Country[];
 };

@@ -8,7 +8,7 @@ import { getUserLevels, removeUserLevelById } from '../../../../services/api.use
 import ConfirmationDialog from '../../common/ConfirmationDialog';
 import { UserLevel, UserLevelListProps } from '../../../../types/user_levels';
 
-const UserLevelTable = ({ userLevelList }: UserLevelListProps) => {
+const UserLevelTable = ({ userLevelList, servicesList }: UserLevelListProps) => {
     const intl = useIntl();
     const router = useRouter();
     const { locale } = router.query;
@@ -19,6 +19,16 @@ const UserLevelTable = ({ userLevelList }: UserLevelListProps) => {
     useEffect(() => {
         setUserLevels(userLevelList);
     }, [])
+
+    const getServiceLabel = (serviceId: number | null) => {
+        if (serviceId !== null && servicesList.length > 0) {
+            const filter = servicesList.filter(service => service.id === serviceId);
+            if (filter.length > 0) {
+                return filter[0].name;
+            }
+        }
+        return serviceId;
+    }
 
     const loadWarehouses = async () => {
         const pms = await getUserLevels();
@@ -50,7 +60,7 @@ const UserLevelTable = ({ userLevelList }: UserLevelListProps) => {
     }
 
     return (
-        <div className='wrapper'>
+        <div className='list-elements scrollable-hidden'>
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
@@ -81,7 +91,7 @@ const UserLevelTable = ({ userLevelList }: UserLevelListProps) => {
                     { userLevels.map((el, index) => (
                         <div className={`${(index %2 === 0) ? '' : 'table_stripe'} table_columns`} key={index} style={{marginTop: '5px'}}>
                             <span className='table_data'>{el.name}</span>
-                            <span className='table_data'>{el.service_id}</span>
+                            <span className='table_data'>{getServiceLabel(el.service_id)}</span>
                             <span className='table_data'></span>
                             <span className='table_data'></span>
                             <span className='table_data'></span>

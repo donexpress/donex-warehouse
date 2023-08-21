@@ -1,5 +1,6 @@
 export enum RouteMenu {
     STORAGE_PLAN = 'storage_plan',
+    INSERT_STORAGE_PLAN = 'storage_plan/insert',
     EXIT_PLAN = 'exit_plan',
     WAREHOUSE_MANAGEMENT = 'warehouses',
     INSERT_WAREHOUSE = 'warehouses/insert',

@@ -50,7 +50,7 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
     }
 
     return (
-        <div className='wrapper'>
+        <div className='list-elements scrollable-hidden'>
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">

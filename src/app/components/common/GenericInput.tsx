@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, useState } from 'react';
+import React, { InputHTMLAttributes, useState, useEffect } from 'react';
 import { Field, useField } from 'formik';
 import '../../../styles/generic.input.scss';
 import Image from 'next/image';
@@ -8,20 +8,27 @@ import showPasswordIcon from '../../../assets/icons/see_passwd.svg';
 import passwordIcon from '../../../assets/icons/login/password.svg';
 import userIcon from '../../../assets/icons/login/user.svg';
 import { useIntl } from 'react-intl';
+import Select from 'react-select';
+import { useFormikContext } from 'formik';
+
+type OptionType = {
+  value: string | number;
+  label: string;
+};
 
 type GenericInputProps = {
   label?: string;
   selectLabel?: string;
   type: TypeField;
-  options?: { value: string | number; label: string }[];
+  options?: OptionType[];
   customClass?: string;
   hasRepresentativeIcon?: boolean;
   isUserField?: boolean;
   isPasswordField?: boolean;
   disabled?: boolean;
-} & InputHTMLAttributes<
+} & (InputHTMLAttributes<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
->;
+>);
 
 const GenericInput: React.FC<GenericInputProps> = ({
   label,
@@ -38,11 +45,33 @@ const GenericInput: React.FC<GenericInputProps> = ({
   // @ts-ignore
   const [field, meta] = useField(props.name);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const intl = useIntl()
+  const intl = useIntl();
+  const formik = useFormikContext();
+  
+  const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+  const [isTouchedMenu, setIsTouchedMenu] = useState<boolean>(false);
 
   const inputClassName = `generic-input${type === 'password' ? ' input-with-right-icon' : ''}${hasRepresentativeIcon ? ' input-with-left-icon' : ''} ${customClass} ${
     meta.touched && meta.error ? 'input-error' : ''
   }`;
+
+  useEffect(() => {
+    if (type === 'select-filter') {
+      const { values } = formik;
+      // @ts-ignore
+      const value = values[String(props.name)];
+      
+      if (value && options && options.length > 0) {
+        const filter = options.filter((option) => option.value === value);
+        
+        if (filter.length > 0) {
+          setSelectedOption(filter[0]);
+        }
+      } else {
+        setSelectedOption(null);
+      }
+    }
+  }, [formik, options, type]);
 
   const getTypeField = (typeField: TypeField) => {
     if (typeField === 'password') {
@@ -59,7 +88,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
       {
         type === 'select' &&
         <select {...field} {...props} className={inputClassName} disabled={disabled} autoComplete='on'>
-          <option value="" label={ selectLabel ? selectLabel : intl.formatMessage({ id: 'selectOption' })} />
+          <option value="" label={ (selectLabel ? selectLabel : intl.formatMessage({ id: 'selectOption' })) + (props.required ? ' *' : '')} />
           {options &&
             options.map((option) => (
               <option key={option.value} value={option.value}>
@@ -73,8 +102,24 @@ const GenericInput: React.FC<GenericInputProps> = ({
         <textarea {...field} {...props} className={inputClassName} disabled={disabled} />
       }
       {
-        type !== 'select' && type !== 'textarea' && type !== 'checkbox' && 
-        <input {...field} {...props} type={getTypeField(type)} className={inputClassName} disabled={disabled} />
+        type === 'select-filter' &&    
+        <Select
+          name={props.name}
+          options={options}
+          className={customClass}
+          isDisabled={disabled}
+          placeholder={props.placeholder + (props.required ? ' *' : '')}
+          isSearchable
+          value={selectedOption}
+          onChange={(selectedOption) => {
+            formik.setFieldValue(String(props.name), selectedOption ? selectedOption.value : null);
+          }}
+          onMenuClose={()=>setIsTouchedMenu(true)}
+        />
+      }
+      {
+        type !== 'select' && type !== 'select-filter' && type !== 'textarea' && type !== 'checkbox' && 
+        <input {...field} {...props} type={getTypeField(type)} className={inputClassName} disabled={disabled} placeholder={ props.placeholder ? (props.placeholder + (props.required ? ' *' : '')) : "" } />
       }
       {
         props.placeholder && (
@@ -133,7 +178,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
           </div>
         )
       }
-      {meta.touched && meta.error ? (
+      {(meta.touched || (type === 'select-filter' && isTouchedMenu)) && meta.error ? (
         <div className='error-text'>{meta.error}</div>
       ) : (<div className='without-error'></div>)}
     </div>

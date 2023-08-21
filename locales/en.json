@@ -17,6 +17,7 @@
 	"documents": "Documents",
 	"storageAndTransshipment": "Storage and Transshipment",
 	"storagePlan": "Storage plan",
+	"insertStoragePlan": "Insert storage plan",
 	"exitPlan": "Exit plan",
 	"warehouseManagement": "Warehouse management",
 	"operatingInstructions": "Operating instructions",
@@ -85,5 +86,6 @@
 	"postal_code": "Postal code",
 	"code": "Code",
 	"designated_service": "Designated service",
-	"customer_number": "Customer number"
+	"customer_number": "Customer number",
+	"warehouse_name": "Warehouse name"
 }

@@ -1,6 +1,8 @@
 import { StaticImageData } from "next/image";
 import { Service } from './service';
 import { User } from './user';
+import { PaymentMethod } from './payment_methods';
+import { UserState } from './user_state';
 
 export type Languages = 'es' | 'en';
 
@@ -103,6 +105,8 @@ export type CargoStationWarehouseProps = {
 
 export type UsersProps = {
   userList: User[];
+  userStateList: UserState[];
+  paymentMethodList: PaymentMethod[];
 };
 
 export type UserFormProps = {
@@ -120,6 +124,9 @@ export type UserFormProps = {
 
 export type WarehouseListProps = {
   warehouseList: CargoStationWarehouseForm[];
+  states: StateWarehouse[];
+  countries: Country[];
+  receptionAreas: any[];
 };
 
 export type ValueSelect = {
@@ -164,4 +171,4 @@ export type MenuOption = {
 export type TypeOptions = "success" | "error" | "info" | "warning";
 export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
 export type TypeThemes = "light" | "dark";
-export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search' | 'checkbox';
+export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search' | 'checkbox' | 'select-filter';

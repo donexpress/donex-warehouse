@@ -100,13 +100,13 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             name="code"
                             placeholder="Código de almacén"
                             customClass="custom-input"
-                            disabled={ isFromDetails }
+                            disabled={ !!id }
                             required
                           />
                           <GenericInput
                             type="text"
                             name="name"
-                            placeholder="Nombre"
+                            placeholder="Nombre de almacén"
                             customClass="custom-input"
                             disabled={ isFromDetails }
                             required
@@ -117,6 +117,7 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             placeholder="Persona de contacto"
                             customClass="custom-input"
                             disabled={ isFromDetails }
+                            required
                           />
                           <GenericInput
                             type="text"
@@ -126,12 +127,13 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             disabled={ isFromDetails }
                           />
                           <GenericInput
-                            type="select"
+                            type="select-filter"
                             name="country"
-                            selectLabel="Seleccione la Nación"
+                            placeholder="Seleccione la Nación"
                             options={getStatesFormattedCountries(countries)}
-                            customClass="custom-input"
-                            disabled={ isFromDetails }
+                            customClass="select-filter"
+                            disabled={ !!id }
+                            required
                           />
                           <GenericInput
                             type="text"
@@ -139,6 +141,7 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             placeholder="Dirección 1"
                             customClass="custom-input"
                             disabled={ isFromDetails }
+                            required
                           />
                           <GenericInput
                             type="text"
