@@ -84,7 +84,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
 
       const treatmentToResponse = (response: Response) => {
         if (response.status >= 200 && response.status <= 299) {
-          showMsg("Plan de almacenamiento " + (id ? "modificado" : "creado") + " de manera satisfactoria.", { type: "success" });
+          const message = id ? intl.formatMessage({ id: 'changedsuccessfullyMsg' }) : intl.formatMessage({ id: 'successfullyMsg' });
+          showMsg(message, { type: "success" });
           router.push(`/${locale}/wms/storagePlan`);
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
@@ -99,7 +100,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     return (
         <div className='elements-start-center user-form scrollable-hidden'>
             <div className='user-form-body'>
-                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? "Visualizar" : "Modificar") : "Insertar"} plan de almacenamiento</b></div>
+                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? intl.formatMessage({ id: 'vizualice' }) : intl.formatMessage({ id: 'modify' })) : intl.formatMessage({ id: 'insert' })} {intl.formatMessage({ id: 'storagePlan' })}</b></div>
                 <div className='user-form-body__container'>
                 <Formik
                   initialValues={initialValues}
@@ -112,7 +113,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           <GenericInput
                             type="text"
                             name="customer_order_number"
-                            placeholder="Número de pedido del cliente"
+                            placeholder={intl.formatMessage({ id: 'customer_order_number' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                             required
@@ -120,7 +121,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           <GenericInput
                             type="select"
                             name="user_id"
-                            selectLabel="Seleccione el usuario"
+                            selectLabel={intl.formatMessage({ id: 'select_user' })}
                             options={getUsersFormatted(users)}
                             customClass="custom-input"
                             disabled={ isFromDetails }
@@ -129,7 +130,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           <GenericInput
                             type="select"
                             name="warehouse_id"
-                            selectLabel="Seleccione el almacén"
+                            selectLabel={intl.formatMessage({ id: 'select_warehouse' })}
                             options={getWarehousesFormatted(warehouses)}
                             customClass="custom-input"
                             disabled={ isFromDetails }
@@ -138,14 +139,14 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           <GenericInput
                             type="number"
                             name="boxes_count"
-                            placeholder="Número de cajas"
+                            placeholder={intl.formatMessage({ id: 'number_of_boxes' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="date"
                             name="delivery_time"
-                            placeholder="Tiempo de entrega"
+                            placeholder={intl.formatMessage({ id: 'delivery_time' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
@@ -153,7 +154,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                       <GenericInput
                         type="textarea"
                         name="observations"
-                        placeholder="Observaciones"
+                        placeholder={intl.formatMessage({ id: 'observations' })}
                         customClass="custom-input"
                         disabled={ isFromDetails }
                       />
@@ -167,7 +168,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                                 className='user-form-body__accept_button'
                                 disabled={isSubmitting || !isValid}
                               >
-                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? "Modificar" :'Adicionar')}
+                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? intl.formatMessage({ id: 'modify' }) : intl.formatMessage({ id: 'add' }))}
                               </button>
                             )
                           }
@@ -178,7 +179,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                                 className='user-form-body__accept_button'
                                 onClick={()=>goToEdit()}
                               >
-                                Ir a edición
+                                {intl.formatMessage({ id: 'go_to_edit' })}
                               </button>
                             )
                           }
@@ -189,7 +190,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             className='user-form-body__cancel'
                             onClick={()=>cancelSend()}
                           >
-                            Cancelar
+                            {intl.formatMessage({ id: 'cancel' })}
                           </button>
                         </div>
                       </div>

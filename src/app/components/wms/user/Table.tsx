@@ -74,7 +74,7 @@ const UserTable = ({ userList, paymentMethodList, userStateList }: UsersProps) =
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
-                        <div className="table_title">Usuarios</div>
+                        <div className="table_title">{intl.formatMessage({ id: 'users' })}</div>
                     </div>
                     <div className="table_row table_menu" style={{ marginTop: '10px', justifyContent: 'space-between' }}>
                         <div className="search">

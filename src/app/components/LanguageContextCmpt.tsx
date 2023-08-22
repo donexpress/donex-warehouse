@@ -10,12 +10,12 @@ interface LanguageContextProps {
 }
   
 const LanguageContext = createContext<LanguageContextProps>({
-    language: 'en',
+    language: 'es',
     changeLanguage: () => {}
 })
 
 export const LanguageProvider = ({ children }: Props) => {
-  const [language, setLanguage] = useState<string>('en') // idioma predeterminado
+  const [language, setLanguage] = useState<string>('es') // idioma predeterminado
 
   const changeLanguage = (newLanguage: string) => {
     setLanguage(newLanguage)

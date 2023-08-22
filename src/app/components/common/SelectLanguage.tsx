@@ -6,6 +6,7 @@ import { Languages, LanguageObj } from '../../../types/index';
 import messages from '../../../../messages';
 import enFlag from '../../../assets/flags/en.png';
 import esFlag from '../../../assets/flags/es.png';
+import zhFlag from '../../../assets/flags/zh.png';
 import defaultFlag from '../../../assets/flags/default.png';
 
 type LanguageProps = {
@@ -43,6 +44,7 @@ const SelectLanguage = ({ isFromLogin }: LanguageProps) => {
       switch(lang) {
         case 'en': return enFlag;
         case 'es': return esFlag;
+        case 'zh': return zhFlag;
       }
       return defaultFlag;
     };

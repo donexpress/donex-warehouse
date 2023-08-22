@@ -54,7 +54,7 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
-                        <div className="table_title">Métodos de pago</div>
+                        <div className="table_title">{intl.formatMessage({ id: 'payment_methods' })}</div>
                     </div>
                     <div className="table_row table_menu" style={{ marginTop: '10px', justifyContent: 'space-between' }}>
                         <div className="search">

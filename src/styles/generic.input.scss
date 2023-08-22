@@ -95,4 +95,15 @@ input:focus + .label-up {
     font-size: 10px;
     padding: 0 4px;
 }
+
+textarea:focus + .label-up {
+    display: inline-block;
+    position: absolute;
+    background: white;
+    top: -7px;
+    left: 10px;
+    color: #aaa;
+    font-size: 10px;
+    padding: 0 4px;
+}
   

@@ -99,7 +99,8 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
 
   const treatmentToResponse = (response: Response) => {
     if (response.status >= 200 && response.status <= 299) {
-      showMsg("Terminal de carga " + (id ? "modificada" : "creada") + " de manera satisfactoria.", { type: "success" });
+      const message = id ? intl.formatMessage({ id: 'changedsuccessfullyMsg' }) : intl.formatMessage({ id: 'successfullyMsg' });
+      showMsg(message, { type: "success" });
       router.push(`/${locale}/wms/warehouse_cargo_station`);
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
@@ -114,7 +115,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
     return (
         <div className='elements-start-center user-form scrollable-hidden'>
             <div className='user-form-body'>
-                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? "Visualizar" : "Modificar") : "Insertar"} terminal de carga</b></div>
+                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? intl.formatMessage({ id: 'vizualice' }) : intl.formatMessage({ id: 'modify' })) : intl.formatMessage({ id: 'insert' })} {intl.formatMessage({ id: 'cargoTerminal' })}</b></div>
                 <div className='user-form-body__container'>
                 <Formik
                   initialValues={initialValues}
@@ -127,7 +128,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                           <GenericInput
                             type="text"
                             name="name"
-                            placeholder="Nombre del sitio"
+                            placeholder={intl.formatMessage({ id: 'site_name' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                             required
@@ -135,7 +136,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                           <GenericInput
                             type="text"
                             name="english_name"
-                            placeholder="Nombre del sitio (inglés)"
+                            placeholder={intl.formatMessage({ id: 'site_name_english' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                             required
@@ -143,7 +144,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                           <GenericInput
                             type="select"
                             name="receiving_area"
-                            selectLabel="Seleccione el área de recepción"
+                            selectLabel={intl.formatMessage({ id: 'select_reception_area' })}
                             options={getRegionalDivisionFormatted(receptionAreas)}
                             customClass="custom-input"
                             disabled={ isFromDetails }
@@ -151,21 +152,21 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                           <GenericInput
                             type="text"
                             name="principal"
-                            placeholder="Principal"
+                            placeholder={intl.formatMessage({ id: 'principal' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="contact_phone"
-                            placeholder="Teléfono de contacto"
+                            placeholder={intl.formatMessage({ id: 'contact_phone' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="select"
                             name="state_id"
-                            selectLabel="Seleccione el estado"
+                            selectLabel={intl.formatMessage({ id: 'select_state' })}
                             options={getStatesFormatted(states)}
                             customClass="custom-input"
                             disabled={ isFromDetails }
@@ -174,28 +175,28 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                           <GenericInput
                             type="text"
                             name="address"
-                            placeholder="Dirección 1"
+                            placeholder={`${intl.formatMessage({ id: 'address' })} 1`}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="city"
-                            placeholder="Ciudad"
+                            placeholder={intl.formatMessage({ id: 'city' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="province"
-                            placeholder="Provincia / Estado"
+                            placeholder={intl.formatMessage({ id: 'province' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="select-filter"
                             name="country"
-                            placeholder="Seleccione la Nación"
+                            placeholder={intl.formatMessage({ id: 'select_nation' })}
                             options={getStatesFormattedCountries(countries)}
                             customClass="select-filter"
                             disabled={ isFromDetails }
@@ -203,28 +204,28 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                           <GenericInput
                             type="text"
                             name="cp"
-                            placeholder="Código Postal"
+                            placeholder={intl.formatMessage({ id: 'postal_code' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="shared_warehouse_system_code"
-                            placeholder="Código del sistema de almacén compartido"
+                            placeholder={intl.formatMessage({ id: 'shared_warehouse_system_code' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="shared_warehouse_docking_code"
-                            placeholder="Código de atraque de almacén compartido"
+                            placeholder={intl.formatMessage({ id: 'shared_warehouse_berth_code' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                           <GenericInput
                             type="text"
                             name="customer_order_number_rules"
-                            placeholder="Reglas de número de orden de cliente"
+                            placeholder={intl.formatMessage({ id: 'customer_order_number_rules' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
@@ -239,7 +240,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                                 className='user-form-body__accept_button'
                                 disabled={isSubmitting || !isValid}
                               >
-                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? "Modificar" :'Adicionar')}
+                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? intl.formatMessage({ id: 'modify' }) : intl.formatMessage({ id: 'add' }))}
                               </button>
                             )
                           }
@@ -250,7 +251,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                                 className='user-form-body__accept_button'
                                 onClick={()=>goToEdit()}
                               >
-                                Ir a edición
+                                {intl.formatMessage({ id: 'go_to_edit' })}
                               </button>
                             )
                           }
@@ -261,7 +262,7 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                             className='user-form-body__cancel'
                             onClick={()=>cancelSend()}
                           >
-                            Cancelar
+                            {intl.formatMessage({ id: 'cancel' })}
                           </button>
                         </div>
                       </div>
@@ -271,12 +272,12 @@ const CargoStationWarehouseFormBody = ({ states, countries, receptionAreas, id, 
                 {
                   !isFromDetails && (
                     <div style={{ fontSize: '14px', color: '#757575', paddingTop: '20px' }}>
-                      <div style={{ fontWeight: 600 }}>Formato de número único</div>
+                      <div style={{ fontWeight: 600 }}>{ intl.formatMessage({ id: 'single_number_format' }) }</div>
                       <div>
-                        <div>•	{"{shipment_id}"}: Número de seguimiento del sistema</div>
-                        <div>•	{"{client_reference}"}: Número de pedido del cliente</div>
-                        <div>•	{"{ext_numbers}"}: Números impares extendidos</div>
-                        <div>•	{"{self_reference}"}: Número de seguimiento asociado</div>
+                        <div>•	{"{shipment_id}"}: { intl.formatMessage({ id: 'system_tracking_number' }) }</div>
+                        <div>•	{"{client_reference}"}: { intl.formatMessage({ id: 'customer_order_number' }) }</div>
+                        <div>•	{"{ext_numbers}"}: { intl.formatMessage({ id: 'extended_odd_numbers' }) }</div>
+                        <div>•	{"{self_reference}"}: { intl.formatMessage({ id: 'associated_tracking_number' }) }</div>
                       </div>
                     </div>
                   )

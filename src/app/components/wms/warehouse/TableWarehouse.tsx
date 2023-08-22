@@ -84,7 +84,7 @@ const WarehouseTable = ({ warehouseList, states, countries, receptionAreas }: Wa
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
-                        <div className="table_title">Terminales de carga</div>
+                        <div className="table_title">{intl.formatMessage({ id: 'cargoTerminals' })}</div>
                     </div>
                     <div className="table_row table_menu" style={{ marginTop: '10px', justifyContent: 'space-between' }}>
                         <div className="search">

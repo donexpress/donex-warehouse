@@ -96,7 +96,8 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
 
   const treatmentToResponse = (response: Response) => {
     if (response.status >= 200 && response.status <= 299) {
-      showMsg("Usuario " + (id ? "modificado" : "creado") + " de manera satisfactoria.", { type: "success" });
+      const message = id ? intl.formatMessage({ id: 'changedsuccessfullyMsg' }) : intl.formatMessage({ id: 'successfullyMsg' });
+      showMsg(message, { type: "success" });
       router.push(`/${locale}/wms/users`);
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
@@ -114,7 +115,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
   return (
     <div className='elements-start-center user-form scrollable-hidden'>
       <div className='user-form-body'>
-        <div className='user-form-body__title black-label'><b>{id ? (isFromShowUser ? "Visualizar" : "Modificar") : "Insertar"} usuario</b></div>
+        <div className='user-form-body__title black-label'><b>{id ? (isFromShowUser ? intl.formatMessage({ id: 'vizualice' }) : intl.formatMessage({ id: 'modify' })) : intl.formatMessage({ id: 'insert' })} {intl.formatMessage({ id: 'user' })}</b></div>
         <div className='user-form-body__container'>
           <Formik
             initialValues={initialValues}
@@ -127,7 +128,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="text"
                     name="nickname"
-                    placeholder="Apodo"
+                    placeholder={intl.formatMessage({ id: 'nickname' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                     required
@@ -151,14 +152,14 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="text"
                     name="label_code"
-                    placeholder="Código de etiqueta"
+                    placeholder={intl.formatMessage({ id: 'label_code' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                   />
                   <GenericInput
                     type="select"
                     name="payment_method_id"
-                    selectLabel="Seleccione método de pago"
+                    selectLabel={intl.formatMessage({ id: 'select_payment_method' })}
                     options={paymentMethods}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -166,7 +167,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="select"
                     name="state_id"
-                    selectLabel="Seleccione el estado"
+                    selectLabel={intl.formatMessage({ id: 'select_state' })}
                     options={userStates}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -174,49 +175,49 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="text"
                     name="contact"
-                    placeholder="Persona de contacto"
+                    placeholder={intl.formatMessage({ id: 'contact' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                   />
                   <GenericInput
                     type="text"
                     name="company"
-                    placeholder="Compañía"
+                    placeholder={intl.formatMessage({ id: 'company' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                   />
                   <GenericInput
                     type="text"
                     name="email"
-                    placeholder="Correo electrónico"
+                    placeholder={intl.formatMessage({ id: 'email' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                   />
                   <GenericInput
                     type="text"
                     name="phone_number"
-                    placeholder="Teléfono móvil"
+                    placeholder={intl.formatMessage({ id: 'mobile_phone' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                   />
                   <GenericInput
                     type="text"
                     name="phone"
-                    placeholder="Teléfono"
+                    placeholder={intl.formatMessage({ id: 'phone' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                   />
                   <GenericInput
                     type="text"
                     name="qq"
-                    placeholder="QQ"
+                    placeholder={intl.formatMessage({ id: 'qq' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                   />
                   <GenericInput
                     type="select"
                     name="user_level_id"
-                    selectLabel="Seleccione el nivel de usuario"
+                    selectLabel={intl.formatMessage({ id: 'select_user_level' })}
                     options={userLevels}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -224,14 +225,14 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="text"
                     name="credits"
-                    placeholder="Créditos"
+                    placeholder={intl.formatMessage({ id: 'credits' })}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
                   />
                   <GenericInput
                     type="select"
                     name="finantial_representative"
-                    selectLabel="Seleccione representante financiero"
+                    selectLabel={intl.formatMessage({ id: 'select_financial_representative' })}
                     options={staff}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -239,7 +240,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="select"
                     name="client_service_representative"
-                    selectLabel="Seleccione representante de servicio al cliente"
+                    selectLabel={intl.formatMessage({ id: 'select_customer_service_representative' })}
                     options={staff}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -247,7 +248,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="select"
                     name="sales_representative"
-                    selectLabel="Seleccione representante de ventas"
+                    selectLabel={intl.formatMessage({ id: 'select_sales_representative' })}
                     options={staff}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -255,7 +256,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="select"
                     name="sales_source"
-                    selectLabel="Seleccione la fuente de ventas"
+                    selectLabel={intl.formatMessage({ id: 'select_source_sales' })}
                     options={staff}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -263,7 +264,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="select"
                     name="subsidiary_id"
-                    selectLabel="Seleccione el subsidiario"
+                    selectLabel={intl.formatMessage({ id: 'select_subsidiary' })}
                     options={subsidiaries}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -271,7 +272,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="select"
                     name="regional_division_id"
-                    selectLabel="Seleccione el área de recepción"
+                    selectLabel={intl.formatMessage({ id: 'select_reception_area' })}
                     options={regionalDivisions}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -279,7 +280,7 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                   <GenericInput
                     type="select"
                     name="warehouse_id"
-                    selectLabel="Seleccione el sitio"
+                    selectLabel={intl.formatMessage({ id: 'select_site' })}
                     options={warehouses}
                     customClass="custom-input"
                     disabled={ isFromShowUser }
@@ -288,49 +289,49 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
                 <GenericInput
                   type="textarea"
                   name="observations"
-                  placeholder="Observaciones"
+                  placeholder={intl.formatMessage({ id: 'observations' })}
                   customClass="custom-input"
                   disabled={ isFromShowUser }
                 />
-                <GenericInput type='checkbox' name="shipping_control" placeholder='Control de Envío' customClass='custom-input' disabled={ isFromShowUser }/>
-                <GenericInput type='checkbox' name="hidde_transfer_order" placeholder='Ocultar Orden de Transferencia' customClass='custom-input ' disabled={ isFromShowUser }/>
-                <GenericInput type='checkbox' name="reset_password" placeholder='Reiniciar Contraseña' customClass='custom-input ' disabled={ isFromShowUser }/>
+                <GenericInput type='checkbox' name="shipping_control" placeholder={intl.formatMessage({ id: 'shipping_control' })} customClass='custom-input' disabled={ isFromShowUser }/>
+                <GenericInput type='checkbox' name="hidde_transfer_order" placeholder={intl.formatMessage({ id: 'hide_transfer_order' })} customClass='custom-input ' disabled={ isFromShowUser }/>
+                <GenericInput type='checkbox' name="reset_password" placeholder={intl.formatMessage({ id: 'reset_password' })} customClass='custom-input ' disabled={ isFromShowUser }/>
+                
                 <div className='user-form-body__buttons'>
-                  <div>
-                    {
-                      !isFromShowUser &&
-                      (
-                        <button
-                          type="submit"
-                          className='user-form-body__accept_button'
-                          disabled={isSubmitting || !isValid}
-                        >
-                          {isSubmitting ? intl.formatMessage({ id: 'sending' }) : id ? "Modificar" :'Adicionar'}
-                        </button>
-                      )
-                    }
-                    {
-                      isFromShowUser && id &&
-                      (
-                        <button
-                          type="button"
-                          className='user-form-body__accept_button'
-                          onClick={()=>goToEdit()}
-                        >
-                          Ir a edición
-                        </button>
-                      )
-                    }
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      className='user-form-body__cancel'
-                      onClick={()=>cancelSend()}
-                    >
-                      Cancelar
-                    </button>
-                  </div>
+                        <div>
+                          {
+                            !isFromShowUser &&
+                            (
+                              <button
+                                type="submit"
+                                className='user-form-body__accept_button'
+                                disabled={isSubmitting || !isValid}
+                              >
+                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? intl.formatMessage({ id: 'modify' }) : intl.formatMessage({ id: 'add' }))}
+                              </button>
+                            )
+                          }
+                          {
+                            isFromShowUser && id && (
+                              <button
+                                type="button"
+                                className='user-form-body__accept_button'
+                                onClick={()=>goToEdit()}
+                              >
+                                {intl.formatMessage({ id: 'go_to_edit' })}
+                              </button>
+                            )
+                          }
+                        </div>
+                        <div>
+                          <button
+                            type="button"
+                            className='user-form-body__cancel'
+                            onClick={()=>cancelSend()}
+                          >
+                            {intl.formatMessage({ id: 'cancel' })}
+                          </button>
+                        </div>
                 </div>
               </Form>
             )}

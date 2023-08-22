@@ -14,6 +14,7 @@ import { countRole } from '@/services/api.roleerege1992';
 import { countOrganization } from '@/services/api.organizationerege1992';
 import { countWarehouse } from '@/services/api.warehouseerege1992';
 import { countService } from '@/services/api.serviceerege1992';
+import { useIntl } from 'react-intl';
 
 const RootWMS = () => {
   const [user, setUser] = useState<number>(0)
@@ -28,6 +29,7 @@ const RootWMS = () => {
   const [line, setLine] = useState<number>(0)
   const router = useRouter();
   const { locale } = router.query;
+  const intl = useIntl();
   useEffect(() => {
     setup()
   },[])
@@ -51,16 +53,16 @@ const RootWMS = () => {
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
         <div className='card_section'>
-          <DashboardCard ammount={user} text="Usuarios" Icon={FaUser} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={userLevel} text="Niveles de usuario" Icon={FaUserTag} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={staff} text="Personal" Icon={FaUniversalAccess} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={paymentMethod} text="Métodos de Pago" Icon={FaCreditCard} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={role} text="Roles" Icon={FaUserTie} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={organization} text="Departamentos" Icon={FaLandmark} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={warehouse} text="Almacenes" Icon={FaWarehouse} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={service} text="Servicios" Icon={FaServicestack} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={suppliers} text="Proveedores" Icon={FaTruckFront} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={line} text="Clasificacion de líneas" Icon={FaSackXmark} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={user} text={intl.formatMessage({ id: 'users' })} Icon={FaUser} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={userLevel} text={intl.formatMessage({ id: 'user_levels' })} Icon={FaUserTag} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={staff} text={intl.formatMessage({ id: 'staff' })} Icon={FaUniversalAccess} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={paymentMethod} text={intl.formatMessage({ id: 'payment_methods' })} Icon={FaCreditCard} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={role} text={intl.formatMessage({ id: 'roles' })} Icon={FaUserTie} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={organization} text={intl.formatMessage({ id: 'departments' })} Icon={FaLandmark} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={warehouse} text={intl.formatMessage({ id: 'warehouses' })} Icon={FaWarehouse} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={service} text={intl.formatMessage({ id: 'services' })} Icon={FaServicestack} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={suppliers} text={intl.formatMessage({ id: 'suppliers' })} Icon={FaTruckFront} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={line} text={intl.formatMessage({ id: 'lineClassification' })} Icon={FaSackXmark} url={`/${locale}/wms/users`}/>
         </div>
       </Layout>
     </ProtectedRoute>

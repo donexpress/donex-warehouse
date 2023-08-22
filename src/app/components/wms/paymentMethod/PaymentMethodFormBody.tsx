@@ -48,7 +48,8 @@ const PaymentMethodFormBody = ({ id, paymentMethod, isFromDetails }: PaymentMeth
 
       const treatmentToResponse = (response: Response) => {
         if (response.status >= 200 && response.status <= 299) {
-          showMsg("Método de pago " + (id ? "modificado" : "creado") + " de manera satisfactoria.", { type: "success" });
+          const message = id ? intl.formatMessage({ id: 'changedsuccessfullyMsg' }) : intl.formatMessage({ id: 'successfullyMsg' });
+          showMsg(message, { type: "success" });
           router.push(`/${locale}/wms/payment_methods`);
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
@@ -63,7 +64,7 @@ const PaymentMethodFormBody = ({ id, paymentMethod, isFromDetails }: PaymentMeth
     return (
         <div className='elements-start-center user-form scrollable-hidden'>
             <div className='user-form-body'>
-                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? "Visualizar" : "Modificar") : "Insertar"} método de pago</b></div>
+                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? intl.formatMessage({ id: 'vizualice' }) : intl.formatMessage({ id: 'modify' })) : intl.formatMessage({ id: 'insert' })} {intl.formatMessage({ id: 'paymentMethod' })}</b></div>
                 <div className='user-form-body__container'>
                 <Formik
                   initialValues={initialValues}
@@ -76,7 +77,7 @@ const PaymentMethodFormBody = ({ id, paymentMethod, isFromDetails }: PaymentMeth
                           <GenericInput
                             type="text"
                             name="code"
-                            placeholder="Código"
+                            placeholder={intl.formatMessage({ id: 'code' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                             required
@@ -84,12 +85,13 @@ const PaymentMethodFormBody = ({ id, paymentMethod, isFromDetails }: PaymentMeth
                           <GenericInput
                             type="text"
                             name="name"
-                            placeholder="Nombre del método de pago"
+                            placeholder={intl.formatMessage({ id: 'payment_method_name' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                             required
                           />
                       </div>
+                      
                       <div className='user-form-body__buttons'>
                         <div>
                           {
@@ -100,7 +102,7 @@ const PaymentMethodFormBody = ({ id, paymentMethod, isFromDetails }: PaymentMeth
                                 className='user-form-body__accept_button'
                                 disabled={isSubmitting || !isValid}
                               >
-                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? "Modificar" :'Adicionar')}
+                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? intl.formatMessage({ id: 'modify' }) : intl.formatMessage({ id: 'add' }))}
                               </button>
                             )
                           }
@@ -111,7 +113,7 @@ const PaymentMethodFormBody = ({ id, paymentMethod, isFromDetails }: PaymentMeth
                                 className='user-form-body__accept_button'
                                 onClick={()=>goToEdit()}
                               >
-                                Ir a edición
+                                {intl.formatMessage({ id: 'go_to_edit' })}
                               </button>
                             )
                           }
@@ -122,7 +124,7 @@ const PaymentMethodFormBody = ({ id, paymentMethod, isFromDetails }: PaymentMeth
                             className='user-form-body__cancel'
                             onClick={()=>cancelSend()}
                           >
-                            Cancelar
+                            {intl.formatMessage({ id: 'cancel' })}
                           </button>
                         </div>
                       </div>

@@ -64,7 +64,7 @@ const WhTable = ({ warehouseList, countries }: WHListProps) => {
             <div className="content_wrapper">
                 <div className="table_header">
                     <div className="table_row">
-                        <div className="table_title">Almacenes</div>
+                        <div className="table_title">{intl.formatMessage({ id: 'warehouses' })}</div>
                     </div>
                     <div className="table_row table_menu" style={{ marginTop: '10px', justifyContent: 'space-between' }}>
                         <div className="search">

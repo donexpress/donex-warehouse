@@ -68,7 +68,8 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
 
       const treatmentToResponse = (response: Response) => {
         if (response.status >= 200 && response.status <= 299) {
-          showMsg("Nivel de usuario " + (id ? "modificado" : "creado") + " de manera satisfactoria.", { type: "success" });
+          const message = id ? intl.formatMessage({ id: 'changedsuccessfullyMsg' }) : intl.formatMessage({ id: 'successfullyMsg' });
+          showMsg(message, { type: "success" });
           router.push(`/${locale}/wms/user_levels`);
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
@@ -83,7 +84,7 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
     return (
         <div className='elements-start-center user-form scrollable-hidden'>
             <div className='user-form-body'>
-                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? "Visualizar" : "Modificar") : "Insertar"} nivel de usuario</b></div>
+                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? intl.formatMessage({ id: 'vizualice' }) : intl.formatMessage({ id: 'modify' })) : intl.formatMessage({ id: 'insert' })} {intl.formatMessage({ id: 'userLevel' })}</b></div>
                 <div className='user-form-body__container'>
                 <Formik
                   initialValues={initialValues}
@@ -96,7 +97,7 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
                           <GenericInput
                             type="text"
                             name="name"
-                            placeholder="Nombre"
+                            placeholder={intl.formatMessage({ id: 'name' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                             required
@@ -104,7 +105,7 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
                           <GenericInput
                             type="select"
                             name="service_id"
-                            selectLabel="Seleccione el servicio designado"
+                            selectLabel={intl.formatMessage({ id: 'select_designated_service' })}
                             options={getServicesFormatted(services)}
                             customClass="custom-input"
                             disabled={ isFromDetails }
@@ -113,7 +114,7 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
                       <GenericInput
                         type="textarea"
                         name="observations"
-                        placeholder="Observaciones"
+                        placeholder={intl.formatMessage({ id: 'observations' })}
                         customClass="custom-input"
                         disabled={ isFromDetails }
                       />
@@ -127,7 +128,7 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
                                 className='user-form-body__accept_button'
                                 disabled={isSubmitting || !isValid}
                               >
-                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? "Modificar" :'Adicionar')}
+                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? intl.formatMessage({ id: 'modify' }) : intl.formatMessage({ id: 'add' }))}
                               </button>
                             )
                           }
@@ -138,7 +139,7 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
                                 className='user-form-body__accept_button'
                                 onClick={()=>goToEdit()}
                               >
-                                Ir a edición
+                                {intl.formatMessage({ id: 'go_to_edit' })}
                               </button>
                             )
                           }
@@ -149,7 +150,7 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
                             className='user-form-body__cancel'
                             onClick={()=>cancelSend()}
                           >
-                            Cancelar
+                            {intl.formatMessage({ id: 'cancel' })}
                           </button>
                         </div>
                       </div>

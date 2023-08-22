@@ -38,11 +38,11 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                                     label: intl.formatMessage({ id: 'warehouseManagement' }),
                                     items:[
                                         {
-                                            label: 'Insertar almacen',
+                                            label: intl.formatMessage({ id: 'insertWarehouses' }),
                                             route: RouteMenu.INSERT_WAREHOUSE
                                         },
                                         {
-                                            label: 'Listar almacenes',
+                                            label: intl.formatMessage({ id: 'listWarehouses' }),
                                             route: RouteMenu.WAREHOUSE_MANAGEMENT
                                         }
                                     ]

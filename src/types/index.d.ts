@@ -4,7 +4,7 @@ import { User } from './user';
 import { PaymentMethod } from './payment_methods';
 import { UserState } from './user_state';
 
-export type Languages = 'es' | 'en';
+export type Languages = 'es' | 'en' | 'zh';
 
 export type LanguageObj = {
   code: string;
