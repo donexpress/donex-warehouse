@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../../styles/login.scss';
 import Image from 'next/image';
-import logoDE from '../../../assets/icons/logo_desktop.png';
+import logoDE from '../../../assets/icons/logo_desktop.svg';
 import { Formik, Form } from 'formik';
 import GenericInput from './GenericInput';
 import { useIntl } from 'react-intl';
@@ -13,6 +13,7 @@ import { login } from '../../../services/api.users';
 import { setCookie } from '../../../helpers/cookieUtils';
 import { showMsg } from '../../../helpers';
 import { useRouter } from 'next/router'
+import { Button } from '@nextui-org/react';
 
 const LoginBody = ({ inWMS, inOMS }: AppProps) => {
     const router = useRouter();
@@ -100,13 +101,10 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
                         isPasswordField={true}
                         required
                       />
-                      <button
-                        type="submit"
-                        className='login-button'
-                        disabled={isSubmitting || !isValid}
-                      >
-                        {isSubmitting ? intl.formatMessage({ id: 'sending' }) : intl.formatMessage({ id: 'login' })}
-                      </button>
+                
+                        <Button color="primary" className='px-4 w-full' type="submit" disabled={isSubmitting || !isValid}>
+                          {isSubmitting ? intl.formatMessage({ id: 'sending' }) : intl.formatMessage({ id: 'login' })}
+                        </Button>
                     </Form>
                   )}
                 </Formik>
