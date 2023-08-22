@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import {
+  Button
+} from "@nextui-org/react"
 import '../../../../styles/wms/user.form.scss';
 import { showMsg } from '../../../../helpers';
 import { useRouter } from 'next/router'
@@ -14,13 +17,13 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
-  const [staff, setStaff] = useState<{value: number, label: string}[]>([])
-  const [subsidiaries, setSubsidiaries] = useState<{value: number, label: string}[]>([])
-  const [regionalDivisions, setRegionalDivisions] = useState<{value: number, label: string}[]>([])
-  const [warehouses, setWarehouses] = useState<{value: number, label: string}[]>([])
-  const [userLevels, setUserLevels] = useState<{value: number, label: string}[]>([])
-  const [paymentMethods, setPaymentMethods] = useState<{value: number, label: string}[]>([])
-  const [userStates, setUserStates] = useState<{value: number, label: string}[]>([])
+  const [staff, setStaff] = useState<{ value: number, label: string }[]>([])
+  const [subsidiaries, setSubsidiaries] = useState<{ value: number, label: string }[]>([])
+  const [regionalDivisions, setRegionalDivisions] = useState<{ value: number, label: string }[]>([])
+  const [warehouses, setWarehouses] = useState<{ value: number, label: string }[]>([])
+  const [userLevels, setUserLevels] = useState<{ value: number, label: string }[]>([])
+  const [paymentMethods, setPaymentMethods] = useState<{ value: number, label: string }[]>([])
+  const [userStates, setUserStates] = useState<{ value: number, label: string }[]>([])
 
   let initialValues: UserForm = {
     nickname: (id && user) ? user.nickname : '',
@@ -50,14 +53,14 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
     reset_password: (id && user) ? user.reset_password : false
   };
 
-  useEffect(()=> {
-    setStaff(staffList.map(el => {return {value: el.id, label: el.chinesse_name}}));
-    setSubsidiaries(subsidiarieList.map(el => {return {value: el.id, label: el.name}}));
-    setRegionalDivisions(regionalDivisionList.map(el => {return {value: el.id, label: el.name}}))
-    setWarehouses(warehouseList.map(el => {return {value: el.id, label: el.name}}))
-    setPaymentMethods(paymentMethodList.map(el => {return {value: el.id, label: el.name}}))
-    setUserLevels(userLevelList.map(el => {return {value: el.id, label: el.name}}))
-    setUserStates(userStateList.map(el => {return {value: el.id, label: el.name}}))
+  useEffect(() => {
+    setStaff(staffList.map(el => { return { value: el.id, label: el.chinesse_name } }));
+    setSubsidiaries(subsidiarieList.map(el => { return { value: el.id, label: el.name } }));
+    setRegionalDivisions(regionalDivisionList.map(el => { return { value: el.id, label: el.name } }))
+    setWarehouses(warehouseList.map(el => { return { value: el.id, label: el.name } }))
+    setPaymentMethods(paymentMethodList.map(el => { return { value: el.id, label: el.name } }))
+    setUserLevels(userLevelList.map(el => { return { value: el.id, label: el.name } }))
+    setUserStates(userStateList.map(el => { return { value: el.id, label: el.name } }))
   }, []);
 
   const handleSubmit = async (values: UserForm) => {
@@ -67,21 +70,21 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
       await create(values);
     }
   };
-  
+
   const formatBody = (values: UserForm): UserForm => {
     return {
-            ...values, 
-            payment_method_id: values.payment_method_id ? Number(values.payment_method_id) : null, 
-            state_id: values.state_id ? Number(values.state_id) : null, 
-            user_level_id: values.user_level_id ? Number(values.user_level_id) : null, 
-            finantial_representative: values.finantial_representative ? Number(values.finantial_representative) : null, 
-            client_service_representative: values.client_service_representative ? Number(values.client_service_representative) : null, 
-            sales_representative: values.sales_representative ? Number(values.sales_representative) : null, 
-            sales_source: values.sales_source ? Number(values.sales_source) : null, 
-            subsidiary_id: values.subsidiary_id ? Number(values.subsidiary_id) : null, 
-            regional_division_id: values.regional_division_id ? Number(values.regional_division_id) : null, 
-            warehouse_id: values.warehouse_id ? Number(values.warehouse_id) : null
-          };
+      ...values,
+      payment_method_id: values.payment_method_id ? Number(values.payment_method_id) : null,
+      state_id: values.state_id ? Number(values.state_id) : null,
+      user_level_id: values.user_level_id ? Number(values.user_level_id) : null,
+      finantial_representative: values.finantial_representative ? Number(values.finantial_representative) : null,
+      client_service_representative: values.client_service_representative ? Number(values.client_service_representative) : null,
+      sales_representative: values.sales_representative ? Number(values.sales_representative) : null,
+      sales_source: values.sales_source ? Number(values.sales_source) : null,
+      subsidiary_id: values.subsidiary_id ? Number(values.subsidiary_id) : null,
+      regional_division_id: values.regional_division_id ? Number(values.regional_division_id) : null,
+      warehouse_id: values.warehouse_id ? Number(values.warehouse_id) : null
+    };
   }
 
   const create = async (values: UserForm) => {
@@ -112,231 +115,225 @@ const UserFormBody = ({ id, user, isFromShowUser, staffList, regionalDivisionLis
     router.push(`/${locale}/wms/users/${id}/update_user`)
   };
   return (
-    <div className='elements-start-center user-form scrollable-hidden'>
-      <div className='user-form-body'>
-        <div className='user-form-body__title black-label'><b>{id ? (isFromShowUser ? "Visualizar" : "Modificar") : "Insertar"} usuario</b></div>
-        <div className='user-form-body__container'>
-          <Formik
-            initialValues={initialValues}
-            validationSchema={id ? generateValidationSchemaUserModify(intl) : generateValidationSchemaUser(intl)}
-            onSubmit={handleSubmit}
-          >
-            {({ isSubmitting, isValid }) => (
-              <Form>
-                <div className='user-form-body__form'>
-                  <GenericInput
-                    type="text"
-                    name="nickname"
-                    placeholder="Apodo"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                    required
-                  />
-                  <GenericInput
-                    type="text"
-                    name="username"
-                    placeholder={intl.formatMessage({ id: 'username' })}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                    required
-                  />
-                  <GenericInput
-                    type="password"
-                    name="password"
-                    placeholder={intl.formatMessage({ id: 'password' })}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                    required={ !id }
-                  />
-                  <GenericInput
-                    type="text"
-                    name="label_code"
-                    placeholder="Código de etiqueta"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="payment_method_id"
-                    selectLabel="Seleccione método de pago"
-                    options={paymentMethods}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="state_id"
-                    selectLabel="Seleccione el estado"
-                    options={userStates}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="text"
-                    name="contact"
-                    placeholder="Persona de contacto"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="text"
-                    name="company"
-                    placeholder="Compañía"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="text"
-                    name="email"
-                    placeholder="Correo electrónico"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="text"
-                    name="phone_number"
-                    placeholder="Teléfono móvil"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="text"
-                    name="phone"
-                    placeholder="Teléfono"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="text"
-                    name="qq"
-                    placeholder="QQ"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="user_level_id"
-                    selectLabel="Seleccione el nivel de usuario"
-                    options={userLevels}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="text"
-                    name="credits"
-                    placeholder="Créditos"
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="finantial_representative"
-                    selectLabel="Seleccione representante financiero"
-                    options={staff}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="client_service_representative"
-                    selectLabel="Seleccione representante de servicio al cliente"
-                    options={staff}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="sales_representative"
-                    selectLabel="Seleccione representante de ventas"
-                    options={staff}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="sales_source"
-                    selectLabel="Seleccione la fuente de ventas"
-                    options={staff}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="subsidiary_id"
-                    selectLabel="Seleccione el subsidiario"
-                    options={subsidiaries}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="regional_division_id"
-                    selectLabel="Seleccione el área de recepción"
-                    options={regionalDivisions}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                  <GenericInput
-                    type="select"
-                    name="warehouse_id"
-                    selectLabel="Seleccione el sitio"
-                    options={warehouses}
-                    customClass="custom-input"
-                    disabled={ isFromShowUser }
-                  />
-                </div>
+    <div className='user-form-body shadow-small'>
+      <h1 className='text-xl font-semibold'>{id ? (isFromShowUser ? "Visualizar" : "Modificar") : "Insertar"} usuario</h1>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={id ? generateValidationSchemaUserModify(intl) : generateValidationSchemaUser(intl)}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting, isValid }) => (
+          <Form className='flex flex-col gap-3'>
+            <div className='flex gap-3 flex-wrap justify-between'>
+              <div className='w-full sm:w-[49%]'>
+                <GenericInput
+                  type="text"
+                  name="nickname"
+                  placeholder="Apodo"
+                  customClass="custom-input"
+                  disabled={isFromShowUser}
+                  required
+                />
+              </div>
+              <div className='w-full sm:w-[49%]'>
+                <GenericInput
+                  type="text"
+                  name="username"
+                  placeholder={intl.formatMessage({ id: 'username' })}
+                  customClass="custom-input"
+                  disabled={isFromShowUser}
+                  required
+                />
+              </div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="password"
+                name="password"
+                placeholder={intl.formatMessage({ id: 'password' })}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+                required={!id}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="text"
+                name="label_code"
+                placeholder="Código de etiqueta"
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="payment_method_id"
+                selectLabel="Seleccione método de pago"
+                options={paymentMethods}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="state_id"
+                selectLabel="Seleccione el estado"
+                options={userStates}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="text"
+                name="contact"
+                placeholder="Persona de contacto"
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="text"
+                name="company"
+                placeholder="Compañía"
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="text"
+                name="email"
+                placeholder="Correo electrónico"
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="text"
+                name="phone_number"
+                placeholder="Teléfono móvil"
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="text"
+                name="phone"
+                placeholder="Teléfono"
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="text"
+                name="qq"
+                placeholder="QQ"
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="user_level_id"
+                selectLabel="Seleccione el nivel de usuario"
+                options={userLevels}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="text"
+                name="credits"
+                placeholder="Créditos"
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="finantial_representative"
+                selectLabel="Seleccione representante financiero"
+                options={staff}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="client_service_representative"
+                selectLabel="Seleccione representante de servicio al cliente"
+                options={staff}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="sales_representative"
+                selectLabel="Seleccione representante de ventas"
+                options={staff}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="sales_source"
+                selectLabel="Seleccione la fuente de ventas"
+                options={staff}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="subsidiary_id"
+                selectLabel="Seleccione el subsidiario"
+                options={subsidiaries}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="regional_division_id"
+                selectLabel="Seleccione el área de recepción"
+                options={regionalDivisions}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+              <div className='w-full sm:w-[49%]'><GenericInput
+                type="select"
+                name="warehouse_id"
+                selectLabel="Seleccione el sitio"
+                options={warehouses}
+                customClass="custom-input"
+                disabled={isFromShowUser}
+              /></div>
+            </div>
+            <div className='flex gap-3 flex-wrap'>
+              <div className='w-full'>
                 <GenericInput
                   type="textarea"
                   name="observations"
                   placeholder="Observaciones"
                   customClass="custom-input"
-                  disabled={ isFromShowUser }
+                  disabled={isFromShowUser}
                 />
-                <GenericInput type='checkbox' name="shipping_control" placeholder='Control de Envío' customClass='custom-input' disabled={ isFromShowUser }/>
-                <GenericInput type='checkbox' name="hidde_transfer_order" placeholder='Ocultar Orden de Transferencia' customClass='custom-input ' disabled={ isFromShowUser }/>
-                <GenericInput type='checkbox' name="reset_password" placeholder='Reinciar Contraseña' customClass='custom-input ' disabled={ isFromShowUser }/>
-                <div className='user-form-body__buttons'>
-                  <div>
-                    {
-                      !isFromShowUser &&
-                      (
-                        <button
-                          type="submit"
-                          className='user-form-body__accept_button'
-                          disabled={isSubmitting || !isValid}
-                        >
-                          {isSubmitting ? intl.formatMessage({ id: 'sending' }) : id ? "Modificar" :'Adicionar'}
-                        </button>
-                      )
-                    }
-                    {
-                      isFromShowUser && id &&
-                      (
-                        <button
-                          type="button"
-                          className='user-form-body__accept_button'
-                          onClick={()=>goToEdit()}
-                        >
-                          Ir a edición
-                        </button>
-                      )
-                    }
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      className='user-form-body__cancel'
-                      onClick={()=>cancelSend()}
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        </div>
-      </div>
+              </div>
+            </div>
+            <div className='flex gap-3 flex-wrap'>
+              <GenericInput type='checkbox' name="shipping_control" placeholder='Control de Envío' customClass='custom-input' disabled={isFromShowUser} />
+              <GenericInput type='checkbox' name="hidde_transfer_order" placeholder='Ocultar Orden de Transferencia' customClass='custom-input ' disabled={isFromShowUser} />
+              <GenericInput type='checkbox' name="reset_password" placeholder='Reinciar Contraseña' customClass='custom-input ' disabled={isFromShowUser} />
+            </div>            
+            <div className='flex justify-end gap-3'>
+              <div>
+                {
+                  !isFromShowUser &&
+                  (
+                    <Button color="primary" type="submit" className='px-4'>
+                      {isSubmitting ? intl.formatMessage({ id: 'sending' }) : id ? "Modificar" : 'Adicionar'}
+                    </Button>
+                  )
+                }
+                {
+                  isFromShowUser && id &&
+                  (
+                    <Button color="primary" onClick={() => goToEdit()} className='px-4' type="button">
+                      Ir a edición
+                    </Button>
+                  )
+                }
+              </div>
+              <div>
+                <Button onClick={() => cancelSend()} type="button" className='bg-secundary px-4'>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };

@@ -1,13 +1,48 @@
+.search-input input,
 .generic-input {
-    padding: 8px;
-    border: 1px solid #ccc;
+    min-height: 42px;
+    color: #fff;
+    background-color: #101935;
+    border: .6px solid #343b4f;
+    border-top-color: rgb(52, 59, 79);
+    border-right-color: rgb(52, 59, 79);
+    border-bottom-color: rgb(52, 59, 79);
+    border-left-color: rgb(52, 59, 79);
     border-radius: 4px;
-    font-size: 14px;
     width: 100%;
+    margin-bottom: 0;
+    padding: 14px;
+    padding-left: 14px;
+    font-size: 12px;
+    line-height: 1.167em;
+    transition: box-shadow .3s, color .3s, border-color .3s;
+    box-shadow: 0 2px 4px rgba(1, 5, 17, .2);
+}
+
+.search-input{
+    .bg-default-100{
+        background-color: #101935 !important;
+        border-radius: 4px !important;
+        border: .6px solid #343b4f;
+    }
+    input{
+        border: none;
+        box-shadow: none;
+        min-height: auto;
+    }
+    
+}
+.search-input.group[data-focus="true"] .group-data-\[focus\=true\]\:bg-default-100 {	
+	background-color: #101935 !important;
+}
+
+.generic-input:hover {
+    border-color: #7e89ac;
+    box-shadow: 0 2px 12px rgba(20, 20, 43, .1);
 }
 
 .generic-input:disabled {
-    color: #757575;
+    color: #aeb9e1;
 }
 
 .generic-input:focus {
@@ -96,3 +131,10 @@ input:focus + .label-up {
     padding: 0 4px;
 }
   
+
+select{
+    background-color: #101935 !important;
+    padding: 5px 10px !important;
+    border-radius: 4px !important;
+    border: .6px solid #343b4f; 
+}

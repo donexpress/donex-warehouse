@@ -10,6 +10,7 @@ import { Response, ValueSelect } from '../../../../types';
 import { createUserLevel, updateUserLevelById } from '../../../../services/api.user_level';
 import { UserLevelProps, UserLevel } from '../../../../types/user_levels';
 import { Service } from '../../../../types/service';
+import { Button } from '@nextui-org/react';
 
 const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevelProps) => {
     const router = useRouter();
@@ -81,84 +82,77 @@ const UserLevelFormBody = ({ services, id, userLevel, isFromDetails }: UserLevel
       };
 
     return (
-        <div className='elements-start-center user-form scrollable-hidden'>
-            <div className='user-form-body'>
-                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? "Visualizar" : "Modificar") : "Insertar"} nivel de usuario</b></div>
-                <div className='user-form-body__container'>
-                <Formik
-                  initialValues={initialValues}
-                  validationSchema={generateValidationSchemaUserLevel(intl)}
-                  onSubmit={handleSubmit}
-                >
-                  {({ isSubmitting, isValid }) => (
-                    <Form>
-                      <div className='user-form-body__form'>
-                          <GenericInput
-                            type="text"
-                            name="name"
-                            placeholder="Nombre"
-                            customClass="custom-input"
-                            disabled={ isFromDetails }
-                            required
-                          />
-                          <GenericInput
-                            type="select"
-                            name="service_id"
-                            selectLabel="Seleccione el servicio designado"
-                            options={getServicesFormatted(services)}
-                            customClass="custom-input"
-                            disabled={ isFromDetails }
-                          />
-                      </div>
-                      <GenericInput
-                        type="textarea"
-                        name="observations"
-                        placeholder="Observaciones"
+      <div className='user-form-body shadow-small'>
+        <h1 className='text-xl font-semibold'>{id ? (isFromDetails ? "Visualizar" : "Modificar") : "Insertar"} nivel de usuario</h1>
+        <div className='user-form-body__container'>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={generateValidationSchemaUserLevel(intl)}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting, isValid }) => (
+              <Form className='flex flex-col gap-3'>
+                <div className='flex gap-3 flex-wrap justify-between'>
+                  <div className='w-full sm:w-[49%]'>
+                    <GenericInput
+                        type="text"
+                        name="name"
+                        placeholder="Nombre"
                         customClass="custom-input"
                         disabled={ isFromDetails }
+                        required
                       />
-                      <div className='user-form-body__buttons'>
-                        <div>
-                          {
-                            !isFromDetails &&
-                            (
-                              <button
-                                type="submit"
-                                className='user-form-body__accept_button'
-                                disabled={isSubmitting || !isValid}
-                              >
-                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? "Modificar" :'Adicionar')}
-                              </button>
-                            )
-                          }
-                          {
-                            isFromDetails && id && (
-                              <button
-                                type="button"
-                                className='user-form-body__accept_button'
-                                onClick={()=>goToEdit()}
-                              >
-                                Ir a edición
-                              </button>
-                            )
-                          }
-                        </div>
-                        <div>
-                          <button
-                            type="button"
-                            className='user-form-body__cancel'
-                            onClick={()=>cancelSend()}
-                          >
-                            Cancelar
-                          </button>
-                        </div>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
+                  </div>
+                  <div className='w-full sm:w-[49%]'>
+                    <GenericInput
+                      type="select"
+                      name="service_id"
+                      selectLabel="Seleccione el servicio designado"
+                      options={getServicesFormatted(services)}
+                      customClass="custom-input"
+                      disabled={ isFromDetails }
+                    />
+                  </div>
                 </div>
-            </div>
+                <div className='w-full'>
+                <GenericInput
+                  type="textarea"
+                  name="observations"
+                  placeholder="Observaciones"
+                  customClass="custom-input"
+                  disabled={ isFromDetails }
+                />
+                </div>
+                
+                <div className='flex justify-end gap-3'>
+                  <div>
+                    {
+                      !isFromDetails &&
+                      (
+                         <Button color="primary" type="submit" className='px-4' disabled={isSubmitting || !isValid}>
+                         {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? "Modificar" :'Adicionar')}
+                       </Button>
+                      )
+                    }
+                    {
+                      isFromDetails && id && (
+                        <Button color="primary" onClick={() => goToEdit()} className='px-4' type="button">
+                          Ir a edición
+                        </Button>
+                      )
+                    }
+                  </div>
+                  <div>
+                    <Button onClick={() => cancelSend()} type="button" className='bg-secundary px-4'>
+                      {intl.formatMessage({ id: 'cancel' })}
+                    </Button>
+                  </div>
+                </div>
+              </Form>
+            )}
+          </Formik>
         </div>
+      </div>
     );
 };
   

@@ -129,7 +129,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
         type === 'checkbox' && (
           <div>
             <Field type="checkbox" {...props}  disabled={disabled} />
-            <span style={{marginLeft: '5px', color: `${ disabled ? '#757575' : '#333' }`}}>{props.placeholder}</span>
+            <span style={{marginLeft: '5px'}}>{props.placeholder}</span>
           </div>
         )
       }

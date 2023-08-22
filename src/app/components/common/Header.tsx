@@ -4,13 +4,14 @@ import Image from 'next/image';
 import { MenuItem, IconButton, Popover, } from "@material-ui/core";
 import logoDE from '../../../assets/icons/logo_desktop.svg';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import SelectLanguage from './SelectLanguage';
+// import SelectLanguage from './SelectLanguage';
 import { removeAllCookies, getCookie } from '../../../helpers/cookieUtils';
 import { UserProfile } from '../../../types';
 import { useIntl } from 'react-intl';
 import { isOMS, isWMS} from '../../../helpers';
 import HorizontalMenu from './HorizontalMenu';
 import userIcon from '../../../assets/icons/user.svg';
+import { BiExit } from 'react-icons/bi';
 
 const Header = () => {
     const intl = useIntl()
@@ -63,63 +64,60 @@ const Header = () => {
     }, []);
     
     return (
-        <header className="bg-gray-800 text-white header">
-          <div className="container-header">
-            <div className='flex flex-row justify-start section-left'>
-              <div className='container-header__image-content'>
-                <Image
-                  src={logoDE}
-                  alt=''
-                  className='container-header__img'
-                  onClick={()=>{ goHome() }}
-                />
-              </div>
-            </div>
-            <div>
-              <HorizontalMenu inOMS={isOMS()}  inWMS={isWMS()} />
-            </div>
-            <div className='flex justify-end items-center section-right'>
-                <SelectLanguage/>
-                <div className='container-header__menu-user'>
-                  <div onClick={handleMenuOpen} className='flex justify-start items-center'>
-                    <div style={{ padding: '0px 6px 0px 0px', marginTop: '-4px'}}>
-                      <Image
-                        src={userIcon}
-                        alt=''
-                        className='container-header__icon'
-                      />
-                    </div>
-                    <span className='container-header__username'>{profile.username}</span>
-                  </div>
-
-                  <Popover
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'center',
-                    }}
-                    PaperProps={{
-                      style: {
-                        minWidth: '160px',
-                        marginTop: '18px',
-                      },
-                    }}
-                  >
-                    <MenuItem onClick={exitApp}>
-                      <ExitToAppIcon style={{ marginRight: '8px' }} />
-                      { intl.formatMessage({ id: 'exitApp' }) }
-                    </MenuItem>
-                  </Popover>
-                </div>
-            </div>
+      <header className="bg-gray-800 text-white header">
+      <div className="container-header">
+        <div className='flex flex-row justify-start section-left'>
+          <div className='container-header__image-content'>
+            <Image
+              src={logoDE}
+              alt=''
+              className='container-header__img'
+              onClick={()=>{ goHome() }}
+            />
           </div>
-        </header>
+        </div>
+        <div className='flex justify-end items-center section-right'>
+            <div className='container-header__menu-user'>
+              <div onClick={handleMenuOpen} className='flex justify-start items-center'>
+                <div className='pr-2 -mt-1'>
+                  <Image
+                    src={userIcon}
+                    alt=''
+                    className='container-header__icon'
+                  />
+                </div>
+                {/* <span className='container-header__username'>{profile.username}</span> */}
+              </div>
+
+              <Popover
+                className='user-Popover'
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'center',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'center',
+                }}
+                PaperProps={{
+                  style: {
+                    minWidth: '160px',
+                    marginTop: '18px',
+                  },
+                }}
+              >
+                <MenuItem onClick={exitApp}>
+                  <ExitToAppIcon style={{ marginRight: '8px' }} />
+                  { intl.formatMessage({ id: 'exitApp' }) }
+                </MenuItem>
+              </Popover>
+            </div>
+        </div>
+      </div>
+    </header>
     );
 };
   

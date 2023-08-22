@@ -7,6 +7,7 @@ import { IntlProvider } from 'react-intl'
 import messages from '../messages'
 import { Languages } from '../src/types/index'  
 import { ToastContainer } from 'react-toastify';
+import {NextUIProvider} from '@nextui-org/react'
 import 'react-toastify/dist/ReactToastify.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -32,12 +33,14 @@ function MyApp({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <IntlProvider locale={getLocale(language)} messages={getMessages(getLocale(language) as Languages)}>
-      <LanguageProvider>
-        <Component {...pageProps} />
-        <ToastContainer />
-      </LanguageProvider>
-    </IntlProvider>
+    <NextUIProvider>
+      <IntlProvider locale={getLocale(language)} messages={getMessages(getLocale(language) as Languages)}>
+        <LanguageProvider>
+          <Component {...pageProps} />
+          <ToastContainer />
+        </LanguageProvider>
+      </IntlProvider>
+    </NextUIProvider>
   )
 }
 

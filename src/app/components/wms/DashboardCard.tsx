@@ -11,7 +11,7 @@ const DashboardCard = ({ ammount, Icon, text, url }: Props) => {
     return (
         <div className="dashboard_card">
             <div className="dashboard_card_header">
-                <div style={{display: 'flex', alignItems: 'center'}}>
+                <div style={{display: 'flex', alignItems: 'center',  gridColumnGap: '4px'}}>
                     <Icon />
                     <span style={{marginLeft: '5px'}}>{text}</span>
                 </div>

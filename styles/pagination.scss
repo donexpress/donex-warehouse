@@ -1,0 +1,45 @@
+$color: #fff;
+$background: #37446b ;
+
+  
+  .current-page {
+    line-height: 1;
+  }
+  
+  // Override some Bootstrap pagination styles
+  ul.pagination {
+    margin-top: 0;
+    margin-bottom: 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  
+    li.page-item.active {
+      a.page-link {
+        color: $color !important;
+        background-color: $background !important;
+        border-color: $background !important;
+      }
+    }
+  
+    a.page-link {
+      padding: 0.75rem 1rem;
+      text-align: center;
+      box-shadow: none !important;
+      border-color: $color !important;
+      color: $background;
+      font-weight: 900;
+      font-size: 1rem;
+      margin: 5px;
+      border-radius: 25px;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+  
+      &:hover {
+        background-color: $background;
+        color: $color;
+      }
+    }
+  }

@@ -1,12 +1,34 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+    Input,
+    Button,
+    DropdownTrigger,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    Selection,
+    SortDescriptor
+} from "@nextui-org/react";
+import PaginationTable from '../../common/Pagination';
+import {PlusIcon} from "./../../common/PlusIcon";
+import {VerticalDotsIcon} from "./../../common/VerticalDotsIcon";
+import {ChevronDownIcon} from "./../../common/ChevronDownIcon";
+import {SearchIcon} from "./../../common/SearchIcon";
+import {capitalize} from "../../../../helpers/utils";
 import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
-import '../../../../styles/wms/user.table.scss'
-import { FaSearch, FaEye, FaPen } from 'react-icons/fa';
-import { FaCirclePlus, FaTrashCan } from 'react-icons/fa6';
-import { useEffect, useState } from 'react';
+import './../../../../styles/generic.input.scss';
 import { getWarehouses, removeWarehouseById } from '../../../../services/api.warehouse';
 import ConfirmationDialog from '../../common/ConfirmationDialog';
 import { WarehouseListProps, CargoStationWarehouseForm } from '../../../../types';
+
+const INITIAL_VISIBLE_COLUMNS = ["name", "principal", "receiving_area", "actions"];
 
 const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
     const intl = useIntl();
@@ -16,6 +38,195 @@ const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
     const [showConfirm, setShowConfirm] = useState<boolean>(false)
     const [deleteElement, setDeleteElemtent] = useState<number>(-1)
 
+    /** start*/
+    const [filterValue, setFilterValue] = React.useState("");
+    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
+    const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
+    const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+        column: "name",
+        direction: "ascending",
+    });
+
+    const [page, setPage] = useState(1);
+
+    const columns = [
+        {name: intl.formatMessage({ id: 'name' }), uid: "name", sortable: true},
+        {name: intl.formatMessage({ id: 'principal' }), uid: "principal", sortable: true},
+        {name: intl.formatMessage({ id: 'receiving_area' }), uid: "receiving_area", sortable: true},
+        {name: intl.formatMessage({ id: 'state' }), uid: "state_id", sortable: true},
+        {name: intl.formatMessage({ id: 'country' }), uid: "country", sortable: true},
+        {name: intl.formatMessage({ id: 'actions' }), uid: "actions"},
+    ];
+    
+    
+    const hasSearchFilter = Boolean(filterValue);
+
+    const headerColumns = React.useMemo(() => {
+        if (visibleColumns === "all") return columns;
+
+        return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
+    }, [visibleColumns]);
+
+    const filteredItems = React.useMemo(() => {
+        let filteredUsers = [...warehouses];
+
+        if (hasSearchFilter) {
+            filteredUsers = filteredUsers.filter((user) =>
+                user.name.toLowerCase().includes(filterValue.toLowerCase())
+                || (user.principal?.toString())?.toLowerCase()?.includes(filterValue.toLowerCase())
+                || (user.state_id?.toString())?.toLowerCase()?.includes(filterValue.toLowerCase())
+                || user.receiving_area?.toLowerCase()?.includes(filterValue.toLowerCase())
+                || (user.country?.toString())?.toLowerCase()?.includes(filterValue.toLowerCase()),
+            );
+        }
+
+        return filteredUsers;
+    }, [warehouses, filterValue, statusFilter]);
+
+    const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+    const items = React.useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        return filteredItems.slice(start, end);
+    }, [page, filteredItems, rowsPerPage]);
+
+    const sortedItems = React.useMemo(() => {
+        return [...items].sort((a: CargoStationWarehouseForm, b: CargoStationWarehouseForm) => {
+        const first = a[sortDescriptor.column as keyof CargoStationWarehouseForm] as number;
+        const second = b[sortDescriptor.column as keyof CargoStationWarehouseForm] as number;
+        const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+        return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [sortDescriptor, items]);
+
+    const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
+        const cellValue = user[columnKey];
+        switch (columnKey) {
+        case "actions":
+            return (
+            <div className="relative flex justify-end items-center gap-2">
+                <Dropdown>
+                <DropdownTrigger>
+                    <Button isIconOnly size="sm" variant="light">
+                    <VerticalDotsIcon className="text-default-300" />
+                    </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                    <DropdownItem onClick={() => handleShow(user['id'])}>View</DropdownItem>
+                    <DropdownItem onClick={()=> handleEdit(user['id'])}>Edit</DropdownItem>
+                    <DropdownItem onClick={()=> handleDelete(user['id'])}>Delete</DropdownItem>
+                </DropdownMenu>
+                </Dropdown>
+            </div>
+            );
+        default:
+            return cellValue;
+        }
+    }, []);
+
+    const onRowsPerPageChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
+    }, []);
+
+    const onSearchChange = React.useCallback((value?: string) => {
+        if (value) {
+        setFilterValue(value);
+        setPage(1);
+        } else {
+        setFilterValue("");
+        }
+    }, []);
+
+    const onClear = React.useCallback(()=>{
+        setFilterValue("")
+        setPage(1)
+    }, [])
+    
+    const topContent = React.useMemo(() => {
+        return (
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between gap-3 items-end">
+              <Input
+                isClearable
+                className="w-full sm:max-w-[33%] search-input"
+                placeholder=""
+                startContent={<SearchIcon />}
+                value={filterValue}
+                onClear={() => onClear()}
+                onValueChange={onSearchChange}
+              />
+              <div className="flex gap-3">
+                <Dropdown>
+                  <DropdownTrigger className="hidden sm:flex">
+                    <Button className="bnt-select" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                      Columns
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    disallowEmptySelection
+                    aria-label="Table Columns"
+                    closeOnSelect={false}
+                    selectedKeys={visibleColumns}
+                    selectionMode="multiple"
+                    onSelectionChange={setVisibleColumns}
+                  >
+                    {columns.map((column) => (
+                      <DropdownItem key={column.uid} className="capitalize">
+                        {capitalize(column.name)}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
+                <Button color="primary" endContent={<PlusIcon />} onClick={() => handleAdd()}>
+                    {intl.formatMessage({ id: 'create' })}
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-default-400 text-small">Total {warehouses.length} users</span>
+              <label className="flex items-center text-default-400 text-small">
+                Rows per page:
+                <select
+                  className="outline-none text-default-400 text-small m-1"
+                  onChange={onRowsPerPageChange}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        );
+      }, [
+        filterValue,
+        statusFilter,
+        visibleColumns,
+        onSearchChange,
+        onRowsPerPageChange,
+        warehouses.length,
+        hasSearchFilter,
+      ]);
+    
+      const bottomContent = React.useMemo(() => {
+        return (
+          <div className="py-2 px-2 flex justify-between items-center">
+            <span className="w-[30%] text-small text-default-400">
+              {selectedKeys === "all"
+                ? "All items selected"
+                : `${selectedKeys.size} of ${filteredItems.length} selected`}
+            </span>
+            <PaginationTable totalRecords={100} pageLimit={5} pageNeighbours={1} onPageChanged={() => { }} />
+          </div>
+        );
+      }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+    /** end*/
     useEffect(() => {
         setWarehouses(warehouseList);
     }, [])
@@ -37,6 +248,9 @@ const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
     const handleShow = (id: number) => {
         router.push(`/${locale}/wms/warehouse_cargo_station/${id}/show`)
     }
+    const handleAdd = (id: number) => {
+        router.push(`/${locale}/wms/warehouse_cargo_station/insert`)
+    }
 
     const close = () => {
         setShowConfirm(false)
@@ -50,54 +264,46 @@ const WarehouseTable = ({ warehouseList }: WarehouseListProps) => {
     }
 
     return (
-        <div className='wrapper'>
-            <div className="content_wrapper">
-                <div className="table_header">
-                    <div className="table_row">
-                        <div className="table_title">Terminales de carga</div>
-                    </div>
-                    <div className="table_row table_menu" style={{ marginTop: '10px', justifyContent: 'space-between' }}>
-                        <div className="search">
-                            <input type="text" />
-                            <button className='table_search_button'><FaSearch /></button>
-                        </div>
-                        <div className="table_actions">
-                            <a href={`/${locale}/wms/warehouse_cargo_station/insert`} className='accent_button' style={{display: 'flex', width: '120px', justifyContent: 'space-around', alignItems: 'center'}}>
-                               <FaCirclePlus /> {intl.formatMessage({ id: 'create' })}
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-                <div className="table_body">
-                    <div className="table_body_header table_columns">
-                        <span>{intl.formatMessage({ id: 'name' })}</span>
-                        <span>{intl.formatMessage({ id: 'principal' })}</span>
-                        <span>{intl.formatMessage({ id: 'receiving_area' })}</span>
-                        <span>{intl.formatMessage({ id: 'state' })}</span>
-                        <span>{intl.formatMessage({ id: 'country' })}</span>
-                        <span>{intl.formatMessage({ id: 'actions' })}</span>
-                    </div>
-                    { warehouses.map((el, index) => (
-                        <div className={`${(index %2 === 0) ? '' : 'table_stripe'} table_columns`} key={index} style={{marginTop: '5px'}}>
-                            <span className='table_data'>{el.name}</span>
-                            <span className='table_data'>{el.principal}</span>
-                            <span className='table_data'>{el.receiving_area}</span>
-                            <span className='table_data'>{el.state_id}</span>
-                            <span className='table_data'>{el.country}</span>
-                            <div className='table_data table_action_container'>
-                                <button className='table_action_button' style={{color: '#ff7811'}} onClick={() => handleShow(Number(el.id))}><FaEye /></button>
-                                <button className='table_action_button' style={{color: '#ff7811'}} onClick={()=> handleEdit(Number(el.id))}><FaPen /></button>
-                                <button className='table_action_button' style={{color: '#f3412f'}} onClick={() => handleDelete(Number(el.id))}><FaTrashCan /></button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+        <>
+            <Table
+                aria-label="WARE-HOUSE"
+                isHeaderSticky
+                bottomContent={bottomContent}
+                bottomContentPlacement="outside"
+                classNames={{
+                    wrapper: "max-h-[382px]",
+                }}
+                selectedKeys={selectedKeys}
+                selectionMode="multiple"
+                sortDescriptor={sortDescriptor}
+                topContent={topContent}
+                topContentPlacement="outside"
+                onSelectionChange={setSelectedKeys}
+                onSortChange={setSortDescriptor}
+                >
+                <TableHeader columns={headerColumns}>
+                    {(column) => (
+                    <TableColumn
+                        key={column.uid}
+                        align={column.uid === "actions" ? "center" : "start"}
+                        allowsSorting={column.sortable}
+                    >
+                        {column.name}
+                    </TableColumn>
+                    )}
+                </TableHeader>
+                <TableBody emptyContent={"No ware house found"} items={sortedItems}>
+                    {(item) => (
+                    <TableRow key={item.id}>
+                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                    </TableRow>
+                    )}
+                </TableBody>
+            </Table>
             {showConfirm && (
                 <ConfirmationDialog close={close} confirm={confirm} />
             )}
-        </div>
+        </>
     )
 }
 

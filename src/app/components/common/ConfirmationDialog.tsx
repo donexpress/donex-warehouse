@@ -1,3 +1,4 @@
+import { Button } from "@nextui-org/react";
 import { useIntl } from "react-intl";
 
 interface Params {
@@ -14,16 +15,16 @@ const ConfirmationDialog = ({close, confirm}: Params) => {
                 <div className="confirmation_card_header black-label">
                     <strong>{intl.formatMessage({ id: "confirmation_header" })}</strong>
                 </div>
-                <div className="confirmation_card_body  black-label">
+                <div className="flex justify-center my-4  black-label">
                     {intl.formatMessage({ id: "confirmation_text" })}
                 </div>
-                <div className="confirmation_card_actions">
-                    <button className='accent_button' onClick={confirm}>
+                <div className='flex justify-between gap-3'>
+                    <Button color="primary" type="button" className='px-4' onClick={confirm}>
                         {intl.formatMessage({ id: 'confirmation_header' })}
-                    </button>
-                    <button className='cancel_button' style={{marginLeft: '10px'}} onClick={close}>
+                    </Button>
+                    <Button onClick={close} type="button" className='bg-secundary px-4'>
                         {intl.formatMessage({ id: 'cancel' })}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
