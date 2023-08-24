@@ -15,7 +15,7 @@
 }
   
 .input-error {
-    border-color: #ff0000;
+    border-color: #560c0c;
 }
   
 input[type="date"],
@@ -33,7 +33,7 @@ input[type="daterange"] {
 }
   
 .error-text {
-    color: #ff0000;
+    color: #560c0c;
     font-size: 13px;
     line-height: 1;
     padding: 4px 0 8px;
@@ -80,7 +80,7 @@ input[type="daterange"] {
     display: none;
 
     &__required {
-        color: #ff0000;
+        color: #560c0c;
         font-size: 10px;
     }
 }
