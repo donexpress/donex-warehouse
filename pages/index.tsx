@@ -15,8 +15,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div className='flex justify-center align-center items-center content-center' style={{height: '100vh'}}>
-      <h1 className='text-base font-bold' >You are being redirected to the home page...</h1>
+    <div>
+      <h1>You are being redirected to the home page...</h1>
     </div>
   );
 }

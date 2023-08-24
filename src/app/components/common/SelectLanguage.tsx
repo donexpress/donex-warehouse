@@ -62,7 +62,7 @@ const SelectLanguage = ({ isFromLogin }: LanguageProps) => {
 
     return (
         <FormControl>
-         <InputLabel htmlFor="language-select"></InputLabel>
+          <InputLabel htmlFor="language-select"></InputLabel>
           <Select
             value={language}
             onChange={(e) => {handleChange(e)}}
@@ -104,7 +104,7 @@ const SelectLanguage = ({ isFromLogin }: LanguageProps) => {
                   height="24"
                   className="mr-2"
                 />
-                {isFromLogin && <span>{lang.name}</span>}
+                <span>{lang.name}</span>
               </MenuItem>
             ))}
           </Select>

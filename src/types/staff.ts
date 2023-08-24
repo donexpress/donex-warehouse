@@ -6,9 +6,9 @@ export type Staff = {
     email: string;
     phone: string;
     observations: string | null;
-    state_id: number;
-    organization_id: number;
-    role_id: number;
+    stateId: number;
+    organizationId: number;
+    roleId: number;
     states: {
         id: number;
         name: string;

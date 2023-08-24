@@ -1,7 +1,6 @@
 import { StaticImageData } from "next/image";
 import { Service } from './service';
 import { User } from './user';
-import { Staff } from './staff';
 import { PaymentMethod } from './payment_methods';
 import { UserState } from './user_state';
 
@@ -157,36 +156,12 @@ export type CargoStationWarehouseResponse = {
   warehouse?: CargoStationWarehouseForm;
 };
 
-export type StaffProps = {
-  staffList: Staff[];
-};
-
-export type StaffFormProps = {
-  id?: number;
-  staff?: Staff;
-  isFromShowStaff?: boolean;
-};
-
-export type StaffForm = {
-    username: string;
-    chinesse_name: string | null;
-    english_name: string | null;
-    email: string;
-    phone: string;
-    observations: string | null;
-    state_id: number | null;
-    organization_id: number | null;
-    role_id: number | null;
-};
-
 export type Response = {
   status: number;
   data?: any;
 };
 
 export type MenuOption = {
-  id?: number;
-  icon?: string;
   label: string;
   items?: MenuOption[];
   action?: number;

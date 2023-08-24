@@ -1,60 +1,23 @@
-.search-input input,
 .generic-input {
-    min-height: 42px;
-    color: #fff;
-    background-color: #101935;
-    border: .6px solid #343b4f;
-    border-top-color: rgb(52, 59, 79);
-    border-right-color: rgb(52, 59, 79);
-    border-bottom-color: rgb(52, 59, 79);
-    border-left-color: rgb(52, 59, 79);
+    padding: 8px;
+    border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 14px;
     width: 100%;
-    margin-bottom: 0;
-    padding: 14px;
-    padding-left: 14px;
-    font-size: 12px;
-    line-height: 1.167em;
-    transition: box-shadow .3s, color .3s, border-color .3s;
-    box-shadow: 0 2px 4px rgba(1, 5, 17, .2);
-}
-
-.search-input {
-    .bg-default-100 {
-        background-color: #101935 !important;
-        border-radius: 4px !important;
-        border: .6px solid #343b4f;
-    }
-
-    input {
-        border: none;
-        box-shadow: none;
-        min-height: auto;
-    }
-
-}
-
-.search-input.group[data-focus="true"] .group-data-\[focus\=true\]\:bg-default-100 {
-    background-color: #101935 !important;
-}
-
-.generic-input:hover {
-    border-color: #7e89ac;
-    box-shadow: 0 2px 12px rgba(20, 20, 43, .1);
 }
 
 .generic-input:disabled {
-    color: #aeb9e1;
+    color: #757575;
 }
 
 .generic-input:focus {
     outline: none;
 }
-
+  
 .input-error {
-    border-color: #560c0c;
+    border-color: #ff0000;
 }
-
+  
 input[type="date"],
 input[type="daterange"] {
     padding: 8px;
@@ -63,14 +26,14 @@ input[type="daterange"] {
     font-size: 14px;
     width: 100%;
 }
-
+  
 .input-container {
     position: relative;
     font-size: 14px;
 }
-
+  
 .error-text {
-    color: #560c0c;
+    color: #ff0000;
     font-size: 13px;
     line-height: 1;
     padding: 4px 0 8px;
@@ -117,12 +80,12 @@ input[type="daterange"] {
     display: none;
 
     &__required {
-        color: #560c0c;
+        color: #ff0000;
         font-size: 10px;
     }
 }
 
-input:focus+.label-up {
+input:focus + .label-up {
     display: inline-block;
     position: absolute;
     background: white;
@@ -133,7 +96,7 @@ input:focus+.label-up {
     padding: 0 4px;
 }
 
-textarea:focus+.label-up {
+textarea:focus + .label-up {
     display: inline-block;
     position: absolute;
     background: white;
@@ -143,23 +106,4 @@ textarea:focus+.label-up {
     font-size: 10px;
     padding: 0 4px;
 }
-
-select {
-    background-color: #101935 !important;
-    padding: 5px 10px !important;
-    border-radius: 4px !important;
-    border: .6px solid #343b4f;
-}
-
-.select-filter{
-    color: #aeb9e1;
-    div{
-        color: #aeb9e1;
-        border-color: #343b4f !important;
-        padding-top: 3.5px;
-        padding-bottom: 3.5px;
-    }
-    #react-select-3-listbox{
-        background-color: #101935 !important;
-    }
-}
+  

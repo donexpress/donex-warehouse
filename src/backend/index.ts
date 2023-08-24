@@ -32,10 +32,6 @@ export const countStaffPath = () => {
   return BASE_URL + '/api/v1/staff/count';
 };
 
-export const removeStaffPath = (id: number) => {
-  return `${BASE_URL}/api/v1/staff/${id}`
-}
-
 export const subsidiaryPath = () => {
   return BASE_URL + '/api/v1/subsidiary';
 };
