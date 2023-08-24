@@ -9,7 +9,6 @@ import { getRegionalDivision } from '../../../../../src/services/api.regional_di
 import { GetServerSidePropsContext } from 'next';
 
 const UpdateWarehouseCargoStation = ({ states, countries, receptionAreas, warehouse, id }: CargoStationWarehouseProps) => {
-    console.log(warehouse)
     return (
     <ProtectedRoute>
         <Layout>
