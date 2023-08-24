@@ -2,25 +2,147 @@
 @tailwind components;
 @tailwind utilities;
 
+$color: #aeb9e1;
+$background: #37446b;
+$background30: #37446b30;
+$background-black: #080f25;
+$background-blue: #101935;
+$background-primary: #6c72ff;
+
+
+body {
+  background-color: $background-black;
+  color: $color;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5em;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: $background !important;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $background !important;
+  border-radius: 15px !important;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: $background !important;
+}
+
 .black-label {
   color: #333;
 }
 
+.main {
+  height: calc(100vh - 65px);
+  overflow: auto;
+}
+
+main {
+  padding: 24px;
+}
+
+.sidebar {
+  border-right: .6px solid $background;
+  background: #080f25;
+
+  button {
+    background-color: $background;
+    color: white
+  }
+
+  ;
+
+  .nav-item-hover {
+    border-left: 2px solid transparent;
+    position: relative;
+  }
+
+  .bg-nav-item-hover,
+  .nav-item-hover:hover {
+    border-left: 2px solid $background;
+    color: white;
+  }
+
+  .scroll {
+    overflow: auto;
+    height: calc(100vh - 80px);
+  }
+
+  ;
+}
+
+.sidebar.w-20 {
+  margin-right: 2px;
+
+  .group-nav {
+    border-bottom: 2px solid $background;
+
+    a,
+    span {
+      display: none !important;
+    }
+  }
+
+  .text-sidebar {
+    display: none !important;
+
+  }
+}
+
+.sidebar.w-96.w-20 {
+  .group-nav {
+    border-bottom: 2px solid transparent;
+
+    a,
+    span {
+      display: inline !important;
+    }
+  }
+
+  .text-sidebar {
+    display: inline !important;
+
+  }
+}
+
+.sidebar.w-0 {
+  width: 0px !important;
+}
+
 .header {
   min-height: 60px;
-  background: linear-gradient(to right, #ff7811, #f3412f);
+  background: $background-black;
   padding-left: 25px;
   padding-right: 25px;
+  -webkit-box-shadow: 0 0 11px $background30;
+  box-shadow: 1px 1px 1px $background30;
 }
 
 .container-header {
-  display: grid;
-  grid-template-columns: 140px 1fr 260px;
-  column-gap: 10px;
+  display: flex;
+  justify-content: space-between;
 
   &__image-content {
     height: 44px;
     width: 100%;
+    display: none;
+  }
+
+  @media only screen and (max-width: 991.9px) {
+    &__image-content {
+      display: flex;
+    }
   }
 
   &__img {
@@ -30,6 +152,8 @@
 
   &__icon {
     height: 28px;
+    border-radius: 25px;
+    border: 1px solid $color;
   }
 
   &__menu-user {
@@ -62,9 +186,10 @@
 }
 
 .footer {
-  background: linear-gradient(to right, #ff7811, #f3412f);
-  width: 100vw;
-  font-size: 15px;
+  text-align: center;
+  border-top: .6px solid $background;
+  padding-top: 32px;
+  padding-bottom: 32px;
 }
 
 .custom-background {
@@ -180,7 +305,7 @@
     background: #fff;
     padding: 15px 20px;
     border-radius: 5px;
-    
+
     .confirmation_card_header {
       font-size: 16px;
       padding-bottom: 5px;
@@ -202,34 +327,43 @@
 }
 
 .card_section {
-  width: 100%;
-  padding: 20px;
-  display: flex;
-  flex-wrap: wrap;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  grid-column-gap: 16px;
+  grid-row-gap: 16px;
+  grid-template-rows: auto;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-auto-columns: 1fr;
+  display: grid;
 }
 
 .dashboard_card {
-  padding: 15px;
-  width: 19%;
-  margin-right: 12px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  border: 1px solid #ff7811;
-  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .04), 0 1px 1px 0 rgba(213, 211, 211, .06), 0 1px 35px 0 rgba(0, 0, 0, .12) !important;
+  background-color: $background-blue;
+  border: .6px solid #343b4f;
+  box-shadow: 0 2px 7px rgba(20, 20, 43, .06);
+  z-index: 1;
+  grid-row-gap: 16px;
+  border-radius: 8px;
+  flex-direction: column;
+  padding: 10px 15px;
+  display: flex;
+  position: relative;
+  grid-area: span 1 / span 1 / span 1 / span 1;
 
   .dashboard_card_header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    color: #ff7811;
-    font-size: 17px;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5em;
   }
 
   .dashboard_card_body {
-    font-size: 40px;
-    font-weight: 500;
-    color: #ff7811;
-    text-align: center;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.333em;
   }
 }
 
@@ -316,4 +450,89 @@
   .mobile-mode {
     display: none !important;
   }
+}
+
+.user-Popover {
+  .MuiPaper-root {
+    background: $background-blue;
+    color: $color;
+    border-right: .6px solid $background;
+
+    li {
+      margin-top: 4px;
+      margin-bottom: 4px;
+
+    }
+  }
+}
+
+form {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.bg-content1 {
+  background-color: $background-blue !important;
+}
+
+.bg-default-100 {
+  background-color: $background !important;
+}
+
+.text-foreground-500 {
+  color: $color !important;
+}
+
+table {
+  .text-foreground-500 {
+    color: $color !important;
+  }
+
+  th:hover,
+  th.data-\[hover\=true\]\:text-foreground-400[data-hover="true"] {
+    color: white !important;
+  }
+
+  th:last-child {
+    text-align: end !important;
+  }
+
+  tr:hover,
+  tr.data-\[hover\=true\] {
+    color: $background-black !important;
+    background-color: $color;
+
+    .text-default-300 {
+      color: $background-black !important;
+    }
+  }
+
+  tr .data-\[selected\=true\]\:text-default-foreground[data-selected="true"] {
+    color: white !important;
+  }
+
+  .before\:bg-default\/40::before {
+    background-color: $background !important;
+  }
+
+  .after\:bg-primary::after {
+    background-color: $background-black !important;
+  }
+}
+
+button.bg-primary {
+  background-color: $background-primary !important;
+  border-radius: 4px !important;
+  padding: 8px;
+  transition: background-color .3s, color .3s;
+}
+
+button.bnt-select,
+button.bg-secundary {
+  color: #aeb9e1 !important;
+  background-color: #212c4d !important;
+  border: 1px solid #37446b !important;
+  border-radius: 4px !important;
+  padding: 8px;
+  transition: color 0.3s, border-color 0.3s;
 }

@@ -2,8 +2,8 @@
     margin-top: 0 !important;
 
     #mui-component-select-language {
-        padding: 0 24px 0 0 !important;
-        color: white !important;
+        padding: 0 !important;
+        color: #aeb9e1 !important;
         font-size: 15px;
 
         img {
@@ -13,7 +13,8 @@
     }
 
     .MuiSelect-icon {
-        color: white !important;
+        display: none;
+        color: #aeb9e1 !important;
     }
 }
 
@@ -29,10 +30,13 @@
             display: inline-block !important;
             margin-bottom: 4px;
         }
+        span {
+            color: #aeb9e1;
+        }
     }
 
     .MuiSelect-icon {
-        color: #333 !important;
+        color: #aeb9e1 !important;
     }
 }
 
@@ -60,4 +64,13 @@
     .cmp-inside-layout {
         margin-left: 250px !important;
     }
+}
+
+#menu-language{
+    .MuiPopover-paper{
+        background: #101935;
+        color: #aeb9e1;
+        border-right: 0.6px solid #37446b;
+    }
+    
 }

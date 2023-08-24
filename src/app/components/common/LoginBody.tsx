@@ -109,11 +109,9 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
                 type="submit"
                 disabled={isSubmitting || !isValid}
               >
-                className='login-button'
                 {isSubmitting
                   ? intl.formatMessage({ id: "sending" })
                   : intl.formatMessage({ id: "login" })}
-                disabled={isSubmitting || !isValid}
               </Button>
             </Form>
           )}

@@ -162,6 +162,8 @@ export type Response = {
 };
 
 export type MenuOption = {
+  id?: number;
+  icon?: string;
   label: string;
   items?: MenuOption[];
   action?: number;
