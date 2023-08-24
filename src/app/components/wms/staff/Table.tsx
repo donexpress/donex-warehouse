@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -12,10 +12,11 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
+  Chip,
   Selection,
+  ChipProps,
   SortDescriptor,
 } from "@nextui-org/react";
-import PaginationTable from "../../common/Pagination";
 import { PlusIcon } from "./../../common/PlusIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
@@ -23,37 +24,33 @@ import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
+import { StaffProps } from "@/typeserege1992";
 import "../../../../styles/wms/user.table.scss";
-import { FaSearch, FaEye, FaPen } from "react-icons/fa";
-import { FaCirclePlus, FaTrashCan } from "react-icons/fa6";
-import {
-  getWarehouses,
-  removeWarehouseById,
-} from "../../../../services/api.warehouse";
+import { Staff } from "@/types/stafferege1992";
+import PaginationTable from "../../common/Pagination";
+import { getStaff, removeStaff } from "@/services/api.stafferege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
-import {
-  WarehouseListProps,
-  CargoStationWarehouseForm,
-} from "../../../../types";
 import "./../../../../styles/generic.input.scss";
 
+const statusColorMap: Record<string, ChipProps["color"]> = {
+  active: "success",
+  paused: "danger",
+  vacation: "warning",
+};
+
 const INITIAL_VISIBLE_COLUMNS = [
-  "name",
-  "principal",
-  "receiving_area",
+  "username",
+  "email",
+  "phone",
+  "state_id",
   "actions",
 ];
 
-const WarehouseTable = ({
-  warehouseList,
-  states,
-  countries,
-  receptionAreas,
-}: WarehouseListProps) => {
+const StaffTable = ({ staffList }: StaffProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
-  const [warehouses, setWarehouses] = useState<CargoStationWarehouseForm[]>([]);
+  const [staffs, setStaffs] = useState<Staff[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
 
@@ -68,35 +65,61 @@ const WarehouseTable = ({
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
-    column: "name",
+    column: "username",
     direction: "ascending",
   });
 
   const [page, setPage] = useState(1);
 
   const columns = [
-    { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
+    { name: "ID", uid: "id", sortable: true },
     {
-      name: intl.formatMessage({ id: "principal" }),
-      uid: "principal",
+      name: intl.formatMessage({ id: "username" }),
+      uid: "username",
       sortable: true,
     },
     {
-      name: intl.formatMessage({ id: "receiving_area" }),
-      uid: "receiving_area",
+      name: intl.formatMessage({ id: "chinesse_name" }),
+      uid: "chinesse_name",
       sortable: true,
     },
     {
-      name: intl.formatMessage({ id: "state" }),
+      name: intl.formatMessage({ id: "english_name" }),
+      uid: "english_name",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "email" }),
+      uid: "email",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "phone" }),
+      uid: "phone",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "organization_id" }),
+      uid: "organization_id",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "role_id" }),
+      uid: "role_id",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "state_id" }),
       uid: "state_id",
       sortable: true,
     },
-    {
-      name: intl.formatMessage({ id: "country" }),
-      uid: "country",
-      sortable: true,
-    },
     { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
+  ];
+
+  const statusOptions = [
+    { name: "Active", uid: "active" },
+    { name: "Paused", uid: "paused" },
+    { name: "Vacation", uid: "vacation" },
   ];
 
   const hasSearchFilter = Boolean(filterValue);
@@ -110,32 +133,32 @@ const WarehouseTable = ({
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...warehouses];
+    let filteredUsers = [...staffs];
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter(
         (user) =>
-          user.name.toLowerCase().includes(filterValue.toLowerCase()) ||
-          user.principal
+          user.username.toLowerCase().includes(filterValue.toLowerCase()) ||
+          user.chinesse_name
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||
-          user.state_id
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          user.receiving_area
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          user.country
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase())
+          user.english_name?.toLowerCase()?.includes(filterValue.toLowerCase()) ||
+          user.email?.toLowerCase()?.includes(filterValue.toLowerCase()) ||
+          user.phone?.toLowerCase()?.includes(filterValue.toLowerCase())
+      );
+    }
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
+      filteredUsers = filteredUsers.filter((user) =>
+        Array.from(statusFilter).includes(user.state_id)
       );
     }
 
     return filteredUsers;
-  }, [warehouses, filterValue, statusFilter]);
+  }, [staffs, filterValue, statusFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -147,30 +170,29 @@ const WarehouseTable = ({
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
-    return [...items].sort(
-      (a: CargoStationWarehouseForm, b: CargoStationWarehouseForm) => {
-        const first = a[
-          sortDescriptor.column as keyof CargoStationWarehouseForm
-        ] as number;
-        const second = b[
-          sortDescriptor.column as keyof CargoStationWarehouseForm
-        ] as number;
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
+    return [...items].sort((a: Staff, b: Staff) => {
+      const first = a[sortDescriptor.column as keyof Staff] as number;
+      const second = b[sortDescriptor.column as keyof Staff] as number;
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
 
-        return sortDescriptor.direction === "descending" ? -cmp : cmp;
-      }
-    );
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
+  const renderCell = React.useCallback((user: Staff, columnKey: React.Key) => {
     const cellValue = user[columnKey];
     switch (columnKey) {
-      case "receiving_area":
-        return getReceptionAreaLabel(cellValue);
-      case "state_id":
-        return getStateLabel(cellValue);
-      case "country":
-        return getCountryLabel(cellValue);
+      case "status":
+        return (
+          <Chip
+            className="capitalize"
+            color={statusColorMap[user.status]}
+            size="sm"
+            variant="flat"
+          >
+            {cellValue}
+          </Chip>
+        );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
@@ -181,13 +203,13 @@ const WarehouseTable = ({
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleShow(Number(user["id"]))}>
+                <DropdownItem onClick={() => handleShow(user["id"])}>
                   View
                 </DropdownItem>
-                <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
+                <DropdownItem onClick={() => handleEdit(user["id"])}>
                   Edit
                 </DropdownItem>
-                <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
+                <DropdownItem onClick={() => handleDelete(user["id"])}>
                   Delete
                 </DropdownItem>
               </DropdownMenu>
@@ -242,6 +264,31 @@ const WarehouseTable = ({
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
+                  Status
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
+              >
+                {statusOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  className="bnt-select"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
                   Columns
                 </Button>
               </DropdownTrigger>
@@ -271,7 +318,7 @@ const WarehouseTable = ({
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {warehouses.length} users
+            Total {staffs.length} staffs
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -293,7 +340,7 @@ const WarehouseTable = ({
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    warehouses.length,
+    staffs.length,
     hasSearchFilter,
   ]);
 
@@ -317,44 +364,12 @@ const WarehouseTable = ({
   /** end*/
 
   useEffect(() => {
-    setWarehouses(warehouseList);
+    setStaffs(staffList);
   }, []);
 
-  const getStateLabel = (stateId: number | null) => {
-    if (stateId !== null && states.length > 0) {
-      const filter = states.filter((state) => state.id === stateId);
-      if (filter.length > 0) {
-        return filter[0].name;
-      }
-    }
-    return stateId;
-  };
-
-  const getCountryLabel = (countryId: string) => {
-    if (countryId !== null && countries.length > 0) {
-      const filter = countries.filter((country) => country.name === countryId);
-      if (filter.length > 0) {
-        return filter[0].emoji + " " + filter[0].name;
-      }
-    }
-    return countryId;
-  };
-
-  const getReceptionAreaLabel = (receptionAreaId: string) => {
-    if (receptionAreaId !== null && receptionAreas.length > 0) {
-      const filter = receptionAreas.filter(
-        (receptionArea) => receptionArea.name === receptionAreaId
-      );
-      if (filter.length > 0) {
-        return filter[0].name;
-      }
-    }
-    return receptionAreaId;
-  };
-
-  const loadWarehouses = async () => {
-    const whs = await getWarehouses();
-    setWarehouses(whs ? whs : []);
+  const loadStaffs = async () => {
+    const staffs = await getStaff();
+    setStaffs(staffs);
   };
 
   const handleDelete = (id: number) => {
@@ -363,15 +378,15 @@ const WarehouseTable = ({
   };
 
   const handleEdit = (id: number) => {
-    router.push(`/${locale}/wms/warehouse_cargo_station/${id}/update`);
+    router.push(`/${locale}/wms/staff/${id}/update_staff`);
   };
 
   const handleShow = (id: number) => {
-    router.push(`/${locale}/wms/warehouse_cargo_station/${id}/show`);
+    router.push(`/${locale}/wms/staff/${id}/show_staff`);
   };
 
-  const handleAdd = (id: number) => {
-    router.push(`/${locale}/wms/warehouse_cargo_station/insert`);
+  const handleAdd = () => {
+    router.push(`/${locale}/wms/staff/insert_staff`);
   };
 
   const close = () => {
@@ -380,15 +395,14 @@ const WarehouseTable = ({
   };
 
   const confirm = async () => {
-    const reponse = await removeWarehouseById(deleteElement);
+    const reponse = await removeStaff(deleteElement);
     close();
-    await loadWarehouses();
+    await loadStaffs();
   };
-
   return (
     <>
       <Table
-        aria-label="WARE-HOUSE"
+        aria-label="STAFF"
         isHeaderSticky
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
@@ -414,7 +428,7 @@ const WarehouseTable = ({
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No ware house found"} items={sortedItems}>
+        <TableBody emptyContent={"No staff found"} items={sortedItems}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -428,5 +442,4 @@ const WarehouseTable = ({
     </>
   );
 };
-
-export default WarehouseTable;
+export default StaffTable;

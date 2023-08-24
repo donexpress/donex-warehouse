@@ -8,7 +8,7 @@ export enum RouteMenu {
     OPERATIONS_RECORD = 'operations_record',
     INSERT_USER = 'users/insert_user',
     LIST_USERS = 'users',
-    INSERT_STAFF = 'insert_staff',
+    INSERT_STAFF = 'staff/insert_staff',
     LIST_STAFF = 'staff',
     INSERT_WAREHOUSE_CARGO_STATION = 'warehouse_cargo_station/insert',
     LIST_WAREHOUSE_CARGO_STATION = 'warehouse_cargo_station',
