@@ -22,15 +22,14 @@ import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
-
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
+import { StaffProps } from "@/typeserege1992";
 import "../../../../styles/wms/user.table.scss";
-import { getUsers, removeUser } from "@/services/api.userserege1992";
-import { User as UserModel } from "@/types/usererege1992";
-import ConfirmationDialog from "../../common/ConfirmationDialog";
-import { UsersProps } from "../../../../types";
+import { Staff } from "@/types/stafferege1992";
 import PaginationTable from "../../common/Pagination";
+import { getStaff, removeStaff } from "@/services/api.stafferege1992";
+import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
@@ -40,22 +39,18 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "customer_number",
   "username",
-  "contact",
-  "payment_method",
+  "email",
+  "phone",
+  "state_id",
   "actions",
 ];
 
-const UserTable = ({
-  userList,
-  paymentMethodList,
-  userStateList,
-}: UsersProps) => {
+const StaffTable = ({ staffList }: StaffProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
-  const [users, setUsers] = useState<UserModel[]>([]);
+  const [staffs, setStaffs] = useState<Staff[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
 
@@ -70,7 +65,7 @@ const UserTable = ({
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
-    column: "customer_number",
+    column: "username",
     direction: "ascending",
   });
 
@@ -79,27 +74,42 @@ const UserTable = ({
   const columns = [
     { name: "ID", uid: "id", sortable: true },
     {
-      name: intl.formatMessage({ id: "customer_number" }),
-      uid: "customer_number",
-      sortable: true,
-    },
-    {
       name: intl.formatMessage({ id: "username" }),
       uid: "username",
       sortable: true,
     },
     {
-      name: intl.formatMessage({ id: "contact" }),
-      uid: "contact",
+      name: intl.formatMessage({ id: "chinesse_name" }),
+      uid: "chinesse_name",
       sortable: true,
     },
     {
-      name: intl.formatMessage({ id: "payment_method" }),
-      uid: "payment_method_id",
+      name: intl.formatMessage({ id: "english_name" }),
+      uid: "english_name",
       sortable: true,
     },
     {
-      name: intl.formatMessage({ id: "state" }),
+      name: intl.formatMessage({ id: "email" }),
+      uid: "email",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "phone" }),
+      uid: "phone",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "organization_id" }),
+      uid: "organization_id",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "role_id" }),
+      uid: "role_id",
+      sortable: true,
+    },
+    {
+      name: intl.formatMessage({ id: "state_id" }),
       uid: "state_id",
       sortable: true,
     },
@@ -123,21 +133,19 @@ const UserTable = ({
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
+    let filteredUsers = [...staffs];
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter(
         (user) =>
           user.username.toLowerCase().includes(filterValue.toLowerCase()) ||
-          user.customer_number
+          user.chinesse_name
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||
-          user.contact?.toLowerCase()?.includes(filterValue.toLowerCase()) ||
-          user.payment_method_id
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase())
+          user.english_name?.toLowerCase()?.includes(filterValue.toLowerCase()) ||
+          user.email?.toLowerCase()?.includes(filterValue.toLowerCase()) ||
+          user.phone?.toLowerCase()?.includes(filterValue.toLowerCase())
       );
     }
     if (
@@ -150,7 +158,7 @@ const UserTable = ({
     }
 
     return filteredUsers;
-  }, [users, filterValue, statusFilter]);
+  }, [staffs, filterValue, statusFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -162,16 +170,16 @@ const UserTable = ({
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: UserModel, b: UserModel) => {
-      const first = a[sortDescriptor.column as keyof UserModel] as number;
-      const second = b[sortDescriptor.column as keyof UserModel] as number;
+    return [...items].sort((a: Staff, b: Staff) => {
+      const first = a[sortDescriptor.column as keyof Staff] as number;
+      const second = b[sortDescriptor.column as keyof Staff] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
+  const renderCell = React.useCallback((user: Staff, columnKey: React.Key) => {
     const cellValue = user[columnKey];
     switch (columnKey) {
       case "status":
@@ -310,7 +318,7 @@ const UserTable = ({
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {users.length} users
+            Total {staffs.length} staffs
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -332,7 +340,7 @@ const UserTable = ({
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    users.length,
+    staffs.length,
     hasSearchFilter,
   ]);
 
@@ -356,36 +364,12 @@ const UserTable = ({
   /** end*/
 
   useEffect(() => {
-    setUsers(userList);
+    setStaffs(staffList);
   }, []);
 
-  const loadUsers = async () => {
-    const users = await getUsers();
-    setUsers(users);
-  };
-
-  const getPaymentMethodLabel = (paymentMethodId: number | null) => {
-    if (paymentMethodId !== null && paymentMethodList.length > 0) {
-      const filter = paymentMethodList.filter(
-        (paymentMethod) => paymentMethod.id === paymentMethodId
-      );
-      if (filter.length > 0) {
-        return filter[0].name;
-      }
-    }
-    return paymentMethodId;
-  };
-
-  const getUserStateLabel = (userStateId: number | null) => {
-    if (userStateId !== null && userStateList.length > 0) {
-      const filter = userStateList.filter(
-        (userState) => userState.id === userStateId
-      );
-      if (filter.length > 0) {
-        return filter[0].name;
-      }
-    }
-    return userStateId;
+  const loadStaffs = async () => {
+    const staffs = await getStaff();
+    setStaffs(staffs);
   };
 
   const handleDelete = (id: number) => {
@@ -394,15 +378,15 @@ const UserTable = ({
   };
 
   const handleEdit = (id: number) => {
-    router.push(`/${locale}/wms/users/${id}/update_user`);
+    router.push(`/${locale}/wms/staff/${id}/update_staff`);
   };
 
   const handleShow = (id: number) => {
-    router.push(`/${locale}/wms/users/${id}/show_user`);
+    router.push(`/${locale}/wms/staff/${id}/show_staff`);
   };
 
   const handleAdd = () => {
-    router.push(`/${locale}/wms/users/insert_user`);
+    router.push(`/${locale}/wms/staff/insert_staff`);
   };
 
   const close = () => {
@@ -411,15 +395,14 @@ const UserTable = ({
   };
 
   const confirm = async () => {
-    const reponse = await removeUser(deleteElement);
+    const reponse = await removeStaff(deleteElement);
     close();
-    await loadUsers();
+    await loadStaffs();
   };
-
   return (
     <>
       <Table
-        aria-label="USER"
+        aria-label="STAFF"
         isHeaderSticky
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
@@ -445,7 +428,7 @@ const UserTable = ({
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No users found"} items={sortedItems}>
+        <TableBody emptyContent={"No staff found"} items={sortedItems}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -459,5 +442,4 @@ const UserTable = ({
     </>
   );
 };
-
-export default UserTable;
+export default StaffTable;
