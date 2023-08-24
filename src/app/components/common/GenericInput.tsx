@@ -58,8 +58,8 @@ const GenericInput: React.FC<GenericInputProps> = ({
   }`;
 
   const colourStyles = {
-    control: (styles) => ({ ...styles, backgroundColor: "#101935" }),
-    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+    control: (styles: any) => ({ ...styles, backgroundColor: "#101935" }),
+    option: (styles: any, { data, isDisabled, isFocused, isSelected }: any) => {
       return {
         ...styles,
         backgroundColor:  "#101935",

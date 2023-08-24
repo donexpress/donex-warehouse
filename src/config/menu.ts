@@ -1,10 +1,7 @@
 import { RouteMenu } from "./../helpers/enums";
-import { useRouter } from "next/router";
-import { useIntl } from "react-intl";
+import { IntlShape } from "react-intl";
 
-export const menuWMS = () => {
-  const intl = useIntl();
-  const router = useRouter();
+export const menuWMS = (intl: IntlShape) => {
   return [
     {
       id: 1,
@@ -117,9 +114,7 @@ export const menuWMS = () => {
   ];
 };
 
-export const menuOMS = () => {
-  const intl = useIntl();
-  const router = useRouter();
+export const menuOMS = (intl: IntlShape) => {
   return [
     {
       id: 1,

@@ -38,6 +38,13 @@ export type AppProps = {
   inOMS: boolean;
 };
 
+export type PaginationProps = {
+  pageLimit: number;
+  totalRecords: number;
+  pageNeighbours: number;
+  totalPages: number;
+};
+
 export type LoginBody = {
   username: string;
   password: string;

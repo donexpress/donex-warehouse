@@ -171,7 +171,7 @@ const UserTable = ({
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
+  const renderCell = React.useCallback((user: any, columnKey: React.Key) => {
     const cellValue = user[columnKey];
     switch (columnKey) {
       case "status":

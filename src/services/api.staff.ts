@@ -3,13 +3,13 @@ import { countStaffPath, removeStaffPath, staffPath } from "../backend";
 import { Staff } from "@/types/stafferege1992";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
+import { Response } from '../types/index';
 
-export const getStaff = async (
-  context?: GetServerSidePropsContext
-): Promise<Staff[]> => {
-  const response = await axios.get(staffPath(), getHeaders(context));
-  return response.data;
-};
+export const getStaff = async(context?: GetServerSidePropsContext): Promise<Staff[]> => {
+  const response = await axios.get(staffPath(), getHeaders(context))
+  return response.data
+}
+
 
 export const countStaff = async (
   context?: GetServerSidePropsContext

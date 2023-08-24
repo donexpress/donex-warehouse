@@ -31,12 +31,11 @@ const Index = () => {
 
   useEffect(() => {
     if (isWMS()) {
-      setOptions(menuWMS);
+      setOptions(menuWMS(intl));
     }
     if (isOMS()) {
-      setOptions(menuOMS);
+      setOptions(menuOMS(intl));
     }
-    console.log(options);
   }, [isWMS, isOMS, intl]);
 
   useEffect(() => {
@@ -74,7 +73,7 @@ const Index = () => {
     }
   );
 
-  const getNavItemClass = (menu) => {
+  const getNavItemClass = (menu: MenuOption) => {
     let e = `/[locale]/${isOMS() ? "oms" : ""}${isWMS() ? "wms" : ""}/${
       menu.route
     }`;
