@@ -73,7 +73,7 @@ const Index = () => {
     }
   );
 
-  const getNavItemClass = (menu) => {
+  const getNavItemClass = (menu: MenuOption) => {
     let e = `/[locale]/${isOMS() ? "oms" : ""}${isWMS() ? "wms" : ""}/${
       menu.route
     }`;

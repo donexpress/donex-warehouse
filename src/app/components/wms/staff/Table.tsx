@@ -179,7 +179,7 @@ const StaffTable = ({ staffList }: StaffProps) => {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user: Staff, columnKey: React.Key) => {
+  const renderCell = React.useCallback((user: any, columnKey: React.Key) => {
     const cellValue = user[columnKey];
     switch (columnKey) {
       case "status":

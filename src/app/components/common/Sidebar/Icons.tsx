@@ -9,7 +9,7 @@ import {
 } from "react-icons/bi";
 
 interface Props {
-  icons: string;
+  icons: any;
 }
 
 const Icons = ({ icons }: Props) => {

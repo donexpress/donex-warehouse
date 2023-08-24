@@ -162,7 +162,7 @@ const WarehouseTable = ({
     );
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
+  const renderCell = React.useCallback((user: any, columnKey: React.Key) => {
     const cellValue = user[columnKey];
     switch (columnKey) {
       case "receiving_area":
@@ -370,7 +370,7 @@ const WarehouseTable = ({
     router.push(`/${locale}/wms/warehouse_cargo_station/${id}/show`);
   };
 
-  const handleAdd = (id: number) => {
+  const handleAdd = () => {
     router.push(`/${locale}/wms/warehouse_cargo_station/insert`);
   };
 

@@ -104,7 +104,7 @@ const UserLevelTable = ({
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = useCallback((user: User, columnKey: React.Key) => {
+  const renderCell = useCallback((user: any, columnKey: React.Key) => {
     const cellValue = user[columnKey];
     switch (columnKey) {
       case "actions":
