@@ -109,7 +109,7 @@ const StaffTable = ({ staffList }: StaffProps) => {
       sortable: true,
     },
     {
-      name: intl.formatMessage({ id: "state_id" }),
+      name: intl.formatMessage({ id: "state" }),
       uid: "state_id",
       sortable: true,
     },

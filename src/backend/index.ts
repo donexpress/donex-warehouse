@@ -24,8 +24,12 @@ export const userStatePath = () => {
   return BASE_URL + '/api/v1/user_state';
 };
 
-export const staffPath = () => {
-  return BASE_URL + '/api/v1/staff';
+export const staffPath = (page?: number, rowsPerPage?: number) => {
+  let params = '';
+  if (page && rowsPerPage) {
+    params = `?current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  return BASE_URL + '/api/v1/staff' + params;
 };
 
 export const countStaffPath = () => {

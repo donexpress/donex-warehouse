@@ -17,7 +17,7 @@ const UpdateStaff = ({ staff, id, staffStates, roles, organizations, affiliation
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StaffFormBody staff={staff} id={id} staffStates={staffStates} roles={roles} organizations={organizations} affiliations={affiliations} />
+        <StaffFormBody staff={staff} id={id} staffStates={staffStates ? staffStates : []} roles={roles ? roles : []} organizations={organizations ? organizations : []} affiliations={affiliations ? affiliations : []} />
       </Layout>
     </ProtectedRoute>
     );

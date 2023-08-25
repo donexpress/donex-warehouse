@@ -146,20 +146,31 @@ textarea:focus+.label-up {
 
 select {
     background-color: #101935 !important;
-    padding: 5px 10px !important;
+    padding: 14px 10px !important;
     border-radius: 4px !important;
     border: .6px solid #343b4f;
 }
 
 .select-filter{
     color: #aeb9e1;
-    div{
-        color: #aeb9e1;
+    /* div{
+        color: #333;
         border-color: #343b4f !important;
-        padding-top: 3.5px;
-        padding-bottom: 3.5px;
+        padding-top: 2.5px;
+        padding-bottom: 3px;
     }
-    #react-select-3-listbox{
-        background-color: #101935 !important;
+    #react-select-3-listbox {
+        background-color: #1c2c4c !important;
+        border-color: solid 1px #ccc !important;
+        color: #aeb9e1 !important;
+        
+        div {
+            color: #aeb9e1 !important;
+            padding-top: 4px;
+            padding-bottom: 4px;
+        }
     }
+    #react-select-3-placeholder {
+        color: #aeb9e1 !important;
+    } */
 }

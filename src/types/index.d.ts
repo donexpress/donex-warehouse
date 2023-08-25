@@ -182,6 +182,7 @@ export type StaffFormProps = {
 
 export type StaffForm = {
     username: string;
+    password: string;
     chinesse_name: string | null;
     english_name: string | null;
     email: string;
@@ -191,6 +192,10 @@ export type StaffForm = {
     organization_id: number | null;
     role_id: number | null;
     affiliations: number[] | null;
+    warehouses?: CargoStationWarehouseForm[];
+    default_cargo_station_id: number | null;
+    change_password_on_login: boolean;
+    allow_search: boolean;
 };
 
 export type Response = {

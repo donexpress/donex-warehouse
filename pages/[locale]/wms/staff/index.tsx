@@ -6,7 +6,7 @@ import { getStaff } from '../../../../src/services/api.staff';
 import { StaffProps } from "@/typeserege1992";
 import StaffTable from "@/app/components/wms/staff/Tableerege1992";
 
-const Index = ({ staffList }: StaffProps) => {
+const Index = ({ staffList }: StaffProps) => {console.log(staffList)
     return (
         <ProtectedRoute>
             <Layout>

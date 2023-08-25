@@ -14,14 +14,26 @@ import { Organization } from '../../../../types/organization';
 import { generateValidationStaff, generateValidationStaffModify } from "../../../../validation/generateValidationStaff";
 import { createStaff, getStaffStates, updateStaff } from "@/services/api.stafferege1992";
 
+const getAffiliationsFormatted = (affiliationsAll: CargoStationWarehouseForm[]): ValueSelect[] => {
+  let response: ValueSelect[] = [];
+  affiliationsAll.forEach((affiliation) => {
+    response.push({
+      value: Number(affiliation.id),
+      label: affiliation.name,
+    });
+  });
+  return response;
+};
+
 const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizations, affiliations }: StaffFormProps) => {
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
-  const [filterAffiliations, setFilterAffiliations] = useState<ValueSelect[]>([]);
+  const [filterAffiliations, setFilterAffiliations] = useState<ValueSelect[]>(id && staff ? ((staff.warehouses !== null && staff.warehouses !== undefined) ? getAffiliationsFormatted(staff.warehouses) : []) : []);
 
   let initialValues: StaffForm = {
     username: id && staff ? staff.username : "",
+    password: "",
     chinesse_name: id && staff ? staff.chinesse_name : "",
     english_name: id && staff ? staff.english_name : "",
     email: id && staff ? staff.email : "",
@@ -37,7 +49,10 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
         : null,
     role_id:
       id && staff ? (staff.role_id !== null ? staff.role_id : null) : null,
-    affiliations: id && staff ? (staff.affiliations !== null ? staff.affiliations : null) : null,
+    affiliations: id && staff ? ((staff.warehouses !== null && staff.warehouses !== undefined) ? staff.warehouses.map((wh: CargoStationWarehouseForm) => Number(wh.id)) : null) : null,
+    default_cargo_station_id: id && staff ? (staff.default_cargo_station_id !== null ? staff.default_cargo_station_id : null) : null,
+    change_password_on_login: id && staff ? staff.change_password_on_login : true,
+    allow_search: id && staff ? staff.allow_search : true,
   };
 
   const getStaffStatesFormatted = (staffStatesAll: StaffState[]): ValueSelect[] => {
@@ -73,17 +88,6 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
     return response;
   };
 
-  const getAffiliationsFormatted = (affiliationsAll: CargoStationWarehouseForm[]): ValueSelect[] => {
-    let response: ValueSelect[] = [];
-    affiliationsAll.forEach((affiliation) => {
-      response.push({
-        value: Number(affiliation.id),
-        label: affiliation.name,
-      });
-    });
-    return response;
-  };
-
   const getValueChange = (value: any) => {
     if (value !== filterAffiliations) {
       setFilterAffiliations(value)
@@ -104,12 +108,16 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
       organization_id: values.state_id ? Number(values.organization_id) : null,
       role_id: values.state_id ? Number(values.role_id) : null,
       username: values.username,
+      password: values.password,
       chinesse_name: values.chinesse_name,
       english_name: values.english_name,
       email: values.email,
       phone: values.phone,
       observations: values.observations,
-      affiliations: values.affiliations
+      affiliations: values.affiliations,
+      default_cargo_station_id: values.default_cargo_station_id,
+      change_password_on_login: values.change_password_on_login,
+      allow_search: values.allow_search
     };
   };
 
@@ -265,7 +273,7 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="select"
-                    name="affiliation_id"
+                    name="default_cargo_station_id"
                     selectLabel={intl.formatMessage({
                       id: "select_default_chargo_station",
                     })}
@@ -289,7 +297,7 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
               <div className="flex gap-2 flex-wrap">
                 <GenericInput
                   type="checkbox"
-                  name="force_password"
+                  name="change_password_on_login"
                   placeholder={intl.formatMessage({ id: "login_to_force_password_update" })}
                   customClass="custom-input"
                   disabled={isFromDetails}

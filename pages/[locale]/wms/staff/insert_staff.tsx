@@ -17,7 +17,7 @@ const InsertStaff = ({ staffStates, roles, organizations, affiliations }: StaffF
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StaffFormBody staffStates={staffStates} roles={roles} organizations={organizations} affiliations={affiliations} />
+        <StaffFormBody staffStates={staffStates ? staffStates : []} roles={roles ? roles : []} organizations={organizations ? organizations : []} affiliations={affiliations ? affiliations : []} />
       </Layout>
     </ProtectedRoute>
     );

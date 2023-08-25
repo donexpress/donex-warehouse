@@ -62,15 +62,33 @@ const GenericInput: React.FC<GenericInputProps> = ({
   }`;
 
   const colourStyles = {
-    control: (styles: any) => ({ ...styles, backgroundColor: "#101935" }),
+    control: (styles: any) => ({ ...styles, backgroundColor: "#101935", borderColor: "#343b4f", paddingTop: "3px", paddingBottom: "3px",
+    "&:hover": {
+      borderColor: "#7e89ac",
+    },
+    "&:focus": {
+      borderColor: "#7e89ac",
+    }, }),
     option: (styles: any, { data, isDisabled, isFocused, isSelected }: any) => {
       return {
         ...styles,
-        backgroundColor:  "#101935",
+        backgroundColor:  "#1c2c4c",
         color: "#aeb9e1",
         cursor: isDisabled ? "not-allowed" : "default",
       };
     },
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: '#aeb9e1',
+    }),
+    multiValueLabel: (provided: any) => ({
+      ...provided,
+      color: '#333',
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: '#aeb9e1',
+    }),
   };
 
   useEffect(() => {
