@@ -1,15 +1,15 @@
-import React, { InputHTMLAttributes, useState, useEffect } from "react";
-import { Field, useField } from "formik";
-import "../../../styles/generic.input.scss";
-import Image from "next/image";
-import { TypeField } from "../../../types";
-import dontShowPasswordIcon from "../../../assets/icons/dont_see_passwd.svg";
-import showPasswordIcon from "../../../assets/icons/see_passwd.svg";
-import passwordIcon from "../../../assets/icons/login/password.svg";
-import userIcon from "../../../assets/icons/login/user.svg";
-import { useIntl } from "react-intl";
-import Select from "react-select";
-import { useFormikContext } from "formik";
+import React, { InputHTMLAttributes, useState, useEffect, ChangeEvent, useCallback } from 'react';
+import { Field, useField } from 'formik';
+import '../../../styles/generic.input.scss';
+import Image from 'next/image';
+import { TypeField } from '../../../types';
+import dontShowPasswordIcon from '../../../assets/icons/dont_see_passwd.svg';
+import showPasswordIcon from '../../../assets/icons/see_passwd.svg';
+import passwordIcon from '../../../assets/icons/login/password.svg';
+import userIcon from '../../../assets/icons/login/user.svg';
+import { useIntl } from 'react-intl';
+import Select from 'react-select';
+import { useFormikContext } from 'formik';
 
 type OptionType = {
   value: string | number;
@@ -26,6 +26,9 @@ type GenericInputProps = {
   isUserField?: boolean;
   isPasswordField?: boolean;
   disabled?: boolean;
+  minValue?: number;
+  hideErrorContent?: boolean;
+  onChangeFunction?: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   getValueChangeFn?: (value: any)=>void;
   isMulti?: boolean;
 } & InputHTMLAttributes<
@@ -42,6 +45,8 @@ const GenericInput: React.FC<GenericInputProps> = ({
   isUserField,
   isPasswordField,
   disabled = false,
+  hideErrorContent = false,
+  onChangeFunction,
   isMulti=false,
   getValueChangeFn,
   ...props
@@ -96,7 +101,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
         const { values } = formik;
         // @ts-ignore
         const value = values[String(props.name)];
-  
+
         if (isMulti) {
           // Tratar valores múltiples
           if (value && options && options.length > 0) {
@@ -110,7 +115,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
         } else {
           if (value && options && options.length > 0) {
             const filter = options.filter((option) => option.value === value);
-            
+
             if (filter.length > 0) {
               setSelectedOption(filter[0]);
             }
@@ -118,7 +123,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
             setSelectedOption(null);
           }
         }
-      
+
       }
   }, []);
 
@@ -141,7 +146,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
         if (value && options && options.length > 0) {
           // @ts-ignore
           const filter = options.filter((option) => option.value === value);
-  
+
           if (filter.length > 0) {
             setSelectedOption(filter[0]);
           }
@@ -151,6 +156,28 @@ const GenericInput: React.FC<GenericInputProps> = ({
       }
     }
   }
+
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      if (onChangeFunction) {
+        onChangeFunction(event);
+      }
+      formik.handleChange(event);
+      if (type === "number" && props.minValue !== undefined) {
+        const newValue = event.target.value;
+        const parsedValue = parseFloat(newValue);
+
+        if (!isNaN(parsedValue) && parsedValue < props.minValue) {
+          formik.setFieldValue(String(props.name), props.minValue);
+        } else {
+          formik.handleChange(event);
+        }
+      } else {
+        formik.handleChange(event);
+      }
+    },
+    [formik, onChangeFunction]
+  );
 
   const getTypeField = (typeField: TypeField) => {
     if (typeField === "password") {
@@ -221,69 +248,76 @@ const GenericInput: React.FC<GenericInputProps> = ({
           onMenuClose={() => setIsTouchedMenu(true)}
         />
       )}
-      {type !== "select" &&
-        type !== "select-filter" &&
-        type !== "textarea" &&
-        type !== "checkbox" && (
-          <input
-            {...field}
-            {...props}
-            type={getTypeField(type)}
-            className={inputClassName}
-            disabled={disabled}
-            placeholder={
-              props.placeholder
-                ? props.placeholder + (props.required ? " *" : "")
-                : ""
+      {
+        type !== 'select' && type !== 'select-filter' && type !== 'textarea' && type !== 'checkbox' && 
+        <input {...field} {...props} onChange={handleChange} type={getTypeField(type)} className={inputClassName} disabled={disabled} placeholder={ props.placeholder ? (props.placeholder + (props.required ? ' *' : '')) : "" } />
+      }
+      {
+        props.placeholder && (
+          <div className='label-up'>{props.required && (<span className='label-up__required'>* </span>)}{props.placeholder}</div>
+        )
+      }
+      {
+        hasRepresentativeIcon && (
+          <div className='container-icon-left elements-center'>
+            {
+              isUserField &&
+              <Image
+                src={userIcon}
+                alt=''
+                className='icon-left'
+              />
             }
-          />
-        )}
-      {props.placeholder && (
-        <div className="label-up">
-          {props.required && <span className="label-up__required">* </span>}
-          {props.placeholder}
-        </div>
-      )}
-      {hasRepresentativeIcon && (
-        <div className="container-icon-left elements-center">
-          {isUserField && <Image src={userIcon} alt="" className="icon-left" />}
-          {isPasswordField && (
-            <Image src={passwordIcon} alt="" className="icon-left" />
-          )}
-        </div>
-      )}
-      {type === "password" && (
-        <div className="container-eyes elements-center">
-          {showPassword && (
-            <Image
-              src={showPasswordIcon}
-              alt=""
-              className="eye-icon"
-              onClick={() => setShowPassword(false)}
-            />
-          )}
-          {!showPassword && (
-            <Image
-              src={dontShowPasswordIcon}
-              alt=""
-              className="eye-icon"
-              onClick={() => setShowPassword(true)}
-            />
-          )}
-        </div>
-      )}
-      {type === "checkbox" && (
-        <div>
-          <Field type="checkbox" {...props} disabled={disabled} />
-          <span style={{ marginLeft: "5px" }}>{props.placeholder}</span>
-        </div>
-      )}
-      {(meta.touched || (type === "select-filter" && isTouchedMenu)) &&
-      meta.error ? (
-        <div className="error-text">{meta.error}</div>
-      ) : (
-        <div className="without-error"></div>
-      )}
+            {
+              isPasswordField &&
+              <Image
+                src={passwordIcon}
+                alt=''
+                className='icon-left'
+              />
+            }
+          </div>
+        )
+      }
+      {
+        type === 'password' && (
+          <div className='container-eyes elements-center'>
+            {showPassword &&
+              <Image
+                src={showPasswordIcon}
+                alt=''
+                className='eye-icon'
+                onClick={() => setShowPassword(false)}
+              />
+            }
+            {!showPassword &&
+              <Image
+                src={dontShowPasswordIcon}
+                alt=''
+                className='eye-icon'
+                onClick={() => setShowPassword(true)}
+              />
+            }
+          </div>
+        )
+      }
+      {
+        type === 'checkbox' && (
+          <div>
+            <Field type="checkbox" {...props}  disabled={disabled} onChange={handleChange} />
+            <span style={{marginLeft: '5px'}}>{props.placeholder}</span>
+          </div>
+        )
+      }
+      {
+        !hideErrorContent && (
+          <div>
+            {(meta.touched || (type === 'select-filter' && isTouchedMenu)) && meta.error ? (
+              <div className='error-text'>{meta.error}</div>
+            ) : (<div className='without-error'></div>)}
+          </div>
+        )
+      }
     </div>
   );
 };

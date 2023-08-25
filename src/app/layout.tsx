@@ -10,7 +10,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <Sidebar />
       <div className='flex flex-col min-h-screen w-full'>
         <Header />
-        <div className='main flex flex-col'>
+        <div className='main flex flex-col scrollable-hidden'>
           <main className="flex-1">
             <div className="flex flex-row">
               <div className="flex-1" style={{maxWidth: '100%'}}>{children}</div>

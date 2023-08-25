@@ -10,5 +10,15 @@ export const generateValidationSchemaStoragePlan = (intl: IntlShape) => {
         .required(intl.formatMessage({ id: 'required' })),
       warehouse_id: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
+      rows: Yup.array().of(
+        Yup.object().shape({
+          box_number: Yup.string().when(['id'], (id, schema) => {
+            return id !== undefined
+              ? schema.required('El número de caja es obligatorio')
+              : schema;
+          }),
+          // Agregar otras validaciones para los otros campos de la fila aquí si es necesario
+        })
+      ),
     });
   };

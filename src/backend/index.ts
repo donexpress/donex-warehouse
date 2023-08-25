@@ -88,6 +88,14 @@ export const countStoragePlanPath = () => {
   return BASE_URL + '/api/v1/storage_plan/count';
 };
 
+export const packingListPath = () => {
+  return BASE_URL + '/api/v1/packing_list';
+};
+
+export const countPackingListPath = () => {
+  return BASE_URL + '/api/v1/packing_list/count';
+};
+
 export const countriesPath = () => {
   return BASE_URL + '/api/v1/countries';
 }

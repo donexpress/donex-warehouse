@@ -3,3 +3,28 @@
     padding: 16px;
     border-radius: 14px;
 }
+
+.boxes-container {
+    width: calc(100vw - 365px);
+    overflow-x: auto;
+    scrollbar-width: thin;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: initial;
+
+    &__table {
+        display: grid;
+        padding-right: 16px;
+        grid-template-columns: 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px;
+    }
+}
+
+.text-center {
+    text-align: center;
+}
+
+@media only screen and (max-width: 990px) {
+    .boxes-container {
+        width: calc(100vw - 64px);
+    }
+}

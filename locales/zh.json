@@ -150,5 +150,6 @@
     "system_tracking_number": "系統跟踪號碼",
     "extended_odd_numbers": "擴展奇數",
     "associated_tracking_number": "關聯的跟踪號碼",
-    "customer_order_number_validation": "它只能由字母、數字、下劃線、連字符和空格組成。"
+    "customer_order_number_validation": "它只能由字母、數字、下劃線、連字符和空格組成。",
+	"packing_list": "装箱单"
 }
