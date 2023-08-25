@@ -3,6 +3,7 @@
     overflow-y: scroll;
     padding: 15px;
 }
+
 .user-form-body {
     padding: 20px 15px;
     width: 850px;
@@ -57,5 +58,25 @@
         border: solid 1px #cccccc;
         width: 100%;
         font-size: 14px;
+    }
+}
+
+.boxes-container {
+    width: 800px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: initial;
+
+    &__table {
+        display: grid;
+        grid-template-columns: 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px;
+    }
+}
+
+@media only screen and (max-width: 899px) {
+    .boxes-container {
+        width: calc(100vw - 80px);
     }
 }

@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, useState, useEffect } from 'react';
+import React, { InputHTMLAttributes, useState, useEffect, ChangeEvent, useCallback } from 'react';
 import { Field, useField } from 'formik';
 import '../../../styles/generic.input.scss';
 import Image from 'next/image';
@@ -26,6 +26,9 @@ type GenericInputProps = {
   isUserField?: boolean;
   isPasswordField?: boolean;
   disabled?: boolean;
+  minValue?: number;
+  hideErrorContent?: boolean;
+  onChangeFunction?: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
 } & (InputHTMLAttributes<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 >);
@@ -40,6 +43,8 @@ const GenericInput: React.FC<GenericInputProps> = ({
   isUserField,
   isPasswordField,
   disabled = false,
+  hideErrorContent = false,
+  onChangeFunction,
   ...props
 }) => {
   // @ts-ignore
@@ -72,6 +77,28 @@ const GenericInput: React.FC<GenericInputProps> = ({
       }
     }
   }, [formik, options, type]);
+
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      if (onChangeFunction) {
+        onChangeFunction(event);
+      }
+      formik.handleChange(event);
+      if (type === "number" && props.minValue !== undefined) {
+        const newValue = event.target.value;
+        const parsedValue = parseFloat(newValue);
+
+        if (!isNaN(parsedValue) && parsedValue < props.minValue) {
+          formik.setFieldValue(String(props.name), props.minValue);
+        } else {
+          formik.handleChange(event);
+        }
+      } else {
+        formik.handleChange(event);
+      }
+    },
+    [formik, onChangeFunction]
+  );
 
   const getTypeField = (typeField: TypeField) => {
     if (typeField === 'password') {
@@ -119,7 +146,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
       }
       {
         type !== 'select' && type !== 'select-filter' && type !== 'textarea' && type !== 'checkbox' && 
-        <input {...field} {...props} type={getTypeField(type)} className={inputClassName} disabled={disabled} placeholder={ props.placeholder ? (props.placeholder + (props.required ? ' *' : '')) : "" } />
+        <input {...field} {...props} onChange={handleChange} type={getTypeField(type)} className={inputClassName} disabled={disabled} placeholder={ props.placeholder ? (props.placeholder + (props.required ? ' *' : '')) : "" } />
       }
       {
         props.placeholder && (
@@ -173,14 +200,20 @@ const GenericInput: React.FC<GenericInputProps> = ({
       {
         type === 'checkbox' && (
           <div>
-            <Field type="checkbox" {...props}  disabled={disabled} />
+            <Field type="checkbox" {...props}  disabled={disabled} onChange={handleChange} />
             <span style={{marginLeft: '5px', color: `${ disabled ? '#757575' : '#333' }`}}>{props.placeholder}</span>
           </div>
         )
       }
-      {(meta.touched || (type === 'select-filter' && isTouchedMenu)) && meta.error ? (
-        <div className='error-text'>{meta.error}</div>
-      ) : (<div className='without-error'></div>)}
+      {
+        !hideErrorContent && (
+          <div>
+            {(meta.touched || (type === 'select-filter' && isTouchedMenu)) && meta.error ? (
+              <div className='error-text'>{meta.error}</div>
+            ) : (<div className='without-error'></div>)}
+          </div>
+        )
+      }
     </div>
   );
 };

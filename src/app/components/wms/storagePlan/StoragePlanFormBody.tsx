@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import '../../../../styles/wms/user.form.scss';
 import { showMsg, isOMS, isWMS } from '../../../../helpers';
 import { useRouter } from 'next/router'
@@ -8,22 +8,27 @@ import GenericInput from '../../common/GenericInput';
 import { useIntl } from 'react-intl';
 import { Response, ValueSelect } from '../../../../types';
 import { createStoragePlan, updateStoragePlanById } from '../../../../services/api.storage_plan';
-import { StoragePlanProps, StoragePlan } from '../../../../types/storage_plan';
+import { StoragePlanProps, StoragePlan, RowBoxData } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
 import { Warehouse } from '../../../../types/warehouse';
+import RowStoragePlan from '../../common/RowStoragePlan';
 
 const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails }: StoragePlanProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
+    const [showPackingList, setShowPackingList] = useState<boolean>(false);
+    const [rows, setRows] = useState<RowBoxData[]>([]);
     
     const initialValues: StoragePlan = {
         customer_order_number: (id && storagePlan) ? storagePlan.customer_order_number : '',
         user_id: (id && storagePlan) ? storagePlan.user_id : null,
         warehouse_id: (id && storagePlan) ? storagePlan.warehouse_id : null,
-        boxes_count: (id && storagePlan) ? storagePlan.boxes_count : 0,
-        delivery_time: (id && storagePlan) ? storagePlan.delivery_time : '',
-        observations: (id && storagePlan) ? storagePlan.observations : ''
+        box_amount: (id && storagePlan) ? storagePlan.box_amount : 0,
+        delivered_time: (id && storagePlan) ? storagePlan.delivered_time : '',
+        observations: (id && storagePlan) ? storagePlan.observations : '',
+        show_packing_list: false,
+        rows: [],
     };
   
       const cancelSend = () => {
@@ -62,14 +67,14 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
               };
       }
   
-      const handleSubmit = async (values: StoragePlan) => {
-          if (isWMS()) {
+      const handleSubmit = async (values: StoragePlan) => {console.log(values);console.log(rows)
+          /* if (isWMS()) {
             if (id) {
               await modify(id, values);
             } else {
               await create(values);
             }
-          }
+          } */
       };
 
       const create = async (values: StoragePlan) => {
@@ -96,12 +101,60 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
       const goToEdit = () => {
         router.push(`/${locale}/wms/storagePlan/${id}/update`)
       };
+      
+      const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        // @ts-ignore
+        const { name, value, type, checked } = event.target;
+        const fieldValue = type === "checkbox" ? checked : value;
+        
+        if (name === 'show_packing_list') {
+          setShowPackingList(fieldValue);
+        } else if (name === 'box_amount') {
+          const value = fieldValue < 0 ? 0 : fieldValue;
+          setBoxesCount(value);
+        }
+      };
+
+      const setBoxesCount = (value: number) => {
+        if (rows.length > value) {
+          setRows(rows.slice(0, value));
+        } else if (rows.length < value) {
+          const count = value - rows.length;
+          let items: RowBoxData[] = [];
+
+          for (let index = 0; index < count; index++) {
+            items.push({
+              id: rows.length + index, 
+              box_number: '', 
+              transfer_order_number: '',
+              quantity: 0,
+              customer_weight: 0,
+              customer_length: 0,
+              customer_width: 0,
+              customer_height: 0,
+              product_name: '',
+              english_product_name: '',
+              declaration_unit_price: 0,
+              material: '',
+              customs_code: '',
+              fnscu: '',
+            });
+          }
+
+          setRows(rows.concat(items));
+        }
+      }
+
+      const handleUpdateRow = (id: number, updatedValues: RowBoxData) => {
+        const updatedRows = rows.map((row) => (row.id === id ? updatedValues : row));
+        setRows(updatedRows);
+      };
 
     return (
         <div className='elements-start-center user-form scrollable-hidden'>
             <div className='user-form-body'>
                 <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? intl.formatMessage({ id: 'vizualice' }) : intl.formatMessage({ id: 'modify' })) : intl.formatMessage({ id: 'insert' })} {intl.formatMessage({ id: 'storagePlan' })}</b></div>
-                <div className='user-form-body__container'>
+                <div className='user-form-body__container' style={{ paddingRight: '0px' }}>
                 <Formik
                   initialValues={initialValues}
                   validationSchema={generateValidationSchemaStoragePlan(intl)}
@@ -109,7 +162,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 >
                   {({ isSubmitting, isValid }) => (
                     <Form>
-                      <div className='user-form-body__form'>
+                      <div className='user-form-body__form' style={{ paddingRight: '20px' }}>
                           <GenericInput
                             type="text"
                             name="customer_order_number"
@@ -138,27 +191,59 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           />
                           <GenericInput
                             type="number"
-                            name="boxes_count"
+                            name="box_amount"
                             placeholder={intl.formatMessage({ id: 'number_of_boxes' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
+                            minValue={0}
+                            onChangeFunction={handleInputChange}
                           />
                           <GenericInput
                             type="date"
-                            name="delivery_time"
+                            name="delivered_time"
                             placeholder={intl.formatMessage({ id: 'delivery_time' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
                       </div>
-                      <GenericInput
-                        type="textarea"
-                        name="observations"
-                        placeholder={intl.formatMessage({ id: 'observations' })}
-                        customClass="custom-input"
-                        disabled={ isFromDetails }
-                      />
-                      <div className='user-form-body__buttons'>
+                      <div style={{ paddingRight: '20px' }}>
+                        <GenericInput
+                          type="textarea"
+                          name="observations"
+                          placeholder={intl.formatMessage({ id: 'observations' })}
+                          customClass="custom-input"
+                          disabled={ isFromDetails }
+                        />
+                      </div>
+                      <GenericInput onChangeFunction={handleInputChange} type='checkbox' name="show_packing_list" placeholder={intl.formatMessage({ id: 'packing_list' })} customClass='custom-input' />
+                      {
+                        showPackingList && (
+                          <div className='boxes-container'>
+                            <div>
+                              <div className='boxes-container__table'>
+                                <span>Número de caja</span>
+                                <span>Número de orden</span>
+                                <span>Peso del cliente</span>
+                                <span>Longitud del cliente</span>
+                                <span>Ancho del cliente</span>
+                                <span>Altura del cliente</span>
+                                <span>Cantidad</span>
+                                <span>Nombre del producto</span>
+                                <span>Nombre del producto (inglés)</span>
+                                <span>Declaración precio unitario</span>
+                                <span>Material</span>
+                                <span>Código aduanero</span>
+                                <span>FNSCU</span>
+                              </div>
+                              {rows.map((row, index) => (
+                                <RowStoragePlan key={index} initialValues={{ ...row, id: index }}
+                                onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      }
+                      <div className='user-form-body__buttons' style={{ paddingRight: '20px' }}>
                         <div>
                           {
                             !isFromDetails &&

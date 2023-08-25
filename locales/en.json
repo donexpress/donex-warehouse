@@ -142,5 +142,6 @@
 	"system_tracking_number": "System Tracking Number",
 	"extended_odd_numbers": "Extended odd numbers",
 	"associated_tracking_number": "Associated tracking number",
-	"customer_order_number_validation": "It can only consist of letters, numbers, underscores, hyphens, and spaces."
+	"customer_order_number_validation": "It can only consist of letters, numbers, underscores, hyphens, and spaces.",
+	"packing_list": "Packing list"
 }

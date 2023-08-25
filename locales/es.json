@@ -142,5 +142,6 @@
 	"system_tracking_number": "Número de seguimiento del sistema",
 	"extended_odd_numbers": "Números impares extendidos",
 	"associated_tracking_number": "Número de seguimiento asociado",
-	"customer_order_number_validation": "Solo puede constar de letras, números, guiones bajos, guiones y espacios."
+	"customer_order_number_validation": "Solo puede constar de letras, números, guiones bajos, guiones y espacios.",
+	"packing_list": "Lista de embalaje"
 }
