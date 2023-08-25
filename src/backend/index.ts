@@ -96,6 +96,18 @@ export const countRolePath = () => {
   return BASE_URL + '/api/v1/role/count';
 }
 
+export const rolePath = () => {
+  return BASE_URL + '/api/v1/role';
+}
+
+export const staffStatePath = () => {
+  return BASE_URL + '/api/v1/staff_state';
+}
+
+export const organizationPath = () => {
+  return BASE_URL + '/api/v1/organization';
+}
+
 export const countOrganizationPath = () => {
   return BASE_URL + '/api/v1/organization/count';
 }

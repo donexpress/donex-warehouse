@@ -11,9 +11,20 @@ export const generateValidationStaff = (intl: IntlShape) => {
           intl.formatMessage({ id: "finalLength" })
       )
       .required(intl.formatMessage({ id: "required" })),
-    email: Yup.string()
-      .email()
+    password: Yup.string()
       .required(intl.formatMessage({ id: "required" })),
-    phone: Yup.string().required(intl.formatMessage({ id: "required" })),
+  });
+};
+
+export const generateValidationStaffModify = (intl: IntlShape) => {
+  return Yup.object({
+    username: Yup.string()
+      .min(
+        2,
+        intl.formatMessage({ id: "initialLength" }) +
+          "2" +
+          intl.formatMessage({ id: "finalLength" })
+      )
+      .required(intl.formatMessage({ id: "required" })),
   });
 };

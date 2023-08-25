@@ -1,9 +1,11 @@
 import { StaticImageData } from "next/image";
 import { Service } from './service';
 import { User } from './user';
-import { Staff } from './staff';
+import { Staff, StaffState } from './staff';
 import { PaymentMethod } from './payment_methods';
 import { UserState } from './user_state';
+import { Role } from './role';
+import { Organization } from './organization';
 
 export type Languages = 'es' | 'en' | 'zh';
 
@@ -171,7 +173,11 @@ export type StaffProps = {
 export type StaffFormProps = {
   id?: number;
   staff?: Staff;
-  isFromShowStaff?: boolean;
+  isFromDetails?: boolean;
+  staffStates: StaffState[];
+  roles: Role[];
+  organizations: Organization[];
+  affiliations: CargoStationWarehouseForm[];
 };
 
 export type StaffForm = {
@@ -184,6 +190,7 @@ export type StaffForm = {
     state_id: number | null;
     organization_id: number | null;
     role_id: number | null;
+    affiliations: number[] | null;
 };
 
 export type Response = {

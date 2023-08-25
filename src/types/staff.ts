@@ -19,5 +19,11 @@ export type Staff = {
         parent_organization: string;
         organization_type: string;
     },
-    warehouses: []
+    warehouses: [],
+    affiliations: number[] | null;
+}
+
+export type StaffState = {
+    id: number;
+    name: string;
 }

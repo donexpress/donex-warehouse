@@ -7,14 +7,18 @@ import { Formik, Form } from "formik";
 import GenericInput from "../../common/GenericInput";
 import { useIntl } from "react-intl";
 import { StaffForm, Response } from "../../../../types";
-import { StaffFormProps } from "../../../../types";
-import { generateValidationStaff } from "../../../../validation/generateValidationStaff";
-import { createStaff, updateStaff } from "@/services/api.stafferege1992";
+import { StaffFormProps, CargoStationWarehouseForm, ValueSelect } from "../../../../types";
+import { StaffState } from '../../../../types/staff';
+import { Role } from '../../../../types/role';
+import { Organization } from '../../../../types/organization';
+import { generateValidationStaff, generateValidationStaffModify } from "../../../../validation/generateValidationStaff";
+import { createStaff, getStaffStates, updateStaff } from "@/services/api.stafferege1992";
 
-const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
+const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizations, affiliations }: StaffFormProps) => {
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
+  const [filterAffiliations, setFilterAffiliations] = useState<ValueSelect[]>([]);
 
   let initialValues: StaffForm = {
     username: id && staff ? staff.username : "",
@@ -33,7 +37,58 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
         : null,
     role_id:
       id && staff ? (staff.role_id !== null ? staff.role_id : null) : null,
+    affiliations: id && staff ? (staff.affiliations !== null ? staff.affiliations : null) : null,
   };
+
+  const getStaffStatesFormatted = (staffStatesAll: StaffState[]): ValueSelect[] => {
+    let response: ValueSelect[] = [];
+    staffStatesAll.forEach((staffState) => {
+      response.push({
+        value: staffState.id,
+        label: staffState.name,
+      });
+    });
+    return response;
+  };
+
+  const getRolesFormatted = (rolesAll: Role[]): ValueSelect[] => {
+    let response: ValueSelect[] = [];
+    rolesAll.forEach((role) => {
+      response.push({
+        value: role.id,
+        label: role.name,
+      });
+    });
+    return response;
+  };
+
+  const getOrganizationsFormatted = (organizationsAll: Organization[]): ValueSelect[] => {
+    let response: ValueSelect[] = [];
+    organizationsAll.forEach((organization) => {
+      response.push({
+        value: organization.id,
+        label: organization.name,
+      });
+    });
+    return response;
+  };
+
+  const getAffiliationsFormatted = (affiliationsAll: CargoStationWarehouseForm[]): ValueSelect[] => {
+    let response: ValueSelect[] = [];
+    affiliationsAll.forEach((affiliation) => {
+      response.push({
+        value: Number(affiliation.id),
+        label: affiliation.name,
+      });
+    });
+    return response;
+  };
+
+  const getValueChange = (value: any) => {
+    if (value !== filterAffiliations) {
+      setFilterAffiliations(value)
+    }
+  }
 
   const handleSubmit = async (values: StaffForm) => {
     if (id) {
@@ -45,10 +100,16 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
 
   const formatBody = (values: StaffForm): StaffForm => {
     return {
-      ...values,
       state_id: values.state_id ? Number(values.state_id) : null,
       organization_id: values.state_id ? Number(values.organization_id) : null,
       role_id: values.state_id ? Number(values.role_id) : null,
+      username: values.username,
+      chinesse_name: values.chinesse_name,
+      english_name: values.english_name,
+      email: values.email,
+      phone: values.phone,
+      observations: values.observations,
+      affiliations: values.affiliations
     };
   };
 
@@ -86,7 +147,7 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
     <div className="user-form-body shadow-small">
       <h1 className="text-xl font-semibold">
         {id
-          ? isFromShowStaff
+          ? isFromDetails
             ? intl.formatMessage({ id: "vizualice" })
             : intl.formatMessage({ id: "modify" })
           : intl.formatMessage({ id: "insert" })}{" "}
@@ -95,7 +156,7 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
-          validationSchema={generateValidationStaff(intl)}
+          validationSchema={id ? generateValidationStaffModify(intl) : generateValidationStaff(intl)}
           onSubmit={handleSubmit}
         >
           {({ isSubmitting, isValid }) => (
@@ -107,18 +168,27 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
                     name="username"
                     placeholder={intl.formatMessage({ id: "username" })}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
+                    disabled={!!id}
                     required
+                  />
+                </div>
+                <div className="w-full sm:w-[49%]">
+                  <GenericInput
+                    type="password"
+                    name="password"
+                    placeholder={intl.formatMessage({ id: "password" })}
+                    customClass="custom-input"
+                    disabled={isFromDetails}
+                    required={!id}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="text"
                     name="chinesse_name"
-                    placeholder={intl.formatMessage({ id: "chinesse_name" })}
+                    placeholder={intl.formatMessage({ id: "chinese_name" })}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
-                    required
+                    disabled={isFromDetails}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
@@ -127,7 +197,7 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
                     name="english_name"
                     placeholder={intl.formatMessage({ id: "english_name" })}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
+                    disabled={isFromDetails}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
@@ -136,7 +206,7 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
                     name="email"
                     placeholder={intl.formatMessage({ id: "email" })}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
+                    disabled={isFromDetails}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
@@ -145,18 +215,7 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
                     name="phone"
                     placeholder={intl.formatMessage({ id: "phone" })}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
-                  />
-                </div>
-
-                <div className="w-full sm:w-[49%]">
-                  <GenericInput
-                    type="password"
-                    name="password"
-                    placeholder={intl.formatMessage({ id: "password" })}
-                    customClass="custom-input"
-                    disabled={isFromShowStaff}
-                    required={!id}
+                    disabled={isFromDetails}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
@@ -164,31 +223,55 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
                     type="select"
                     name="state_id"
                     selectLabel={intl.formatMessage({
-                      id: "state_id",
+                      id: "select_state",
                     })}
-                    options={[]}
+                    options={getStaffStatesFormatted(staffStates)}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
+                    disabled={isFromDetails}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="select"
                     name="organization_id"
-                    selectLabel={intl.formatMessage({ id: "organization_id" })}
-                    options={[]}
+                    selectLabel={intl.formatMessage({ id: "select_department" })}
+                    options={getOrganizationsFormatted(organizations)}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
+                    disabled={isFromDetails}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="select"
                     name="role_id"
-                    selectLabel={intl.formatMessage({ id: "role_id" })}
-                    options={[]}
+                    selectLabel={intl.formatMessage({ id: "select_role" })}
+                    options={getRolesFormatted(roles)}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
+                    disabled={isFromDetails}
+                  />
+                </div>
+                <div className="w-full sm:w-[49%]">
+                  <GenericInput
+                    type="select-filter"
+                    name="affiliations"
+                    placeholder={intl.formatMessage({ id: "select_affiliation" })}
+                    options={getAffiliationsFormatted(affiliations)}
+                    customClass="select-filter"
+                    isMulti={true}
+                    getValueChangeFn={getValueChange}
+                    disabled={isFromDetails}
+                  />
+                </div>
+                <div className="w-full sm:w-[49%]">
+                  <GenericInput
+                    type="select"
+                    name="affiliation_id"
+                    selectLabel={intl.formatMessage({
+                      id: "select_default_chargo_station",
+                    })}
+                    options={filterAffiliations}
+                    customClass="custom-input"
+                    disabled={isFromDetails}
                   />
                 </div>
               </div>
@@ -199,14 +282,32 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
                     name="observations"
                     placeholder={intl.formatMessage({ id: "observations" })}
                     customClass="custom-input"
-                    disabled={isFromShowStaff}
+                    disabled={isFromDetails}
                   />
                 </div>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <GenericInput
+                  type="checkbox"
+                  name="force_password"
+                  placeholder={intl.formatMessage({ id: "login_to_force_password_update" })}
+                  customClass="custom-input"
+                  disabled={isFromDetails}
+                />
+                <GenericInput
+                  type="checkbox"
+                  name="allow_search"
+                  placeholder={intl.formatMessage({
+                    id: "allow_search",
+                  })}
+                  customClass="custom-input "
+                  disabled={isFromDetails}
+                />
               </div>
 
               <div className="flex justify-end gap-3">
                 <div>
-                  {!isFromShowStaff && (
+                  {!isFromDetails && (
                     <Button
                       color="primary"
                       type="submit"
@@ -220,7 +321,7 @@ const StaffFormBody = ({ id, staff, isFromShowStaff }: StaffFormProps) => {
                         : intl.formatMessage({ id: "add" })}
                     </Button>
                   )}
-                  {isFromShowStaff && id && (
+                  {isFromDetails && id && (
                     <Button
                       color="primary"
                       onClick={() => goToEdit()}

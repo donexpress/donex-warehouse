@@ -26,6 +26,8 @@ type GenericInputProps = {
   isUserField?: boolean;
   isPasswordField?: boolean;
   disabled?: boolean;
+  getValueChangeFn?: (value: any)=>void;
+  isMulti?: boolean;
 } & InputHTMLAttributes<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 >;
@@ -40,6 +42,8 @@ const GenericInput: React.FC<GenericInputProps> = ({
   isUserField,
   isPasswordField,
   disabled = false,
+  isMulti=false,
+  getValueChangeFn,
   ...props
 }) => {
   // @ts-ignore
@@ -48,7 +52,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
   const intl = useIntl();
   const formik = useFormikContext();
 
-  const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+  const [selectedOption, setSelectedOption] = useState<OptionType | OptionType[] | null>(null);
   const [isTouchedMenu, setIsTouchedMenu] = useState<boolean>(false);
 
   const inputClassName = `generic-input${
@@ -70,22 +74,65 @@ const GenericInput: React.FC<GenericInputProps> = ({
   };
 
   useEffect(() => {
+      if (type === "select-filter") {
+        const { values } = formik;
+        // @ts-ignore
+        const value = values[String(props.name)];
+  
+        if (isMulti) {
+          // Tratar valores múltiples
+          if (value && options && options.length > 0) {
+            const selectedOptions = options.filter((option) =>
+              value.includes(option.value)
+            );
+            setSelectedOption(selectedOptions);
+          } else {
+            setSelectedOption([]);
+          }
+        } else {
+          if (value && options && options.length > 0) {
+            const filter = options.filter((option) => option.value === value);
+            
+            if (filter.length > 0) {
+              setSelectedOption(filter[0]);
+            }
+          } else {
+            setSelectedOption(null);
+          }
+        }
+      
+      }
+  }, []);
+
+  const onChangeReactSelect = (value: number | number[]) => {
     if (type === "select-filter") {
-      const { values } = formik;
-      // @ts-ignore
-      const value = values[String(props.name)];
-
-      if (value && options && options.length > 0) {
-        const filter = options.filter((option) => option.value === value);
-
-        if (filter.length > 0) {
-          setSelectedOption(filter[0]);
+      if (isMulti) {
+        // Tratar valores múltiples
+        if (value && options && options.length > 0) {
+          const selectedOptions = options.filter((option) =>
+            (value as number[]).includes(Number(option.value))
+          );
+          setSelectedOption(selectedOptions);
+          if (getValueChangeFn !== undefined) {
+            getValueChangeFn(selectedOptions);
+          }
+        } else {
+          setSelectedOption([]);
         }
       } else {
-        setSelectedOption(null);
+        if (value && options && options.length > 0) {
+          // @ts-ignore
+          const filter = options.filter((option) => option.value === value);
+  
+          if (filter.length > 0) {
+            setSelectedOption(filter[0]);
+          }
+        } else {
+          setSelectedOption(null);
+        }
       }
     }
-  }, [formik, options, type]);
+  }
 
   const getTypeField = (typeField: TypeField) => {
     if (typeField === "password") {
@@ -140,11 +187,18 @@ const GenericInput: React.FC<GenericInputProps> = ({
           placeholder={props.placeholder + (props.required ? " *" : "")}
           isSearchable
           value={selectedOption}
-          onChange={(selectedOption) => {
-            formik.setFieldValue(
-              String(props.name),
-              selectedOption ? selectedOption.value : null
-            );
+          isMulti={isMulti}
+          onChange={(selectedOption: any) => {
+            let value: any = null;
+            if (Array.isArray(selectedOption)) {
+              const selectedValues = selectedOption.map(option => option.value);
+              formik.setFieldValue(String(props.name), selectedValues);
+              value = selectedValues;
+            } else {
+              formik.setFieldValue(String(props.name), selectedOption ? selectedOption.value : null);
+              value = selectedOption ? selectedOption.value : null;
+            }
+            onChangeReactSelect(value);
           }}
           onMenuClose={() => setIsTouchedMenu(true)}
         />
