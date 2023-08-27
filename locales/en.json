@@ -160,5 +160,6 @@
 	"selected_all":"All items selected",
 	"no_results_found":"No results found",
 	"total_results":"Total {in}",
-	"rows_page":"Rows per page:"
+	"rows_page":"Rows per page:",
+	"home":"Home"
 }

@@ -160,5 +160,6 @@
 	"selected_all":"Todos seleccionados",
 	"no_results_found":"No se encontraron resultados",
 	"total_results":"Total {in}",
-	"rows_page":"Filas por página:"
+	"rows_page":"Filas por página:",
+	"home":"Inicio"
 }

@@ -160,5 +160,6 @@
     "selected_all":"已選擇所有項目",
     "no_results_found":"未找到結果",
     "total_results":"總計 {in}",
-	"rows_page":"每頁行數："
+	"rows_page":"每頁行數：",
+    "home":"家"
 }
