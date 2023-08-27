@@ -151,5 +151,14 @@
     "extended_odd_numbers": "擴展奇數",
     "associated_tracking_number": "關聯的跟踪號碼",
     "customer_order_number_validation": "它只能由字母、數字、下劃線、連字符和空格組成。",
-	"packing_list": "装箱单"
+	"packing_list": "装箱单",
+
+    "Delete":"刪除",
+	"Edit":"編輯",
+	"View":"看法",
+    "selected":"已選擇 {in} 個（共 {end} 個）",
+    "selected_all":"已選擇所有項目",
+    "no_results_found":"未找到結果",
+    "total_results":"總計 {in}",
+	"rows_page":"每頁行數："
 }

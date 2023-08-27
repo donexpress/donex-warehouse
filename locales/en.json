@@ -151,5 +151,14 @@
 	"extended_odd_numbers": "Extended odd numbers",
 	"associated_tracking_number": "Associated tracking number",
 	"customer_order_number_validation": "It can only consist of letters, numbers, underscores, hyphens, and spaces.",
-	"packing_list": "Packing list"
+	"packing_list": "Packing list",
+
+	"Delete":"Delete",
+	"Edit":"Edit",
+	"View":"View",
+	"selected":"{in} of {end} selected",
+	"selected_all":"All items selected",
+	"no_results_found":"No results found",
+	"total_results":"Total {in}",
+	"rows_page":"Rows per page:"
 }

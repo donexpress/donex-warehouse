@@ -151,5 +151,14 @@
 	"extended_odd_numbers": "Números impares extendidos",
 	"associated_tracking_number": "Número de seguimiento asociado",
 	"customer_order_number_validation": "Solo puede constar de letras, números, guiones bajos, guiones y espacios.",
-	"packing_list": "Lista de embalaje"
+	"packing_list": "Lista de embalaje",
+
+	"Delete":"Eliminar",
+	"Edit":"Editar",
+	"View":"Ver",
+	"selected":"{in} de {end} seleccionados",
+	"selected_all":"Todos seleccionados",
+	"no_results_found":"No se encontraron resultados",
+	"total_results":"Total {in}",
+	"rows_page":"Filas por página:"
 }
