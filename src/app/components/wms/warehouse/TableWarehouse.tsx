@@ -242,7 +242,7 @@ const WarehouseTable = ({
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  Columns
+                  {intl.formatMessage({ id: "columns" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu

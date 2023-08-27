@@ -28,8 +28,8 @@ import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
 import { getUsers, removeUser } from "@/services/api.userserege1992";
 import { User as UserModel } from "@/types/usererege1992";
-import { PaymentMethod } from '@/types/payment_methodserege1992';
-import { UserState } from '@/types/user_stateerege1992';
+import { PaymentMethod } from "@/types/payment_methodserege1992";
+import { UserState } from "@/types/user_stateerege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
@@ -56,7 +56,9 @@ const UserTable = () => {
   const router = useRouter();
   const { locale } = router.query;
   const [users, setUsers] = useState<UserModel[]>([]);
-  const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>([]);
+  const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>(
+    []
+  );
   const [userStateList, setUserStateList] = useState<UserState[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
@@ -266,7 +268,7 @@ const UserTable = () => {
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  Status
+                  {intl.formatMessage({ id: "filters" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -291,7 +293,7 @@ const UserTable = () => {
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  Columns
+                  {intl.formatMessage({ id: "columns" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -320,7 +322,7 @@ const UserTable = () => {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {intl.formatMessage({ id: "total_results" }, {in:users.length})}
+            {intl.formatMessage({ id: "total_results" }, { in: users.length })}
           </span>
           <label className="flex items-center text-default-400 text-small">
             {intl.formatMessage({ id: "rows_page" })}
@@ -347,14 +349,16 @@ const UserTable = () => {
     intl,
   ]);
 
-
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
           {selectedKeys === "all"
-            ? `${intl.formatMessage({id:"selected_all"})}` 
-            : `${intl.formatMessage({id:"selected"}, {in:selectedKeys.size, end:filteredItems.length})}`} 
+            ? `${intl.formatMessage({ id: "selected_all" })}`
+            : `${intl.formatMessage(
+                { id: "selected" },
+                { in: selectedKeys.size, end: filteredItems.length }
+              )}`}
         </span>
         <PaginationTable
           totalRecords={filteredItems.slice(0, users.length).length}
@@ -487,7 +491,10 @@ const UserTable = () => {
               </TableColumn>
             )}
           </TableHeader>
-          <TableBody emptyContent={`${intl.formatMessage({id:"no_results_found"})}` } items={sortedItems}>
+          <TableBody
+            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
+            items={sortedItems}
+          >
             {(item) => (
               <TableRow key={item.id}>
                 {(columnKey) => (

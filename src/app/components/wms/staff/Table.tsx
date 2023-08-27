@@ -275,7 +275,7 @@ const StaffTable = () => {
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  Status
+                  {intl.formatMessage({ id: "filters" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -300,7 +300,7 @@ const StaffTable = () => {
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  Columns
+                  {intl.formatMessage({ id: "columns" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -389,7 +389,7 @@ const StaffTable = () => {
   /** end*/
 
   useEffect(() => {
-    loadStaffs()
+    loadStaffs();
   }, []);
 
   useEffect(() => {

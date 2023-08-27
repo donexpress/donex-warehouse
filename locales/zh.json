@@ -163,5 +163,7 @@
     "no_results_found":"未找到結果",
     "total_results":"總計 {in}",
 	"rows_page":"每頁行數：",
-    "home":"家"
+    "home":"家",
+    "columns":"列",
+	"filters":"過濾器"
 }
