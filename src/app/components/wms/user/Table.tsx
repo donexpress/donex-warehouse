@@ -76,7 +76,7 @@ const UserTable = () => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "customer_number",
-    direction: "ascending",
+    direction: "descending",
   });
 
   const [page, setPage] = useState(1);
