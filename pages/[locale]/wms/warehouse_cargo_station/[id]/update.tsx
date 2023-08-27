@@ -1,43 +1,58 @@
-import Head from 'next/head';
-import Layout from '../../../../../src/app/layout';
-import ProtectedRoute from '../../../../../src/app/components/common/ProtectedRoute';
-import CargoStationWarehouseFormBody from '../../../../../src/app/components/wms/warehouse/CargoStationWarehouseFormBody';
-import { CargoStationWarehouseProps } from '../../../../../src/types';
-import { indexStateWarehouse, getWarehouseById } from '../../../../../src/services/api.warehouse';
-import { indexCountries } from '../../../../../src/services/api.countries';
-import { getRegionalDivision } from '../../../../../src/services/api.regional_division';
-import { GetServerSidePropsContext } from 'next';
+import Head from "next/head";
+import Layout from "../../../../../src/app/layout";
+import ProtectedRoute from "../../../../../src/app/components/common/ProtectedRoute";
+import CargoStationWarehouseFormBody from "../../../../../src/app/components/wms/warehouse/CargoStationWarehouseFormBody";
+import { CargoStationWarehouseProps } from "../../../../../src/types";
+import {
+  indexStateWarehouse,
+  getWarehouseById,
+} from "../../../../../src/services/api.warehouse";
+import { indexCountries } from "../../../../../src/services/api.countries";
+import { getRegionalDivision } from "../../../../../src/services/api.regional_division";
+import { GetServerSidePropsContext } from "next";
 
-const UpdateWarehouseCargoStation = ({ states, countries, receptionAreas, warehouse, id }: CargoStationWarehouseProps) => {
-    return (
-    <ProtectedRoute>
-        <Layout>
-          <Head>
-            <title>Don Express Warehouse</title>
-            <link rel="icon" href="/icon_favicon.png" />
-          </Head>
-          <CargoStationWarehouseFormBody states={states ? states : []} countries={countries ? countries : []} receptionAreas={receptionAreas} warehouse={warehouse} id={id} />
-        </Layout>
+const UpdateWarehouseCargoStation = ({
+  states,
+  countries,
+  receptionAreas,
+  warehouse,
+  id,
+}: CargoStationWarehouseProps) => {
+  return (
+    <Layout>
+      <Head>
+        <title>Don Express Warehouse</title>
+        <link rel="icon" href="/icon_favicon.png" />
+      </Head>
+      <ProtectedRoute>
+        <CargoStationWarehouseFormBody
+          states={states ? states : []}
+          countries={countries ? countries : []}
+          receptionAreas={receptionAreas}
+          warehouse={warehouse}
+          id={id}
+        />
       </ProtectedRoute>
-      );
+    </Layout>
+  );
+};
+
+export async function getServerSideProps(context: any) {
+  const { id } = context.params;
+  const warehouse = await getWarehouseById(id, context);
+  const states = await indexStateWarehouse(context);
+  const countries = await indexCountries(context);
+  const receptionAreas = await getRegionalDivision(context);
+
+  return {
+    props: {
+      states,
+      countries,
+      receptionAreas,
+      warehouse,
+      id,
+    },
   };
-  
-  export async function getServerSideProps(context: any) {
-    const { id } = context.params;
-    const warehouse = await getWarehouseById(id, context);
-    const states = await indexStateWarehouse(context);
-    const countries = await indexCountries(context);
-    const receptionAreas = await getRegionalDivision(context);
-  
-    return {
-      props: {
-        states,
-        countries,
-        receptionAreas,
-        warehouse,
-        id
-      }
-    }
-  }
-  
-  export default UpdateWarehouseCargoStation;
+}
+
+export default UpdateWarehouseCargoStation;

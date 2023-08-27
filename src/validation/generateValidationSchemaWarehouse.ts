@@ -7,8 +7,8 @@ export const generateValidationSchemaWarehouse = (intl: IntlShape) => {
         .required(intl.formatMessage({ id: 'required' })),
       english_name: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
-      state_id: Yup.string()
-        .required(intl.formatMessage({ id: 'required' })),
+      // state_id: Yup.string()
+      //   .required(intl.formatMessage({ id: 'required' })),
       /* receiving_area: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
       principal: Yup.string()

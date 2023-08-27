@@ -154,7 +154,7 @@ const CargoStationWarehouseFormBody = ({
           ? isFromDetails
             ? intl.formatMessage({ id: "vizualice" })
             : intl.formatMessage({ id: "modify" })
-          : intl.formatMessage({ id: "insert" })}
+          : intl.formatMessage({ id: "insert" })}{" "}
         {intl.formatMessage({ id: "cargoTerminal" })}
       </h1>
       <div className="user-form-body__container">
@@ -226,7 +226,6 @@ const CargoStationWarehouseFormBody = ({
                     options={getStatesFormatted(states)}
                     customClass="custom-input"
                     disabled={isFromDetails}
-                    required
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">

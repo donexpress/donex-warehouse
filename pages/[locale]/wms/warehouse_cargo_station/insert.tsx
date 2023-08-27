@@ -1,26 +1,33 @@
-import Head from 'next/head';
-import Layout from '../../../../src/app/layout';
-import ProtectedRoute from '../../../../src/app/components/common/ProtectedRoute';
-import CargoStationWarehouseFormBody from '../../../../src/app/components/wms/warehouse/CargoStationWarehouseFormBody';
-import { CargoStationWarehouseProps } from '../../../../src/types';
-import { indexStateWarehouse } from '../../../../src/services/api.warehouse';
-import { indexCountries } from '../../../../src/services/api.countries';
-import { getRegionalDivision } from '../../../../src/services/api.regional_division';
-import { GetServerSidePropsContext } from 'next';
+import Head from "next/head";
+import Layout from "../../../../src/app/layout";
+import ProtectedRoute from "../../../../src/app/components/common/ProtectedRoute";
+import CargoStationWarehouseFormBody from "../../../../src/app/components/wms/warehouse/CargoStationWarehouseFormBody";
+import { CargoStationWarehouseProps } from "../../../../src/types";
+import { indexStateWarehouse } from "../../../../src/services/api.warehouse";
+import { indexCountries } from "../../../../src/services/api.countries";
+import { getRegionalDivision } from "../../../../src/services/api.regional_division";
+import { GetServerSidePropsContext } from "next";
 
-const InsertWarehouseCargoStation = ({ states, countries, receptionAreas }: CargoStationWarehouseProps) => {
-  
+const InsertWarehouseCargoStation = ({
+  states,
+  countries,
+  receptionAreas,
+}: CargoStationWarehouseProps) => {
   return (
-  <ProtectedRoute>
-      <Layout>
-        <Head>
-          <title>Don Express Warehouse</title>
-          <link rel="icon" href="/icon_favicon.png" />
-        </Head>
-        <CargoStationWarehouseFormBody states={states ? states : []} countries={countries ? countries : []} receptionAreas={receptionAreas}/>
-      </Layout>
-    </ProtectedRoute>
-    );
+    <Layout>
+      <Head>
+        <title>Don Express Warehouse</title>
+        <link rel="icon" href="/icon_favicon.png" />
+      </Head>
+      <ProtectedRoute>
+        <CargoStationWarehouseFormBody
+          states={states ? states : []}
+          countries={countries ? countries : []}
+          receptionAreas={receptionAreas}
+        />
+      </ProtectedRoute>
+    </Layout>
+  );
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -32,9 +39,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     props: {
       states,
       countries,
-      receptionAreas
-    }
-  }
+      receptionAreas,
+    },
+  };
 }
 
 export default InsertWarehouseCargoStation;
