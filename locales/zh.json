@@ -99,8 +99,10 @@
     "user_levels": "用戶級別",
     "payment_methods": "付款方式",
     "roles": "角色",
+    "role_id": "角色",
     "departments": "部門",
 	"select_department": "選擇部門",
+	"organization_id": "部門",
 	"select_role": "選擇角色",
 	"select_default_chargo_station": "選擇默認充電站",
 	"select_affiliation": "選擇隸屬關係",
@@ -151,5 +153,17 @@
     "extended_odd_numbers": "擴展奇數",
     "associated_tracking_number": "關聯的跟踪號碼",
     "customer_order_number_validation": "它只能由字母、數字、下劃線、連字符和空格組成。",
-	"packing_list": "装箱单"
+	"packing_list": "装箱单",
+
+    "Delete":"刪除",
+	"Edit":"編輯",
+	"View":"看法",
+    "selected":"已選擇 {in} 個（共 {end} 個）",
+    "selected_all":"已選擇所有項目",
+    "no_results_found":"未找到結果",
+    "total_results":"總計 {in}",
+	"rows_page":"每頁行數：",
+    "home":"家",
+    "columns":"列",
+	"filters":"過濾器"
 }

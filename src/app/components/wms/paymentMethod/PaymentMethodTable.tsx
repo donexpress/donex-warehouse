@@ -25,21 +25,22 @@ import {
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import {
   PaymentMethod,
-  PaymentMethodListProps,
 } from "../../../../types/payment_methods";
 import { PlusIcon } from "./../../common/PlusIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
+import { Loading } from "../../common/Loading";
 
-const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
+const PaymentMethodTable = () => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
+  const [loading, setLoading] = useState<boolean>(true);
 
   /** start*/
   const [filterValue, setFilterValue] = useState("");
@@ -53,17 +54,15 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
 
   const [page, setPage] = useState(1);
 
-  const columns = [
-    { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
-    { name: intl.formatMessage({ id: "code" }), uid: "code", sortable: true },
-    { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
-  ];
-
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
-    return columns;
-  }, []);
+    return [
+      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
+      { name: intl.formatMessage({ id: "code" }), uid: "code", sortable: true },
+      { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
+    ];
+  }, [intl]);
 
   const filteredItems = useMemo(() => {
     let filteredUsers = [...paymentMethods];
@@ -114,13 +113,13 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
               </DropdownTrigger>
               <DropdownMenu>
                 <DropdownItem onClick={() => handleShow(Number(user["id"]))}>
-                  View
+                  {intl.formatMessage({ id: "View" })}
                 </DropdownItem>
                 <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
-                  Edit
+                  {intl.formatMessage({ id: "Edit" })}
                 </DropdownItem>
                 <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
-                  Delete
+                  {intl.formatMessage({ id: "Delete" })}
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -178,10 +177,13 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {paymentMethods.length} users
+            {intl.formatMessage(
+              { id: "total_results" },
+              { in: paymentMethods.length }
+            )}
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Rows per page:
+            {intl.formatMessage({ id: "rows_page" })}
             <select
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
@@ -201,6 +203,7 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
     onRowsPerPageChange,
     paymentMethods.length,
     hasSearchFilter,
+    intl,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -208,27 +211,53 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
           {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+            ? `${intl.formatMessage({ id: "selected_all" })}`
+            : `${intl.formatMessage(
+                { id: "selected" },
+                { in: selectedKeys.size, end: filteredItems.length }
+              )}`}
         </span>
         <PaginationTable
-          totalRecords={100}
-          pageLimit={5}
+          totalRecords={filteredItems.slice(0, paymentMethods.length).length}
+          pageLimit={rowsPerPage}
           pageNeighbours={1}
-          onPageChanged={() => {}}
+          page={page}
+          onPageChanged={setPage}
         />
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+  }, [
+    selectedKeys,
+    items.length,
+    sortedItems.length,
+    page,
+    paymentMethods.length,
+    rowsPerPage,
+    hasSearchFilter,
+    onSearchChange,
+    onRowsPerPageChange,
+    intl,
+  ]);
   /** end*/
 
   useEffect(() => {
-    setPaymentMethods(paymentMethodList);
+    loadWarehouses();
   }, []);
 
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [intl]);
+
   const loadWarehouses = async () => {
+    setLoading(true);
     const pms = await getPaymentMethods();
     setPaymentMethods(pms ? pms : []);
+
+    setLoading(false);
   };
 
   const handleDelete = (id: number) => {
@@ -237,14 +266,17 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
   };
 
   const handleEdit = (id: number) => {
+    setLoading(true);
     router.push(`/${locale}/wms/payment_methods/${id}/update`);
   };
 
   const handleShow = (id: number) => {
+    setLoading(true);
     router.push(`/${locale}/wms/payment_methods/${id}/show`);
   };
 
   const handleAdd = () => {
+    setLoading(true);
     router.push(`/${locale}/wms/payment_methods/insert`);
   };
 
@@ -254,51 +286,59 @@ const PaymentMethodTable = ({ paymentMethodList }: PaymentMethodListProps) => {
   };
 
   const confirm = async () => {
+    setLoading(true);
     const reponse = await removePaymentMethodById(deleteElement);
     close();
     await loadWarehouses();
+
+    setLoading(false);
   };
 
   return (
     <>
-      <Table
-        aria-label="USER-LEVEL"
-        isHeaderSticky
-        bottomContent={bottomContent}
-        bottomContentPlacement="outside"
-        classNames={{
-          wrapper: "max-h-[382px]",
-        }}
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
-        sortDescriptor={sortDescriptor}
-        topContent={topContent}
-        topContentPlacement="outside"
-        onSelectionChange={setSelectedKeys}
-        onSortChange={setSortDescriptor}
-      >
-        <TableHeader columns={headerColumns}>
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              align={column.uid == "actions" ? "center" : "start"}
-              allowsSorting={column.sortable}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody emptyContent={"No payment found"} items={sortedItems}>
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+      <Loading loading={loading}>
+        <Table
+          aria-label="USER-LEVEL"
+          isHeaderSticky
+          bottomContent={bottomContent}
+          bottomContentPlacement="outside"
+          classNames={{
+            wrapper: "max-h-[382px]",
+          }}
+          selectedKeys={selectedKeys}
+          selectionMode="multiple"
+          sortDescriptor={sortDescriptor}
+          topContent={topContent}
+          topContentPlacement="outside"
+          onSelectionChange={setSelectedKeys}
+          onSortChange={setSortDescriptor}
+        >
+          <TableHeader columns={headerColumns}>
+            {(column) => (
+              <TableColumn
+                key={column.uid}
+                align={column.uid == "actions" ? "center" : "start"}
+                allowsSorting={column.sortable}
+              >
+                {column.name}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody
+            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
+            items={sortedItems}
+          >
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
+                  <TableCell>{renderCell(item, columnKey)}</TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+      </Loading>
     </>
   );
 };

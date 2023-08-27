@@ -99,8 +99,10 @@
 	"user_levels": "Niveles de usuario",
 	"payment_methods": "Métodos de Pago",
 	"roles": "Roles",
+	"role_id": "Rol",
 	"departments": "Departamentos",
 	"select_department": "Seleccione el departamento",
+	"organization_id": "Departamento",
 	"select_role": "Seleccione el rol",
 	"select_default_chargo_station": "Seleccione la estación de carga predeterminada",
 	"select_affiliation": "Seleccione afiliaciones",
@@ -151,5 +153,17 @@
 	"extended_odd_numbers": "Números impares extendidos",
 	"associated_tracking_number": "Número de seguimiento asociado",
 	"customer_order_number_validation": "Solo puede constar de letras, números, guiones bajos, guiones y espacios.",
-	"packing_list": "Lista de embalaje"
+	"packing_list": "Lista de embalaje",
+
+	"Delete":"Eliminar",
+	"Edit":"Editar",
+	"View":"Ver",
+	"selected":"{in} de {end} seleccionados",
+	"selected_all":"Todos seleccionados",
+	"no_results_found":"No se encontraron resultados",
+	"total_results":"Total {in}",
+	"rows_page":"Filas por página:",
+	"home":"Inicio",
+	"columns":"Columnas",
+	"filters":"Filtros"
 }

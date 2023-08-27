@@ -10,12 +10,12 @@ export const menuWMS = (intl: IntlShape) => {
       items: [
         {
           id: 1.1,
-          label: intl.formatMessage({ id: "listUsers" }),
+          label: intl.formatMessage({ id: "users" }),
           route: RouteMenu.LIST_USERS,
         },
         {
           id: 1.2,
-          label: intl.formatMessage({ id: "listUserLevels" }),
+          label: intl.formatMessage({ id: "user_levels" }),
           route: RouteMenu.LIST_USER_LEVELS,
         },
         {

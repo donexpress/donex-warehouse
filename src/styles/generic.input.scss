@@ -52,7 +52,7 @@
 }
 
 .input-error {
-    border-color: #560c0c;
+    border-color: #ca6969;
 }
 
 input[type="date"],
@@ -70,7 +70,7 @@ input[type="daterange"] {
 }
 
 .error-text {
-    color: #560c0c;
+    color: #ca6969;
     font-size: 13px;
     line-height: 1;
     padding: 4px 0 8px;
@@ -117,7 +117,7 @@ input[type="daterange"] {
     display: none;
 
     &__required {
-        color: #560c0c;
+        color: #ca6969;
         font-size: 10px;
     }
 }

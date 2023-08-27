@@ -28,14 +28,20 @@ import { FaSearch, FaEye, FaPen } from "react-icons/fa";
 import { FaCirclePlus, FaTrashCan } from "react-icons/fa6";
 import {
   getWarehouses,
+  indexStateWarehouse,
   removeWarehouseById,
 } from "../../../../services/api.warehouse";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import {
   WarehouseListProps,
   CargoStationWarehouseForm,
+  StateWarehouse,
+  Country,
 } from "../../../../types";
 import "./../../../../styles/generic.input.scss";
+import { indexCountries } from "@/services/api.countrieserege1992";
+import { getRegionalDivision } from "@/services/api.regional_divisionerege1992";
+import { Loading } from "../../common/Loading";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
@@ -44,18 +50,17 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const WarehouseTable = ({
-  warehouseList,
-  states,
-  countries,
-  receptionAreas,
-}: WarehouseListProps) => {
+const WarehouseTable = () => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
   const [warehouses, setWarehouses] = useState<CargoStationWarehouseForm[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [states, setStates] = useState<StateWarehouse[]>([]);
+  const [receptionAreas, setReceptionAreas] = useState<any>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
+  const [loading, setLoading] = useState<boolean>(true);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -74,30 +79,32 @@ const WarehouseTable = ({
 
   const [page, setPage] = useState(1);
 
-  const columns = [
-    { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
-    {
-      name: intl.formatMessage({ id: "principal" }),
-      uid: "principal",
-      sortable: true,
-    },
-    {
-      name: intl.formatMessage({ id: "receiving_area" }),
-      uid: "receiving_area",
-      sortable: true,
-    },
-    {
-      name: intl.formatMessage({ id: "state" }),
-      uid: "state_id",
-      sortable: true,
-    },
-    {
-      name: intl.formatMessage({ id: "country" }),
-      uid: "country",
-      sortable: true,
-    },
-    { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
-  ];
+  const columns = React.useMemo(() => {
+    return [
+      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
+      {
+        name: intl.formatMessage({ id: "principal" }),
+        uid: "principal",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "receiving_area" }),
+        uid: "receiving_area",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "state" }),
+        uid: "state_id",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "country" }),
+        uid: "country",
+        sortable: true,
+      },
+      { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
+    ];
+  }, [intl]);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -107,7 +114,7 @@ const WarehouseTable = ({
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
     );
-  }, [visibleColumns]);
+  }, [visibleColumns, intl]);
 
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...warehouses];
@@ -162,42 +169,47 @@ const WarehouseTable = ({
     );
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user: any, columnKey: React.Key) => {
-    const cellValue = user[columnKey];
-    switch (columnKey) {
-      case "receiving_area":
-        return getReceptionAreaLabel(cellValue);
-      case "state_id":
-        return getStateLabel(cellValue);
-      case "country":
-        return getCountryLabel(cellValue);
-      case "actions":
-        return (
-          <div className="relative flex justify-end items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem onClick={() => handleShow(Number(user["id"]))}>
-                  View
-                </DropdownItem>
-                <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
-                  Edit
-                </DropdownItem>
-                <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
-                  Delete
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+  const renderCell = React.useCallback(
+    (user: any, columnKey: React.Key) => {
+      const cellValue = user[columnKey];
+      switch (columnKey) {
+        case "receiving_area":
+          return getReceptionAreaLabel(cellValue);
+        case "state_id":
+          return getStateLabel(cellValue);
+        case "country":
+          return getCountryLabel(cellValue);
+        case "actions":
+          return (
+            <div className="relative flex justify-end items-center gap-2">
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly size="sm" variant="light">
+                    <VerticalDotsIcon className="text-default-300" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem onClick={() => handleShow(Number(user["id"]))}>
+                    {intl.formatMessage({ id: "View" })}
+                  </DropdownItem>
+                  <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
+                    {intl.formatMessage({ id: "Edit" })}
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleDelete(Number(user["id"]))}
+                  >
+                    {intl.formatMessage({ id: "Delete" })}
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [intl]
+  );
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -242,7 +254,7 @@ const WarehouseTable = ({
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  Columns
+                  {intl.formatMessage({ id: "columns" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -271,10 +283,13 @@ const WarehouseTable = ({
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {warehouses.length} users
+            {intl.formatMessage(
+              { id: "total_results" },
+              { in: warehouses.length }
+            )}
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Rows per page:
+            {intl.formatMessage({ id: "rows_page" })}
             <select
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
@@ -295,6 +310,7 @@ const WarehouseTable = ({
     onRowsPerPageChange,
     warehouses.length,
     hasSearchFilter,
+    intl,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -302,23 +318,47 @@ const WarehouseTable = ({
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
           {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+            ? `${intl.formatMessage({ id: "selected_all" })}`
+            : `${intl.formatMessage(
+                { id: "selected" },
+                { in: selectedKeys.size, end: filteredItems.length }
+              )}`}
         </span>
         <PaginationTable
-          totalRecords={100}
-          pageLimit={5}
+          totalRecords={filteredItems.slice(0, warehouses.length).length}
+          pageLimit={rowsPerPage}
           pageNeighbours={1}
-          onPageChanged={() => {}}
+          page={page}
+          onPageChanged={setPage}
         />
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+  }, [
+    selectedKeys,
+    items.length,
+    warehouses.length,
+    intl,
+    rowsPerPage,
+    page,
+    pages,
+    hasSearchFilter,
+    onSearchChange,
+    onRowsPerPageChange,
+    intl,
+  ]);
   /** end*/
 
   useEffect(() => {
-    setWarehouses(warehouseList);
+    loadWarehouses();
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [intl]);
 
   const getStateLabel = (stateId: number | null) => {
     if (stateId !== null && states.length > 0) {
@@ -343,7 +383,8 @@ const WarehouseTable = ({
   const getReceptionAreaLabel = (receptionAreaId: string) => {
     if (receptionAreaId !== null && receptionAreas.length > 0) {
       const filter = receptionAreas.filter(
-        (receptionArea) => receptionArea.name === receptionAreaId
+        (receptionArea: { name: string }) =>
+          receptionArea.name === receptionAreaId
       );
       if (filter.length > 0) {
         return filter[0].name;
@@ -353,8 +394,16 @@ const WarehouseTable = ({
   };
 
   const loadWarehouses = async () => {
+    setLoading(true);
     const whs = await getWarehouses();
+    const _states = await indexStateWarehouse();
+    const _countries = await indexCountries();
+    const _receptionAreas = await getRegionalDivision();
     setWarehouses(whs ? whs : []);
+    setStates(_states ? _states : []);
+    setCountries(_countries ? _countries : []);
+    setReceptionAreas(_receptionAreas ? _receptionAreas : []);
+    setLoading(false);
   };
 
   const handleDelete = (id: number) => {
@@ -363,14 +412,17 @@ const WarehouseTable = ({
   };
 
   const handleEdit = (id: number) => {
+    setLoading(true);
     router.push(`/${locale}/wms/warehouse_cargo_station/${id}/update`);
   };
 
   const handleShow = (id: number) => {
+    setLoading(true);
     router.push(`/${locale}/wms/warehouse_cargo_station/${id}/show`);
   };
 
   const handleAdd = () => {
+    setLoading(true);
     router.push(`/${locale}/wms/warehouse_cargo_station/insert`);
   };
 
@@ -380,51 +432,58 @@ const WarehouseTable = ({
   };
 
   const confirm = async () => {
+    setLoading(true);
     const reponse = await removeWarehouseById(deleteElement);
     close();
     await loadWarehouses();
+    setLoading(false);
   };
 
   return (
     <>
-      <Table
-        aria-label="WARE-HOUSE"
-        isHeaderSticky
-        bottomContent={bottomContent}
-        bottomContentPlacement="outside"
-        classNames={{
-          wrapper: "max-h-[382px]",
-        }}
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
-        sortDescriptor={sortDescriptor}
-        topContent={topContent}
-        topContentPlacement="outside"
-        onSelectionChange={setSelectedKeys}
-        onSortChange={setSortDescriptor}
-      >
-        <TableHeader columns={headerColumns}>
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
-              allowsSorting={column.sortable}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody emptyContent={"No ware house found"} items={sortedItems}>
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+      <Loading loading={loading}>
+        <Table
+          aria-label="WARE-HOUSE"
+          isHeaderSticky
+          bottomContent={bottomContent}
+          bottomContentPlacement="outside"
+          classNames={{
+            wrapper: "max-h-[382px]",
+          }}
+          selectedKeys={selectedKeys}
+          selectionMode="multiple"
+          sortDescriptor={sortDescriptor}
+          topContent={topContent}
+          topContentPlacement="outside"
+          onSelectionChange={setSelectedKeys}
+          onSortChange={setSortDescriptor}
+        >
+          <TableHeader columns={headerColumns}>
+            {(column) => (
+              <TableColumn
+                key={column.uid}
+                align={column.uid === "actions" ? "center" : "start"}
+                allowsSorting={column.sortable}
+              >
+                {column.name}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody
+            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
+            items={sortedItems}
+          >
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
+                  <TableCell>{renderCell(item, columnKey)}</TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+      </Loading>
     </>
   );
 };

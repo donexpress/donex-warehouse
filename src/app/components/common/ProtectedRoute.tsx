@@ -1,24 +1,37 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { verifySessionOMS, verifySessionWMS } from '../../../helpers/cookieUtils';
 import { isOMS, isWMS} from '../../../helpers';
+import { Loading } from './Loading';
 
 const ProtectedRoute = ({ children }: any) => {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const hasSessionOMS = verifySessionOMS();
   const hasSessionWMS = verifySessionWMS();
+
 
   useEffect(() => {
     const { locale } = router.query;
     if (isWMS() && !hasSessionWMS) {
       router.push(`/${locale}/wms/login`);
-    }
-    if (isOMS() && !hasSessionOMS) {
+    }else if (isOMS() && !hasSessionOMS) {
       router.push(`/${locale}/oms/login`);
+    } else {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [hasSessionWMS, hasSessionOMS, router]);
 
-  return children;
+  return (
+    <>
+      <Loading loading={loading}>
+        {children}
+      </Loading>
+    </>
+  );
 };
 
 export default ProtectedRoute;

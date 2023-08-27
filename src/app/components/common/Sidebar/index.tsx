@@ -137,7 +137,7 @@ const Index = () => {
               <div className="mr-1 text-xl flex items-center">
                 <Icons icons="BiHome" />
               </div>
-              <span className="text-base font-medium text-sidebar">Inicio</span>
+              <span className="text-base font-medium text-sidebar">{intl.formatMessage({ id: "home" })}</span>
             </div>
           </div>
 

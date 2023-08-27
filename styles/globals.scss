@@ -488,6 +488,10 @@ table {
     color: $color !important;
   }
 
+  thead.top-0{
+    top: -16px !important;
+  }
+
   th:hover,
   th.data-\[hover\=true\]\:text-foreground-400[data-hover="true"] {
     color: white !important;
@@ -518,6 +522,10 @@ table {
   .after\:bg-primary::after {
     background-color: $background-black !important;
   }
+
+  .group[aria-selected="false"][data-hover="true"] .group-aria-\[selected\=false\]\:group-data-\[hover\=true\]\:before\:opacity-70::before {
+    background-color: #37446b !important;
+  }
 }
 
 button.bg-primary {
@@ -535,4 +543,9 @@ button.bg-secundary {
   border-radius: 4px !important;
   padding: 8px;
   transition: color 0.3s, border-color 0.3s;
+}
+
+button:disabled{
+  opacity: 0.3;
+  cursor: not-allowed;
 }

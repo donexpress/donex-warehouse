@@ -1,26 +1,40 @@
-import Head from 'next/head';
-import Layout from '../../../../../src/app/layout';
-import ProtectedRoute from '../../../../../src/app/components/common/ProtectedRoute';
-import { getStaffStates } from '../../../../../src/services/api.staff';
-import { getRoles } from '../../../../../src/services/api.role';
-import { getOrganizations } from '../../../../../src/services/api.organization';
-import { getWarehouses } from '../../../../../src/services/api.warehouse';
-import { StaffFormProps } from '@/typeserege1992';
-import StaffFormBody from '@/app/components/wms/staff/StaffFormBodyerege1992';
-import { getStaffById } from '@/services/api.stafferege1992';
+import Head from "next/head";
+import Layout from "../../../../../src/app/layout";
+import ProtectedRoute from "../../../../../src/app/components/common/ProtectedRoute";
+import { getStaffStates } from "../../../../../src/services/api.staff";
+import { getRoles } from "../../../../../src/services/api.role";
+import { getOrganizations } from "../../../../../src/services/api.organization";
+import { getWarehouses } from "../../../../../src/services/api.warehouse";
+import { StaffFormProps } from "@/typeserege1992";
+import StaffFormBody from "@/app/components/wms/staff/StaffFormBodyerege1992";
+import { getStaffById } from "@/services/api.stafferege1992";
 
-const UpdateStaff = ({ staff, id, staffStates, roles, organizations, affiliations }: StaffFormProps) => {
+const UpdateStaff = ({
+  staff,
+  id,
+  staffStates,
+  roles,
+  organizations,
+  affiliations,
+}: StaffFormProps) => {
   return (
-  <ProtectedRoute>
-      <Layout>
-        <Head>
-          <title>Don Express Warehouse</title>
-          <link rel="icon" href="/icon_favicon.png" />
-        </Head>
-        <StaffFormBody staff={staff} id={id} staffStates={staffStates ? staffStates : []} roles={roles ? roles : []} organizations={organizations ? organizations : []} affiliations={affiliations ? affiliations : []} />
-      </Layout>
-    </ProtectedRoute>
-    );
+    <Layout>
+      <Head>
+        <title>Don Express Warehouse</title>
+        <link rel="icon" href="/icon_favicon.png" />
+      </Head>
+      <ProtectedRoute>
+        <StaffFormBody
+          staff={staff}
+          id={id}
+          staffStates={staffStates ? staffStates : []}
+          roles={roles ? roles : []}
+          organizations={organizations ? organizations : []}
+          affiliations={affiliations ? affiliations : []}
+        />
+      </ProtectedRoute>
+    </Layout>
+  );
 };
 
 export async function getServerSideProps(context: any) {
@@ -33,14 +47,14 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-        id,
-        staff,
-        staffStates,
-        roles,
-        organizations,
-        affiliations
-    }
-  }
+      id,
+      staff,
+      staffStates,
+      roles,
+      organizations,
+      affiliations,
+    },
+  };
 }
 
 export default UpdateStaff;
