@@ -32,6 +32,9 @@ export type StoragePlan = {
     delivered_time: string;
     observations: string;
     show_packing_list?: boolean;
+    show_expansion_box_number?: boolean;
+    prefix_expansion_box_number?: string;
+    digits_box_number?: number;
     rows?: PackingList[];
 };
 
@@ -45,4 +48,10 @@ export type StoragePlanProps = {
 
 export type StoragePlanListProps = {
   storagePlanList: StoragePlan[];
+};
+
+export type BoxNumberLabelFn = { 
+  showEBN: boolean; 
+  prefixEBN: string; 
+  dBN: number;
 };

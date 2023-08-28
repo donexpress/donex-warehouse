@@ -9,7 +9,8 @@ import GenericInput from '../../common/GenericInput';
 import { useIntl } from 'react-intl';
 import { Response, ValueSelect } from '../../../../types';
 import { createStoragePlan, updateStoragePlanById } from '../../../../services/api.storage_plan';
-import { StoragePlanProps, StoragePlan, PackingList } from '../../../../types/storage_plan';
+import { createPackingList } from '../../../../services/api.packing_list';
+import { StoragePlanProps, StoragePlan, PackingList, BoxNumberLabelFn } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
 import { Warehouse } from '../../../../types/warehouse';
 import RowStoragePlan from '../../common/RowStoragePlan';
@@ -20,7 +21,20 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     const { locale } = router.query;
     const intl = useIntl();
     const [showPackingList, setShowPackingList] = useState<boolean>(false);
+    const [showExpansionBoxNumber, setShowExpansionBoxNumber] = useState<boolean>(false);
     const [rows, setRows] = useState<PackingList[]>([]);
+    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>('FBA');
+    const [digitsBoxNumber, setDigitsBoxNumber] = useState<number>(6);
+    const digitsBoxNumberOptions: ValueSelect[] = [
+      {
+        value: 3,
+        label: "3"
+      },
+      {
+        value: 6,
+        label: "6"
+      }
+    ];
     
     const initialValues: StoragePlan = {
         customer_order_number: (id && storagePlan) ? storagePlan.customer_order_number : '',
@@ -30,12 +44,15 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         delivered_time: (id && storagePlan) ? storagePlan.delivered_time : '',
         observations: (id && storagePlan) ? storagePlan.observations : '',
         show_packing_list: false,
+        show_expansion_box_number: false,
+        prefix_expansion_box_number: 'FBA',
+        digits_box_number: 6,
         rows: [],
     };
   
       const cancelSend = () => {
           if (isWMS()) {
-            router.push(`/${locale}/wms/storagePlan`);
+            router.push(`/${locale}/wms/storage_plan`);
           }
       };
 
@@ -71,32 +88,71 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 observations: values.observations
               };
       }
+
+      const tableIsValid = () => {
+        if (showPackingList && rows.length > 0) {
+          return rows.every(item => {
+            return item.box_number !== '' &&
+              item.box_number !== null &&
+              item.box_number !== undefined &&
+              !isNaN(item.amount);
+          });
+        }
+        return true;
+      }
   
-      const handleSubmit = async (values: StoragePlan) => {console.log(values);console.log(rows)
-          /* if (isWMS()) {
+      const handleSubmit = async (values: StoragePlan) => {
+          if (isWMS()) {
             if (id) {
               await modify(id, values);
             } else {
               await create(values);
             }
-          } */
+          }
       };
+
+      const formatBodyPackingList = (pl: PackingList, storagePlanId: number): PackingList => {
+        return {
+          storage_plan_id: storagePlanId,
+          box_number: pl.box_number,
+          case_number: pl.case_number,
+          client_height: pl.client_height,
+          client_length: pl.client_length,
+          client_weight: pl.client_weight,
+          client_width: pl.client_width,
+          amount: pl.amount,
+          product_name: pl.product_name,
+          english_product_name: pl.english_product_name,
+          price: pl.price,
+          material: pl.material,
+          customs_code: pl.customs_code,
+          fnscu: pl.fnscu
+        }
+      }
 
       const create = async (values: StoragePlan) => {
         const response: Response = await createStoragePlan(formatBody(values));
-        treatmentToResponse(response);
+        if (response.status >= 200 && response.status <= 299) {
+          const responseSP: StoragePlan = response.data;
+          if (responseSP) {
+            for (let index = 0; index < rows.length; index++) {
+              const element: PackingList = rows[index];
+              await createPackingList(formatBodyPackingList(element, Number(responseSP.id)));
+            }
+          }
+          showMsg(intl.formatMessage({ id: 'successfullyMsg' }), { type: "success" });
+          router.push(`/${locale}/wms/storage_plan`);
+        } else {
+          let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+          showMsg(message, { type: "error" });
+        }
       }
     
       const modify = async (storagePlanId: number, values: StoragePlan) => {
         const response: Response = await updateStoragePlanById(storagePlanId, formatBody(values));
-        treatmentToResponse(response);
-      }
-
-      const treatmentToResponse = (response: Response) => {
         if (response.status >= 200 && response.status <= 299) {
-          const message = id ? intl.formatMessage({ id: 'changedsuccessfullyMsg' }) : intl.formatMessage({ id: 'successfullyMsg' });
-          showMsg(message, { type: "success" });
-          router.push(`/${locale}/wms/storagePlan`);
+          showMsg(intl.formatMessage({ id: 'changedsuccessfullyMsg' }), { type: "success" });
+          router.push(`/${locale}/wms/storage_plan`);
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
           showMsg(message, { type: "error" });
@@ -104,7 +160,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
       }
 
       const goToEdit = () => {
-        router.push(`/${locale}/wms/storagePlan/${id}/update`)
+        router.push(`/${locale}/wms/storage_plan/${id}/update`)
       };
       
       const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -114,9 +170,20 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         
         if (name === 'show_packing_list') {
           setShowPackingList(fieldValue);
+        } else if (name === 'show_expansion_box_number') {
+          setShowExpansionBoxNumber(fieldValue);
+          setBoxNumberLabel({ showEBN: fieldValue, prefixEBN: prefixExpansionBoxNumber, dBN: digitsBoxNumber });
+        } else if (name === 'prefix_expansion_box_number') {
+          const valueElement: string = fieldValue ? fieldValue : '';
+          setPrefixExpansionBoxNumber(valueElement);
+          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: valueElement, dBN: digitsBoxNumber });
+        } else if (name === 'digits_box_number') {
+          const valueElement: number = fieldValue ? Number (fieldValue) : 6;
+          setDigitsBoxNumber(valueElement);
+          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: prefixExpansionBoxNumber, dBN: valueElement });
         } else if (name === 'box_amount') {
-          const value = fieldValue < 0 ? 0 : fieldValue;
-          setBoxesCount(value);
+          const valueElement = fieldValue < 0 ? 0 : fieldValue;
+          setBoxesCount(valueElement);
         }
       };
 
@@ -130,7 +197,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
           for (let index = 0; index < count; index++) {
             items.push({
               id: rows.length + index, 
-              box_number: '', 
+              box_number: getInitialBoxNumberLabel(rows.length + index + 1), 
               case_number: '',
               amount: 0,
               client_weight: 0,
@@ -148,6 +215,23 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
 
           setRows(rows.concat(items));
         }
+      }
+
+      const setBoxNumberLabel = (params: BoxNumberLabelFn) => {
+        const allRows = rows.map((row: PackingList) => ({...row, box_number: getInitialBoxNumberLabel(Number(row.id) + 1, params)}));
+        setRows(allRows);
+      }
+
+      const getInitialBoxNumberLabel = (value: number, params: BoxNumberLabelFn | null = null) => {
+        let showEBN: boolean = params !== null ? params.showEBN : showExpansionBoxNumber;
+        let prefixEBN: string = params !== null ? params.prefixEBN : prefixExpansionBoxNumber;
+        let dBN: number = params !== null ? params.dBN : digitsBoxNumber;
+        if (showEBN){
+          let numberPart = 'U' + ((value.toString.length >= dBN) ? value : (String(value).padStart(dBN, '0')));
+          
+          return prefixEBN + numberPart;
+        }
+        return value.toString();
       }
 
       const handleUpdateRow = (id: number, updatedValues: PackingList) => {
@@ -248,13 +332,46 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                       }
                       {
                         showPackingList && (
-                          <div className='boxes-container'>
-                            <div>
-                              <RowStoragePlanHeader />
-                              {rows.map((row, index) => (
-                                <RowStoragePlan key={index} initialValues={{ ...row, id: index }}
-                                onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
-                              ))}
+                          <div>
+                            <div style={{ paddingLeft: '10px' }}>
+                              <div className="flex gap-2 flex-wrap" style={{ paddingBottom: '10px' }}>
+                                <GenericInput onChangeFunction={handleInputChange} hideErrorContent={true} type='checkbox' name="show_expansion_box_number" placeholder={intl.formatMessage({ id: 'expansion_box_number' })} customClass='custom-input' />
+                              </div>
+                              {
+                                showExpansionBoxNumber && 
+                                <div className='flex gap-3 flex-wrap justify-between' style={{ paddingRight: '16px' }}>
+                                  <div className="w-full sm:w-[49%]">
+                                    <GenericInput
+                                      type="text"
+                                      name="prefix_expansion_box_number"
+                                      placeholder={intl.formatMessage({ id: 'expansion_box_number' })}
+                                      customClass="custom-input"
+                                      onChangeFunction={handleInputChange}
+                                      disabled={ isFromDetails }
+                                    />
+                                  </div>
+                                  <div className="w-full sm:w-[49%]">
+                                    <GenericInput
+                                      type="select"
+                                      name="digits_box_number"
+                                      selectLabel={intl.formatMessage({ id: 'digits_box_number' })}
+                                      options={digitsBoxNumberOptions}
+                                      customClass="custom-input"
+                                      onChangeFunction={handleInputChange}
+                                      disabled={ isFromDetails }
+                                    />
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                            <div className='boxes-container'>
+                              <div>
+                                <RowStoragePlanHeader />
+                                {rows.map((row, index) => (
+                                  <RowStoragePlan key={index} initialValues={{ ...row, id: index }}
+                                  onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
+                                ))}
+                              </div>
                             </div>
                           </div>
                         )
@@ -268,7 +385,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                                 color="primary"
                                 type="submit"
                                 className='px-4'
-                                disabled={isSubmitting || !isValid}
+                                disabled={isSubmitting || !isValid || !tableIsValid()}
                               >
                                 {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? intl.formatMessage({ id: 'modify' }) : intl.formatMessage({ id: 'add' }))}
                               </Button>

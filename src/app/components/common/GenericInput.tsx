@@ -48,6 +48,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
   hideErrorContent = false,
   onChangeFunction,
   isMulti=false,
+  minValue=undefined,
   getValueChangeFn,
   ...props
 }) => {
@@ -163,12 +164,12 @@ const GenericInput: React.FC<GenericInputProps> = ({
         onChangeFunction(event);
       }
       formik.handleChange(event);
-      if (type === "number" && props.minValue !== undefined) {
+      if (type === "number" && minValue !== undefined) {
         const newValue = event.target.value;
         const parsedValue = parseFloat(newValue);
 
-        if (!isNaN(parsedValue) && parsedValue < props.minValue) {
-          formik.setFieldValue(String(props.name), props.minValue);
+        if (!isNaN(parsedValue) && parsedValue < minValue) {
+          formik.setFieldValue(String(props.name), minValue);
         } else {
           formik.handleChange(event);
         }
@@ -196,6 +197,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
           className={inputClassName}
           disabled={disabled}
           autoComplete="on"
+          onChange={handleChange}
         >
           <option
             value=""
