@@ -154,6 +154,7 @@
 	"associated_tracking_number": "Associated tracking number",
 	"customer_order_number_validation": "It can only consist of letters, numbers, underscores, hyphens, and spaces.",
 	"packing_list": "Packing list",
+	"config": "Set up",
 	
 	"box_number": "Box number",
 	"case_number": "Transfer order number",

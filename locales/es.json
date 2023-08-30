@@ -154,6 +154,7 @@
 	"associated_tracking_number": "Número de seguimiento asociado",
 	"customer_order_number_validation": "Solo puede constar de letras, números, guiones bajos, guiones y espacios.",
 	"packing_list": "Lista de embalaje",
+	"config": "Configurar",
 	
 	"box_number": "Número de caja",
 	"case_number": "Número de orden",

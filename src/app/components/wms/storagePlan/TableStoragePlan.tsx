@@ -195,6 +195,9 @@ const TableStoragePlan = () => {
                   <DropdownItem onClick={() => handleEdit(storageP["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
+                  <DropdownItem onClick={() => handleConfig(storageP["id"])}>
+                    {intl.formatMessage({ id: "config" })}
+                  </DropdownItem>
                   <DropdownItem onClick={() => handleDelete(storageP["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
@@ -368,6 +371,11 @@ const TableStoragePlan = () => {
   const handleEdit = (id: number) => {
     setLoading(true);
     router.push(`/${locale}/wms/storage_plan/${id}/update`);
+  };
+
+  const handleConfig = (id: number) => {
+    setLoading(true);
+    router.push(`/${locale}/wms/storage_plan/${id}/config`);
   };
 
   const handleShow = (id: number) => {
