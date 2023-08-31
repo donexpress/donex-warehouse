@@ -20,15 +20,16 @@ interface RowData {
   custome_picture?: string,
   operator_picture?: string,
   storage_plan_id?: number,
-  meta?: any
+  order_transfer_number?: string,
 }
 
 interface RowStoragePlanProps {
   initialValues: RowData;
   onUpdate: (updatedValues: RowData) => void;
+  onlyReadly?: boolean;
 }
 
-const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate }) => {
+const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate, onlyReadly = false }) => {
   const handleRowChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     onUpdate({
@@ -38,7 +39,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
   };
 
   return (
-    <div className='boxes-container__table'>
+    <div className={!onlyReadly ? 'boxes-container__table' :  'boxes-container__table boxes-container-table-only-readly'}>
       <GenericInput
         type="text"
         name="box_number"
@@ -46,14 +47,29 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         customClass="custom-input input-table"
         hideErrorContent={true}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
+      {
+        onlyReadly && (
+          <GenericInput
+            type="text"
+            name="case_number"
+            value={initialValues.case_number}
+            customClass="custom-input input-table"
+            hideErrorContent={true}
+            onChangeFunction={handleRowChange}
+            disabled={onlyReadly}
+          />
+        )
+      }
       <GenericInput
         type="text"
-        name="case_number"
-        value={initialValues.case_number}
+        name="order_transfer_number"
+        value={initialValues.order_transfer_number}
         customClass="custom-input input-table"
         hideErrorContent={true}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="number"
@@ -63,6 +79,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         hideErrorContent={true}
         minValue={1}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="number"
@@ -72,6 +89,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         hideErrorContent={true}
         minValue={1}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="number"
@@ -81,6 +99,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         hideErrorContent={true}
         minValue={1}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="number"
@@ -90,6 +109,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         hideErrorContent={true}
         minValue={1}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="number"
@@ -99,6 +119,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         hideErrorContent={true}
         minValue={1}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="text"
@@ -107,6 +128,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         customClass="custom-input input-table"
         hideErrorContent={true}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="text"
@@ -115,6 +137,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         customClass="custom-input input-table"
         hideErrorContent={true}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="number"
@@ -124,6 +147,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         hideErrorContent={true}
         minValue={1}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="text"
@@ -132,6 +156,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         customClass="custom-input input-table"
         hideErrorContent={true}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="text"
@@ -140,6 +165,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         customClass="custom-input input-table"
         hideErrorContent={true}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
       <GenericInput
         type="text"
@@ -148,6 +174,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         customClass="custom-input input-table"
         hideErrorContent={true}
         onChangeFunction={handleRowChange}
+        disabled={onlyReadly}
       />
     </div>
   );

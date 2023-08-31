@@ -15,6 +15,7 @@ import { User } from '../../../../types/user';
 import { Warehouse } from '../../../../types/warehouse';
 import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
+import CheckboxesStoragePlan from './CheckboxesStoragePlan';
 
 const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails }: StoragePlanProps) => {
     const router = useRouter();
@@ -43,6 +44,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         box_amount: (id && storagePlan) ? storagePlan.box_amount : 0,
         delivered_time: (id && storagePlan) ? storagePlan.delivered_time : '',
         observations: (id && storagePlan) ? storagePlan.observations : '',
+        rejected_boxes: (id && storagePlan) ? storagePlan.rejected_boxes : false,
+        return: (id && storagePlan) ? storagePlan.return : false,
         show_packing_list: false,
         show_expansion_box_number: false,
         prefix_expansion_box_number: 'FBA',
@@ -85,7 +88,9 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 customer_order_number: values.customer_order_number,
                 box_amount: values.box_amount,
                 delivered_time: values.delivered_time,
-                observations: values.observations
+                observations: values.observations,
+                rejected_boxes: values.rejected_boxes,
+                return: values.return
               };
       }
 
@@ -126,7 +131,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
           price: pl.price,
           material: pl.material,
           customs_code: pl.customs_code,
-          fnscu: pl.fnscu
+          fnscu: pl.fnscu,
+          order_transfer_number: pl.order_transfer_number,
         }
       }
 
@@ -184,6 +190,14 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         } else if (name === 'box_amount') {
           const valueElement = fieldValue < 0 ? 0 : fieldValue;
           setBoxesCount(valueElement);
+        } else if (name === 'return') {
+          if (checked) {
+
+          }
+        } else if (name === 'rejected_boxes') {
+          if (checked) {
+            
+          }
         }
       };
 
@@ -210,6 +224,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
               material: '',
               customs_code: '',
               fnscu: '',
+              order_transfer_number: '',
             });
           }
 
@@ -300,6 +315,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             disabled={ isFromDetails }
                             minValue={0}
                             onChangeFunction={handleInputChange}
+                            required
                           />
                         </div>
                         <div className="w-full sm:w-[49%]">
@@ -312,6 +328,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           />
                         </div>
                       </div>
+                      <CheckboxesStoragePlan  isFromDetails={!!isFromDetails}/>
                       <div className="flex gap-3 flex-wrap" style={{ paddingRight: '16px' }}>
                         <div className="w-full">
                           <GenericInput

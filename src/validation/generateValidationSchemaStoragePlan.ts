@@ -10,5 +10,18 @@ export const generateValidationSchemaStoragePlan = (intl: IntlShape) => {
         .required(intl.formatMessage({ id: 'required' })),
       warehouse_id: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
+      box_amount: Yup.number()
+        .required(intl.formatMessage({ id: 'required' }))
+        .positive(intl.formatMessage({ id: 'must_be_greater_than_0' }))
+        .integer(intl.formatMessage({ id: 'must_be_an_integer' })),
+    });
+  };
+
+export const generateValidationSchemaPackingList = (intl: IntlShape) => {
+    return Yup.object({
+      box_amount: Yup.number()
+      .required(intl.formatMessage({ id: 'required' }))
+      .positive(intl.formatMessage({ id: 'must_be_greater_than_0' }))
+      .integer(intl.formatMessage({ id: 'must_be_an_integer' })),
     });
   };

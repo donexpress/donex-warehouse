@@ -4,6 +4,7 @@ import { Warehouse } from './warehouse';
 export type PackingList = {
   id?: number,
   box_number: string,
+  box_number_aux?: number,
   case_number: string,
   client_weight: number,
   client_length: number,
@@ -20,7 +21,9 @@ export type PackingList = {
   custome_picture?: string,
   operator_picture?: string,
   storage_plan_id?: number,
-  meta?: any
+  order_transfer_number?: string;
+  meta?: any;
+  checked?: boolean;
 };
 
 export type StoragePlan = {
@@ -31,6 +34,12 @@ export type StoragePlan = {
     box_amount: number;
     delivered_time: string;
     observations: string;
+    rejected_boxes: boolean;
+    return: boolean;
+    packing_list?: PackingList[];
+    country?: string;
+    weight?: string;
+    volume?: string;
     show_packing_list?: boolean;
     show_expansion_box_number?: boolean;
     prefix_expansion_box_number?: string;
@@ -45,6 +54,13 @@ export type StoragePlanProps = {
   users: User[];
   warehouses: Warehouse[];
 };
+
+export type PackingListProps = {
+  id: number;
+  storagePlan: StoragePlan;
+  isFromAddPackingList?: boolean;
+  isFromModifyPackingList?: boolean;
+}
 
 export type StoragePlanListProps = {
   storagePlanList: StoragePlan[];

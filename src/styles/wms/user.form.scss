@@ -19,6 +19,11 @@
     }
 }
 
+.boxes-container-table-only-readly {
+    display: grid;
+    grid-template-columns: 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px !important;
+}
+
 .text-center {
     text-align: center;
 }

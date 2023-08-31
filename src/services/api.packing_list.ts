@@ -16,7 +16,7 @@ export const createPackingList = async (values: PackingList): Promise<Response> 
     const response = await axios.post(path, values, getHeaders());
     
     if (response.status && (response.status >= 200 && response.status <= 299)) {
-      return {...response.data, status: response.status};
+      return {data: response.data, status: response.status};
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
@@ -30,7 +30,7 @@ export const updatePackingListById = async (packingListId: number, packingList: 
     const response = await axios.put(path, packingList, getHeaders());
     
     if (response.status && (response.status >= 200 && response.status <= 299)) {
-      return {...response.data, status: response.status};
+      return {data: response.data, status: response.status};
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {

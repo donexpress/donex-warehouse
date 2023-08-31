@@ -30,7 +30,7 @@ export const updateStoragePlanById = async (storagePlanId: number, storagePlan: 
     const response = await axios.put(path, storagePlan, getHeaders());
     
     if (response.status && (response.status >= 200 && response.status <= 299)) {
-      return {...response.data, status: response.status};
+      return {data: response.data, status: response.status};
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
