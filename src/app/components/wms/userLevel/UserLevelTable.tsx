@@ -131,6 +131,8 @@ const UserLevelTable = () => {
               </Dropdown>
             </div>
           );
+        case "service_id":
+          return user.service ? user.service.name : "";
         default:
           return cellValue;
       }
@@ -259,16 +261,6 @@ const UserLevelTable = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [intl]);
-
-  const getServiceLabel = (serviceId: number | null) => {
-    if (serviceId !== null && servicesList.length > 0) {
-      const filter = servicesList.filter((service) => service.id === serviceId);
-      if (filter.length > 0) {
-        return filter[0].name;
-      }
-    }
-    return serviceId;
-  };
 
   const loadWarehouses = async () => {
     setLoading(true);

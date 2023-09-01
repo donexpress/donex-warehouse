@@ -136,7 +136,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
                 warehouse_id: storagePlan.warehouse_id ? Number(storagePlan.warehouse_id) : null,
                 customer_order_number: storagePlan.customer_order_number,
                 box_amount: storagePlan.box_amount + value,
-                delivered_time: storagePlan.delivered_time,
+                delivered_time: (storagePlan.delivered_time ? storagePlan.delivered_time.substring(0,10) : null),
                 observations: storagePlan.observations,
                 rejected_boxes: storagePlan.rejected_boxes,
                 return: storagePlan.return

@@ -225,6 +225,12 @@ const StaffTable = () => {
               </Dropdown>
             </div>
           );
+        case "organization_id": 
+          return user.organization ? user.organization.name : "";
+        case "role_id": 
+          return user.role ? user.role.name : "";
+        case "state_id": 
+          return user.state ? user.state.name : "";
         default:
           return cellValue;
       }

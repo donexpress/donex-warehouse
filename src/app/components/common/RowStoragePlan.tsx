@@ -34,8 +34,20 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
     const { name, value } = event.target;
     onUpdate({
       ...initialValues,
-      [name]: value,
+      [name]: changeNumberValue(name, value),
     });
+  };
+
+  const changeNumberValue = (name: string, value: any) => {
+    switch(name) {
+      case 'amount': return (value && !isNaN(value) && Number(value) >= 0) ? Number(value) : 0;
+      case 'client_weight': return (value && !isNaN(value) && Number(value) >= 0) ? Number(value) : 0;
+      case 'client_length': return (value && !isNaN(value) && Number(value) >= 0) ? Number(value) : 0;
+      case 'client_width': return (value && !isNaN(value) && Number(value) >= 0) ? Number(value) : 0;
+      case 'client_height': return (value && !isNaN(value) && Number(value) >= 0) ? Number(value) : 0;
+      case 'price': return (value && !isNaN(value) && Number(value) >= 0) ? Number(value) : 0;
+    }
+    return value;
   };
 
   return (
@@ -77,7 +89,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         value={initialValues.amount}
         customClass="custom-input input-table"
         hideErrorContent={true}
-        minValue={1}
+        minValue={0}
         onChangeFunction={handleRowChange}
         disabled={onlyReadly}
       />
@@ -87,7 +99,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         value={initialValues.client_weight}
         customClass="custom-input input-table"
         hideErrorContent={true}
-        minValue={1}
+        minValue={0}
         onChangeFunction={handleRowChange}
         disabled={onlyReadly}
       />
@@ -97,7 +109,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         value={initialValues.client_length}
         customClass="custom-input input-table"
         hideErrorContent={true}
-        minValue={1}
+        minValue={0}
         onChangeFunction={handleRowChange}
         disabled={onlyReadly}
       />
@@ -107,7 +119,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         value={initialValues.client_width}
         customClass="custom-input input-table"
         hideErrorContent={true}
-        minValue={1}
+        minValue={0}
         onChangeFunction={handleRowChange}
         disabled={onlyReadly}
       />
@@ -117,7 +129,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         value={initialValues.client_height}
         customClass="custom-input input-table"
         hideErrorContent={true}
-        minValue={1}
+        minValue={0}
         onChangeFunction={handleRowChange}
         disabled={onlyReadly}
       />
@@ -145,7 +157,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         value={initialValues.price}
         customClass="custom-input input-table"
         hideErrorContent={true}
-        minValue={1}
+        minValue={0}
         onChangeFunction={handleRowChange}
         disabled={onlyReadly}
       />

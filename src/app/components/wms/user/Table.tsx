@@ -28,14 +28,10 @@ import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
 import { getUsers, removeUser } from "@/services/api.userserege1992";
 import { User as UserModel } from "@/types/usererege1992";
-import { PaymentMethod } from "@/types/payment_methodserege1992";
-import { UserState } from "@/types/user_stateerege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
-import { getPaymentMethods } from "@/services/api.payment_methoderege1992";
-import { getUserStates } from "@/services/api.userserege1992";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -56,10 +52,6 @@ const UserTable = () => {
   const router = useRouter();
   const { locale } = router.query;
   const [users, setUsers] = useState<UserModel[]>([]);
-  const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>(
-    []
-  );
-  const [userStateList, setUserStateList] = useState<UserState[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
@@ -110,6 +102,11 @@ const UserTable = () => {
       {
         name: intl.formatMessage({ id: "payment_method" }),
         uid: "payment_method_id",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "user_level" }),
+        uid: "user_level_id",
         sortable: true,
       },
       {
@@ -218,6 +215,12 @@ const UserTable = () => {
               </Dropdown>
             </div>
           );
+        case "payment_method_id": 
+            return user.payment_method ? user.payment_method.name : "";
+        case "user_level_id": 
+            return user.user_level ? user.user_level.name : "";
+        case "state_id": 
+            return user.state ? user.state.name : "";
         default:
           return cellValue;
       }
@@ -396,36 +399,9 @@ const UserTable = () => {
   const loadUsers = async () => {
     setLoading(true);
     const users = await getUsers();
-    const _payments = await getPaymentMethods();
-    const userStates = await getUserStates();
     setUsers(users);
-    // setPaymentMethodList(_payments);
-    setUserStateList(userStates);
+    
     setLoading(false);
-  };
-
-  const getPaymentMethodLabel = (paymentMethodId: number | null) => {
-    if (paymentMethodId !== null && paymentMethodList.length > 0) {
-      const filter = paymentMethodList.filter(
-        (paymentMethod) => paymentMethod.id === paymentMethodId
-      );
-      if (filter.length > 0) {
-        return filter[0].name;
-      }
-    }
-    return paymentMethodId;
-  };
-
-  const getUserStateLabel = (userStateId: number | null) => {
-    if (userStateId !== null && userStateList.length > 0) {
-      const filter = userStateList.filter(
-        (userState) => userState.id === userStateId
-      );
-      if (filter.length > 0) {
-        return filter[0].name;
-      }
-    }
-    return userStateId;
   };
 
   const handleDelete = (id: number) => {

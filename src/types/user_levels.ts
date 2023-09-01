@@ -4,6 +4,7 @@ export type UserLevel = {
     id?: number;
     name: string;
     service_id: number | null;
+    service?: Service;
     observations: string;
 };
 

@@ -176,7 +176,7 @@ const WarehouseTable = () => {
         case "receiving_area":
           return getReceptionAreaLabel(cellValue);
         case "state_id":
-          return getStateLabel(cellValue);
+          return user.state ? user.state.name : '';
         case "country":
           return getCountryLabel(cellValue);
         case "actions":

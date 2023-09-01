@@ -42,7 +42,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         user_id: (id && storagePlan) ? storagePlan.user_id : null,
         warehouse_id: (id && storagePlan) ? storagePlan.warehouse_id : null,
         box_amount: (id && storagePlan) ? storagePlan.box_amount : 0,
-        delivered_time: (id && storagePlan) ? storagePlan.delivered_time : '',
+        delivered_time: (id && storagePlan) ? (storagePlan.delivered_time ? storagePlan.delivered_time.substring(0,10) : null) : null,
         observations: (id && storagePlan) ? storagePlan.observations : '',
         rejected_boxes: (id && storagePlan) ? storagePlan.rejected_boxes : false,
         return: (id && storagePlan) ? storagePlan.return : false,
@@ -325,6 +325,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             placeholder={intl.formatMessage({ id: 'delivery_time' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
+                            selectDateMinToday={true}
                           />
                         </div>
                       </div>

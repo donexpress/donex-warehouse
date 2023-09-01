@@ -2,6 +2,9 @@ import { RegionalDivision } from "./regional_division";
 import { Staff } from "./staff";
 import { Subsidiary } from "./subsidiary";
 import { CargoStationWarehouseForm } from "./index";
+import { PaymentMethod } from './payment_methods';
+import { UserLevel } from './user_levels';
+import { UserState } from './user_state';
 
 export type User = {
     id: number;
@@ -37,4 +40,7 @@ export type User = {
     payment_method_id: number | null;
     user_level_id: number | null;
     customer_number?: string;
+    payment_method?: PaymentMethod;
+    user_level?: UserLevel;
+    state?: UserState;
 }

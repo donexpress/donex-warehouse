@@ -64,6 +64,10 @@ input[type="daterange"] {
     width: 100%;
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background: #101935;
+}
+
 .input-container {
     position: relative;
     font-size: 14px;

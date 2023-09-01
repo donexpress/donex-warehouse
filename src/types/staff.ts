@@ -1,5 +1,6 @@
 import { CargoStationWarehouseForm } from './index';
 import { Role } from './role';
+import { Organization } from './organization';
 
 export type Staff = {
     id: number;
@@ -24,6 +25,7 @@ export type Staff = {
     },
     role: Role;
     state: StaffState;
+    organization: Organization;
     warehouses: CargoStationWarehouseForm[],
     affiliations: number[] | null;
     default_cargo_station_id: number;

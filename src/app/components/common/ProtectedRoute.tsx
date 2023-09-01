@@ -27,7 +27,7 @@ const ProtectedRoute = ({ children }: any) => {
 
   return (
     <>
-      <Loading loading={loading}>
+      <Loading loading={loading} isFromProtectedRoute={true}>
         {children}
       </Loading>
     </>

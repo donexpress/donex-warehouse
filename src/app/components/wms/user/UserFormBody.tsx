@@ -126,7 +126,7 @@ const UserFormBody = ({
   useEffect(() => {
     setStaff(
       staffList.map((el) => {
-        return { value: el.id, label: el.chinesse_name };
+        return { value: el.id, label: el.username };
       })
     );
     setSubsidiaries(

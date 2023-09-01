@@ -32,7 +32,7 @@ export type StoragePlan = {
     user_id: number | null;
     warehouse_id: number | null;
     box_amount: number;
-    delivered_time: string;
+    delivered_time: string | null;
     observations: string;
     rejected_boxes: boolean;
     return: boolean;
@@ -45,6 +45,8 @@ export type StoragePlan = {
     prefix_expansion_box_number?: string;
     digits_box_number?: number;
     rows?: PackingList[];
+    user?: User;
+    warehouse?: Warehouse;
 };
 
 export type StoragePlanProps = {

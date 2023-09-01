@@ -97,6 +97,7 @@ export type CargoStationWarehouseForm = {
   shared_warehouse_system_code: string;
   shared_warehouse_docking_code: string;
   customer_order_number_rules: string;
+  state?: StateWarehouse;
 };
 
 export type StateWarehouse = {
