@@ -17,6 +17,7 @@
 	"unknownStatusErrorMsg": "Ha ocurrido un error al intentar ejecutar la acción, por favor, intente de nuevo",
 	"successfullyMsg": "Elemento creado de manera satisfactoria",
 	"changedsuccessfullyMsg": "Elemento modificado de manera satisfactoria",
+	"successfullyActionMsg": "La acción fue ejecutada de forma exitosa",
 	"dontExistUserPasswordMsg": "Usuario o contraseña incorrecta, por favor, intente de nuevo",
 	"documents": "Documentos",
 	"storageAndTransshipment": "Almacenamiento y Transbordo",
@@ -187,6 +188,8 @@
 	"storage_time": "Tiempo de almacenamiento",
 	"return": "Devolución",
 	"rejected_boxes": "Cajas rechazadas",
+	"split_bill": "Factura dividida",
+	"warehouse_order_number": "Número de orden de almacén",
 
 	"Delete":"Eliminar",
 	"Edit":"Editar",

@@ -40,6 +40,7 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
+  "order_number",
   "customer_order_number",
   "user_id",
   "warehouse_id",
@@ -78,6 +79,11 @@ const TableStoragePlan = () => {
   const getColumns = React.useMemo(() => {
     const columns = [
       { name: "ID", uid: "id", sortable: true },
+      {
+        name: intl.formatMessage({ id: "warehouse_order_number" }),
+        uid: "order_number",
+        sortable: true,
+      },
       {
         name: intl.formatMessage({ id: "customer_order_number" }),
         uid: "customer_order_number",

@@ -8,15 +8,17 @@ import '../../../../styles/wms/user.form.scss';
 import '../../../../styles/wms/storage.plan.config.scss';
 import { showMsg, isOMS, isWMS } from '../../../../helpers';
 import { useRouter } from 'next/router'
-import GenericInput from '../../common/GenericInput';
 import { useIntl } from 'react-intl';
-import { createPackingList } from '../../../../services/api.packing_list';
-import { StoragePlanProps, PackingList } from '../../../../types/storage_plan';
+import { updatePackingListById, removePackingListById } from '../../../../services/api.packing_list';
+import { updateStoragePlanById, createStoragePlan} from '../../../../services/api.storage_plan';
+import { StoragePlanProps, PackingList, StoragePlan } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
+import { Response } from '../../../../types/index';
 import { Warehouse } from '../../../../types/warehouse';
 import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 import { Formik, Form } from 'formik';
+import PackingListDialog from '../../common/PackingListDialog';
 
 const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boolean = true): PackingList[] => {
   return packingLists.map((packingList: PackingList) => {
@@ -35,6 +37,9 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
     const [selectedRows, setSelectedRows] = useState<PackingList[]>([]);
     const [tabToShow, setTabToShow] = useState<number>(1);
     const [selectAllPackingListItems, setSelectAllPackingListItems] = useState<boolean>(false);
+    const [showRemoveBoxDialog, setShowRemoveBoxDialog] = useState<boolean>(false);
+    const [showSplitBillDialog, setShowSplitBillDialog] = useState<boolean>(false);
+    const [boxNumber, setBoxNumber] = useState<number | null>(storagePlan?.box_amount ? storagePlan?.box_amount : null);
     
     const initialValues = {
         rows: [],
@@ -76,12 +81,113 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
             router.push(`/${locale}/wms/storage_plan/${id}/add_packing_list`)
           } break;
           case 2: {
-
+            setShowRemoveBoxDialog(true);
           } break;
           case 3: {
             router.push(`/${locale}/wms/storage_plan/${id}/modify_packing_list`)
           } break;
+          case 4: {
+            setShowSplitBillDialog(true);
+          } break;
         }
+      }
+  
+      const formatBody = (values: StoragePlan, isSplitBill=false): StoragePlan => {
+        return {
+                user_id: values.user_id,
+                warehouse_id: values.warehouse_id,
+                customer_order_number: values.customer_order_number + (isSplitBill ? '_1' : ''),
+                box_amount: values.box_amount,
+                delivered_time: values.delivered_time,
+                observations: values.observations,
+                rejected_boxes: values.rejected_boxes,
+                return: values.return
+              };
+      }
+
+      const removeBoxes = async() => {
+        let amount = 0;
+        let packingListAux: PackingList[] = [];
+        for (let index = 0; index < selectedRows.length; index++) {
+          const element: PackingList = selectedRows[index];
+          const response: Response = await removePackingListById(Number(element.id));
+          if (response.status >= 200 && response.status <= 299) {
+            amount ++;
+            packingListAux.push(element);
+          }
+        }
+        if (amount !== 0) {
+          await updateStoragePlanById(Number(id), formatBody({ ...(storagePlan as StoragePlan), box_amount: (rows.length - amount) < 0 ? 0 : (rows.length - amount) }));
+          const items = rows.filter(item => !packingListAux.find(subItem => subItem.id === item.id));
+          setRows(items);
+          setSelectedRows([]);
+          showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+          setBoxNumber(items.length);
+        } else {
+          showMsg(intl.formatMessage({ id: 'unknownStatusErrorMsg' }), { type: "error" })
+        }
+        setShowRemoveBoxDialog(false);
+      };
+
+      const closeRemoveBoxesDialog = () => {
+        setShowRemoveBoxDialog(false);
+      }
+
+      const formatBodyPackingList = (pl: PackingList, storagePlanId: number): PackingList => {
+        return  {
+          storage_plan_id: storagePlanId,
+          box_number: pl.box_number,
+          case_number: pl.case_number,
+          client_height: pl.client_height,
+          client_length: pl.client_length,
+          client_weight: pl.client_weight,
+          client_width: pl.client_width,
+          amount: pl.amount,
+          product_name: pl.product_name,
+          english_product_name: pl.english_product_name,
+          price: pl.price,
+          material: pl.material,
+          customs_code: pl.customs_code,
+          fnscu: pl.fnscu,
+          order_transfer_number: pl.order_transfer_number,
+          id: pl.id
+        };
+      }
+
+      const splitBill = async() => {
+        let amount = 0;
+        let packingListAux: PackingList[] = [];
+        const response: Response = await createStoragePlan(formatBody({ ...(storagePlan as StoragePlan), box_amount: selectedRows.length }, true));
+        if (response.status >= 200 && response.status <= 299) {
+          const responseSP: StoragePlan = response.data;
+          if (responseSP) {
+            for (let index = 0; index < selectedRows.length; index++) {
+              const element: PackingList = selectedRows[index];
+              const response: Response = await updatePackingListById(Number(element.id), formatBodyPackingList(element, Number(responseSP.id)));
+              if (response.status >= 200 && response.status <= 299) {
+                amount ++;
+                packingListAux.push(element);
+              }
+            }
+
+            if (amount !== 0) {
+              await updateStoragePlanById(Number(id), formatBody({ ...(storagePlan as StoragePlan), box_amount: (rows.length - amount) < 0 ? 0 : (rows.length - amount) }));
+              const items = rows.filter(item => !packingListAux.find(subItem => subItem.id === item.id));
+              setRows(items);
+              setSelectedRows([]);
+              setBoxNumber(items.length);
+            }
+          }
+          showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+          setShowSplitBillDialog(false);
+        } else {
+          let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+          showMsg(message, { type: "error" });
+        }
+      };
+
+      const closeSplitBillDialog = () => {
+        setShowSplitBillDialog(false);
       }
 
       const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, index: number = -1) => {
@@ -174,7 +280,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                         {getWarehouseLabel(warehouses, Number(storagePlan?.warehouse_id))}
                       </div>
                       <div>
-                        {storagePlan?.box_amount}
+                        {boxNumber}
                       </div>
                       <div>
                         {storagePlan?.country}
@@ -212,11 +318,14 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           <DropdownItem onClick={() => handleAction(1)}>
                             {intl.formatMessage({ id: "add_box" })}
                           </DropdownItem>
-                          <DropdownItem onClick={() => handleAction(2)}>
+                          <DropdownItem className={selectedRows.length === 0 ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
                             {intl.formatMessage({ id: "remove_box" })}
                           </DropdownItem>
                           <DropdownItem onClick={() => handleAction(3)}>
                             {intl.formatMessage({ id: "modify_packing_list" })}
+                          </DropdownItem>
+                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
+                            {intl.formatMessage({ id: "split_bill" })}
                           </DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
@@ -311,6 +420,8 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                   )
                 }
             </div>
+            { showRemoveBoxDialog && <PackingListDialog close={closeRemoveBoxesDialog} confirm={removeBoxes} title={intl.formatMessage({ id: 'remove_box' })} packingLists={selectedRows} /> }
+            { showSplitBillDialog && <PackingListDialog close={closeSplitBillDialog} confirm={splitBill} title={intl.formatMessage({ id: 'split_bill' })} packingLists={selectedRows} /> }
         </div>
     );
 };

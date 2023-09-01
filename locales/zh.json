@@ -17,6 +17,7 @@
     "unknownStatusErrorMsg": "嘗試執行操作時發生錯誤，請重試",
     "successivelyMsg": "項目創建成功",
     "changedsuccessivelyMsg": "項目更改成功",
+	"successfullyActionMsg": "操作已成功執行",
     "dontExistUserPasswordMsg": "用戶名或密碼錯誤，請重試",
     "documents": "文件",
     "storageAndTransshipment": "存儲和轉運",
@@ -187,6 +188,8 @@
 	"storage_time": "入库时间",
 	"return": "返回",
 	"rejected_boxes": "被拒絕的盒子",
+	"split_bill": "分攤賬單",
+	"warehouse_order_number": "仓储单号",
 
     "Delete":"刪除",
 	"Edit":"編輯",

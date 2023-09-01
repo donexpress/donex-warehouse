@@ -17,6 +17,7 @@
 	"unknownStatusErrorMsg":"An error occurred while trying to execute the action, please try again",
 	"successfullyMsg": "Item created successfully",
 	"changedsuccessfullyMsg": "Item changed successfully",
+	"successfullyActionMsg": "The action was executed successfully",
 	"dontExistUserPasswordMsg": "User or password incorrect, please try again",
 	"documents": "Documents",
 	"storageAndTransshipment": "Storage and Transshipment",
@@ -187,6 +188,8 @@
 	"storage_time": "Storage time",
 	"return": "Return",
 	"rejected_boxes": "Rejected boxes",
+	"split_bill": "Split bill",
+	"warehouse_order_number": "Warehouse order number",
 
 	"Delete":"Delete",
 	"Edit":"Edit",

@@ -32,8 +32,7 @@ const UpdateUser = ({
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
           <ProtectedRoute>
-              {id ?? (
-                  <UserFormBody
+              <UserFormBody
                   id={Number(id)}
                   user={user}
                   staffList={staffList}
@@ -43,9 +42,7 @@ const UpdateUser = ({
                   userLevelList={userLevelList}
                   paymentMethodList={paymentMethodList}
                   userStateList={userStateList}
-                />
-              )}
-        
+              />
       </ProtectedRoute>
     </Layout>
   );

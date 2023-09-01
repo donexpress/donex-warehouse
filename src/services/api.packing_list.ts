@@ -48,13 +48,13 @@ export const getPackingListById = async (packingListId: number, context?: GetSer
   }
 }
 
-export const removePackingListById = async (packingListId: number):Promise<any | null> => {
+export const removePackingListById = async (packingListId: number):Promise<Response> => {
   const path = packingListPath() + `/${packingListId}`;
   try {
     const response = await axios.delete(path, getHeaders());
-    return response.data;
-  } catch (error) {
-    return null;
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
   }
 }
 

@@ -21,6 +21,10 @@
     }
 }
 
+.do-not-show-dropdown-item {
+    display: none !important;
+}
+
 .info-packing-list {
     width: calc(100vw - 365px);
     overflow-x: auto;

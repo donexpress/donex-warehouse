@@ -47,6 +47,7 @@ export type StoragePlan = {
     rows?: PackingList[];
     user?: User;
     warehouse?: Warehouse;
+    order_number?: string;
 };
 
 export type StoragePlanProps = {

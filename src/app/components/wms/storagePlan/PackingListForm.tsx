@@ -75,6 +75,17 @@ const getPackingListFromSP = (isModify: boolean, packingList: PackingList[] | un
     return items;
 };
 
+const getMajorNumber = (packingList: PackingList[] | undefined): number => {
+  let result = 0;
+  if ((packingList !== undefined) && packingList.length > 0) {
+    let items: number[] = packingList.map((pl: PackingList) => { return !isNaN(Number(pl.box_number)) ? Number(pl.box_number) : Number(getNumericPartWithoutLeadingZeros(pl.box_number) !== null ? Number(getNumericPartWithoutLeadingZeros(pl.box_number)) : (pl.id)) })
+    if (items.length > 0) {
+      result = Math.max(...items);
+    }
+  }
+  return result;
+}
+
 const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModifyPackingList }: PackingListProps) => {
     const router = useRouter();
     const { locale } = router.query;
@@ -84,8 +95,8 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
         ([
             {
                 id: (storagePlan.packing_list && (storagePlan.packing_list.length > 0)) ? (Number(storagePlan.packing_list[storagePlan.packing_list.length - 1].id) + 1) : storagePlan.box_amount, 
-                box_number: String(storagePlan.box_amount + 1),
-                box_number_aux: storagePlan.box_amount + 1,  
+                box_number: String(getMajorNumber(storagePlan.packing_list) + 1),
+                box_number_aux: getMajorNumber(storagePlan.packing_list) + 1,  
                 case_number: '',
                 amount: 0,
                 client_weight: 0,
@@ -256,8 +267,8 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
           for (let index = 0; index < count; index++) {
             items.push({
               id: ((storagePlan.packing_list && (storagePlan.packing_list.length > 0)) ? (Number(storagePlan.packing_list[storagePlan.packing_list.length - 1].id) + 1) : storagePlan.box_amount) + rows.length + index, 
-              box_number: getInitialBoxNumberLabel(storagePlan.box_amount + rows.length + index + 1), 
-              box_number_aux: storagePlan.box_amount + rows.length + index + 1, 
+              box_number: getInitialBoxNumberLabel(getMajorNumber(storagePlan.packing_list) + rows.length + index + 1), 
+              box_number_aux: getMajorNumber(storagePlan.packing_list) + rows.length + index + 1, 
               case_number: '',
               amount: 0,
               client_weight: 0,
