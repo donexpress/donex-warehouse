@@ -159,6 +159,11 @@
 	"packing_list": "Packing list",
 	"cargo_information": "Cargo information",
 	"config": "Set up",
+
+	"to_be_stored_state": "To be stored",
+	"warehouse_entry_state": "Warehouse entry",
+	"stocked_state": "Stocked",
+	"cancelled": "Cancelled",
 	
 	"box_number": "Box number",
 	"case_number": "Transfer order number",

@@ -159,6 +159,11 @@
 	"packing_list": "Lista de embalaje",
 	"cargo_information": "Información de carga",
 	"config": "Configurar",
+
+	"to_be_stored_state": "Para ser almacenado",
+	"warehouse_entry_state": "Entrada en almacén",
+	"stocked_state": "Abastecido",
+	"cancelled": "Cancelado",
 	
 	"box_number": "Número de caja",
 	"case_number": "Número de orden",

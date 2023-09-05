@@ -159,6 +159,11 @@
 	"packing_list": "装箱单",
 	"cargo_information": "货箱信息",
 	"config": "設置",
+
+	"to_be_stored_state": "待入库",
+	"warehouse_entry_state": "入库中",
+	"stocked_state": "已入库",
+	"cancelled": "已取消",
 	
 	"box_number": "箱号",
 	"case_number": "转单号",

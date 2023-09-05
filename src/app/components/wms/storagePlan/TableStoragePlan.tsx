@@ -211,6 +211,7 @@ const TableStoragePlan = () => {
               </Dropdown>
             </div>
           );
+        case "user_id": return storageP.user ? storageP.user.username : '';
         default:
           return cellValue;
       }
