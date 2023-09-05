@@ -10,7 +10,7 @@ import {
   userStatePath
  } from '../backend';
 import { LoginBody, LoginResponse, UserProfile, Response } from '../types/index';
-import { getHeaders } from '../helpers';
+import { getHeaders, isWMS } from '../helpers';
 import { User } from '@/types/usererege1992';
 import { UserState } from '@/types/user_stateerege1992';
 import { UserLevel } from '../types/user_levels';
@@ -23,6 +23,7 @@ export const login = async (values: LoginBody): Promise<LoginResponse> => {
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        'warehouse_service': isWMS() ? 'wms' : 'oms',
       },
     };
     const response = await axios.post(path, values, config);
