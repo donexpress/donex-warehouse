@@ -145,6 +145,7 @@
 	"reset_password": "Reiniciar Contraseña",
 	"chinese_name": "Nombre chino",
 	"english_name": "Nombre inglés",
+	"fullname": "Nombre completo",
 	"site_name": "Nombre del sitio",
 	"site_name_english": "Nombre del sitio (inglés)",
 	"contact_phone": "Teléfono de contacto",
@@ -163,7 +164,8 @@
 	"to_be_stored_state": "Para ser almacenado",
 	"warehouse_entry_state": "Entrada en almacén",
 	"stocked_state": "Abastecido",
-	"cancelled": "Cancelado",
+	"cancelled_state": "Cancelado",
+	"loading_items": "Cargando elementos...",
 	
 	"box_number": "Número de caja",
 	"case_number": "Número de orden",
@@ -195,6 +197,9 @@
 	"rejected_boxes": "Cajas rechazadas",
 	"split_bill": "Factura dividida",
 	"warehouse_order_number": "Número de orden de almacén",
+	"client_image": "Imagen cliente",
+	"staff_image": "Imagen personal",
+	"upload": "Subir",
 
 	"Delete":"Eliminar",
 	"Edit":"Editar",

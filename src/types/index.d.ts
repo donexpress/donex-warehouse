@@ -213,6 +213,11 @@ export type MenuOption = {
   route?: string;
 };
 
+export type File = {
+  url: string;
+  name: string;
+};
+
 export type TypeOptions = "success" | "error" | "info" | "warning";
 export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
 export type TypeThemes = "light" | "dark";

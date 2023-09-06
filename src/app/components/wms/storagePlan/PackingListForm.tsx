@@ -109,7 +109,9 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
                 material: '',
                 customs_code: '',
                 fnscu: '',
-                order_transfer_number: ''
+                order_transfer_number: '',
+                custome_picture: '',
+                operator_picture: '',
             }
         ])
         :
@@ -191,6 +193,8 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
           customs_code: pl.customs_code,
           fnscu: pl.fnscu,
           order_transfer_number: pl.order_transfer_number,
+          custome_picture: pl.custome_picture,
+          operator_picture: pl.operator_picture,
         };
 
         if (isFromModifyPackingList) {
@@ -281,7 +285,9 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
               material: '',
               customs_code: '',
               fnscu: '',
-              order_transfer_number: ''
+              order_transfer_number: '',
+              custome_picture: '',
+              operator_picture: '',
             });
           }
           setRows(rows.concat(items));

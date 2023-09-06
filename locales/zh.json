@@ -145,6 +145,7 @@
     "reset_password": "重置密碼",
 	"chinese_name": "中文名",
 	"english_name": "英文名",
+	"fullname": "全名",
     "site_name": "站點名稱",
     "site_name_english": "網站名稱（英文）",
     "contact_phone": "聯繫電話",
@@ -163,7 +164,8 @@
 	"to_be_stored_state": "待入库",
 	"warehouse_entry_state": "入库中",
 	"stocked_state": "已入库",
-	"cancelled": "已取消",
+	"cancelled_state": "已取消",
+	"loading_items": "正在加載項目...",
 	
 	"box_number": "箱号",
 	"case_number": "转单号",
@@ -195,6 +197,9 @@
 	"rejected_boxes": "被拒絕的盒子",
 	"split_bill": "分攤賬單",
 	"warehouse_order_number": "仓储单号",
+	"client_image": "客戶形象",
+	"staff_image": "員工形象",
+	"upload": "增加",
 
     "Delete":"刪除",
 	"Edit":"編輯",

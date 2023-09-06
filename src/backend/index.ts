@@ -80,8 +80,9 @@ export const countUserLevelPath = () => {
   return BASE_URL + '/api/v1/user_level/count';
 };
 
-export const storagePlanPath = () => {
-  return BASE_URL + '/api/v1/storage_plan';
+export const storagePlanPath = (status: number = 0) => {
+  const params = status !== 0 ? `?state=${status}` : '';
+  return BASE_URL + '/api/v1/storage_plan' + params;
 };
 
 export const countStoragePlanPath = () => {
@@ -134,4 +135,8 @@ export const whPath = () => {
 
 export const countWhPath = () => {
   return BASE_URL + '/api/v1/aos_warehouse/count';
+}
+
+export const filePath = () => {
+  return BASE_URL + '/api/v1/file';
 }

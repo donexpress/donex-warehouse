@@ -48,6 +48,7 @@ export type StoragePlan = {
     user?: User;
     warehouse?: Warehouse;
     order_number?: string;
+    state?: number,
 };
 
 export type StoragePlanProps = {

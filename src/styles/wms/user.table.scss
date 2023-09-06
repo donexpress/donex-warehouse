@@ -148,3 +148,29 @@
         }
     }
 }
+
+.tab-system-table {
+    width: calc(100vw - 349px);
+    scrollbar-width: thin;
+    border-radius: 6px;
+}
+
+.tab-selected {
+    border-bottom: solid 2px white;
+    color: white;
+    cursor: default;
+}
+
+.tab-default {
+    border-bottom: solid 2px transparent;
+}
+
+.tab-default:hover {
+    color: white;
+}
+
+@media only screen and (max-width: 990px) {
+    .tab-system-table {
+        width: calc(100vw - 25px);
+    }
+}

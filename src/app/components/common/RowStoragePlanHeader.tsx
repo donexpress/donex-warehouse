@@ -56,6 +56,12 @@ const RowStoragePlanHeader: React.FC<RowStoragePlanHeaderProps> = ({ onlyReadly 
         <div className='elements-center'>
           <span className='text-center'>{intl.formatMessage({ id: 'fnscu' })}</span>
         </div>
+        <div className='elements-center'>
+          <span className='text-center'>{intl.formatMessage({ id: 'client_image' })}</span>
+        </div>
+        <div className='elements-center'>
+          <span className='text-center'>{intl.formatMessage({ id: 'staff_image' })}</span>
+        </div>
     </div>
   );
 };

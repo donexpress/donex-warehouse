@@ -90,7 +90,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 delivered_time: values.delivered_time,
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
-                return: values.return
+                return: values.return,
+                state: values.state ? values.state : 1,
               };
       }
 
@@ -133,6 +134,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
           customs_code: pl.customs_code,
           fnscu: pl.fnscu,
           order_transfer_number: pl.order_transfer_number,
+          custome_picture: pl.custome_picture,
+          operator_picture: pl.operator_picture,
         }
       }
 
@@ -225,6 +228,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
               customs_code: '',
               fnscu: '',
               order_transfer_number: '',
+              custome_picture: '',
+              operator_picture: '',
             });
           }
 
