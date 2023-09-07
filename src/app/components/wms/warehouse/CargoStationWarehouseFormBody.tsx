@@ -38,7 +38,8 @@ const CargoStationWarehouseFormBody = ({
     receiving_area: id && warehouse ? warehouse.receiving_area : "",
     principal: id && warehouse ? warehouse.principal : "",
     contact_phone: id && warehouse ? warehouse.contact_phone : "",
-    state_id: id && warehouse ? warehouse.state_id : null,
+    // @ts-ignore
+    state: id && warehouse && warehouse.state ? warehouse.state.value : null,
     address: id && warehouse ? warehouse.address : "",
     city: id && warehouse ? warehouse.city : "",
     province: id && warehouse ? warehouse.province : "",
@@ -56,11 +57,20 @@ const CargoStationWarehouseFormBody = ({
     let response: ValueSelect[] = [];
     statesAll.forEach((state) => {
       response.push({
-        value: state.id,
-        label: state.name,
+        value: state.value,
+        label: getLabelByLanguage(state),
       });
     });
     return response;
+  };
+
+  const getLabelByLanguage = (state: StateWarehouse) => {
+    if (locale === 'es') {
+      return state.es_name;
+    } else if (locale === 'zh') {
+      return state.zh_name;
+    }
+    return state.name;
   };
 
   const getStatesFormattedCountries = (
@@ -110,7 +120,7 @@ const CargoStationWarehouseFormBody = ({
   ): CargoStationWarehouseForm => {
     return {
       ...values,
-      state_id: values.state_id ? Number(values.state_id) : null,
+      state: values.state ? values.state : null,
     };
   };
 
@@ -221,7 +231,7 @@ const CargoStationWarehouseFormBody = ({
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="select"
-                    name="state_id"
+                    name="state"
                     selectLabel={intl.formatMessage({ id: "select_state" })}
                     options={getStatesFormatted(states)}
                     customClass="custom-input"

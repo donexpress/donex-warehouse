@@ -3,11 +3,11 @@ import {
     countWarehousePath,
     getStateWarehousePath, warehousePath
    } from '../backend';
-import { StateWarehouse, CargoStationWarehouseForm, Response } from '../types/index';
+import { StateWarehouse, StateDefault, CargoStationWarehouseForm, Response } from '../types/index';
 import { getHeaders } from '../helpers';
 import { GetServerSidePropsContext } from 'next';
 
-export const indexStateWarehouse = async (context?: GetServerSidePropsContext): Promise<StateWarehouse[] | null> => {
+export const indexStateWarehouse = async (context?: GetServerSidePropsContext): Promise<StateDefault | null> => {
   const path = getStateWarehousePath();
   try {
     const response = await axios.get(path, getHeaders(context));

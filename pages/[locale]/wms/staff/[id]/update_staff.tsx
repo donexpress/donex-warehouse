@@ -40,11 +40,12 @@ const UpdateStaff = ({
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
   const staff = await getStaffById(id, context);
-  const staffStates = await getStaffStates(context);
+  const staffStatesObj = await getStaffStates(context);
   const roles = await getRoles(context);
   const organizations = await getOrganizations(context);
   const affiliations = await getWarehouses(context);
 
+  const staffStates = staffStatesObj !== null ? Object.values(staffStatesObj) : null;
   return {
     props: {
       id,
