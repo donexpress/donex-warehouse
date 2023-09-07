@@ -201,6 +201,13 @@
 	"staff_image": "Staff image",
 	"upload": "Upload",
 
+	"batch_on_shelves": "Batch on shelves",
+	"partition": "Partition",
+	"shelf": "Shelf",
+	"select_partition": "Select partition",
+	"select_shelf": "Select shelf",
+	"select_location": "Select location",
+
 	"Delete":"Delete",
 	"Edit":"Edit",
 	"View":"View",

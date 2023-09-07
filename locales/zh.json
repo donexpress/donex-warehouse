@@ -201,6 +201,13 @@
 	"staff_image": "員工形象",
 	"upload": "增加",
 
+	"batch_on_shelves": "批量上架",
+	"partition": "分区",
+	"shelf": "货架",
+	"select_partition": "選擇分区",
+	"select_shelf": "選擇货架",
+	"select_location": "選擇库位",
+
     "Delete":"刪除",
 	"Edit":"編輯",
 	"View":"看法",

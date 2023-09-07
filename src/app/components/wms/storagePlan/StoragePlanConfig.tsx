@@ -19,6 +19,7 @@ import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 import { Formik, Form } from 'formik';
 import PackingListDialog from '../../common/PackingListDialog';
+import BatchOnShelvesDialog from '../../common/BatchOnShelvesDialog';
 
 const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boolean = true): PackingList[] => {
   return packingLists.map((packingList: PackingList) => {
@@ -39,6 +40,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
     const [selectAllPackingListItems, setSelectAllPackingListItems] = useState<boolean>(false);
     const [showRemoveBoxDialog, setShowRemoveBoxDialog] = useState<boolean>(false);
     const [showSplitBillDialog, setShowSplitBillDialog] = useState<boolean>(false);
+    const [showBatchOnShelvesDialog, setShowBatchOnShelvesDialog] = useState<boolean>(false);
     const [boxNumber, setBoxNumber] = useState<number | null>(storagePlan?.box_amount ? storagePlan?.box_amount : null);
     
     const initialValues = {
@@ -88,6 +90,9 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
           } break;
           case 4: {
             setShowSplitBillDialog(true);
+          } break;
+          case 5: {
+            setShowBatchOnShelvesDialog(true);
           } break;
         }
       }
@@ -188,6 +193,14 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
 
       const closeSplitBillDialog = () => {
         setShowSplitBillDialog(false);
+      }
+
+      const batchOnShelvesAction = () => {
+        setShowBatchOnShelvesDialog(false);
+      }
+
+      const closeBatchOnShelvesDialog = () => {
+        setShowBatchOnShelvesDialog(false);
       }
 
       const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, index: number = -1) => {
@@ -321,6 +334,9 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           <DropdownItem className={selectedRows.length === 0 ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
                             {intl.formatMessage({ id: "remove_box" })}
                           </DropdownItem>
+                          <DropdownItem className={selectedRows.length === 0 ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
+                            {intl.formatMessage({ id: "batch_on_shelves" })}
+                          </DropdownItem>
                           <DropdownItem onClick={() => handleAction(3)}>
                             {intl.formatMessage({ id: "modify_packing_list" })}
                           </DropdownItem>
@@ -422,6 +438,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
             </div>
             { showRemoveBoxDialog && <PackingListDialog close={closeRemoveBoxesDialog} confirm={removeBoxes} title={intl.formatMessage({ id: 'remove_box' })} packingLists={selectedRows} /> }
             { showSplitBillDialog && <PackingListDialog close={closeSplitBillDialog} confirm={splitBill} title={intl.formatMessage({ id: 'split_bill' })} packingLists={selectedRows} /> }
+            { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows} /> }
         </div>
     );
 };

@@ -201,6 +201,13 @@
 	"staff_image": "Imagen personal",
 	"upload": "Subir",
 
+	"batch_on_shelves": "Lote en estantes",
+	"partition": "Partición",
+	"shelf": "Estante",
+	"select_partition": "Seleccione la partición",
+	"select_shelf": "Seleccione el estante",
+	"select_location": "Seleccione la ubicación",
+
 	"Delete":"Eliminar",
 	"Edit":"Editar",
 	"View":"Ver",
