@@ -81,7 +81,7 @@ const ExitPlanTable = () => {
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter(
         (user) =>
-          user.output_number
+          user.output_number ? user.output_number : ""
             .toLowerCase()
             .includes(filterValue.toLowerCase()) ||
           user.case_numbers
