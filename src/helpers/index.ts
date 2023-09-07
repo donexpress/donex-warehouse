@@ -65,10 +65,10 @@ export const isOMS = (context?: any): boolean => {
   return false;
 };
 
-export const getHeaders = (context?: any) => {
+export const getHeaders = (context?: any, isFile = false) => {
   let configs: AxiosRequestConfig = {
     headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': isFile ? 'multipart/form-data' : 'application/json',
   }};
   let tokenWMS = getCookie('tokenWMS');
   let tokenOMS = getCookie('tokenOMS');

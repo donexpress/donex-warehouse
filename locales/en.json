@@ -145,6 +145,7 @@
 	"reset_password": "Reset Password",
 	"chinese_name": "Chinese name",
 	"english_name": "English name",
+	"fullname": "Fullname",
 	"site_name": "Name of the site",
 	"site_name_english": "Name of the site (english)",
 	"contact_phone": "Contact phone",
@@ -159,6 +160,12 @@
 	"packing_list": "Packing list",
 	"cargo_information": "Cargo information",
 	"config": "Set up",
+
+	"to_be_stored_state": "To be stored",
+	"warehouse_entry_state": "Warehouse entry",
+	"stocked_state": "Stocked",
+	"cancelled_state": "Cancelled",
+	"loading_items": "Loading items...",
 	
 	"box_number": "Box number",
 	"case_number": "Transfer order number",
@@ -190,6 +197,9 @@
 	"rejected_boxes": "Rejected boxes",
 	"split_bill": "Split bill",
 	"warehouse_order_number": "Warehouse order number",
+	"client_image": "Client image",
+	"staff_image": "Staff image",
+	"upload": "Upload",
 
 	"Delete":"Delete",
 	"Edit":"Edit",

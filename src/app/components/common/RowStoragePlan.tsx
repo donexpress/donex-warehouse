@@ -1,6 +1,11 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState, useRef, useEffect } from 'react';
 import GenericInput from './GenericInput';
+import ImageUploader from './ImageUploader';
 import '../../../styles/wms/user.form.scss';
+import { useIntl } from 'react-intl';
+import Lightbox from 'react-18-image-lightbox';
+import 'react-18-image-lightbox/style.css';
+
 interface RowData {
   id?: number,
   box_number: string,
@@ -30,6 +35,25 @@ interface RowStoragePlanProps {
 }
 
 const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate, onlyReadly = false }) => {
+  const intl = useIntl();
+  const [showImage, setShowImage] = useState<boolean>(false);
+  const [imageToShow, setImageToShow] = useState<string>('');
+  const lightboxRef = useRef(null);
+  const [zoomed, setZoomed] = useState(false);
+  const [isLoadImage, setIsLoadImage] = useState(false);
+
+  useEffect(() => {
+    if (showImage && lightboxRef.current && !zoomed && isLoadImage) { console.log('entro')
+      setTimeout(()=>{
+        // @ts-ignore
+        lightboxRef.current.setState({
+          zoomLevel: 1.1, // Ajusta el nivel de zoom según lo necesario
+        });
+      }, 100)
+      setZoomed(true);
+    }
+  }, [showImage, zoomed, isLoadImage]);
+
   const handleRowChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     onUpdate({
@@ -49,6 +73,37 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
     }
     return value;
   };
+
+  const closeImageZoom = () => {
+    setZoomed(false);
+    setShowImage(false);
+    setIsLoadImage(false);
+  }
+
+  const handleImageLoad = () => {
+    setIsLoadImage(true);
+  };
+
+  const uploadImageClient = (imagePath: string) => {
+    console.log(imagePath)
+    onUpdate({
+      ...initialValues,
+      ['custome_picture']: imagePath,
+    });
+  }
+
+  const uploadImageStaff = (imagePath: string) => {
+    console.log(imagePath)
+    onUpdate({
+      ...initialValues,
+      ['operator_picture']: imagePath,
+    });
+  }
+
+  const zoomImage = async (image: string) => {
+    await setImageToShow(image);
+    await setShowImage(true);
+  }
 
   return (
     <div className={!onlyReadly ? 'boxes-container__table' :  'boxes-container__table boxes-container-table-only-readly'}>
@@ -188,6 +243,42 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         onChangeFunction={handleRowChange}
         disabled={onlyReadly}
       />
+      <div className='upload-filed-container'>
+        <div className='elements-row-center'>
+          {
+            initialValues.custome_picture && (initialValues.custome_picture !== '') &&
+            <div onClick={() => zoomImage(String(initialValues.custome_picture))} className='upload_button' style={{ marginRight: '10px' }}>{intl.formatMessage({ id: 'View' })}</div>
+          }
+          {
+            !onlyReadly &&
+            <ImageUploader onImageUpload={uploadImageClient}>
+              <div className='upload_button'>{intl.formatMessage({ id: (initialValues.custome_picture && (initialValues.custome_picture !== '')) ? 'modify' : 'upload' })}</div>
+            </ImageUploader>
+          }
+        </div>
+      </div>
+      <div className='upload-filed-container'>
+        <div className='elements-row-center'>
+          {
+            initialValues.operator_picture && (initialValues.operator_picture !== '') &&
+            <div onClick={() => zoomImage(String(initialValues.operator_picture))} className='upload_button' style={{ marginRight: '10px' }}>{intl.formatMessage({ id: 'View' })}</div>
+          }
+          {
+            !onlyReadly &&
+            <ImageUploader onImageUpload={uploadImageStaff}>
+              <div className='upload_button'>{intl.formatMessage({ id: (initialValues.operator_picture && (initialValues.operator_picture !== '')) ? 'modify' : 'upload' })}</div>
+            </ImageUploader>
+          }
+        </div>
+      </div>
+      {showImage && (
+        <Lightbox
+          mainSrc={imageToShow}
+          onCloseRequest={() => closeImageZoom()}
+          ref={lightboxRef}
+          onImageLoad={() => { handleImageLoad() }}
+        />
+      )}
     </div>
   );
 };

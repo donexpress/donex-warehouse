@@ -56,6 +56,8 @@ const TableStoragePlan = () => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
+  const [statusSelected, setStatusSelected] = useState<number>(1);
+  const [loadingItems, setLoadingItems] = useState<boolean>(false);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -211,6 +213,8 @@ const TableStoragePlan = () => {
               </Dropdown>
             </div>
           );
+        case "user_id": return storageP.user ? storageP.user.username : '';
+        case "warehouse_id": return storageP.warehouse ? (`${storageP.warehouse.name} (${storageP.warehouse.code})`) : '';
         default:
           return cellValue;
       }
@@ -239,10 +243,21 @@ const TableStoragePlan = () => {
     setFilterValue("");
     setPage(1);
   }, []);
+  
+  const changeTab = async(tab: number) => {
+    if (tab !== statusSelected && !loadingItems) {
+      await setStatusSelected(tab);
+      await setLoadingItems(true);
+      const storagePlanss = await getStoragePlans(tab);
+      
+      await setLoadingItems(false);
+      await setStoragePlans(storagePlanss !== null ? storagePlanss : []);
+    }
+  }
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -304,6 +319,40 @@ const TableStoragePlan = () => {
             </select>
           </label>
         </div>
+        <div className="bg-gray-200 pt-1">
+          <div className="overflow-x-auto tab-system-table bg-content1">
+            <ul className="flex space-x-4">
+              <li className="whitespace-nowrap">
+                <button className={ statusSelected === 1 ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
+                  onClick={() => changeTab(1)}
+                >
+                  {intl.formatMessage({ id: "to_be_stored_state" })}
+                </button>
+              </li>
+              <li className="whitespace-nowrap">
+                <button className={ statusSelected === 2 ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
+                  onClick={() => changeTab(2)}
+                >
+                  {intl.formatMessage({ id: "warehouse_entry_state" })}
+                </button>
+              </li>
+              <li className="whitespace-nowrap">
+                <button className={ statusSelected === 3 ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
+                  onClick={() => changeTab(3)}
+                >
+                  {intl.formatMessage({ id: "stocked_state" })}
+                </button>
+              </li>
+              <li className="whitespace-nowrap">
+                <button className={ statusSelected === 4 ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
+                  onClick={() => changeTab(4)}
+                >
+                  {intl.formatMessage({ id: "cancelled_state" })}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     );
   }, [
@@ -315,6 +364,7 @@ const TableStoragePlan = () => {
     storagePlans.length,
     hasSearchFilter,
     intl,
+    statusSelected,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -363,7 +413,7 @@ const TableStoragePlan = () => {
 
   const loadStoragePlans = async () => {
     setLoading(true);
-    const storagePlanss = await getStoragePlans();
+    const storagePlanss = await getStoragePlans(statusSelected);
     
     setStoragePlans(storagePlanss !== null ? storagePlanss : []);
     setLoading(false);
@@ -416,7 +466,7 @@ const TableStoragePlan = () => {
           bottomContent={bottomContent}
           bottomContentPlacement="outside"
           classNames={{
-            wrapper: "max-h-[382px]",
+            wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
@@ -438,8 +488,8 @@ const TableStoragePlan = () => {
             )}
           </TableHeader>
           <TableBody
-            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
+            items={loadingItems ? [] : sortedItems}
           >
             {(item) => (
               <TableRow key={item.id}>

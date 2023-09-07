@@ -203,7 +203,7 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
                   <GenericInput
                     type="text"
                     name="english_name"
-                    placeholder={intl.formatMessage({ id: "english_name" })}
+                    placeholder={intl.formatMessage({ id: "fullname" })}
                     customClass="custom-input"
                     disabled={isFromDetails}
                   />

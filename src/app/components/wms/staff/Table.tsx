@@ -94,7 +94,7 @@ const StaffTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "english_name" }),
+        name: intl.formatMessage({ id: "fullname" }),
         uid: "english_name",
         sortable: true,
       },
@@ -455,7 +455,7 @@ const StaffTable = () => {
           bottomContent={bottomContent}
           bottomContentPlacement="outside"
           classNames={{
-            wrapper: "max-h-[382px]",
+            wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
