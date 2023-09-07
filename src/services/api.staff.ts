@@ -20,7 +20,7 @@ export const countStaff = async (
 };
 
 export const removeStaff = async (id: number) => {
-  const response = await axios.delete(removeStaffPath(id));
+  const response = await axios.delete(removeStaffPath(id), getHeaders());
   return response.data;
 };
 
