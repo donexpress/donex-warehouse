@@ -31,10 +31,11 @@ const InsertWarehouseCargoStation = ({
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const states = await indexStateWarehouse(context);
+  const statesObj = await indexStateWarehouse(context);
   const countries = await indexCountries(context);
   const receptionAreas = await getRegionalDivision(context);
 
+  const states = statesObj !== null ? Object.values(statesObj) : null;
   return {
     props: {
       states,

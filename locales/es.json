@@ -27,7 +27,7 @@
 	"warehouseManagement": "Gestión de almacenes",
 	"listWarehouses": "Listar almacenes",
 	"insertWarehouses": "Insertar almacén",
-	"operatingInstructions": "Instrucciones de Operación",
+	"operatingInstructions": "Instrucciones de operación",
 	"operationsRecord": "Registro de operaciones",
 	"user": "Usuario",
 	"insertUser": "Insertar usuario",
@@ -35,7 +35,7 @@
 	"userLevel": "Nivel de Usuario",
 	"insertUserLevel": "Insertar nivel de usuario",
 	"listUserLevels": "Listar niveles de usuario",
-	"paymentMethod": "Método de Pago",
+	"paymentMethod": "Método de pago",
 	"insertPaymentMethod": "Insertar método de pago",
 	"listPaymentMethods": "Listar métodos de pago",
 	"storage": "Almacén",
@@ -218,5 +218,11 @@
 	"rows_page":"Filas por página:",
 	"home":"Inicio",
 	"columns":"Columnas",
-	"filters":"Filtros"
+	"filters":"Filtros",
+	"delivery_number": "Número de entrega",
+	"type": "Tipo",
+	"box_numbers": "Número de cajas",
+	"palets_numbers": "Número de palets",
+	"output_boxes": "Cajas de salida",
+	"delivered_amount_boxes": "Cantidad de cajas entregadas"
 }

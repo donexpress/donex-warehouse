@@ -36,8 +36,8 @@
 	"insertUserLevel": "Insert user level",
 	"listUserLevels": "List user levels",
 	"paymentMethod": "Payment method",
-	"insertPaymentMethod": "Insert Payment Method",
-	"listPaymentMethods": "List Payment Methods",
+	"insertPaymentMethod": "Insert payment method",
+	"listPaymentMethods": "List payment methods",
 	"storage": "Storage",
 	"logisticsNetwork": "Logistics network",
 	"service": "Service",
@@ -218,5 +218,11 @@
 	"rows_page":"Rows per page:",
 	"home":"Home",
 	"columns":"Columns",
-	"filters":"Filters"
+	"filters":"Filters",
+	"delivery_number": "Delivery number",
+	"type": "Type",
+	"box_numbers": "Box numbers",
+	"palets_numbers": "Palets numbers",
+	"output_boxes": "Output boxes",
+	"delivered_amount_boxes": "Delivered amount boxes"
 }

@@ -19,7 +19,7 @@ export type User = {
     qq: string;
     credits: string;
     observations: string;
-    state_id: number;
+    state: string | null;
     finantial_representative: number;
     client_service_representative: number;
     sales_representative: number;
@@ -42,5 +42,4 @@ export type User = {
     customer_number?: string;
     payment_method?: PaymentMethod;
     user_level?: UserLevel;
-    state?: UserState;
 }

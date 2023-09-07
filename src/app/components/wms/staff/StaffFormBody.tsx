@@ -39,8 +39,8 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
     email: id && staff ? staff.email : "",
     phone: id && staff ? staff.phone : "",
     observations: id && staff ? staff.observations : "",
-    state_id:
-      id && staff ? (staff.state_id !== null ? staff.state_id : null) : null,
+    // @ts-ignore
+    state: id && staff && staff.state ? staff.state.value : null,
     organization_id:
       id && staff
         ? staff.organization_id !== null
@@ -59,11 +59,20 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
     let response: ValueSelect[] = [];
     staffStatesAll.forEach((staffState) => {
       response.push({
-        value: staffState.id,
-        label: staffState.name,
+        value: staffState.value,
+        label: getLabelByLanguage(staffState),
       });
     });
     return response;
+  };
+
+  const getLabelByLanguage = (state: StaffState) => {
+    if (locale === 'es') {
+      return state.es_name;
+    } else if (locale === 'zh') {
+      return state.zh_name;
+    }
+    return state.name;
   };
 
   const getRolesFormatted = (rolesAll: Role[]): ValueSelect[] => {
@@ -104,9 +113,9 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
 
   const formatBody = (values: StaffForm): StaffForm => {
     return {
-      state_id: values.state_id ? Number(values.state_id) : null,
-      organization_id: values.state_id ? Number(values.organization_id) : null,
-      role_id: values.state_id ? Number(values.role_id) : null,
+      state: values.state ? values.state : null,
+      organization_id: values.organization_id ? Number(values.organization_id) : null,
+      role_id: values.role_id ? Number(values.role_id) : null,
       username: values.username,
       password: values.password,
       chinesse_name: values.chinesse_name,
@@ -229,7 +238,7 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="select"
-                    name="state_id"
+                    name="state"
                     selectLabel={intl.formatMessage({
                       id: "select_state",
                     })}

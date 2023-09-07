@@ -56,7 +56,6 @@ const WarehouseTable = () => {
   const { locale } = router.query;
   const [warehouses, setWarehouses] = useState<CargoStationWarehouseForm[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [states, setStates] = useState<StateWarehouse[]>([]);
   const [receptionAreas, setReceptionAreas] = useState<any>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
@@ -94,7 +93,7 @@ const WarehouseTable = () => {
       },
       {
         name: intl.formatMessage({ id: "state" }),
-        uid: "state_id",
+        uid: "state",
         sortable: true,
       },
       {
@@ -127,7 +126,7 @@ const WarehouseTable = () => {
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||
-          user.state_id
+          user.state
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||
@@ -169,14 +168,23 @@ const WarehouseTable = () => {
     );
   }, [sortDescriptor, items]);
 
+  const getLabelByLanguage = (state: any) => {
+    if (locale === 'es') {
+      return state.es_name;
+    } else if (locale === 'zh') {
+      return state.zh_name;
+    }
+    return state.name;
+  };
+
   const renderCell = React.useCallback(
     (user: any, columnKey: React.Key) => {
       const cellValue = user[columnKey];
       switch (columnKey) {
         case "receiving_area":
           return getReceptionAreaLabel(cellValue);
-        case "state_id":
-          return user.state ? user.state.name : '';
+        case "state":
+          return user.state ? getLabelByLanguage(user.state) : '';
         case "country":
           return getCountryLabel(cellValue);
         case "actions":
@@ -360,16 +368,6 @@ const WarehouseTable = () => {
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const getStateLabel = (stateId: number | null) => {
-    if (stateId !== null && states.length > 0) {
-      const filter = states.filter((state) => state.id === stateId);
-      if (filter.length > 0) {
-        return filter[0].name;
-      }
-    }
-    return stateId;
-  };
-
   const getCountryLabel = (countryId: string) => {
     if (countryId !== null && countries.length > 0) {
       const filter = countries.filter((country) => country.name === countryId);
@@ -396,11 +394,9 @@ const WarehouseTable = () => {
   const loadWarehouses = async () => {
     setLoading(true);
     const whs = await getWarehouses();
-    const _states = await indexStateWarehouse();
     const _countries = await indexCountries();
     const _receptionAreas = await getRegionalDivision();
     setWarehouses(whs ? whs : []);
-    setStates(_states ? _states : []);
     setCountries(_countries ? _countries : []);
     setReceptionAreas(_receptionAreas ? _receptionAreas : []);
     setLoading(false);

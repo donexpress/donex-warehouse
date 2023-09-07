@@ -10,7 +10,7 @@ export type Staff = {
     email: string;
     phone: string;
     observations: string | null;
-    state_id: number;
+    state: string | null;
     organization_id: number;
     role_id: number;
     states: {
@@ -24,7 +24,6 @@ export type Staff = {
         organization_type: string;
     },
     role: Role;
-    state: StaffState;
     organization: Organization;
     warehouses: CargoStationWarehouseForm[],
     affiliations: number[] | null;
@@ -36,4 +35,14 @@ export type Staff = {
 export type StaffState = {
     id: number;
     name: string;
+    es_name: string,
+    zh_name: string,
+    value: string,
+    position: number,
 }
+
+export type StaffStateDefault = {
+  normal: StaffState,
+  frezze: StaffState,
+  resign: StaffState,
+};

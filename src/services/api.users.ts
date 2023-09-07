@@ -12,7 +12,7 @@ import {
 import { LoginBody, LoginResponse, UserProfile, Response } from '../types/index';
 import { getHeaders, isWMS } from '../helpers';
 import { User } from '@/types/usererege1992';
-import { UserState } from '@/types/user_stateerege1992';
+import { UserState, UserStateDefault } from '@/types/user_stateerege1992';
 import { UserLevel } from '../types/user_levels';
 import { PaymentMethod } from '../types/payment_methods';
 import { GetServerSidePropsContext } from 'next';
@@ -88,7 +88,7 @@ export const countUsers = async(): Promise<{count: number}> => {
   return response.data
 }
 
-export const getUserStates = async(context?: GetServerSidePropsContext): Promise<UserState[]> => {
+export const getUserStates = async(context?: GetServerSidePropsContext): Promise<UserStateDefault> => {
   const response = await axios.get(userStatePath(), getHeaders(context))
   return response.data
 }
