@@ -135,3 +135,7 @@ export const whPath = () => {
 export const countWhPath = () => {
   return BASE_URL + '/api/v1/aos_warehouse/count';
 }
+
+export const exitPlanPath = () => {
+  return BASE_URL + '/api/v1/output_plan';
+}

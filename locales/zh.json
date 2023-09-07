@@ -201,5 +201,11 @@
 	"rows_page":"每頁行數：",
     "home":"家",
     "columns":"列",
-	"filters":"過濾器"
+	"filters":"過濾器",
+    "delivery_number": "发货数量",
+	"type": "盖伊",
+	"box_numbers": "箱数",
+	"palets_numbers": "托盘数量",
+	"output_boxes": "出线盒",
+	"delivered_amount_boxes": "交付箱数"
 }
