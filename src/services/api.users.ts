@@ -94,7 +94,7 @@ export const getUserStates = async(context?: GetServerSidePropsContext): Promise
 }
 
 export const removeUser = async(id: number) => {
-  const response = await axios.delete(removeUserPath(id))
+  const response = await axios.delete(removeUserPath(id), getHeaders())
   return response.data
 }
 
