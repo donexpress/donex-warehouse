@@ -77,13 +77,4 @@ export const generateValidationSchemaUserLevel = (intl: IntlShape) => {
   });
 };
 
-export const generateValidationSchemaExitPlan = (intl: IntlShape) => {
-  return Yup.object({
-    warehouse_id: Yup.string()
-      .required(intl.formatMessage({ id: 'required' })),
-    user_id: Yup.string()
-      .required(intl.formatMessage({ id: 'required' })),
-  });
-};
-
 export default generateValidationSchema;

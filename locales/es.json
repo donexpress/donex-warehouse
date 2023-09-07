@@ -211,11 +211,5 @@
 	"rows_page":"Filas por página:",
 	"home":"Inicio",
 	"columns":"Columnas",
-	"filters":"Filtros",
-	"delivery_number": "Número de entrega",
-	"type": "Tipo",
-	"box_numbers": "Número de cajas",
-	"palets_numbers": "Número de palets",
-	"output_boxes": "Cajas de salida",
-	"delivered_amount_boxes": "Cantidad de cajas entregadas"
+	"filters":"Filtros"
 }

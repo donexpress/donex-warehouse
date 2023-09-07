@@ -211,11 +211,5 @@
 	"rows_page":"Rows per page:",
 	"home":"Home",
 	"columns":"Columns",
-	"filters":"Filters",
-	"delivery_number": "Delivery number",
-	"type": "Type",
-	"box_numbers": "Box numbers",
-	"palets_numbers": "Palets numbers",
-	"output_boxes": "Output boxes",
-	"delivered_amount_boxes": "Delivered amount boxes"
+	"filters":"Filters"
 }
