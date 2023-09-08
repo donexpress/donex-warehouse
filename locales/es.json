@@ -207,6 +207,10 @@
 	"select_partition": "Seleccione la partición",
 	"select_shelf": "Seleccione el estante",
 	"select_location": "Seleccione la ubicación",
+	"history": "Historial",
+	"back": "Volver",
+	"item_history": "Historial del elemento",
+	"packing_list_item": "Elemento de la lista de embalaje",
 
 	"Delete":"Eliminar",
 	"Edit":"Editar",

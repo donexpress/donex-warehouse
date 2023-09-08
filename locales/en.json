@@ -207,6 +207,10 @@
 	"select_partition": "Select partition",
 	"select_shelf": "Select shelf",
 	"select_location": "Select location",
+	"history": "History",
+	"back": "Back",
+	"item_history": "Item history",
+	"packing_list_item": "Packing list item",
 
 	"Delete":"Delete",
 	"Edit":"Edit",

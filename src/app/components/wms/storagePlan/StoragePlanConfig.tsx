@@ -94,6 +94,9 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
           case 5: {
             setShowBatchOnShelvesDialog(true);
           } break;
+          case 6: {
+            router.push(`/${locale}/wms/storage_plan/${id}/history`)
+          } break;
         }
       }
   
@@ -336,6 +339,9 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           </DropdownItem>
                           <DropdownItem className={selectedRows.length === 0 ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
+                          </DropdownItem>
+                          <DropdownItem onClick={() => handleAction(6)}>
+                            {intl.formatMessage({ id: "history" })}
                           </DropdownItem>
                           <DropdownItem onClick={() => handleAction(3)}>
                             {intl.formatMessage({ id: "modify_packing_list" })}
