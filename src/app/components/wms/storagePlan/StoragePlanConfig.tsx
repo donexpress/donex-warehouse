@@ -97,6 +97,9 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
           case 6: {
             router.push(`/${locale}/wms/storage_plan/${id}/history`)
           } break;
+          case 7: {
+            //Fast delivery
+          } break;
         }
       }
   
@@ -109,7 +112,8 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                 delivered_time: values.delivered_time,
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
-                return: values.return
+                return: values.return,
+                state: values.state ? values.state : 1
               };
       }
 
@@ -198,7 +202,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
         setShowSplitBillDialog(false);
       }
 
-      const batchOnShelvesAction = () => {
+      const batchOnShelvesAction = (packingListItems: PackingList[]) => {
         setShowBatchOnShelvesDialog(false);
       }
 
@@ -331,23 +335,26 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu>
-                          <DropdownItem onClick={() => handleAction(1)}>
+                          <DropdownItem className={(storagePlan && storagePlan.state !== 1) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(1)}>
                             {intl.formatMessage({ id: "add_box" })}
                           </DropdownItem>
-                          <DropdownItem className={selectedRows.length === 0 ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && storagePlan.state !== 1)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
                             {intl.formatMessage({ id: "remove_box" })}
                           </DropdownItem>
-                          <DropdownItem className={selectedRows.length === 0 ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
+                          <DropdownItem className={((storagePlan && (storagePlan.state === 1 || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
+                            {intl.formatMessage({ id: "fast_delivery" })}
+                          </DropdownItem>
+                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && (storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
+                          </DropdownItem>
+                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (storagePlan.state === 3 || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
+                            {intl.formatMessage({ id: "split_bill" })}
                           </DropdownItem>
                           <DropdownItem onClick={() => handleAction(6)}>
                             {intl.formatMessage({ id: "history" })}
                           </DropdownItem>
                           <DropdownItem onClick={() => handleAction(3)}>
                             {intl.formatMessage({ id: "modify_packing_list" })}
-                          </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
-                            {intl.formatMessage({ id: "split_bill" })}
                           </DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
@@ -444,7 +451,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
             </div>
             { showRemoveBoxDialog && <PackingListDialog close={closeRemoveBoxesDialog} confirm={removeBoxes} title={intl.formatMessage({ id: 'remove_box' })} packingLists={selectedRows} /> }
             { showSplitBillDialog && <PackingListDialog close={closeSplitBillDialog} confirm={splitBill} title={intl.formatMessage({ id: 'split_bill' })} packingLists={selectedRows} /> }
-            { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows} /> }
+            { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows} warehouse={storagePlan?.warehouse} /> }
         </div>
     );
 };

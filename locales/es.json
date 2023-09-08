@@ -19,6 +19,8 @@
 	"changedsuccessfullyMsg": "Elemento modificado de manera satisfactoria",
 	"successfullyActionMsg": "La acción fue ejecutada de forma exitosa",
 	"dontExistUserPasswordMsg": "Usuario o contraseña incorrecta, por favor, intente de nuevo",
+	"item_has_been_canceled": "El elemento ha sido cancelado",
+	"items_have_been_canceled": "Los elementos han sido cancelado",
 	"documents": "Documentos",
 	"storageAndTransshipment": "Almacenamiento y Transbordo",
 	"storagePlan": "Plan de entrada",
@@ -211,6 +213,7 @@
 	"back": "Volver",
 	"item_history": "Historial del elemento",
 	"packing_list_item": "Elemento de la lista de embalaje",
+	"fast_delivery": "Entrega rápida",
 
 	"Delete":"Eliminar",
 	"Edit":"Editar",

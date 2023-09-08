@@ -143,3 +143,7 @@ export const exitPlanPath = () => {
 export const filePath = () => {
   return BASE_URL + "/api/v1/file";
 };
+
+export const packageShelfPath = () => {
+  return BASE_URL + "/api/v1/shelf_package";
+};

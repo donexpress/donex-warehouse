@@ -19,6 +19,8 @@
 	"changedsuccessfullyMsg": "Item changed successfully",
 	"successfullyActionMsg": "The action was executed successfully",
 	"dontExistUserPasswordMsg": "User or password incorrect, please try again",
+	"item_has_been_canceled": "The item has been canceled",
+	"items_have_been_canceled": "Items have been canceled",
 	"documents": "Documents",
 	"storageAndTransshipment": "Storage and Transshipment",
 	"storagePlan": "Entry plan",
@@ -211,6 +213,7 @@
 	"back": "Back",
 	"item_history": "Item history",
 	"packing_list_item": "Packing list item",
+	"fast_delivery": "Fast delivery",
 
 	"Delete":"Delete",
 	"Edit":"Edit",
