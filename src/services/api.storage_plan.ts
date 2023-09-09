@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { countStoragePlanPath, storagePlanPath } from '../backend';
+import { countStoragePlanPath, storagePlanByOrderNumberPath, storagePlanPath } from '../backend';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
 import { Response } from '../types/index';
@@ -66,4 +66,15 @@ export const getStoragePlans = async (status: number = 0, context?: GetServerSid
   } catch (error) {
     return null;
   }
+}
+
+export const getStoragePlanByOrder_number = async(order_number: string, context?: GetServerSidePropsContext): Promise<StoragePlan[] | null> => {
+  const path = storagePlanByOrderNumberPath(order_number);
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+
 }

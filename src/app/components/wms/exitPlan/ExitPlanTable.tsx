@@ -30,8 +30,27 @@ import { SearchIcon } from "../../common/SearchIcon";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
-import { getExitPlans } from "../../../../services/api.exit_plan";
-import { ExitPlan } from "../../../../types/exit_plan";
+import {
+  getExitPlans,
+  getExitPlansByState,
+  getExitPlansState,
+  removeExitPlan,
+} from "../../../../services/api.exit_plan";
+import { ExitPlan, ExitPlanState } from "../../../../types/exit_plan";
+import { capitalize } from "../../../../helpers/utils";
+import { ChevronDownIcon } from "../../common/ChevronDownIcon";
+
+const INITIAL_VISIBLE_COLUMNS = [
+  "output_number",
+  "user",
+  "warehouse",
+  "box_amount",
+  "palets_amount",
+  "output_boxes",
+  "amount",
+  "delivered_quantity",
+  "actions",
+];
 
 const ExitPlanTable = () => {
   const intl = useIntl();
@@ -41,12 +60,19 @@ const ExitPlanTable = () => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
+  const [statusSelected, setStatusSelected] = useState<number>(1);
+  const [loadingItems, setLoadingItems] = useState<boolean>(false);
+  const [exitPlanState, setExitPlanState] = useState<ExitPlanState | null>(
+    null
+  );
 
-  /** start*/
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
+    new Set(INITIAL_VISIBLE_COLUMNS)
+  );
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "output_number",
     direction: "ascending",
@@ -56,38 +82,108 @@ const ExitPlanTable = () => {
 
   const hasSearchFilter = Boolean(filterValue);
 
-  const headerColumns = useMemo(() => {
-    return [
+  const getColumns = React.useMemo(() => {
+    const columns = [
+      { name: "ID", uid: "id", sortable: true },
       {
         name: intl.formatMessage({ id: "delivery_number" }),
         uid: "output_number",
         sortable: true,
       },
-      { name: intl.formatMessage({ id: "type" }), uid: "type", sortable: true },
-      { name: intl.formatMessage({ id: "user" }), uid: "user" },
-      { name: intl.formatMessage({ id: "warehouse" }), uid: "warehouse" },
-        { name: intl.formatMessage({ id: "box_numbers" }), uid: "box_amount" },
-        { name: intl.formatMessage({ id: "palets_numbers" }), uid: "palets_amount" },
-        { name: intl.formatMessage({ id: "output_boxes" }), uid: "output_boxes" },
-        { name: intl.formatMessage({ id: "amount" }), uid: "amount" },
-        { name: intl.formatMessage({ id: "delivered_amount_boxes" }), uid: "delivered_quantity" },
+      {
+        name: intl.formatMessage({ id: "warehouse" }),
+        uid: "warehouse",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "user" }),
+        uid: "user",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "box_numbers" }),
+        uid: "box_amount",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "number_of_boxes" }),
+        uid: "output_boxes",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "palets_numbers" }),
+        uid: "palets_amount",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "amount" }),
+        uid: "amount",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "delivered_amount_boxes" }),
+        uid: "delivered_quantity",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "country" }),
+        uid: "country",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "city" }),
+        uid: "city",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "address" }),
+        uid: "address",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: true,
+      },
+
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "observations" }),
+        uid: "observations",
+        sortable: true,
+      },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
+
+    return columns;
   }, [intl]);
+
+  const headerColumns = React.useMemo(() => {
+    const columns = getColumns;
+
+    if (visibleColumns === "all") return columns;
+
+    return columns.filter((column) =>
+      Array.from(visibleColumns).includes(column.uid)
+    );
+  }, [visibleColumns, intl]);
 
   const filteredItems = useMemo(() => {
     let filteredUsers = [...exitPlans];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter(
-        (user) =>
-          user.output_number ? user.output_number : ""
-            .toLowerCase()
-            .includes(filterValue.toLowerCase()) ||
-          user.case_numbers
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase())
+      filteredUsers = filteredUsers.filter((user) =>
+        user.output_number
+          ? user.output_number
+          : "".toLowerCase().includes(filterValue.toLowerCase()) ||
+            user.case_numbers
+              ?.toString()
+              ?.toLowerCase()
+              ?.includes(filterValue.toLowerCase())
       );
     }
     return filteredUsers;
@@ -131,6 +227,9 @@ const ExitPlanTable = () => {
                 <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Edit" })}
                 </DropdownItem>
+                <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
+                  {intl.formatMessage({ id: "config" })}
+                </DropdownItem>
                 <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Delete" })}
                 </DropdownItem>
@@ -169,6 +268,28 @@ const ExitPlanTable = () => {
     setPage(1);
   }, []);
 
+  const changeTab = async (tab: number) => {
+    if (tab !== statusSelected && !loadingItems) {
+      await setStatusSelected(tab);
+      await setLoadingItems(true);
+      const state = exitPlanState?.states.find(el => el.position === tab)
+      const storagePlanss = await getExitPlansByState(state ? state.value: 'pending');
+
+      await setLoadingItems(false);
+      await setExitPlans(storagePlanss !== null ? storagePlanss : []);
+      // await setExitPlans([]);
+    }
+  };
+
+  const getLanguage = () => {
+    switch (intl.locale) {
+      case 'es': return "es_name"
+      case 'en': return "name"
+      case 'zh': return "zh_name"
+      default: return "name"
+    }
+  }
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
@@ -183,6 +304,31 @@ const ExitPlanTable = () => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  className="bnt-select"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  {intl.formatMessage({ id: "columns" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={visibleColumns}
+                selectionMode="multiple"
+                onSelectionChange={setVisibleColumns}
+              >
+                {getColumns.map((column) => (
+                  <DropdownItem key={column.uid} className="capitalize">
+                    {capitalize(column.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
             <Button
               color="primary"
               endContent={<PlusIcon />}
@@ -211,15 +357,33 @@ const ExitPlanTable = () => {
             </select>
           </label>
         </div>
+        <div className="bg-gray-200 pt-1">
+          <div className="overflow-x-auto tab-system-table bg-content1">
+            <ul className="flex space-x-4">
+              {exitPlanState && exitPlanState.states.map((state, index) => (
+                  <li className="whitespace-nowrap" key={index}>
+                    <button className={statusSelected === state.position ? "px-4 py-3 tab-selected": "px-4 py-3 tab-default"}
+                      onClick={() => changeTab(state.position)}
+                    >
+                      {state[getLanguage()]}
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        </div>
       </div>
     );
   }, [
     filterValue,
     statusFilter,
+    visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
     exitPlans.length,
     hasSearchFilter,
+    exitPlanState,
+    statusSelected,
     intl,
   ]);
 
@@ -255,10 +419,9 @@ const ExitPlanTable = () => {
     onRowsPerPageChange,
     intl,
   ]);
-  /** end*/
 
   useEffect(() => {
-    loadWarehouses();
+    loadExitPlans();
   }, []);
 
   useEffect(() => {
@@ -269,11 +432,12 @@ const ExitPlanTable = () => {
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const loadWarehouses = async () => {
+  const loadExitPlans = async () => {
     setLoading(true);
     const pms = await getExitPlans();
     setExitPlans(pms ? pms : []);
-
+    const states = await getExitPlansState();
+    setExitPlanState(states);
     setLoading(false);
   };
 
@@ -297,6 +461,11 @@ const ExitPlanTable = () => {
     router.push(`/${locale}/wms/exit_plan/insert`);
   };
 
+  const handleConfig = (id: number) => {
+    setLoading(true);
+    router.push(`/${locale}/wms/exit_plan/${id}/config`)
+  }
+
   const close = () => {
     setShowConfirm(false);
     setDeleteElemtent(-1);
@@ -304,10 +473,9 @@ const ExitPlanTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removePaymentMethodById(deleteElement);
+    const reponse = await removeExitPlan(deleteElement);
     close();
-    await loadWarehouses();
-
+    await loadExitPlans();
     setLoading(false);
   };
 

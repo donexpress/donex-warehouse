@@ -17,17 +17,21 @@ export const getExitPlans = async (
   }
 };
 
-
-export const getExitPlansById = async (exit_plan_id: number, context?: GetServerSidePropsContext): Promise<ExitPlan | null> => {
+export const getExitPlansById = async (
+  exit_plan_id: number,
+  context?: GetServerSidePropsContext
+): Promise<ExitPlan | null> => {
   const path = exitPlanPath();
   try {
-    const response = await axios.get(`${path}/${exit_plan_id}`, getHeaders(context));
+    const response = await axios.get(
+      `${path}/${exit_plan_id}`,
+      getHeaders(context)
+    );
     return response.data;
   } catch (error) {
     return null;
   }
 };
-
 
 export const createExitPlan = async (values: ExitPlan): Promise<Response> => {
   const path = exitPlanPath();
@@ -48,7 +52,7 @@ export const createExitPlan = async (values: ExitPlan): Promise<Response> => {
 
 export const updateExitPlan = async (
   exitPlanId: number,
-  exitPlan: ExitPlan
+  exitPlan: any
 ): Promise<Response> => {
   const path = exitPlanPath() + `/${exitPlanId}`;
   try {
@@ -63,5 +67,50 @@ export const updateExitPlan = async (
       status:
         error.response && error.response.status ? error.response.status : 0,
     };
+  }
+};
+
+export const removeExitPlan = async (exitPlanId: number): Promise<Response> => {
+  const path = exitPlanPath() + `/${exitPlanId}`;
+  try {
+    const response = await axios.delete(path, getHeaders());
+
+    if (response.status && response.status >= 200 && response.status <= 299) {
+      return { ...response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return {
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    };
+  }
+};
+
+export const getExitPlansState = async () => {
+  const path = exitPlanPath() + `/states`;
+  try {
+    const response = await axios.get(path, getHeaders());
+    if (response.status && response.status >= 200 && response.status <= 299) {
+      return { ...response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return {
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    };
+  }
+};
+
+export const getExitPlansByState = async (
+  state: string
+): Promise<ExitPlan[] | null> => {
+  const path = exitPlanPath() + `?state=${state}`;
+  try {
+    const response = await axios.get<ExitPlan[]>(path, getHeaders());
+    return response.data;
+  } catch (error: any) {
+    return null;
   }
 };

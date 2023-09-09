@@ -217,5 +217,11 @@
 	"box_numbers": "Box numbers",
 	"palets_numbers": "Palets numbers",
 	"output_boxes": "Output boxes",
-	"delivered_amount_boxes": "Delivered amount boxes"
+	"delivered_amount_boxes": "Delivered amount boxes",
+	"created_at": "Created at",
+	"updated_at": "Updated at",
+	"print_inventory_list": "Print inventory list",
+	"storage_height": "Storage height",
+	"products_per_box": "Products per box",
+	"add_exit_plan_boxes": "Add boxes to the output plan"
 }
