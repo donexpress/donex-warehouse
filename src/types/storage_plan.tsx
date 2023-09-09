@@ -1,5 +1,6 @@
 import { User } from './user';
 import { Warehouse } from './warehouse';
+import { PackageShelf } from './package_shelf';
 
 export type PackingList = {
   id?: number,
@@ -22,8 +23,11 @@ export type PackingList = {
   operator_picture?: string,
   storage_plan_id?: number,
   order_transfer_number?: string;
+  package_shelf?: PackageShelf;
   meta?: any;
   checked?: boolean;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type StoragePlan = {
@@ -48,8 +52,16 @@ export type StoragePlan = {
     user?: User;
     warehouse?: Warehouse;
     order_number?: string;
-    state?: number,
+    state?: number;
+    history?: History[];
+    created_at?: string;
+    updated_at?: string;
 };
+
+export type History = {
+  type: "packing_list" | "storage_plan";
+  data: PackingList | StoragePlan;
+}
 
 export type StoragePlanProps = {
   id?: number;
@@ -64,6 +76,13 @@ export type PackingListProps = {
   storagePlan: StoragePlan;
   isFromAddPackingList?: boolean;
   isFromModifyPackingList?: boolean;
+}
+
+export type HistoryStoragePlanProps = {
+  id: number;
+  storagePlan: StoragePlan;
+  users: User[];
+  warehouses: Warehouse[];
 }
 
 export type StoragePlanListProps = {

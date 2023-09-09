@@ -42,7 +42,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "username",
   "email",
   "phone",
-  "state_id",
+  "state",
   "actions",
 ];
 
@@ -120,7 +120,7 @@ const StaffTable = () => {
       },
       {
         name: intl.formatMessage({ id: "state" }),
-        uid: "state_id",
+        uid: "state",
         sortable: true,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -161,7 +161,7 @@ const StaffTable = () => {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.state_id)
+        Array.from(statusFilter).includes(String(user.state))
       );
     }
 
@@ -229,14 +229,23 @@ const StaffTable = () => {
           return user.organization ? user.organization.name : "";
         case "role_id": 
           return user.role ? user.role.name : "";
-        case "state_id": 
-          return user.state ? user.state.name : "";
+        case "state": 
+          return user.state ? getLabelByLanguage(user.state) : "";
         default:
           return cellValue;
       }
     },
     [intl]
   );
+
+  const getLabelByLanguage = (state: any) => {
+    if (locale === 'es') {
+      return state.es_name;
+    } else if (locale === 'zh') {
+      return state.zh_name;
+    }
+    return state.name;
+  };
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {

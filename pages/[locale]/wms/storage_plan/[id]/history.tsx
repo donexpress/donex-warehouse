@@ -1,13 +1,13 @@
 import Head from 'next/head';
 import Layout from '../../../../../src/app/layout';
 import ProtectedRoute from '../../../../../src/app/components/common/ProtectedRoute';
-import StoragePlanConfig from '../../../../../src/app/components/wms/storagePlan/StoragePlanConfig';
-import { StoragePlanProps } from '../../../../../src/types/storage_plan';
+import StoragePlanHistory from '../../../../../src/app/components/wms/storagePlan/StoragePlanHistory';
+import { HistoryStoragePlanProps } from '../../../../../src/types/storage_plan';
 import { getUsers } from '../../../../../src/services/api.users';
 import { getWhs } from '../../../../../src/services/api.wh';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const ConfigStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanProps) => {console.log(storagePlan);
+const HistoryStoragePlan = ({ id, storagePlan, warehouses, users }: HistoryStoragePlanProps) => {console.log(warehouses)
   
   return (
   <ProtectedRoute>
@@ -16,7 +16,7 @@ const ConfigStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanPr
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StoragePlanConfig warehouses={warehouses ? warehouses : []} users={users ? users : []} storagePlan={storagePlan} id={id} />
+        <StoragePlanHistory storagePlan={storagePlan} id={id} warehouses={warehouses ? warehouses : []} users={users ? users : []} />
       </Layout>
     </ProtectedRoute>
     );
@@ -38,4 +38,4 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default ConfigStoragePlan;
+export default HistoryStoragePlan;

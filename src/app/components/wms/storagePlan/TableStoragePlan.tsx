@@ -18,16 +18,19 @@ import {
   SortDescriptor,
 } from "@nextui-org/react";
 import { PlusIcon } from "./../../common/PlusIcon";
+import { CancelIcon } from "./../../common/CancelIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
+import { showMsg } from "../../../../helpers";
 
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import { getStoragePlans, removeStoragePlanById } from '../../../../services/api.storage_plan';
+import { getStoragePlans, removeStoragePlanById, updateStoragePlanById } from '../../../../services/api.storage_plan';
 import { StoragePlan } from "../../../../types/storage_plan";
+import { Response } from "../../../../types";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
@@ -58,6 +61,11 @@ const TableStoragePlan = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [statusSelected, setStatusSelected] = useState<number>(1);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+
+  const [showCancelAllDialog, setShowCancelAllDialog] = useState<boolean>(false);
+  const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
+  const [cancelElement, setCancelElement] = useState<StoragePlan | null>(null);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -206,6 +214,9 @@ const TableStoragePlan = () => {
                   <DropdownItem onClick={() => handleConfig(storageP["id"])}>
                     {intl.formatMessage({ id: "config" })}
                   </DropdownItem>
+                  <DropdownItem className={statusSelected !== 1 ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
+                    {intl.formatMessage({ id: "cancel" })}
+                  </DropdownItem>
                   <DropdownItem onClick={() => handleDelete(storageP["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
@@ -219,7 +230,7 @@ const TableStoragePlan = () => {
           return cellValue;
       }
     },
-    [intl]
+    [intl, statusSelected]
   );
 
   const onRowsPerPageChange = React.useCallback(
@@ -303,6 +314,21 @@ const TableStoragePlan = () => {
             </Button>
           </div>
         </div>
+        {
+          statusSelected === 1 && (
+            <div className="elements-row-end">
+                <Button
+                  color="primary"
+                  style={{ width: '121px' }}
+                  endContent={<CancelIcon />}
+                  onClick={() => openCancelAllStoragePlanDialog()}
+                  isDisabled={selectedItems.length === 0}
+                >
+                  {intl.formatMessage({ id: "cancel" })}
+                </Button>
+            </div>
+          )
+        }
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: storagePlans.length })}
@@ -365,6 +391,7 @@ const TableStoragePlan = () => {
     hasSearchFilter,
     intl,
     statusSelected,
+    selectedItems,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -456,6 +483,88 @@ const TableStoragePlan = () => {
     await loadStoragePlans();
     setLoading(false);
   };
+  
+  const formatBodyToCancel = (values: StoragePlan): StoragePlan => {
+    return {
+            user_id: values.user_id ? Number(values.user_id) : null,
+            warehouse_id: values.warehouse_id ? Number(values.warehouse_id) : null,
+            customer_order_number: values.customer_order_number,
+            box_amount: values.box_amount,
+            delivered_time: values.delivered_time,
+            observations: values.observations,
+            rejected_boxes: values.rejected_boxes,
+            return: values.return,
+            state: 4,
+          };
+  }
+
+  const handleCancelAll = async() => {
+    setLoading(true);
+    for (let i = 0; i < selectedItems.length; i++) {
+      const index = selectedItems[i];
+      const item = storagePlans.filter((sp: StoragePlan) => sp.id === index);
+      
+      if (item.length > 0) {
+        const response: Response = await updateStoragePlanById(index, formatBodyToCancel(item[0]));
+        if (((selectedItems.length-1) === index)) {
+          if (response.status >= 200 && response.status <= 299) {
+            const message = selectedItems.length > 1 ? intl.formatMessage({ id: 'items_has_been_canceled' }) : intl.formatMessage({ id: 'item_has_been_canceled' });
+            showMsg(message, { type: "success" });
+          } else {
+            let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+            showMsg(message, { type: "error" });
+          }
+        }
+      }
+    }
+    await setShowCancelAllDialog(false);
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
+    await loadStoragePlans();
+  };
+
+  const handleCancel = async() => {
+    if (cancelElement !== null) {
+      setLoading(true);
+      const response: Response = await updateStoragePlanById(Number(cancelElement.id), formatBodyToCancel(cancelElement));
+      if (response.status >= 200 && response.status <= 299) {
+        const message = intl.formatMessage({ id: 'item_has_been_canceled' });
+        showMsg(message, { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        showMsg(message, { type: "error" });
+      }
+      closeCancelStoragePlanDialog();
+      await loadStoragePlans();
+    }
+  }
+
+  const openCancelAllStoragePlanDialog = () => {
+    setShowCancelAllDialog(true);
+  }
+
+  const openCancelStoragePlanDialog = (sp: StoragePlan) => {
+    setCancelElement(sp);
+    setShowCancelDialog(true);
+  }
+
+  const closeCancelAllStoragePlanDialog = () => {
+    setShowCancelAllDialog(false);
+  }
+
+  const closeCancelStoragePlanDialog = () => {
+    setCancelElement(null);
+    setShowCancelDialog(false);
+  }
+
+  const selectedItemsFn = (selection: Selection) => {
+    setSelectedKeys(selection);
+    if (selection === 'all') {
+      setSelectedItems(storagePlans.map((sp: StoragePlan) => Number(sp.id)));
+    } else {
+      setSelectedItems(Array.from(selection.values()).map(cadena => parseInt(cadena.toString())))
+    }
+  }
 
   return (
     <>
@@ -473,7 +582,7 @@ const TableStoragePlan = () => {
           sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
-          onSelectionChange={setSelectedKeys}
+          onSelectionChange={(keys: Selection) => {selectedItemsFn(keys)}}
           onSortChange={setSortDescriptor}
         >
           <TableHeader columns={headerColumns}>
@@ -501,6 +610,8 @@ const TableStoragePlan = () => {
           </TableBody>
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+        {showCancelAllDialog && <ConfirmationDialog close={closeCancelAllStoragePlanDialog} confirm={handleCancelAll} />}
+        {showCancelDialog && <ConfirmationDialog close={closeCancelStoragePlanDialog} confirm={handleCancel} />}
       </Loading>
     </>
   );

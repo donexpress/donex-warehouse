@@ -111,7 +111,7 @@ const UserTable = () => {
       },
       {
         name: intl.formatMessage({ id: "state" }),
-        uid: "state_id",
+        uid: "state",
         sortable: true,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -153,7 +153,7 @@ const UserTable = () => {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.state_id)
+        Array.from(statusFilter).includes(String(user.state))
       );
     }
 
@@ -219,14 +219,23 @@ const UserTable = () => {
             return user.payment_method ? user.payment_method.name : "";
         case "user_level_id": 
             return user.user_level ? user.user_level.name : "";
-        case "state_id": 
-            return user.state ? user.state.name : "";
+        case "state": 
+            return user.user_state ? getLabelByLanguage(user.user_state) : "";
         default:
           return cellValue;
       }
     },
     [intl]
   );
+
+  const getLabelByLanguage = (state: any) => {
+    if (locale === 'es') {
+      return state.es_name;
+    } else if (locale === 'zh') {
+      return state.zh_name;
+    }
+    return state.name;
+  };
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {

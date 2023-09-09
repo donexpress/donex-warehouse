@@ -65,7 +65,10 @@ input[type="daterange"] {
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-    background: #101935;
+    background: #aeb9e1;
+    border-radius: 5px;
+    border: solid 1px white;
+    cursor: pointer;
 }
 
 .input-container {

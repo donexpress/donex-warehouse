@@ -86,7 +86,7 @@ const Info = ({ user }: Props) => {
                                 </div>
                                 <div className="element">
                                     <div className="key">{intl.formatMessage({ id: 'state' })}: </div>
-                                    <div className="value">{user.state_id}</div>
+                                    <div className="value">{user.state}</div>
                                 </div>
                                 <div className="element">
                                     <div className="key">{intl.formatMessage({ id: 'finantial_representative' })}: </div>

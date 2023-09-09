@@ -17,7 +17,7 @@ const UpdateWarehouseCargoStation = ({
   receptionAreas,
   warehouse,
   id,
-}: CargoStationWarehouseProps) => {
+}: CargoStationWarehouseProps) => {console.log(warehouse)
   return (
     <Layout>
       <Head>
@@ -40,10 +40,11 @@ const UpdateWarehouseCargoStation = ({
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
   const warehouse = await getWarehouseById(id, context);
-  const states = await indexStateWarehouse(context);
+  const statesObj = await indexStateWarehouse(context);
   const countries = await indexCountries(context);
   const receptionAreas = await getRegionalDivision(context);
 
+  const states = statesObj !== null ? Object.values(statesObj) : null;
   return {
     props: {
       states,

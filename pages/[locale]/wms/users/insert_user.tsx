@@ -50,8 +50,9 @@ export async function getServerSideProps(context: any) {
   const warehouseList = await getWarehouses(context);
   const userLevelList = await getUserLevels(context);
   const paymentMethodList = await getPaymentMethods(context);
-  const userStateList = await getUserStates(context);
+  const userStateListObj = await getUserStates(context);
 
+  const userStateList = (userStateListObj && (userStateListObj !== null)) ? Object.values(userStateListObj) : null;
   return {
     props: {
       staffList,

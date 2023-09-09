@@ -10,7 +10,7 @@ import {
 import { Formik, Form } from "formik";
 import GenericInput from "../../common/GenericInput";
 import { useIntl } from "react-intl";
-import { UserForm, Response } from "../../../../types";
+import { UserForm, Response, ValueSelect } from "../../../../types";
 import { createUser, updateUser } from "@/services/api.userserege1992";
 import { UserFormProps } from "../../../../types";
 
@@ -45,9 +45,6 @@ const UserFormBody = ({
   const [paymentMethods, setPaymentMethods] = useState<
     { value: number; label: string }[]
   >([]);
-  const [userStates, setUserStates] = useState<
-    { value: number; label: string }[]
-  >([]);
 
   let initialValues: UserForm = {
     nickname: id && user ? user.nickname : "",
@@ -60,8 +57,8 @@ const UserFormBody = ({
           ? user.payment_method_id
           : null
         : null,
-    state_id:
-      id && user ? (user.state_id !== null ? user.state_id : null) : null,
+    // @ts-ignore
+    state: id && user && user.user_state ? user.user_state.value : null,
     contact: id && user ? user.contact : "",
     company: id && user ? user.company : "",
     email: id && user ? user.email : "",
@@ -126,7 +123,7 @@ const UserFormBody = ({
   useEffect(() => {
     setStaff(
       staffList.map((el) => {
-        return { value: el.id, label: el.username };
+        return { value: el.id, label: (el.username + (el.english_name && el.english_name !== '' ? ` (${el.english_name})` : '')) };
       })
     );
     setSubsidiaries(
@@ -154,12 +151,27 @@ const UserFormBody = ({
         return { value: el.id, label: el.name };
       })
     );
-    setUserStates(
-      userStateList.map((el) => {
-        return { value: el.id, label: el.name };
-      })
-    );
   }, []);
+
+  const getUserStatesFormatted = (userStatesAll: any[]): ValueSelect[] => {
+    let response: ValueSelect[] = [];
+    userStatesAll.forEach((userState) => {
+      response.push({
+        value: userState.value,
+        label: getLabelByLanguage(userState),
+      });
+    });
+    return response;
+  };
+
+  const getLabelByLanguage = (state: any) => {
+    if (locale === 'es') {
+      return state.es_name;
+    } else if (locale === 'zh') {
+      return state.zh_name;
+    }
+    return state.name;
+  };
 
   const handleSubmit = async (values: UserForm) => {
     if (id) {
@@ -175,7 +187,7 @@ const UserFormBody = ({
       payment_method_id: values.payment_method_id
         ? Number(values.payment_method_id)
         : null,
-      state_id: values.state_id ? Number(values.state_id) : null,
+      state: values.state ? values.state : null,
       user_level_id: values.user_level_id ? Number(values.user_level_id) : null,
       finantial_representative: values.finantial_representative
         ? Number(values.finantial_representative)
@@ -302,9 +314,9 @@ const UserFormBody = ({
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="select"
-                    name="state_id"
+                    name="state"
                     selectLabel={intl.formatMessage({ id: "select_state" })}
-                    options={userStates}
+                    options={getUserStatesFormatted(userStateList)}
                     customClass="custom-input"
                     disabled={isFromShowUser}
                   />

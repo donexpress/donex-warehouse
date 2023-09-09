@@ -34,11 +34,12 @@ const InsertStaff = ({
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const staffStates = await getStaffStates(context);
+  const staffStatesObj = await getStaffStates(context);
   const roles = await getRoles(context);
   const organizations = await getOrganizations(context);
   const affiliations = await getWarehouses(context);
 
+  const staffStates = staffStatesObj !== null ? Object.values(staffStatesObj) : null;
   return {
     props: {
       staffStates,

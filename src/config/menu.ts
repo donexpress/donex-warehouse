@@ -50,11 +50,6 @@ export const menuWMS = (intl: IntlShape) => {
           label: intl.formatMessage({ id: "operatingInstructions" }),
           route: RouteMenu.OPERATING_INSTRUCTIONS,
         },
-        {
-          id: 2.5,
-          label: intl.formatMessage({ id: "operationsRecord" }),
-          route: RouteMenu.OPERATIONS_RECORD,
-        },
       ],
     },
     {

@@ -58,7 +58,7 @@ export type UserForm = {
   label_code: string;
   password: string;
   payment_method_id: number | null;
-  state_id: number | null;
+  state: string | null;
   contact: string;
   company: string;
   email: string;
@@ -88,7 +88,7 @@ export type CargoStationWarehouseForm = {
   receiving_area: string;
   principal: string;
   contact_phone: string;
-  state_id: number | null;
+  state: string | null;
   address: string;
   city: string;
   province: string;
@@ -97,13 +97,22 @@ export type CargoStationWarehouseForm = {
   shared_warehouse_system_code: string;
   shared_warehouse_docking_code: string;
   customer_order_number_rules: string;
-  state?: StateWarehouse;
 };
 
 export type StateWarehouse = {
   id: number;
   name: string;
+  es_name: string,
+  zh_name: string,
+  value: string,
+  position: number,
 }
+
+export type StateDefault = {
+  normal: StateWarehouse,
+  frezze: StateWarehouse,
+  close: StateWarehouse,
+};
 
 export type CargoStationWarehouseProps = {
   id?: number;
@@ -189,7 +198,7 @@ export type StaffForm = {
     email: string;
     phone: string;
     observations: string | null;
-    state_id: number | null;
+    state: string | null;
     organization_id: number | null;
     role_id: number | null;
     affiliations: number[] | null;

@@ -1,4 +1,5 @@
 import { Country } from './index';
+import { Shelf } from './shelf';
 
 export type Warehouse = {
     id?: number;
@@ -14,6 +15,8 @@ export type Warehouse = {
     cp: string;
     phone: string;
     email: string;
+    shelfs?: Shelf[];
+    patition_amount?: number; 
     observations: string;
 }
 
