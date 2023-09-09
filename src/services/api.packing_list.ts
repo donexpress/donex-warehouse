@@ -67,3 +67,13 @@ export const getPackingLists = async (context?: GetServerSidePropsContext):Promi
     return null;
   }
 }
+
+export const getPackingListsByCaseNumber = async (case_nummber :string, context?: GetServerSidePropsContext):Promise<PackingList | null> => {
+  const path = packingListPath();
+  try {
+    const response = await axios.get(`${path}/by_case_number?case_number=${case_nummber}`, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}

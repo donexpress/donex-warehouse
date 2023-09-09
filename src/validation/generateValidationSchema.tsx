@@ -82,7 +82,7 @@ export const generateValidationSchemaExitPlan = (intl: IntlShape) => {
     warehouse_id: Yup.string()
       .required(intl.formatMessage({ id: 'required' })),
     user_id: Yup.string()
-      .required(intl.formatMessage({ id: 'required' })),
+      .required(intl.formatMessage({ id: 'required' }))
   });
 };
 

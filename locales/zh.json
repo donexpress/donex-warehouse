@@ -231,5 +231,11 @@
 	"box_numbers": "箱数",
 	"palets_numbers": "托盘数量",
 	"output_boxes": "出线盒",
-	"delivered_amount_boxes": "交付箱数"
+	"delivered_amount_boxes": "交付箱数",
+	"created_at": "创建于",
+	"updated_at": "更新于",
+    "print_inventory_list": "打印库存清单",
+    "storage_height": "存放高度",
+    "products_per_box": "每盒产品",
+    "add_exit_plan_boxes": "将框添加到输出计划中"
 }

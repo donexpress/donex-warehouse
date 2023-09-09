@@ -85,6 +85,11 @@ export const storagePlanPath = (status: number = 0) => {
   return BASE_URL + "/api/v1/storage_plan" + params;
 };
 
+export const storagePlanByOrderNumberPath = (order_number: string) => {
+  const params = `?query=${order_number}`;
+  return BASE_URL + "/api/v1/storage_plan" + params;
+};
+
 export const countStoragePlanPath = () => {
   return BASE_URL + "/api/v1/storage_plan/count";
 };

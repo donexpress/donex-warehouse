@@ -231,5 +231,11 @@
 	"box_numbers": "Número de cajas",
 	"palets_numbers": "Número de palets",
 	"output_boxes": "Cajas de salida",
-	"delivered_amount_boxes": "Cantidad de cajas entregadas"
+	"delivered_amount_boxes": "Cantidad de cajas entregadas",
+	"created_at": "Creado",
+	"updated_at": "Actualizado",
+	"print_inventory_list": "Imprimir lista de inventario",
+	"storage_height": "Altura de almacenamiento",
+	"products_per_box": "Productos por caja",
+	"add_exit_plan_boxes": "Adicionar cajas al plan de salida"
 }

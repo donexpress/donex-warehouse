@@ -35,13 +35,13 @@ const ExitPlanFormBody = ({
 
   const initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
-    warehouse_id: id && exitPlan && exitPlan.warehouse && exitPlan.warehouse.id ? exitPlan.warehouse?.id : -1,
+    warehouse_id: id && exitPlan && exitPlan.warehouse && exitPlan.warehouse.id ? exitPlan.warehouse?.id : undefined,
     city: id && exitPlan ? exitPlan.city : "",
     country: id  && exitPlan? exitPlan.country : "",
     delivered_time: id && exitPlan ? exitPlan.delivered_time : "",
     observations: id && exitPlan ? exitPlan.observations : "",
     type: id && exitPlan ? exitPlan.type : -1,
-    user_id: id && exitPlan && exitPlan.user && exitPlan.user.id ? exitPlan.user.id : -1,
+    user_id: id && exitPlan && exitPlan.user && exitPlan.user.id ? exitPlan.user.id : undefined,
   };
 
 
