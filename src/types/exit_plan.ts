@@ -25,6 +25,7 @@ export type ExitPlan = {
   updated_at?: string;
   user_id?: number;
   warehouse_id?: number;
+  state?: State
   packing_lists?: PackingList[]
 };
 

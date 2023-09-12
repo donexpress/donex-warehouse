@@ -238,9 +238,17 @@
 	"storage_height": "Altura de almacenamiento",
 	"products_per_box": "Productos por caja",
 	"add_exit_plan_boxes": "Adicionar cajas al plan de salida",
-	"duplicatedMsg": "El elemento que desea adicionar ya se encuentra, por favor, intente de nuevo",
+	"duplicatedMsg": "El elemento que desea adicionar ya se encuentra. Por favor, intente con uno diferente",
 	"exitPlans": "Planes de salida",
 	"storage_plans": "Planes de entrada",
-	"cargo_stations": "Estaciones de carga"
+	"cargo_stations": "Estaciones de carga",
+	"number_of_output_boxes": "Número de cajas de salida",
+	"already_sent": "Ya enviado",
+	"manual_pickup": "Recogida manual",
+	"out_warehouse": "Fuera del almacén",
+	"upload_file": "Subir fichero",
+    "file_name": "Nombre del archivo",
+	"owner": "Dueño",
+	"function": "Función"
 
 }

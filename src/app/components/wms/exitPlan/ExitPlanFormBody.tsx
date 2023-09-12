@@ -25,25 +25,39 @@ const ExitPlanFormBody = ({
   isFromDetails,
   countries,
   users,
-  warehouses
+  warehouses,
 }: ExitPlanProps) => {
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
   const [filter_user, set_filter_user] = useState<string>("");
   const [filter_warehouse, set_filter_warehouse] = useState<string>("");
-
+  const date = new Date(
+    exitPlan ? (exitPlan.delivered_time ? exitPlan.delivered_time : "") : ""
+  );
   const initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
-    warehouse_id: id && exitPlan && exitPlan.warehouse && exitPlan.warehouse.id ? exitPlan.warehouse?.id : undefined,
+    warehouse_id:
+      id && exitPlan && exitPlan.warehouse_id
+        ? exitPlan.warehouse_id
+        : undefined,
     city: id && exitPlan ? exitPlan.city : "",
-    country: id  && exitPlan? exitPlan.country : "",
-    delivered_time: id && exitPlan ? exitPlan.delivered_time : "",
+    country: id && exitPlan ? exitPlan.country : "",
+    delivered_time:
+      id && exitPlan
+        ? `${date.getFullYear()}-${
+            date.getMonth() > 9 ? date.getMonth() : "0" + date.getMonth()
+          }-${date.getDate() > 9 ? date.getDate() : "0" + date.getDate()}`
+        : "",
     observations: id && exitPlan ? exitPlan.observations : "",
     type: id && exitPlan ? exitPlan.type : -1,
-    user_id: id && exitPlan && exitPlan.user && exitPlan.user.id ? exitPlan.user.id : undefined,
+    user_id:
+      id && exitPlan && exitPlan.user && exitPlan.user.id
+        ? exitPlan.user.id
+        : undefined,
   };
 
+  console.log(initialValues, exitPlan?.warehouse_id);
 
   const cancelSend = () => {
     if (isWMS()) {
@@ -52,12 +66,13 @@ const ExitPlanFormBody = ({
   };
 
   const handleSubmit = async (values: ExitPlan) => {
-    if(values.delivered_time === '') {
-        values.delivered_time = null
+    if (values.delivered_time === "") {
+      values.delivered_time = null;
     }
     if (isWMS()) {
       if (id) {
-        await modify(id, values);
+        // await modify(id, values);
+        console.log(values);
       } else {
         await create(values);
       }
