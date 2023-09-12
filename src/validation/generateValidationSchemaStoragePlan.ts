@@ -6,8 +6,8 @@ export const generateValidationSchemaStoragePlan = (intl: IntlShape) => {
       customer_order_number: Yup.string()
         .matches(/^[a-zA-Z0-9 _-]*$/, intl.formatMessage({ id: 'customer_order_number_validation' }))
         .required(intl.formatMessage({ id: 'required' })),
-      user_id: Yup.string()
-        .required(intl.formatMessage({ id: 'required' })),
+      //user_id: Yup.string()
+      //  .required(intl.formatMessage({ id: 'required' })),
       warehouse_id: Yup.string()
         .required(intl.formatMessage({ id: 'required' })),
       box_amount: Yup.number()
