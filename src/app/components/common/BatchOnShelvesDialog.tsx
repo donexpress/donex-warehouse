@@ -43,11 +43,11 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
       setPAmount(partitionAmount);
       if (partitionAmount > 0) {
         const elements: ValueSelect[] = [];
-        const count = partitionAmount.toString().length >= 2 ? partitionAmount.toString().length : 2;
+        //const count = partitionAmount.toString().length >= 2 ? partitionAmount.toString().length : 2;
         for (let index = 1; index <= partitionAmount; index++) {
           elements.push({
             value: index,
-            label: warehouse.code + String(index).padStart(count, '0')
+            label: warehouse.code + String(index).padStart(2, '0')
           });
         }
         setPartitions(elements);
@@ -108,13 +108,13 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
       if (fieldValue && fieldValue !== '') {
         const elements: Shelf[] = allShelfs.filter((sh: Shelf) => sh.partition_table === Number(fieldValue));
         elements.sort((a, b) => Number(a.id) - Number(b.id));
-        const countPA = pAmount.toString().length >= 2 ? pAmount.toString().length : 2;
-        let count = elements.length.toString().length;
-        count = count < 2 ? 2 : count;
+        //const countPA = pAmount.toString().length >= 2 ? pAmount.toString().length : 2;
+        //let count = elements.length.toString().length;
+        //count = count < 2 ? 2 : count;
         setShelfs(
           elements.map((sh: Shelf, ind: number) => ({
               value: Number(sh.id),
-              label: (warehouse as Warehouse).code + String(sh.partition_table).padStart(countPA, '0') + String(ind+1).padStart(count, '0'),
+              label: (warehouse as Warehouse).code + String(sh.partition_table).padStart(2, '0') + String(ind+1).padStart(2, '0'),
             }))
         )
       } else {
@@ -130,14 +130,14 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
           const columns = element[0].column_ammount;
           const layers = element[0].layers;
           if (columns > 0 && layers > 0) {
-            const columnsLength = columns.toString().length >= 2 ? columns.toString().length : 2;
-            const layersLength = layers.toString().length >= 2 ? layers.toString().length : 2;
+            //const columnsLength = columns.toString().length >= 2 ? columns.toString().length : 2;
+            //const layersLength = layers.toString().length >= 2 ? layers.toString().length : 2;
             let items: ValueSelect[] = [];
             for (let i = 1; i <= layers; i++) {
               for (let j = 1; j <= columns; j++) {
                 const value = i.toString() + '-' + j.toString();
-                const layerStr = String(i).padStart(layersLength, '0');
-                const columnStr = String(j).padStart(columnsLength, '0');
+                const layerStr = String(i).padStart(2, '0');
+                const columnStr = String(j).padStart(2, '0');
 
                 items.push({
                   value: value,

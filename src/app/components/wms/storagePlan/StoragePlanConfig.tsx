@@ -103,7 +103,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
         }
       }
   
-      const formatBody = (values: StoragePlan, isSplitBill=false): StoragePlan => {
+      const formatBody = (values: StoragePlan, isSplitBill=false, nextState=-1): StoragePlan => {
         return {
                 user_id: values.user_id,
                 warehouse_id: values.warehouse_id,
@@ -113,7 +113,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: values.state ? values.state : 1
+                state: (nextState !== -1 && (!values.state || (values.state && values.state <= 3))) ? nextState : (values.state ? values.state : 1)
               };
       }
 
@@ -202,8 +202,43 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
         setShowSplitBillDialog(false);
       }
 
-      const batchOnShelvesAction = (packingListItems: PackingList[]) => {
+      const batchOnShelvesAction = (packingListItems: PackingList[]) => {console.log(packingListItems)
         setShowBatchOnShelvesDialog(false);
+        const elements = changeRowsAfterBatchOnShelves(packingListItems);
+        setRows(elements);
+        setSelectedRows([]);
+
+        /* if (allHavePackageShelf(elements)) {
+          if (storagePlan && storagePlan.state && storagePlan.state !== 3) {
+            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 3));
+          }
+        } else if (atLeastOneHasPackageShelf(elements)) {
+          if (storagePlan && storagePlan.state && storagePlan.state !== 2) {
+            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 2));
+          }
+        } */
+      }
+
+      const allHavePackageShelf = (packingListItems: PackingList[]): boolean => {
+        return packingListItems.every((item) => !!item.package_shelf);
+      };
+      
+      const atLeastOneHasPackageShelf = (packingListItems: PackingList[]): boolean => {
+        return packingListItems.some((item) => !!item.package_shelf);
+      };
+
+      const changeRowsAfterBatchOnShelves = (packingListItems: PackingList[]) => {
+        const updatedRows = [...rows];
+    
+        packingListItems.forEach((item) => {
+          const index = updatedRows.findIndex((row) => row.id === item.id);
+    
+          if (index !== -1) {
+            updatedRows[index] = { ...updatedRows[index], ...item };
+          }
+        });
+    
+        return changeAllCheckedPackingList(updatedRows, false);
       }
 
       const closeBatchOnShelvesDialog = () => {

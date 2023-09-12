@@ -195,7 +195,6 @@ const CargoStationWarehouseFormBody = ({
                     })}
                     customClass="custom-input"
                     disabled={isFromDetails}
-                    required
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">

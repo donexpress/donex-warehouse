@@ -297,7 +297,6 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             options={getUsersFormatted(users)}
                             customClass="custom-input"
                             disabled={ isFromDetails }
-                            required
                           />
                         </div>
                         <div className="w-full sm:w-[49%]">

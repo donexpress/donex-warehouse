@@ -1,5 +1,6 @@
 import React from 'react';
 import '../../../../styles/wms/user.form.scss';
+import { Button } from "@nextui-org/react";
 import { showMsg, isOMS, isWMS } from '../../../../helpers';
 import { useRouter } from 'next/router'
 import { generateValidationSchemaWH } from '../../../../validation/generateValidationSchemaWH';
@@ -84,18 +85,22 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
   };
 
     return (
-        <div className='elements-start-center user-form scrollable-hidden'>
-            <div className='user-form-body'>
-                <div className='user-form-body__title black-label'><b>{id ? (isFromDetails ? intl.formatMessage({ id: 'vizualice' }) : intl.formatMessage({ id: 'modify' })) : intl.formatMessage({ id: 'insert' })} {intl.formatMessage({ id: 'warehouse' })}</b></div>
-                <div className='user-form-body__container'>
+        <div className='user-form-body shadow-small'>
+            <h1 className="text-xl font-semibold">
+              {id ? (isFromDetails ? intl.formatMessage({ id: 'vizualice' }) : intl.formatMessage({ id: 'modify' })) : intl.formatMessage({ id: 'insert' })}
+              {" "}
+              {intl.formatMessage({ id: 'warehouse' })}
+            </h1>
+            <div className='user-form-body__container'>
                 <Formik
                   initialValues={initialValues}
                   validationSchema={generateValidationSchemaWH(intl)}
                   onSubmit={handleSubmit}
                 >
                   {({ isSubmitting, isValid }) => (
-                    <Form>
-                      <div className='user-form-body__form'>
+                    <Form className='flex flex-col gap-3'>
+                      <div className='flex gap-3 flex-wrap justify-between'>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="code"
@@ -104,6 +109,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             disabled={ !!id }
                             required
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="name"
@@ -112,6 +119,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             disabled={ isFromDetails }
                             required
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="contact"
@@ -120,6 +129,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             disabled={ isFromDetails }
                             required
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="company"
@@ -127,6 +138,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="select-filter"
                             name="country"
@@ -136,6 +149,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             disabled={ !!id }
                             required
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="address_1"
@@ -144,6 +159,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             disabled={ isFromDetails }
                             required
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="address_2"
@@ -151,6 +168,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="city"
@@ -158,6 +177,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="province"
@@ -165,6 +186,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="cp"
@@ -172,6 +195,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="phone"
@@ -179,6 +204,8 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="text"
                             name="email"
@@ -186,54 +213,60 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
                             customClass="custom-input"
                             disabled={ isFromDetails }
                           />
+                        </div>
                       </div>
-                      <GenericInput
-                        type="textarea"
-                        name="observations"
-                        placeholder={intl.formatMessage({ id: 'observations' })}
-                        customClass="custom-input"
-                        disabled={ isFromDetails }
-                      />
-                      <div className='user-form-body__buttons'>
+                      <div className="flex gap-3 flex-wrap">
+                        <div className="w-full">
+                          <GenericInput
+                            type="textarea"
+                            name="observations"
+                            placeholder={intl.formatMessage({ id: 'observations' })}
+                            customClass="custom-input"
+                            disabled={ isFromDetails }
+                          />
+                        </div>
+                      </div>
+                      <div className='flex justify-end gap-3'>
                         <div>
                           {
                             !isFromDetails &&
                             (
-                              <button
+                              <Button
+                                color="primary"
                                 type="submit"
-                                className='user-form-body__accept_button'
+                                className='px-4'
                                 disabled={isSubmitting || !isValid}
                               >
                                 {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? intl.formatMessage({ id: 'modify' }) : intl.formatMessage({ id: 'add' }))}
-                              </button>
+                              </Button>
                             )
                           }
                           {
                             isFromDetails && id && (
-                              <button
+                              <Button
+                                color="primary"
                                 type="button"
-                                className='user-form-body__accept_button'
+                                className='px-4'
                                 onClick={()=>goToEdit()}
                               >
                                 {intl.formatMessage({ id: 'go_to_edit' })}
-                              </button>
+                              </Button>
                             )
                           }
                         </div>
                         <div>
-                          <button
+                          <Button
                             type="button"
-                            className='user-form-body__cancel'
+                            className='bg-secundary px-4'
                             onClick={()=>cancelSend()}
                           >
                             {intl.formatMessage({ id: 'cancel' })}
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </Form>
                   )}
                 </Formik>
-                </div>
             </div>
         </div>
     );
