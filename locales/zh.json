@@ -238,9 +238,18 @@
     "storage_height": "存放高度",
     "products_per_box": "每盒产品",
     "add_exit_plan_boxes": "将框添加到输出计划中",
-	"duplicatedMsg": "您要添加的项目已找到，请重试",
+	"duplicatedMsg": "已找到您要添加的元素。 请尝试另一款",
     "exitPlans":  "退出计划",
 	"storage_plans": "存储计划",
-    "cargo_stations": "货运站"
+    "cargo_stations": "货运站",
+	"number_of_output_boxes": "输出盒数量",
+	"already_sent": "已经发送",
+	"manual_pickup": "手动拾取",
+	"out_warehouse": "出库",
+	"upload_file": "上传文件",
+    "file_name": "文件名",
+	"owner": "所有者",
+	"function": "功能"
+
 
 }
