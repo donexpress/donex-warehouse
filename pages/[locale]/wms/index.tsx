@@ -71,9 +71,9 @@ const RootWMS = () => {
           <DashboardCard ammount={service} text={intl.formatMessage({ id: 'services' })} Icon={FaServicestack} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={suppliers} text={intl.formatMessage({ id: 'suppliers' })} Icon={FaTruckFront} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={line} text={intl.formatMessage({ id: 'lineClassification' })} Icon={FaSackXmark} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={storagePlan} text={intl.formatMessage({ id: 'storage_plans' })} Icon={FaTruckLoading} url={`/${locale}/wms/exit_plan`}/>
+          <DashboardCard ammount={storagePlan} text={intl.formatMessage({ id: 'storage_plans' })} Icon={FaTruckLoading} url={`/${locale}/wms/storage_plan`}/>
           <DashboardCard ammount={exitPLans} text={intl.formatMessage({ id: 'exitPlans' })} Icon={FaTruckMoving} url={`/${locale}/wms/exit_plan`}/>
-          <DashboardCard ammount={exitPLans} text={intl.formatMessage({ id: 'cargo_stations' })} Icon={FaTruck} url={`/${locale}/wms/exit_plan`}/>
+          <DashboardCard ammount={exitPLans} text={intl.formatMessage({ id: 'cargo_stations' })} Icon={FaTruck} url={`/${locale}/wms/warehouse_cargo_station`}/>
         </div>
       </Layout>
     </ProtectedRoute>
