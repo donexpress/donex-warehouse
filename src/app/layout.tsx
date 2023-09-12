@@ -6,7 +6,7 @@ import '../styles/common.scss';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="h-screen flex flex-row justify-start">
+    <div className="h-screen flex flex-row justify-start" style={{overflowX: 'auto'}}>
       <Sidebar />
       <div className='flex flex-col min-h-screen w-full'>
         <Header />

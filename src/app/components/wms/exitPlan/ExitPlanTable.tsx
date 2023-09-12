@@ -70,6 +70,7 @@ const ExitPlanTable = () => {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [currentStatePosition, setCurrentStatePosition] = useState<number>(1)
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
@@ -274,6 +275,7 @@ const ExitPlanTable = () => {
       await setLoadingItems(true);
       const state = exitPlanState?.states.find(el => el.position === tab)
       const storagePlanss = await getExitPlansByState(state ? state.value: 'pending');
+      setCurrentStatePosition(tab)
 
       await setLoadingItems(false);
       await setExitPlans(storagePlanss !== null ? storagePlanss : []);
@@ -366,6 +368,8 @@ const ExitPlanTable = () => {
                       onClick={() => changeTab(state.position)}
                     >
                       {state[getLanguage()]}
+                      {state.position === currentStatePosition && ` (${exitPlans.length})`}
+                      
                     </button>
                   </li>
                 ))}
@@ -385,6 +389,7 @@ const ExitPlanTable = () => {
     exitPlanState,
     statusSelected,
     intl,
+    currentStatePosition
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -434,7 +439,7 @@ const ExitPlanTable = () => {
 
   const loadExitPlans = async () => {
     setLoading(true);
-    const pms = await getExitPlans();
+    const pms = await getExitPlansByState('pending');
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
     setExitPlanState(states);

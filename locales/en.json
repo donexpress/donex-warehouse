@@ -237,5 +237,8 @@
 	"print_inventory_list": "Print inventory list",
 	"storage_height": "Storage height",
 	"products_per_box": "Products per box",
-	"add_exit_plan_boxes": "Add boxes to the output plan"
+	"add_exit_plan_boxes": "Add boxes to the output plan",
+	"duplicatedMsg": "The item you want to add is already found, please try again",
+	"exitPlans": "Exit plans"
+
 }

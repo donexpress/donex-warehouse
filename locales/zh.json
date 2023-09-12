@@ -237,5 +237,8 @@
     "print_inventory_list": "打印库存清单",
     "storage_height": "存放高度",
     "products_per_box": "每盒产品",
-    "add_exit_plan_boxes": "将框添加到输出计划中"
+    "add_exit_plan_boxes": "将框添加到输出计划中",
+	"duplicatedMsg": "您要添加的项目已找到，请重试",
+    "exitPlans":  "退出计划"
+
 }

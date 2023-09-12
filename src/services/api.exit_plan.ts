@@ -114,3 +114,8 @@ export const getExitPlansByState = async (
     return null;
   }
 };
+
+export const countExitPlans = async(): Promise<{count: number}> => {
+  const response = await axios.get(`${exitPlanPath()}/count`)
+  return response.data
+}
