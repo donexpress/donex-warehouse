@@ -239,6 +239,8 @@
 	"products_per_box": "Productos por caja",
 	"add_exit_plan_boxes": "Adicionar cajas al plan de salida",
 	"duplicatedMsg": "El elemento que desea adicionar ya se encuentra, por favor, intente de nuevo",
-	"exitPlans": "Planes de salida"
+	"exitPlans": "Planes de salida",
+	"storage_plans": "Planes de entrada",
+	"cargo_stations": "Estaciones de carga"
 
 }

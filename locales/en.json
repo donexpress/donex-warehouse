@@ -239,6 +239,8 @@
 	"products_per_box": "Products per box",
 	"add_exit_plan_boxes": "Add boxes to the output plan",
 	"duplicatedMsg": "The item you want to add is already found, please try again",
-	"exitPlans": "Exit plans"
+	"exitPlans": "Exit plans",
+	"storage_plans": "Storage plans",
+	"cargo_stations": "Cargo stations"
 
 }

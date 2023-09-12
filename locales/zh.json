@@ -239,6 +239,8 @@
     "products_per_box": "每盒产品",
     "add_exit_plan_boxes": "将框添加到输出计划中",
 	"duplicatedMsg": "您要添加的项目已找到，请重试",
-    "exitPlans":  "退出计划"
+    "exitPlans":  "退出计划",
+	"storage_plans": "存储计划",
+    "cargo_stations": "货运站"
 
 }
