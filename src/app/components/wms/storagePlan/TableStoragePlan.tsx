@@ -35,6 +35,8 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
+import ReceiptPDF from '../../common/ReceiptPDF';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -217,6 +219,13 @@ const TableStoragePlan = () => {
                   <DropdownItem className={statusSelected !== 1 ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
+                  <DropdownItem className={statusSelected !== 3 ? 'do-not-show-dropdown-item' : ''}>
+                    <PDFDownloadLink document={<ReceiptPDF storagePlan={storageP as StoragePlan} intl={intl} />} fileName="receipt_pdf.pdf">
+                      {({ blob, url, loading, error }) =>
+                        intl.formatMessage({ id: "generate_receipt" })
+                      }
+                    </PDFDownloadLink>
+                  </DropdownItem>
                   <DropdownItem onClick={() => handleDelete(storageP["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
@@ -226,6 +235,9 @@ const TableStoragePlan = () => {
           );
         case "user_id": return storageP.user ? storageP.user.username : '';
         case "warehouse_id": return storageP.warehouse ? (`${storageP.warehouse.name} (${storageP.warehouse.code})`) : '';
+        case "order_number": return (
+          <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(storageP["id"])}}>{storageP.order_number}</span>
+        );
         default:
           return cellValue;
       }

@@ -214,6 +214,12 @@
 	"item_history": "Historial del elemento",
 	"packing_list_item": "Elemento de la lista de embalaje",
 	"fast_delivery": "Entrega rápida",
+	"generate_receipt": "Generar comprobante",
+	"entry_plan_data": "Datos del plan de entrada",
+	"entry_plan_receipt": "Comprobante de plan de entrada",
+	"entry_plan_proof": "Constancia de plan de entrada",
+	"layer": "Capa",
+	"column": "Columna",
 
 	"Delete":"Eliminar",
 	"Edit":"Editar",

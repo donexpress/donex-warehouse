@@ -214,6 +214,12 @@
 	"item_history": "Item history",
 	"packing_list_item": "Packing list item",
 	"fast_delivery": "Fast delivery",
+	"generate_receipt": "Generate receipt",
+	"entry_plan_data": "Entry plan data",
+	"entry_plan_receipt": "Entry plan receipt",
+	"entry_plan_proof": "Entry plan proof",
+	"layer": "Layer",
+	"column": "Column",
 
 	"Delete":"Delete",
 	"Edit":"Edit",

@@ -79,12 +79,22 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
           package_id: Number(packingList.id)
         };
 
-        const response: Response = await createPackageShelf(bodyParams);
-        if (response.status >= 200 && response.status <= 299) {
-          c++;
-          const data: PackageShelf = response.data;
-          packingList.package_shelf = data;
-          packingListItems.push(packingList);
+        if (packingList.package_shelf && packingList.package_shelf.length > 0) {
+          const response: Response = await updatePackageShelfById(Number(packingList.package_shelf[0].id), bodyParams);
+          if (response.status >= 200 && response.status <= 299) {
+            c++;
+            const data: PackageShelf = {...packingList.package_shelf[0], ...bodyParams};
+            packingList.package_shelf = [data];
+            packingListItems.push(packingList);
+          }
+        } else {
+          const response: Response = await createPackageShelf(bodyParams);
+          if (response.status >= 200 && response.status <= 299) {
+            c++;
+            const data: PackageShelf = response.data;
+            packingList.package_shelf = [data];
+            packingListItems.push(packingList);
+          }
         }
       }
       if (c > 0) {

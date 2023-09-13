@@ -20,6 +20,8 @@ import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 import { Formik, Form } from 'formik';
 import PackingListDialog from '../../common/PackingListDialog';
 import BatchOnShelvesDialog from '../../common/BatchOnShelvesDialog';
+import ReceiptPDF from '../../common/ReceiptPDF';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 
 const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boolean = true): PackingList[] => {
   return packingLists.map((packingList: PackingList) => {
@@ -99,6 +101,9 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
           } break;
           case 7: {
             //Fast delivery
+          } break;
+          case 8: {
+            
           } break;
         }
       }
@@ -202,13 +207,13 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
         setShowSplitBillDialog(false);
       }
 
-      const batchOnShelvesAction = (packingListItems: PackingList[]) => {console.log(packingListItems)
+      const batchOnShelvesAction = (packingListItems: PackingList[]) => {
         setShowBatchOnShelvesDialog(false);
         const elements = changeRowsAfterBatchOnShelves(packingListItems);
         setRows(elements);
         setSelectedRows([]);
 
-        /* if (allHavePackageShelf(elements)) {
+        if (allHavePackageShelf(elements)) {
           if (storagePlan && storagePlan.state && storagePlan.state !== 3) {
             updateStoragePlanById(Number(id), formatBody(storagePlan, false, 3));
           }
@@ -216,15 +221,15 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
           if (storagePlan && storagePlan.state && storagePlan.state !== 2) {
             updateStoragePlanById(Number(id), formatBody(storagePlan, false, 2));
           }
-        } */
+        }
       }
 
       const allHavePackageShelf = (packingListItems: PackingList[]): boolean => {
-        return packingListItems.every((item) => !!item.package_shelf);
+        return packingListItems.every((item) => (item.package_shelf && (item.package_shelf.length > 0)));
       };
       
       const atLeastOneHasPackageShelf = (packingListItems: PackingList[]): boolean => {
-        return packingListItems.some((item) => !!item.package_shelf);
+        return packingListItems.some((item) => (item.package_shelf && (item.package_shelf.length > 0)));
       };
 
       const changeRowsAfterBatchOnShelves = (packingListItems: PackingList[]) => {
@@ -376,8 +381,15 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           <DropdownItem className={(selectedRows.length === 0 || (storagePlan && storagePlan.state !== 1)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
                             {intl.formatMessage({ id: "remove_box" })}
                           </DropdownItem>
-                          <DropdownItem className={((storagePlan && (storagePlan.state === 1 || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
+                          {/* <DropdownItem className={((storagePlan && (storagePlan.state === 1 || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
                             {intl.formatMessage({ id: "fast_delivery" })}
+                          </DropdownItem> */}
+                          <DropdownItem className={(storagePlan && (storagePlan.state !== 3)) ? 'do-not-show-dropdown-item' : ''}>
+                            <PDFDownloadLink document={<ReceiptPDF storagePlan={storagePlan as StoragePlan} intl={intl} />} fileName="receipt_pdf.pdf">
+                              {({ blob, url, loading, error }) =>
+                                intl.formatMessage({ id: "generate_receipt" })
+                              }
+                            </PDFDownloadLink>
                           </DropdownItem>
                           <DropdownItem className={(selectedRows.length === 0 || (storagePlan && (storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}

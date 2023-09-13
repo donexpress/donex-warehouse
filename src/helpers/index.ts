@@ -100,3 +100,17 @@ export const getHeaders = (context?: any, isFile = false) => {
 
   return configs;
 }
+
+export const getDateFromStr = (date: string | undefined): string => {
+  if (date !== undefined && (date.length >= 10)) {
+      return date.substring(0, 10);
+  }
+  return '';
+}
+
+export const getHourFromStr = (date: string | undefined): string => {
+  if (date !== undefined && (date.length >= 19)) {
+      return date.substring(11, 19);
+  }
+  return '';
+}

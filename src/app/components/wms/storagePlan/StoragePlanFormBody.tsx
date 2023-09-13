@@ -306,7 +306,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             selectLabel={intl.formatMessage({ id: 'select_warehouse' })}
                             options={getWarehousesFormatted(warehouses)}
                             customClass="custom-input"
-                            disabled={ isFromDetails }
+                            disabled={ isFromDetails || (!!id && storagePlan && storagePlan.state !== 1) }
                             required
                           />
                         </div>
