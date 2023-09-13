@@ -73,8 +73,8 @@ const ExitPlanTable = () => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "output_number",
-    direction: "ascending",
+    column: "id",
+    direction: "descending",
   });
 
   const [showListPakcage, setShowListPackage] = useState<boolean>(false);

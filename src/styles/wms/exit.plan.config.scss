@@ -43,6 +43,23 @@
     }
 }
 
+.infoExitPlanAppendixList {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: initial;
+    font-size: 12px;
+
+    &__table {
+        display: grid;
+        margin-right: 16px;
+        grid-template-columns: 2fr 2fr 1fr 2fr 1fr;
+        column-gap: 5px;
+    }
+}
+
 .ExitPlanAppendix {
     width: 100%;
     overflow-x: auto;
