@@ -243,5 +243,18 @@
 	"print_inventory_list": "Print inventory list",
 	"storage_height": "Storage height",
 	"products_per_box": "Products per box",
-	"add_exit_plan_boxes": "Add boxes to the output plan"
+	"add_exit_plan_boxes": "Add boxes to the output plan",
+	"duplicatedMsg": "The element you want to add is already found. Please try a different one",
+	"exitPlans": "Exit plans",
+	"storage_plans": "Storage plans",
+	"cargo_stations": "Cargo stations",
+	"number_of_output_boxes": "Number of output boxes",
+	"already_sent": "Already sent",
+	"manual_pickup": "Manual pickup",
+	"out_warehouse": "Out of the warehouse",
+	"upload_file": "Upload file",
+    "file_name": "File name",
+	"owner": "Owner",
+	"function": "Function"
+
 }

@@ -18,12 +18,7 @@ import {
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import {
-  getPaymentMethods,
-  removePaymentMethodById,
-} from "../../../../services/api.payment_method";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
-import { PaymentMethod } from "../../../../types/payment_methods";
 import { PlusIcon } from "../../common/PlusIcon";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { SearchIcon } from "../../common/SearchIcon";
@@ -31,14 +26,16 @@ import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import {
-  getExitPlans,
   getExitPlansByState,
   getExitPlansState,
   removeExitPlan,
+  updateExitPlan,
 } from "../../../../services/api.exit_plan";
 import { ExitPlan, ExitPlanState } from "../../../../types/exit_plan";
 import { capitalize } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
+import PackingListDialog from "../../common/PackingListDialog";
+import { showMsg } from "@/helperserege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -59,6 +56,7 @@ const ExitPlanTable = () => {
   const [exitPlans, setExitPlans] = useState<ExitPlan[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
+  const [cancelElement, setCancelElement] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
   const [statusSelected, setStatusSelected] = useState<number>(1);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
@@ -70,6 +68,7 @@ const ExitPlanTable = () => {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [currentStatePosition, setCurrentStatePosition] = useState<number>(1);
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
@@ -77,6 +76,13 @@ const ExitPlanTable = () => {
     column: "output_number",
     direction: "ascending",
   });
+
+  const [showListPakcage, setShowListPackage] = useState<boolean>(false);
+  const [changeExitPlanId, setChangeExitPlanId] = useState<number>(-1);
+  const [exitPlanAction, setExitPlanAction] = useState<string>("");
+  const [changeStatePackages, setChangeStatePackages] = useState<
+    { box_number: string }[]
+  >([]);
 
   const [page, setPage] = useState(1);
 
@@ -106,7 +112,7 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "number_of_boxes" }),
+        name: intl.formatMessage({ id: "number_of_output_boxes" }),
         uid: "output_boxes",
         sortable: true,
       },
@@ -230,6 +236,56 @@ const ExitPlanTable = () => {
                 <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
                 </DropdownItem>
+                <DropdownItem
+                  className={
+                    user.state.value !== "pending"
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                  onClick={() => handleAlreadySent(user)}
+                >
+                  {intl.formatMessage({ id: "already_sent" })}
+                </DropdownItem>
+                <DropdownItem
+                  className={
+                    user.state.value !== "to_be_chosen"
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                  onClick={() => handleManualPickup(user)}
+                >
+                  {intl.formatMessage({ id: "manual_pickup" })}
+                </DropdownItem>
+                <DropdownItem
+                  className={
+                    user.state.value !== "chooze"
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                  onClick={() => handleOutOfTheWarehouse(user)}
+                >
+                  {intl.formatMessage({ id: "out_warehouse" })}
+                </DropdownItem>
+                <DropdownItem
+                  className={
+                    user.state.value !== "exhausted" && user.state.value !== "to_be_chosen"
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                  onClick={() => handleReturn(user)}
+                >
+                  {intl.formatMessage({ id: "return" })}
+                </DropdownItem>
+                <DropdownItem
+                  className={
+                    user.state.value !== "pending"
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                  onClick={() => handleCancel(Number(user["id"]))}
+                >
+                  {intl.formatMessage({ id: "cancel" })}
+                </DropdownItem>
                 <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Delete" })}
                 </DropdownItem>
@@ -272,9 +328,11 @@ const ExitPlanTable = () => {
     if (tab !== statusSelected && !loadingItems) {
       await setStatusSelected(tab);
       await setLoadingItems(true);
-      const state = exitPlanState?.states.find(el => el.position === tab)
-      const storagePlanss = await getExitPlansByState(state ? state.value: 'pending');
-
+      const state = exitPlanState?.states.find((el) => el.position === tab);
+      const storagePlanss = await getExitPlansByState(
+        state ? state.value : "pending"
+      );
+      setCurrentStatePosition(tab);
       await setLoadingItems(false);
       await setExitPlans(storagePlanss !== null ? storagePlanss : []);
       // await setExitPlans([]);
@@ -283,12 +341,16 @@ const ExitPlanTable = () => {
 
   const getLanguage = () => {
     switch (intl.locale) {
-      case 'es': return "es_name"
-      case 'en': return "name"
-      case 'zh': return "zh_name"
-      default: return "name"
+      case "es":
+        return "es_name";
+      case "en":
+        return "name";
+      case "zh":
+        return "zh_name";
+      default:
+        return "name";
     }
-  }
+  };
 
   const topContent = React.useMemo(() => {
     return (
@@ -360,12 +422,20 @@ const ExitPlanTable = () => {
         <div className="bg-gray-200 pt-1">
           <div className="overflow-x-auto tab-system-table bg-content1">
             <ul className="flex space-x-4">
-              {exitPlanState && exitPlanState.states.map((state, index) => (
+              {exitPlanState &&
+                exitPlanState.states.map((state, index) => (
                   <li className="whitespace-nowrap" key={index}>
-                    <button className={statusSelected === state.position ? "px-4 py-3 tab-selected": "px-4 py-3 tab-default"}
+                    <button
+                      className={
+                        statusSelected === state.position
+                          ? "px-4 py-3 tab-selected"
+                          : "px-4 py-3 tab-default"
+                      }
                       onClick={() => changeTab(state.position)}
                     >
                       {state[getLanguage()]}
+                      {state.position === currentStatePosition &&
+                        ` (${exitPlans.length})`}
                     </button>
                   </li>
                 ))}
@@ -385,6 +455,7 @@ const ExitPlanTable = () => {
     exitPlanState,
     statusSelected,
     intl,
+    currentStatePosition,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -434,7 +505,7 @@ const ExitPlanTable = () => {
 
   const loadExitPlans = async () => {
     setLoading(true);
-    const pms = await getExitPlans();
+    const pms = await getExitPlansByState("pending");
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
     setExitPlanState(states);
@@ -444,6 +515,92 @@ const ExitPlanTable = () => {
   const handleDelete = (id: number) => {
     setShowConfirm(true);
     setDeleteElemtent(id);
+  };
+
+  const handleAlreadySent = (exitPlan: ExitPlan) => {
+    setExitPlanAction("already_sent");
+    setChangeStatePackages([
+      { box_number: exitPlan.output_number ? exitPlan.output_number : "" },
+    ]);
+    setChangeExitPlanId(exitPlan.id ? exitPlan.id : -1);
+    setShowListPackage(true);
+  };
+
+  const handleManualPickup = (exitPlan: ExitPlan) => {
+    setExitPlanAction("manual_pickup");
+    setChangeStatePackages([
+      { box_number: exitPlan.output_number ? exitPlan.output_number : "" },
+    ]);
+    setChangeExitPlanId(exitPlan.id ? exitPlan.id : -1);
+    setShowListPackage(true);
+  };
+
+  const handleOutOfTheWarehouse = (exitPlan: ExitPlan) => {
+    setExitPlanAction("out_warehouse");
+    setChangeStatePackages([
+      { box_number: exitPlan.output_number ? exitPlan.output_number : "" },
+    ]);
+    setChangeExitPlanId(exitPlan.id ? exitPlan.id : -1);
+    setShowListPackage(true);
+  };
+
+  const handleReturn = (exitPlan: ExitPlan) => {
+    setExitPlanAction("return-"+exitPlan.state?.value);
+    setChangeStatePackages([
+      { box_number: exitPlan.output_number ? exitPlan.output_number : "" },
+    ]);
+    setChangeExitPlanId(exitPlan.id ? exitPlan.id : -1);
+    setShowListPackage(true);
+  };
+
+  const closeListPackage = () => {
+    setChangeStatePackages([]);
+    setChangeExitPlanId(-1);
+    setExitPlanAction("");
+    setShowListPackage(false);
+  };
+
+  const confirmListPackage = async () => {
+    setLoading(true);
+    let state = "";
+    switch (exitPlanAction) {
+      case "already_sent":
+        state = "to_be_chosen";
+        break;
+      case "manual_pickup":
+        state = "chooze";
+        break;
+      case 'out_warehouse':
+        state = 'exhausted'
+        break;
+      case 'return-exhausted':
+        state = 'chooze'
+        break;
+      case 'return-to_be_chosen':
+        state = 'pending'
+        break;
+    }
+    const reponse = await updateExitPlan(changeExitPlanId, {
+      state,
+    });
+    showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+      type: "success",
+    });
+    closeListPackage();
+    await loadExitPlans();
+    setLoading(false);
+  };
+
+  const getListPackageTitle = (intl: any) => {
+    if(exitPlanAction.startsWith("return")) {
+      return intl.formatMessage({ id: 'return' });
+    }
+    return intl.formatMessage({ id: exitPlanAction });
+  };
+
+  const handleCancel = (id: number) => {
+    setShowConfirm(true);
+    setCancelElement(id);
   };
 
   const handleEdit = (id: number) => {
@@ -463,17 +620,24 @@ const ExitPlanTable = () => {
 
   const handleConfig = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/${id}/config`)
-  }
+    router.push(`/${locale}/wms/exit_plan/${id}/config`);
+  };
 
   const close = () => {
     setShowConfirm(false);
     setDeleteElemtent(-1);
+    setCancelElement(-1);
   };
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeExitPlan(deleteElement);
+    if (deleteElement !== -1) {
+      const reponse = await removeExitPlan(deleteElement);
+    } else if (cancelElement !== -1) {
+      const reponse = await updateExitPlan(cancelElement, {
+        state: "cancelled",
+      });
+    }
     close();
     await loadExitPlans();
     setLoading(false);
@@ -523,6 +687,15 @@ const ExitPlanTable = () => {
           </TableBody>
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+        {showListPakcage && (
+          <PackingListDialog
+            close={closeListPackage}
+            confirm={confirmListPackage}
+            title={getListPackageTitle(intl)}
+            // @ts-ignore
+            packingLists={changeStatePackages}
+          />
+        )}
       </Loading>
     </>
   );
