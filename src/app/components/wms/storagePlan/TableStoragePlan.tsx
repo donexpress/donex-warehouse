@@ -19,11 +19,12 @@ import {
 } from "@nextui-org/react";
 import { PlusIcon } from "./../../common/PlusIcon";
 import { CancelIcon } from "./../../common/CancelIcon";
+import { ExportIcon } from "./../../common/ExportIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
-import { showMsg } from "../../../../helpers";
+import { showMsg, storagePlanDataToExcel } from "../../../../helpers";
 
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
@@ -219,6 +220,9 @@ const TableStoragePlan = () => {
                   <DropdownItem className={statusSelected !== 1 ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
+                  <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl)}>
+                    {intl.formatMessage({ id: "export" })}
+                  </DropdownItem>
                   <DropdownItem className={statusSelected !== 3 ? 'do-not-show-dropdown-item' : ''}>
                     <PDFDownloadLink document={<ReceiptPDF storagePlan={storageP as StoragePlan} intl={intl} />} fileName="receipt_pdf.pdf">
                       {({ blob, url, loading, error }) =>
@@ -326,21 +330,30 @@ const TableStoragePlan = () => {
             </Button>
           </div>
         </div>
-        {
-          statusSelected === 1 && (
-            <div className="elements-row-end">
+        <div className="elements-row-end">
+            <Button
+              color="primary"
+              style={{ width: '121px' }}
+              endContent={<ExportIcon />}
+              onClick={() => handleExportStoragePlanData()}
+              isDisabled={selectedItems.length === 0}
+            >
+              {intl.formatMessage({ id: "export" })}
+            </Button>
+            {
+              statusSelected === 1 && (
                 <Button
                   color="primary"
-                  style={{ width: '121px' }}
+                  style={{ width: '121px', marginLeft: '10px' }}
                   endContent={<CancelIcon />}
                   onClick={() => openCancelAllStoragePlanDialog()}
                   isDisabled={selectedItems.length === 0}
                 >
                   {intl.formatMessage({ id: "cancel" })}
                 </Button>
-            </div>
-          )
-        }
+              )
+            }
+        </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: storagePlans.length })}
@@ -508,6 +521,16 @@ const TableStoragePlan = () => {
             return: values.return,
             state: 4,
           };
+  }
+
+  const handleExportStoragePlanData = () => {
+    let items: StoragePlan[] = [];
+    for (let i = 0; i < selectedItems.length; i++) {
+      const index = selectedItems[i];
+      const item = storagePlans.filter((sp: StoragePlan) => sp.id === index);
+      items.push(item[0]);
+    }
+    storagePlanDataToExcel(items, intl);
   }
 
   const handleCancelAll = async() => {
