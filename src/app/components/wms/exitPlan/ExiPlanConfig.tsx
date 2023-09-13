@@ -14,7 +14,6 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
   const { locale } = router.query;
   const intl = useIntl();
 
-
   const handleAction = (action: number) => {
     switch (action) {
       case 3:
@@ -97,8 +96,12 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
             </div>
           </div>
         </div>
-        {exitPlan && <ExitPlanBox exitPlan={exitPlan} />}
-        <ExitPlanAppendix />
+        {exitPlan && exitPlan.user && (
+          <>
+            <ExitPlanBox exitPlan={exitPlan} />
+            <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user}/>
+          </>
+        )}
       </div>
     </div>
   );
