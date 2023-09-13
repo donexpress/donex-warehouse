@@ -256,6 +256,7 @@
 	"upload_file": "Upload file",
     "file_name": "File name",
 	"owner": "Owner",
-	"function": "Function"
+	"function": "Function",
+	"create_appendix": "Create appendix"
 
 }

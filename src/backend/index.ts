@@ -152,3 +152,7 @@ export const filePath = () => {
 export const packageShelfPath = () => {
   return BASE_URL + "/api/v1/shelf_package";
 };
+
+export const appendixPath = () => {
+  return BASE_URL + "/api/v1/appendix";
+};

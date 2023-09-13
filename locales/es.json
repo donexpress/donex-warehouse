@@ -256,6 +256,7 @@
 	"upload_file": "Subir fichero",
     "file_name": "Nombre del archivo",
 	"owner": "Dueño",
-	"function": "Función"
+	"function": "Función",
+	"create_appendix": "Crear apéndice"
 
 }
