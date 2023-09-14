@@ -156,7 +156,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
             {getPackingListWithOperatorPicture(storagePlan.packing_list).map((pl: PackingList, index) => (
               <Image
                 key={index}
-                src={getSecureUrl(pl.operator_picture)}
+                src={getSecureUrl(pl.operator_picture ? pl.operator_picture : '')}
                 style={styles.image}
               />
             ))
