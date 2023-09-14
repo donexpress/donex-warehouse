@@ -96,6 +96,13 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
     return [];
   }
 
+  const getSecureUrl = (url: string): string => {
+    if (url.startsWith('http://')) {
+      return `https://${url.slice(7)}`;
+    }
+    return url;
+  };
+
   return (
     <Document>
         <Page size="A4" style={styles.page}>
@@ -141,20 +148,22 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
               ))
             }
           </View>
+        </Page>
 
-          {atLeastOneHasOperatorPicture(storagePlan.packing_list) &&
+        {atLeastOneHasOperatorPicture(storagePlan.packing_list) &&
+          <Page size="A4" style={styles.page}>
             <Text style={styles.subtitle}>{intl.formatMessage({ id: 'entry_plan_proof' })}</Text>
-          }
-
-          {getPackingListWithOperatorPicture(storagePlan.packing_list).map((pl: PackingList, index) => (
+            {getPackingListWithOperatorPicture(storagePlan.packing_list).map((pl: PackingList, index) => (
               <Image
                 key={index}
-                src={pl.operator_picture}
+                src={getSecureUrl(pl.operator_picture)}
                 style={styles.image}
               />
             ))
-          }
-        </Page>
+            }
+          </Page>
+        }
+        
       </Document>
   );
 };
