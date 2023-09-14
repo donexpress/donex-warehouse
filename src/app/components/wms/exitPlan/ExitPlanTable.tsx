@@ -42,10 +42,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "user",
   "warehouse",
   "box_amount",
-  "palets_amount",
-  "output_boxes",
   "amount",
-  "delivered_quantity",
   "actions",
 ];
 
