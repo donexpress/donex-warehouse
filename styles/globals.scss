@@ -560,3 +560,18 @@ button:disabled{
   opacity: 0.3;
   cursor: not-allowed;
 }
+
+.copy-container {
+  width: 100px;
+  max-width: 100px;
+  display: flex;
+  button {
+    margin-left: 5px;
+    display: none;
+  }
+  &:hover {
+    button {
+      display: block;
+    }
+  }
+}
