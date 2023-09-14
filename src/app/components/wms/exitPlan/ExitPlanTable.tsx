@@ -36,16 +36,14 @@ import { capitalize } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
 import { showMsg } from "@/helperserege1992";
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
   "user",
   "warehouse",
   "box_amount",
-  "palets_amount",
-  "output_boxes",
   "amount",
-  "delivered_quantity",
   "actions",
 ];
 
@@ -297,6 +295,8 @@ const ExitPlanTable = () => {
         return <span>{user["user"]["username"]}</span>;
       case "warehouse":
         return <span>{user["warehouse"]["name"]}</span>;
+      case "output_number":
+        return <CopyColumnToClipboard value={<a href={`/${locale}/wms/exit_plan/${user['id']}/config`}>{cellValue}</a>}/>
       default:
         return cellValue;
     }
