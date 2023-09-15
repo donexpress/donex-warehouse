@@ -258,6 +258,7 @@
 	"owner": "Dueño",
 	"function": "Función",
 	"create_appendix": "Crear apéndice",
-	"destination": "Destino"
+	"destination": "Destino",
+	"delivery": "Entrega"
 
 }

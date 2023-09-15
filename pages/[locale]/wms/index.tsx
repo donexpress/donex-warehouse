@@ -68,7 +68,7 @@ const RootWMS = () => {
           <DashboardCard ammount={paymentMethod} text={intl.formatMessage({ id: 'payment_methods' })} Icon={FaCreditCard} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={role} text={intl.formatMessage({ id: 'roles' })} Icon={FaUserTie} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={organization} text={intl.formatMessage({ id: 'departments' })} Icon={FaLandmark} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={warehouse} text={intl.formatMessage({ id: 'warehouses' })} Icon={FaWarehouse} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={warehouse} text={intl.formatMessage({ id: 'warehouses' })} Icon={FaWarehouse} url={`/${locale}/wms/warehouses`}/>
           <DashboardCard ammount={service} text={intl.formatMessage({ id: 'services' })} Icon={FaServicestack} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={suppliers} text={intl.formatMessage({ id: 'suppliers' })} Icon={FaTruckFront} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={line} text={intl.formatMessage({ id: 'lineClassification' })} Icon={FaSackXmark} url={`/${locale}/wms/users`}/>

@@ -37,18 +37,19 @@ import {
   ExitPlanState,
   StateCount,
 } from "../../../../types/exit_plan";
-import { capitalize, getLanguage } from "../../../../helpers/utils";
+import { capitalize, getDateFormat, getHourFormat, getLanguage } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
 import { showMsg } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
+import FilterExitPlan from "./FilterExitPlan";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
   "user",
   "warehouse",
   "box_amount",
-  "amount",
+  "destination",
   "actions",
 ];
 
@@ -163,6 +164,16 @@ const ExitPlanTable = () => {
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "destination" }),
+        uid: "destination",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "delivery_time" }),
+        uid: "delivered_time",
         sortable: true,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -294,6 +305,14 @@ const ExitPlanTable = () => {
         return <span>{user["user"]["username"]}</span>;
       case "warehouse":
         return <span>{user["warehouse"]["name"]}</span>;
+      case "destination":
+        if(user["destination_ref"]) {
+          return <span>{user['destination_ref'][getLanguage(intl)]}</span>
+        } else {
+          return <span>-</span>
+        }
+      case "delivered_time":
+        return <span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>
       case "output_number":
         return (
           <CopyColumnToClipboard
@@ -357,6 +376,10 @@ const ExitPlanTable = () => {
     return count[value];
   };
 
+  const onFinishFilter = (data: ExitPlan[]) => {
+    setExitPlans(data)
+  }
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
@@ -405,6 +428,7 @@ const ExitPlanTable = () => {
             </Button>
           </div>
         </div>
+        <FilterExitPlan onFinish={onFinishFilter}/>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: count?.total })}

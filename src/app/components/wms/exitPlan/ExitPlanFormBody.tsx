@@ -15,7 +15,7 @@ import { Button } from "@nextui-org/react";
 import { ExitPlan, ExitPlanProps, State } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
 import { Warehouse } from "../../../../types/warehouse";
-import { getLanguage } from "@/helpers/utilserege1992";
+import { getHourFormat, getLanguage } from "@/helpers/utilserege1992";
 
 const ExitPlanFormBody = ({
   id,
@@ -34,6 +34,7 @@ const ExitPlanFormBody = ({
   const date = new Date(
     exitPlan ? (exitPlan.delivered_time ? exitPlan.delivered_time : "") : ""
   );
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
   const [destinationSelected, setDestinationSelected] = useState<string>("");
   const initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
@@ -45,16 +46,14 @@ const ExitPlanFormBody = ({
     country: id && exitPlan ? exitPlan.country : "",
     delivered_time:
       id && exitPlan
-        ? `${date.getFullYear()}-${
-            date.getMonth() > 9 ? date.getMonth() : "0" + date.getMonth()
-          }-${date.getDate() > 9 ? date.getDate() : "0" + date.getDate()}`
-        : "",
+        ? date.toISOString().slice(0,16) : "",
     observations: id && exitPlan ? exitPlan.observations : "",
     type: id && exitPlan ? exitPlan.type : -1,
     user_id:
       id && exitPlan && exitPlan.user && exitPlan.user.id
         ? exitPlan.user.id
         : undefined,
+    destination: id && exitPlan ? exitPlan.destination: ''
   };
 
   console.log(initialValues, exitPlan?.warehouse_id);
@@ -79,6 +78,8 @@ const ExitPlanFormBody = ({
   };
 
   const create = async (values: ExitPlan) => {
+    const d = destinations?.destinations.find(el => el.value === destinationSelected)
+    values.destination = d?.value
     const response: Response = await createExitPlan(values);
     treatmentToResponse(response);
   };

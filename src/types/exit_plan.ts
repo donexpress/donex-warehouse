@@ -26,7 +26,15 @@ export type ExitPlan = {
   user_id?: number;
   warehouse_id?: number;
   state?: State
-  packing_lists?: PackingList[]
+  packing_lists?: PackingList[];
+  destination?: string;
+  destination_ref?: {
+    name: string;
+    es_name: string;
+    zh_name: string;
+    value: string;
+    position: number;
+  }
 };
 
 export type ExitPlanProps = {
