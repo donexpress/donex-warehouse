@@ -258,6 +258,7 @@
 	"owner": "Owner",
 	"function": "Function",
 	"create_appendix": "Create appendix",
-	"destination": "Destination"
+	"destination": "Destination",
+	"delivery": "Delivery"
 
 }
