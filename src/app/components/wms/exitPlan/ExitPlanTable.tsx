@@ -26,16 +26,17 @@ import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import {
+  countExitPlans,
   getExitPlansByState,
   getExitPlansState,
   removeExitPlan,
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
-import { ExitPlan, ExitPlanState } from "../../../../types/exit_plan";
-import { capitalize } from "../../../../helpers/utils";
+import { ExitPlan, ExitPlanCount, ExitPlanState } from "../../../../types/exit_plan";
+import { capitalize, getLanguage } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
-import { showMsg } from "@/helperserege1992";
+import { showMsg } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -83,6 +84,7 @@ const ExitPlanTable = () => {
   >([]);
 
   const [page, setPage] = useState(1);
+  const [count, setCount] = useState<ExitPlanCount | null>(null)
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -246,7 +248,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "to_be_chosen"
+                    user.state.value !== "to_be_processed"
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -256,7 +258,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "chooze"
+                    user.state.value !== "processing"
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -266,7 +268,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "exhausted" && user.state.value !== "to_be_chosen"
+                    user.state.value !== "dispatched" && user.state.value !== "to_be_processed"
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -336,19 +338,6 @@ const ExitPlanTable = () => {
       await setLoadingItems(false);
       await setExitPlans(storagePlanss !== null ? storagePlanss : []);
       // await setExitPlans([]);
-    }
-  };
-
-  const getLanguage = () => {
-    switch (intl.locale) {
-      case "es":
-        return "es_name";
-      case "en":
-        return "name";
-      case "zh":
-        return "zh_name";
-      default:
-        return "name";
     }
   };
 
@@ -433,9 +422,11 @@ const ExitPlanTable = () => {
                       }
                       onClick={() => changeTab(state.position)}
                     >
-                      {state[getLanguage()]}
-                      {state.position === currentStatePosition &&
-                        ` (${exitPlans.length})`}
+                      {state[getLanguage(intl)]}
+                      {count && (
+                        // @ts-ignore
+                        <span> ({count[state.value]})</span>)
+                      }
                     </button>
                   </li>
                 ))}
@@ -508,6 +499,8 @@ const ExitPlanTable = () => {
     const pms = await getExitPlansByState("pending");
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
+    const count = await countExitPlans() 
+    setCount(count)
     setExitPlanState(states);
     setLoading(false);
   };
@@ -565,16 +558,16 @@ const ExitPlanTable = () => {
     let state = "";
     switch (exitPlanAction) {
       case "already_sent":
-        state = "to_be_chosen";
+        state = "to_be_processed";
         break;
       case "manual_pickup":
-        state = "chooze";
+        state = "processing";
         break;
       case 'out_warehouse':
-        state = 'exhausted'
+        state = 'dispatched'
         break;
       case 'return-exhausted':
-        state = 'chooze'
+        state = 'processing'
         break;
       case 'return-to_be_chosen':
         state = 'pending'

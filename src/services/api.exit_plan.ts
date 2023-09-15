@@ -2,7 +2,7 @@ import axios from "axios";
 import { exitPlanPath } from "../backend";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
-import { ExitPlan } from "../types/exit_plan";
+import { ExitPlan, ExitPlanCount, State } from "../types/exit_plan";
 import { Response } from "../types/index";
 
 export const getExitPlans = async (
@@ -115,7 +115,17 @@ export const getExitPlansByState = async (
   }
 };
 
-export const countExitPlans = async(): Promise<{count: number}> => {
-  const response = await axios.get(`${exitPlanPath()}/count`)
-  return response.data
-}
+export const countExitPlans = async (): Promise<ExitPlanCount> => {
+  const response = await axios.get(`${exitPlanPath()}/count`);
+  return response.data;
+};
+
+export const getExitPlanDestinations = async (
+  context?: GetServerSidePropsContext
+): Promise<{ destinations: State[] }> => {
+  const response = await axios.get(
+    `${exitPlanPath()}/destinations`,
+    getHeaders(context)
+  );
+  return response.data;
+};

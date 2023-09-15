@@ -6,8 +6,14 @@ import { indexCountries } from "../../../../src/services/api.countries";
 import { getUsers } from "../../../../src/services/api.users";
 import { getWhs } from "../../../../src/services/api.wh";
 import { ExitPlanProps } from "../../../../src/types/exit_plan";
+import { getExitPlanDestinations } from "@/services/api.exit_planerege1992";
 
-const InsertExitPlan = ({ countries, users, warehouses }: ExitPlanProps) => {
+const InsertExitPlan = ({
+  countries,
+  users,
+  warehouses,
+  destinations,
+}: ExitPlanProps) => {
   return (
     <Layout>
       <Head>
@@ -15,24 +21,31 @@ const InsertExitPlan = ({ countries, users, warehouses }: ExitPlanProps) => {
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
-        <ExitPlanFormBody countries={countries} users={users} warehouses={warehouses}/>
+        <ExitPlanFormBody
+          countries={countries}
+          users={users}
+          warehouses={warehouses}
+          destinations={destinations}
+        />
       </ProtectedRoute>
     </Layout>
   );
 };
 
 export async function getServerSideProps(context: any) {
-    const { id } = context.params;
-    const users = await getUsers(context);
-    const countries = await indexCountries(context);
-    const warehouses = await getWhs(context);
-    return {
-      props: {
-        users,
-        countries,
-        warehouses,
-      },
-    };
-  }
+  const { id } = context.params;
+  const users = await getUsers(context);
+  const countries = await indexCountries(context);
+  const warehouses = await getWhs(context);
+  const destinations = await getExitPlanDestinations(context);
+  return {
+    props: {
+      users,
+      countries,
+      warehouses,
+      destinations,
+    },
+  };
+}
 
 export default InsertExitPlan;

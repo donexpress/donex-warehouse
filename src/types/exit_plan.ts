@@ -36,6 +36,7 @@ export type ExitPlanProps = {
   users: User[];
   countries: Country[];
   warehouses: Warehouse[];
+  destinations?: {destinations: State[]}
 };
 
 export type ExitPlanState = {
@@ -49,3 +50,13 @@ export type State = {
   value: string;
   position: number;
 };
+
+export type ExitPlanCount = {
+  all: number;
+  pending: number;
+  to_be_processed: number;
+  processing: number;
+  dispatched: number;
+  cancelled: number;
+  collecting: number;
+}
