@@ -6,12 +6,12 @@ export type Shelf = {
     layers: number;
     warehouse_id: number;
     partition_table: number;
-    designated_user?: number;
+    number_of_shelves: number;
     high_inventory?: number;
     location_length?: number;
-    location_type_id?: number;
     location_width?: number;
-    number_of_shelves: number;
+    designated_user?: number;
+    location_type_id?: number;
     packages?: PackingList[];
     shelves_type_id?: number;
     billing_mode_id?: number;

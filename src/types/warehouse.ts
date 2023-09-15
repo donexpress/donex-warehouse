@@ -18,6 +18,7 @@ export type Warehouse = {
     shelfs?: Shelf[];
     patition_amount?: number; 
     observations: string;
+    created_at?: string;
 }
 
 export type WarehouseProps = {
@@ -25,6 +26,11 @@ export type WarehouseProps = {
   warehouse?: Warehouse;
   isFromDetails?: boolean;
   countries: Country[];
+};
+
+export type WarehouseConfigProps = {
+  id: number;
+  warehouse: Warehouse;
 };
 
 export type WHListProps = {
