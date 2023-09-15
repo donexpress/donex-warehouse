@@ -18,4 +18,5 @@ export type Shelf = {
     created_at?: string;
     updated_at?: string;
     meta?: any;
+    checked?: boolean;
 }

@@ -240,6 +240,7 @@
 	"height": "Altura",
 	"location_size": "Tamaño de ubicación",
 	"number_of_locations": "Número de ubicaciones",
+	"are_no_partitions": "No existen particiones a mostrar en este almacén",
 
 	"Delete":"Eliminar",
 	"Edit":"Editar",

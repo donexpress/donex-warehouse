@@ -240,6 +240,7 @@
 	"height": "高度",
 	"location_size": "库位尺寸",
 	"number_of_locations": "库位数",
+	"are_no_partitions": "該商店沒有可顯示的分區",
 
     "Delete":"刪除",
 	"Edit":"編輯",

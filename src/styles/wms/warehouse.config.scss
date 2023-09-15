@@ -27,7 +27,7 @@
 
     &__header-pl {
         display: grid;
-        grid-template-columns: 1fr 90px;
+        grid-template-columns: 1fr 320px;
         column-gap: 5px;
     }
 }
@@ -45,10 +45,14 @@
     flex-wrap: initial;
     font-size: 12px;
 
+    &__sub-container {
+        min-width: 100%;
+    }
+
     &__table {
         display: grid;
         margin-right: 16px;
-        grid-template-columns: 30px 180px 180px 140px 140px 140px 140px 140px 140px 140px 140px;
+        grid-template-columns: 30px 1fr 1fr 1fr 1fr 1fr;
         column-gap: 5px;
     }
 }
@@ -70,6 +74,35 @@
     cursor: pointer;
 }
 
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    &__tag {
+        background-color: #37446b;
+        color: #aeb9e1;
+        padding: 4px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    &__tag-selected {
+        background-color: #080f25;
+        color: #aeb9e1;
+        padding: 4px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        user-select: none;
+    }
+}
+
 @media only screen and (max-width: 1250px) {
     .warehouse-data {
         width: calc(100vw - 64px);
@@ -78,9 +111,23 @@
             grid-template-columns: 840px 280px;
         }
     }
+
+    .info-shelf__table {
+        grid-template-columns: 30px 200px 200px 200px 200px 200px;
+    }
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 990px) {
+    .info-shelf {
+        width: calc(100vw - 65px);
+        
+        &__sub-container {
+            min-width: auto;
+        }
+    }
+}
+
+@media only screen and (max-width: 550px) {
     .warehouse-data__header-pl {
         grid-template-columns: 1fr;
     }
@@ -89,7 +136,7 @@
     }
 }
 
-@media only screen and (min-width: 501px) {
+@media only screen and (min-width: 551px) {
     .show-sp-mobile {
         display: none;
     }
