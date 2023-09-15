@@ -15,6 +15,7 @@ import { Button } from "@nextui-org/react";
 import { ExitPlan, ExitPlanProps, State } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
 import { Warehouse } from "../../../../types/warehouse";
+import { getLanguage } from "@/helpers/utilserege1992";
 
 const ExitPlanFormBody = ({
   id,
@@ -136,12 +137,6 @@ const ExitPlanFormBody = ({
     setDestinationSelected(value);
   };
 
-  const getValueChangeWarehouse = (value: any) => {
-    if (value !== filter_warehouse) {
-      set_filter_warehouse(value);
-    }
-  };
-
   const getStatesFormattedCountries = (
     countriesAll: Country[]
   ): ValueSelect[] => {
@@ -162,7 +157,7 @@ const ExitPlanFormBody = ({
     if (destination) {
       destination.destinations.forEach((dest) => {
         response.push({
-          label: dest.name,
+          label: dest[getLanguage(intl)],
           value: dest.value,
         });
       });
@@ -273,7 +268,7 @@ const ExitPlanFormBody = ({
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
-                    type="date"
+                    type="datetime-local"
                     name="delivered_time"
                     placeholder={intl.formatMessage({
                       id: "delivery_time",

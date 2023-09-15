@@ -32,7 +32,11 @@ import {
   removeExitPlan,
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
-import { ExitPlan, ExitPlanCount, ExitPlanState } from "../../../../types/exit_plan";
+import {
+  ExitPlan,
+  ExitPlanState,
+  StateCount,
+} from "../../../../types/exit_plan";
 import { capitalize, getLanguage } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
@@ -65,7 +69,6 @@ const ExitPlanTable = () => {
 
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
-  const [statusFilter, setStatusFilter] = useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentStatePosition, setCurrentStatePosition] = useState<number>(1);
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
@@ -84,7 +87,7 @@ const ExitPlanTable = () => {
   >([]);
 
   const [page, setPage] = useState(1);
-  const [count, setCount] = useState<ExitPlanCount | null>(null)
+  const [count, setCount] = useState<StateCount | null>(null);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -180,22 +183,15 @@ const ExitPlanTable = () => {
 
   const filteredItems = useMemo(() => {
     let filteredUsers = [...exitPlans];
-
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.output_number
-          ? user.output_number
-          : "".toLowerCase().includes(filterValue.toLowerCase()) ||
-            user.case_numbers
-              ?.toString()
-              ?.toLowerCase()
-              ?.includes(filterValue.toLowerCase())
-      );
+      filteredUsers = filteredUsers.filter((user) => {
+        return user.output_number
+          ?.toLowerCase()
+          .includes(filterValue.toLowerCase());
+      });
     }
     return filteredUsers;
-  }, [exitPlans, filterValue, statusFilter]);
-
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+  }, [exitPlans, filterValue]);
 
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -268,7 +264,8 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "dispatched" && user.state.value !== "to_be_processed"
+                    user.state.value !== "dispatched" &&
+                    user.state.value !== "to_be_processed"
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -298,7 +295,15 @@ const ExitPlanTable = () => {
       case "warehouse":
         return <span>{user["warehouse"]["name"]}</span>;
       case "output_number":
-        return <CopyColumnToClipboard value={<a href={`/${locale}/wms/exit_plan/${user['id']}/config`}>{cellValue}</a>}/>
+        return (
+          <CopyColumnToClipboard
+            value={
+              <a href={`/${locale}/wms/exit_plan/${user["id"]}/config`}>
+                {cellValue}
+              </a>
+            }
+          />
+        );
       default:
         return cellValue;
     }
@@ -339,6 +344,17 @@ const ExitPlanTable = () => {
       await setExitPlans(storagePlanss !== null ? storagePlanss : []);
       // await setExitPlans([]);
     }
+  };
+
+  const getCountByPosition = () => {
+    const value = exitPlanState?.states.find(
+      (el) => el.position === currentStatePosition
+    )?.value;
+    if (!value || !count) {
+      return 0;
+    }
+    // @ts-ignore
+    return count[value];
   };
 
   const topContent = React.useMemo(() => {
@@ -391,10 +407,7 @@ const ExitPlanTable = () => {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {intl.formatMessage(
-              { id: "total_results" },
-              { in: exitPlans.length }
-            )}
+            {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
           </span>
           <label className="flex items-center text-default-400 text-small">
             {intl.formatMessage({ id: "rows_page" })}
@@ -424,9 +437,14 @@ const ExitPlanTable = () => {
                     >
                       {state[getLanguage(intl)]}
                       {count && (
-                        // @ts-ignore
-                        <span> ({count[state.value]})</span>)
-                      }
+                        <>
+                          {state.value === "all" && <span> ({count.total})</span>}
+                          {state.value !== "all" && (
+                            // @ts-ignore
+                            <span> ({count[state.value]})</span>
+                          )}
+                        </>
+                      )}
                     </button>
                   </li>
                 ))}
@@ -437,7 +455,6 @@ const ExitPlanTable = () => {
     );
   }, [
     filterValue,
-    statusFilter,
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
@@ -461,7 +478,7 @@ const ExitPlanTable = () => {
               )}`}
         </span>
         <PaginationTable
-          totalRecords={filteredItems.slice(0, exitPlans.length).length}
+          totalRecords={getCountByPosition()}
           pageLimit={rowsPerPage}
           pageNeighbours={1}
           page={page}
@@ -499,8 +516,8 @@ const ExitPlanTable = () => {
     const pms = await getExitPlansByState("pending");
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
-    const count = await countExitPlans() 
-    setCount(count)
+    const count = await countExitPlans();
+    setCount(count);
     setExitPlanState(states);
     setLoading(false);
   };
@@ -538,7 +555,7 @@ const ExitPlanTable = () => {
   };
 
   const handleReturn = (exitPlan: ExitPlan) => {
-    setExitPlanAction("return-"+exitPlan.state?.value);
+    setExitPlanAction("return-" + exitPlan.state?.value);
     setChangeStatePackages([
       { box_number: exitPlan.output_number ? exitPlan.output_number : "" },
     ]);
@@ -563,14 +580,14 @@ const ExitPlanTable = () => {
       case "manual_pickup":
         state = "processing";
         break;
-      case 'out_warehouse':
-        state = 'dispatched'
+      case "out_warehouse":
+        state = "dispatched";
         break;
-      case 'return-exhausted':
-        state = 'processing'
+      case "return-exhausted":
+        state = "processing";
         break;
-      case 'return-to_be_chosen':
-        state = 'pending'
+      case "return-to_be_chosen":
+        state = "pending";
         break;
     }
     const reponse = await updateExitPlan(changeExitPlanId, {
@@ -585,8 +602,8 @@ const ExitPlanTable = () => {
   };
 
   const getListPackageTitle = (intl: any) => {
-    if(exitPlanAction.startsWith("return")) {
-      return intl.formatMessage({ id: 'return' });
+    if (exitPlanAction.startsWith("return")) {
+      return intl.formatMessage({ id: "return" });
     }
     return intl.formatMessage({ id: exitPlanAction });
   };
