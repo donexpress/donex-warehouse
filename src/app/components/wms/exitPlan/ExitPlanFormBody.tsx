@@ -12,12 +12,9 @@ import {
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
 import { Button } from "@nextui-org/react";
-import { ExitPlan, ExitPlanProps } from "../../../../types/exit_plan";
+import { ExitPlan, ExitPlanProps, State } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
-import { getUsers } from "../../../../services/api.users";
 import { Warehouse } from "../../../../types/warehouse";
-import { getWhs } from "../../../../services/api.wh";
-import { indexCountries } from "../../../../services/api.countries";
 
 const ExitPlanFormBody = ({
   id,
@@ -26,6 +23,7 @@ const ExitPlanFormBody = ({
   countries,
   users,
   warehouses,
+  destinations,
 }: ExitPlanProps) => {
   const router = useRouter();
   const { locale } = router.query;
@@ -35,6 +33,7 @@ const ExitPlanFormBody = ({
   const date = new Date(
     exitPlan ? (exitPlan.delivered_time ? exitPlan.delivered_time : "") : ""
   );
+  const [destinationSelected, setDestinationSelected] = useState<string>("");
   const initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
     warehouse_id:
@@ -71,8 +70,7 @@ const ExitPlanFormBody = ({
     }
     if (isWMS()) {
       if (id) {
-        // await modify(id, values);
-        console.log(values);
+        await modify(id, values);
       } else {
         await create(values);
       }
@@ -134,6 +132,10 @@ const ExitPlanFormBody = ({
     }
   };
 
+  const changeDestination = (value: any) => {
+    setDestinationSelected(value);
+  };
+
   const getValueChangeWarehouse = (value: any) => {
     if (value !== filter_warehouse) {
       set_filter_warehouse(value);
@@ -150,6 +152,21 @@ const ExitPlanFormBody = ({
         label: country.emoji + " " + country.name,
       });
     });
+    return response;
+  };
+
+  const getDestinationFormatted = (
+    destination: { destinations: State[] } | undefined
+  ): ValueSelect[] => {
+    let response: ValueSelect[] = [];
+    if (destination) {
+      destination.destinations.forEach((dest) => {
+        response.push({
+          label: dest.name,
+          value: dest.value,
+        });
+      });
+    }
     return response;
   };
 
@@ -221,13 +238,26 @@ const ExitPlanFormBody = ({
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
+                    type="select-filter"
+                    name="destination"
+                    placeholder={intl.formatMessage({
+                      id: "destination",
+                    })}
+                    getValueChangeFn={changeDestination}
+                    options={getDestinationFormatted(destinations)}
+                    customClass="select-filter"
+                    disabled={isFromDetails}
+                  />
+                </div>
+                <div className="w-full sm:w-[49%]">
+                  <GenericInput
                     type="text"
                     name="address"
                     placeholder={intl.formatMessage({
                       id: "address",
                     })}
                     customClass="custom-input"
-                    disabled={isFromDetails}
+                    disabled={isFromDetails || destinationSelected !== 'private_address'}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">

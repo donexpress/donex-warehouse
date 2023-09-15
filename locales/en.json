@@ -257,6 +257,7 @@
     "file_name": "File name",
 	"owner": "Owner",
 	"function": "Function",
-	"create_appendix": "Create appendix"
+	"create_appendix": "Create appendix",
+	"destination": "Destination"
 
 }
