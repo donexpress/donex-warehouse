@@ -49,8 +49,8 @@ const RootWMS = () => {
     countOrganization().then(organization => setOrganization(organization.count))
     countWhs().then(warehouse => setWarehouse(warehouse.count))
     countService().then(service => setService(service.count))
-    countStoragePlan().then(storagePlan => setStoragePlan(storagePlan.count))
-    countExitPlans().then(exitPLan => setExitPlans(exitPLan.all))
+    countStoragePlan().then(storagePlan => setStoragePlan(storagePlan.total))
+    countExitPlans().then(exitPLan => setExitPlans(exitPLan.total))
     countWarehouse().then(warehouse => setCargoStations(warehouse.count))
   }
 

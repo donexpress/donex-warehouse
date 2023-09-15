@@ -4,8 +4,9 @@ import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
 import { Response } from '../types/index';
 import { StoragePlan } from '../types/storage_plan';
+import { StateCount } from '@/types/exit_planerege1992';
 
-export const countStoragePlan = async ():Promise<{count: number}> => {
+export const countStoragePlan = async ():Promise<StateCount> => {
     const response = await axios.get(countStoragePlanPath())
     return response.data
 }

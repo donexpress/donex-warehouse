@@ -51,8 +51,8 @@ export type State = {
   position: number;
 };
 
-export type ExitPlanCount = {
-  all: number;
+export type StateCount = {
+  total: number;
   pending: number;
   to_be_processed: number;
   processing: number;
