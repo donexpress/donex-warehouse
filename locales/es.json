@@ -277,6 +277,8 @@
     "file_name": "Nombre del archivo",
 	"owner": "Dueño",
 	"function": "Función",
-	"create_appendix": "Crear apéndice"
+	"create_appendix": "Crear apéndice",
+	"destination": "Destino",
+	"delivery": "Entrega"
 
 }

@@ -5,7 +5,11 @@ interface Props {
 }
 const CopyColumnToClipboard = ({ value }: Props) => {
     const handleCopy = () => {
-        navigator.clipboard.writeText(value)
+        if(typeof value === "string"){
+            navigator.clipboard.writeText(value.toString())            
+        } else {
+            navigator.clipboard.writeText(value.props.children)
+        }
     }
     return (
         <div className="copy-container">

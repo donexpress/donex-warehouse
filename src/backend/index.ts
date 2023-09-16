@@ -164,3 +164,7 @@ export const appendixPath = () => {
 export const shelfPath = () => {
   return BASE_URL + "/api/v1/shelf";
 }
+
+export const operationInstructionPath = () => {
+  return BASE_URL +  '/api/v1/operation_instruction'
+}

@@ -152,6 +152,8 @@ const GenericInput: React.FC<GenericInputProps> = ({
 
           if (filter.length > 0) {
             setSelectedOption(filter[0]);
+            if(getValueChangeFn)
+            getValueChangeFn(value);
           }
         } else {
           setSelectedOption(null);

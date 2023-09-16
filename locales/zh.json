@@ -277,6 +277,8 @@
     "file_name": "文件名",
 	"owner": "所有者",
 	"function": "功能",
-	"create_appendix": "创建附录"
+	"create_appendix": "创建附录",
+    "destination": "目的地",
+	"delivery": "送货"
 
 }

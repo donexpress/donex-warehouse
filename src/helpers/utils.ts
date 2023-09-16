@@ -1,4 +1,5 @@
 import React from "react";
+import { IntlShape } from "react-intl";
 export function capitalize(str: any) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -57,4 +58,17 @@ export const getHourFormat = (date: string): string => {
     }
   }
   return "";
+};
+
+export const getLanguage = (intl: IntlShape) => {
+  switch (intl.locale) {
+    case "es":
+      return "es_name";
+    case "en":
+      return "name";
+    case "zh":
+      return "zh_name";
+    default:
+      return "name";
+  }
 };
