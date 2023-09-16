@@ -108,7 +108,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
         }
       }
   
-      const formatBody = (values: StoragePlan, isSplitBill=false, nextState=-1): StoragePlan => {
+      const formatBody = (values: StoragePlan, isSplitBill=false, nextState: string = ''): StoragePlan => {
         return {
                 user_id: values.user_id,
                 warehouse_id: values.warehouse_id,
@@ -118,7 +118,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: (nextState !== -1 && (!values.state || (values.state && values.state <= 3))) ? nextState : (values.state ? values.state : 1)
+                state: (nextState !== '' && (!values.state || (values.state && (values.state === 'to be storage' || values.state === 'into warehouse' || values.state === 'stocked')))) ? nextState : (values.state ? values.state : 'to be storage')
               };
       }
 
@@ -214,12 +214,12 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
         setSelectedRows([]);
 
         if (allHavePackageShelf(elements)) {
-          if (storagePlan && storagePlan.state && storagePlan.state !== 3) {
-            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 3));
+          if (storagePlan && storagePlan.state && storagePlan.state !== 'stocked') {
+            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'stocked'));
           }
         } else if (atLeastOneHasPackageShelf(elements)) {
-          if (storagePlan && storagePlan.state && storagePlan.state !== 2) {
-            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 2));
+          if (storagePlan && storagePlan.state && storagePlan.state !== 'into warehouse') {
+            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'into warehouse'));
           }
         }
       }
@@ -375,26 +375,26 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu>
-                          <DropdownItem className={(storagePlan && storagePlan.state !== 1) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(1)}>
+                          <DropdownItem className={(storagePlan && storagePlan.state !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(1)}>
                             {intl.formatMessage({ id: "add_box" })}
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && storagePlan.state !== 1)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && storagePlan.state !== 'to be storage')) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
                             {intl.formatMessage({ id: "remove_box" })}
                           </DropdownItem>
-                          {/* <DropdownItem className={((storagePlan && (storagePlan.state === 1 || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
+                          {/* <DropdownItem className={((storagePlan && (storagePlan.state === 'to be storage' || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
                             {intl.formatMessage({ id: "fast_delivery" })}
                           </DropdownItem> */}
-                          <DropdownItem className={(storagePlan && (storagePlan.state !== 3)) ? 'do-not-show-dropdown-item' : ''}>
+                          <DropdownItem className={(storagePlan && (storagePlan.state !== 'stocked')) ? 'do-not-show-dropdown-item' : ''}>
                             <PDFDownloadLink document={<ReceiptPDF storagePlan={storagePlan as StoragePlan} intl={intl} />} fileName="receipt_pdf.pdf">
                               {({ blob, url, loading, error }) =>
                                 intl.formatMessage({ id: "generate_receipt" })
                               }
                             </PDFDownloadLink>
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && (storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && (storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (storagePlan.state === 3 || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (storagePlan.state === 'stocked' || storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
                             {intl.formatMessage({ id: "split_bill" })}
                           </DropdownItem>
                           <DropdownItem onClick={() => handleAction(6)}>
@@ -457,8 +457,8 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                         </div>
                         {rows.map((row, index) => (
                           <div key={index} className='info-packing-list__table storage-plan-header' style={{ padding: '8px 0px 8px 5px'}}>
-                            <div className='elements-center'>
-                              <input type="checkbox" name={`packing-list-${index}`} checked={row.checked} onChange={(event) => handleCheckboxChange(event, index)} />
+                            <div className='elements-start-center'>
+                              <input type="checkbox" style={{ marginTop: '3px' }} name={`packing-list-${index}`} checked={row.checked} onChange={(event) => handleCheckboxChange(event, index)} />
                             </div>
                             <div>{row.box_number}</div>
                             <div>{row.case_number}</div>
@@ -467,7 +467,10 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                             <div>{'--'}</div>
                             <div>{'--'}</div>
                             <div>{'--'}</div>
-                            <div>{'--'}</div>
+                            <div>{(row.package_shelf && row.package_shelf.length > 0) ? `${intl.formatMessage({ id: 'partition' })}: ${(row.package_shelf && row.package_shelf.length > 0 && row.package_shelf[0].shelf) ? row.package_shelf[0].shelf.partition_table : ''}
+      ${intl.formatMessage({ id: 'shelf' })}: ${(row.package_shelf && row.package_shelf.length > 0 && row.package_shelf[0].shelf) ? row.package_shelf[0].shelf.number_of_shelves : ''}
+      ${intl.formatMessage({ id: 'layer' })}: ${(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].layer : ''}
+      ${intl.formatMessage({ id: 'column' })}: ${(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].column : ''}` : ''}</div>
                             <div>{'--'}</div>
                             <div>{'--'}</div>
                           </div>

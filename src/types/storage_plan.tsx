@@ -52,7 +52,7 @@ export type StoragePlan = {
     user?: User;
     warehouse?: Warehouse;
     order_number?: string;
-    state?: number;
+    state?: string;
     history?: History[];
     created_at?: string;
     updated_at?: string;
@@ -86,11 +86,20 @@ export type HistoryStoragePlanProps = {
 }
 
 export type StoragePlanListProps = {
-  storagePlanList: StoragePlan[];
+  storagePlanList?: StoragePlan[];
+  storagePlanStates: StoragePlanState[];
 };
 
 export type BoxNumberLabelFn = { 
   showEBN: boolean; 
   prefixEBN: string; 
   dBN: number;
+};
+
+export type StoragePlanState = {
+  name: string;
+  es_name: string;
+  zh_name: string;
+  value: string;
+  position: number;
 };

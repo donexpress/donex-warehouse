@@ -30,7 +30,7 @@ import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
 import { getStoragePlans, removeStoragePlanById, updateStoragePlanById } from '../../../../services/api.storage_plan';
-import { StoragePlan } from "../../../../types/storage_plan";
+import { StoragePlan, StoragePlanListProps } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import PaginationTable from "../../common/Pagination";
@@ -54,7 +54,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const TableStoragePlan = () => {
+const TableStoragePlan = ({ storagePlanStates }: StoragePlanListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -62,7 +62,7 @@ const TableStoragePlan = () => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [statusSelected, setStatusSelected] = useState<number>(1);
+  const [statusSelected, setStatusSelected] = useState<string>('to be storage');
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
@@ -217,13 +217,13 @@ const TableStoragePlan = () => {
                   <DropdownItem onClick={() => handleConfig(storageP["id"])}>
                     {intl.formatMessage({ id: "config" })}
                   </DropdownItem>
-                  <DropdownItem className={statusSelected !== 1 ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
+                  <DropdownItem className={statusSelected !== 'to be storage' ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
                   <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl)}>
                     {intl.formatMessage({ id: "export" })}
                   </DropdownItem>
-                  <DropdownItem className={statusSelected !== 3 ? 'do-not-show-dropdown-item' : ''}>
+                  <DropdownItem className={statusSelected !== 'stocked' ? 'do-not-show-dropdown-item' : ''}>
                     <PDFDownloadLink document={<ReceiptPDF storagePlan={storageP as StoragePlan} intl={intl} />} fileName="receipt_pdf.pdf">
                       {({ blob, url, loading, error }) =>
                         intl.formatMessage({ id: "generate_receipt" })
@@ -257,6 +257,15 @@ const TableStoragePlan = () => {
     []
   );
 
+  const getLabelByLanguage = (state: any) => {
+    if (locale === 'es') {
+      return state.es_name;
+    } else if (locale === 'zh') {
+      return state.zh_name;
+    }
+    return state.name;
+  };
+
   const onSearchChange = React.useCallback((value?: string) => {
     if (value) {
       setFilterValue(value);
@@ -271,7 +280,7 @@ const TableStoragePlan = () => {
     setPage(1);
   }, []);
   
-  const changeTab = async(tab: number) => {
+  const changeTab = async(tab: string) => {
     if (tab !== statusSelected && !loadingItems) {
       await setStatusSelected(tab);
       await setLoadingItems(true);
@@ -341,7 +350,7 @@ const TableStoragePlan = () => {
               {intl.formatMessage({ id: "export" })}
             </Button>
             {
-              statusSelected === 1 && (
+              statusSelected === 'to be storage' && (
                 <Button
                   color="primary"
                   style={{ width: '121px', marginLeft: '10px' }}
@@ -373,34 +382,15 @@ const TableStoragePlan = () => {
         <div className="bg-gray-200 pt-1">
           <div className="overflow-x-auto tab-system-table bg-content1">
             <ul className="flex space-x-4">
-              <li className="whitespace-nowrap">
-                <button className={ statusSelected === 1 ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
-                  onClick={() => changeTab(1)}
-                >
-                  {intl.formatMessage({ id: "to_be_stored_state" })}
-                </button>
-              </li>
-              <li className="whitespace-nowrap">
-                <button className={ statusSelected === 2 ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
-                  onClick={() => changeTab(2)}
-                >
-                  {intl.formatMessage({ id: "warehouse_entry_state" })}
-                </button>
-              </li>
-              <li className="whitespace-nowrap">
-                <button className={ statusSelected === 3 ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
-                  onClick={() => changeTab(3)}
-                >
-                  {intl.formatMessage({ id: "stocked_state" })}
-                </button>
-              </li>
-              <li className="whitespace-nowrap">
-                <button className={ statusSelected === 4 ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
-                  onClick={() => changeTab(4)}
-                >
-                  {intl.formatMessage({ id: "cancelled_state" })}
-                </button>
-              </li>
+              {storagePlanStates.map((column, index) => (
+                  <li key={index} className="whitespace-nowrap">
+                    <button className={ statusSelected === column.value ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
+                      onClick={() => changeTab(column.value)}
+                    >
+                      {getLabelByLanguage(column)}
+                    </button>
+                  </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -519,7 +509,7 @@ const TableStoragePlan = () => {
             observations: values.observations,
             rejected_boxes: values.rejected_boxes,
             return: values.return,
-            state: 4,
+            state: 'cancelled',
           };
   }
 

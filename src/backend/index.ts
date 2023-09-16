@@ -80,10 +80,14 @@ export const countUserLevelPath = () => {
   return BASE_URL + "/api/v1/user_level/count";
 };
 
-export const storagePlanPath = (status: number = 0) => {
-  const params = status !== 0 ? `?state=${status}` : "";
+export const storagePlanPath = (status: string = '') => {
+  const params = status !== '' ? `?state=${status}` : "";
   return BASE_URL + "/api/v1/storage_plan" + params;
 };
+
+export const storagePlanStatePath = () => {
+  return BASE_URL + "/api/v1/storage_plan/states";
+}
 
 export const storagePlanByOrderNumberPath = (order_number: string) => {
   const params = `?query=${order_number}`;
