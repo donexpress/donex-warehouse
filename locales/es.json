@@ -241,6 +241,10 @@
 	"location_size": "Tamaño de ubicación",
 	"number_of_locations": "Número de ubicaciones",
 	"are_no_partitions": "No existen particiones a mostrar en este almacén",
+	"add_layer": "Añadir capa",
+	"add_column": "Añadir columna",
+	"remove_layer": "Quitar capa",
+	"remove_column": "Quitar columna",
 
 	"Delete":"Eliminar",
 	"Edit":"Editar",

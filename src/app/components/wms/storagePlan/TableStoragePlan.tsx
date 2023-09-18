@@ -38,6 +38,7 @@ import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import ReceiptPDF from '../../common/ReceiptPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -54,7 +55,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const TableStoragePlan = ({ storagePlanStates }: StoragePlanListProps) => {
+const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -240,7 +241,12 @@ const TableStoragePlan = ({ storagePlanStates }: StoragePlanListProps) => {
         case "user_id": return storageP.user ? storageP.user.username : '';
         case "warehouse_id": return storageP.warehouse ? (`${storageP.warehouse.name} (${storageP.warehouse.code})`) : '';
         case "order_number": return (
-          <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(storageP["id"])}}>{storageP.order_number}</span>
+          
+          <CopyColumnToClipboard
+            value={
+              <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(storageP["id"])}}>{storageP.order_number}</span>
+            }
+          />
         );
         default:
           return cellValue;
@@ -259,12 +265,26 @@ const TableStoragePlan = ({ storagePlanStates }: StoragePlanListProps) => {
 
   const getLabelByLanguage = (state: any) => {
     if (locale === 'es') {
-      return state.es_name;
+      return state.es_name + getCountByState(state);
     } else if (locale === 'zh') {
-      return state.zh_name;
+      return state.zh_name + getCountByState(state);
     }
-    return state.name;
+    return state.name + getCountByState(state);
   };
+
+  const getCountByState = (state: any) => {
+    if (storagePCount) {
+      switch(state.value) {
+        case 'to be storage': return ` (${storagePCount.to_be_storage})`;
+        case 'into warehouse': return ` (${storagePCount.into_warehouse})`;
+        case 'stocked': return ` (${storagePCount.stocked})`;
+        case 'cancelled': return ` (${storagePCount.cancelled})`;
+        case 'returns': return ` (${storagePCount.returns})`;
+        case 'refused': return ` (${storagePCount.refused})`;
+      }
+    }
+    return '';
+  }
 
   const onSearchChange = React.useCallback((value?: string) => {
     if (value) {

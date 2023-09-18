@@ -1,9 +1,9 @@
 import Head from 'next/head';
-import Layout from '../../../../../src/app/layout';
-import ProtectedRoute from '../../../../../src/app/components/common/ProtectedRoute';
-import WarehouseConfig from '../../../../../src/app/components/wms/wh/WarehouseConfg';
-import { WarehouseConfigProps } from '../../../../../src/types/warehouse';
-import { getWhById } from '../../../../../src/services/api.wh';
+import Layout from '../../../../../../src/app/layout';
+import ProtectedRoute from '../../../../../../src/app/components/common/ProtectedRoute';
+import WarehouseConfig from '../../../../../../src/app/components/wms/wh/WarehouseConfg';
+import { WarehouseConfigProps } from '../../../../../../src/types/warehouse';
+import { getWhById } from '../../../../../../src/services/api.wh';
 
 const ConfigWarehouse = ({ warehouse, id }: WarehouseConfigProps) => {console.log(warehouse)
     

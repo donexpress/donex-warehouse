@@ -241,6 +241,10 @@
 	"location_size": "库位尺寸",
 	"number_of_locations": "库位数",
 	"are_no_partitions": "該商店沒有可顯示的分區",
+	"add_layer": "添加圖層",
+	"add_column": "添加欄目",
+	"remove_layer": "刪除圖層",
+	"remove_column": "刪除列",
 
     "Delete":"刪除",
 	"Edit":"編輯",

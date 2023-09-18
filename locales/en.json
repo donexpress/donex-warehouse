@@ -241,6 +241,10 @@
 	"location_size": "Location size",
 	"number_of_locations": "Number of locations",
 	"are_no_partitions": "There are no partitions to show in this warehouse",
+	"add_layer": "Add layer",
+	"add_column": "Add column",
+	"remove_layer": "Remove layer",
+	"remove_column": "Remove column",
 
 	"Delete":"Delete",
 	"Edit":"Edit",

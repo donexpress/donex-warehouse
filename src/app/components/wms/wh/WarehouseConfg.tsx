@@ -114,14 +114,31 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
     };
 
     const goToShelf = (shelfId: number) => {
-      //router.push(`/${locale}/wms/warehouses/${id}/config/${shelfId}/shelf`)
+      router.push(`/${locale}/wms/warehouses/${id}/config/${shelfId}/shelf`)
     };
+
+    const findMaxNumberOfShelvesNP = (pt: number): number => {
+      const shelvesNP = shelves.filter((sv: Shelf) => sv.partition_table === pt)
+      if (shelvesNP.length === 0) {
+        return 1;
+      }
+    
+      let maxNumber = shelvesNP.reduce((max, shelf) => {
+        return Math.max(max, shelf.number_of_shelves);
+      }, shelvesNP[0].number_of_shelves);
+
+      if (shelvesNP.length > maxNumber) {
+        maxNumber = shelvesNP.length;
+      }
+    
+      return maxNumber + 1;
+    }
 
     const handleAddPartition = async() => {
       await setTitleDialog(intl.formatMessage({ id: "add_partition" }));
       await setIsCreatePartition(true);
       await setPartitionTableDialog(partition + 1);
-      await setShelfNumberDialog(1);
+      await setShelfNumberDialog(findMaxNumberOfShelvesNP(partition+1));
       await setShowDialog(true);
     }
 

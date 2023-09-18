@@ -22,6 +22,7 @@ import PackingListDialog from '../../common/PackingListDialog';
 import BatchOnShelvesDialog from '../../common/BatchOnShelvesDialog';
 import ReceiptPDF from '../../common/ReceiptPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
 const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boolean = true): PackingList[] => {
   return packingLists.map((packingList: PackingList) => {
@@ -460,8 +461,16 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                             <div className='elements-start-center'>
                               <input type="checkbox" style={{ marginTop: '3px' }} name={`packing-list-${index}`} checked={row.checked} onChange={(event) => handleCheckboxChange(event, index)} />
                             </div>
-                            <div>{row.box_number}</div>
-                            <div>{row.case_number}</div>
+                            <div>
+                              <CopyColumnToClipboard
+                                value={ row.box_number }
+                              />
+                            </div>
+                            <div>
+                              <CopyColumnToClipboard
+                                value={ row.case_number }
+                              />
+                            </div>
                             <div>{'--'}</div>
                             <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div>
                             <div>{'--'}</div>

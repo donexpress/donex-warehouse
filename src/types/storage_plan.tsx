@@ -88,6 +88,7 @@ export type HistoryStoragePlanProps = {
 export type StoragePlanListProps = {
   storagePlanList?: StoragePlan[];
   storagePlanStates: StoragePlanState[];
+  storagePCount?: StoragePlanCount;
 };
 
 export type BoxNumberLabelFn = { 
@@ -102,4 +103,14 @@ export type StoragePlanState = {
   zh_name: string;
   value: string;
   position: number;
+};
+
+export type StoragePlanCount = {
+  total: number,
+  to_be_storage: number,
+  into_warehouse: number,
+  cancelled: number,
+  refused: number,
+  returns: number,
+  stocked: number
 };

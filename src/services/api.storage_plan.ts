@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { countStoragePlanPath, storagePlanByOrderNumberPath, storagePlanPath, storagePlanStatePath } from '../backend';
+import { countStoragePlanPath, storagePlanByOrderNumberPath, storagePlanPath, storagePlanStatePath, storagePlanCountPath } from '../backend';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
 import { Response } from '../types/index';
-import { StoragePlan, StoragePlanState } from '../types/storage_plan';
+import { StoragePlan, StoragePlanState, StoragePlanCount } from '../types/storage_plan';
 import { StateCount } from '@/types/exit_planerege1992';
 
 export const countStoragePlan = async ():Promise<StateCount> => {
@@ -41,6 +41,16 @@ export const updateStoragePlanById = async (storagePlanId: number, storagePlan: 
 
 export const getStoragePlanById = async (storagePlanId: number, context?: GetServerSidePropsContext):Promise<StoragePlan | null> => {
   const path = storagePlanPath() + `/${storagePlanId}`;
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export const storagePlanCount = async (context?: GetServerSidePropsContext):Promise<StoragePlanCount | null> => {
+  const path = storagePlanCountPath();
   try {
     const response = await axios.get(path, getHeaders(context));
     return response.data;
