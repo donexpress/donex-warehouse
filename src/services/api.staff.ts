@@ -36,7 +36,7 @@ export const createStaff = async (data: any): Promise<Response> => {
   } catch (error: any) {
     return {
       status:
-        error.response && error.response.status ? error.response.status : 0,
+        error.response && error.response.status ? error.response.status : 0, data: error.response.data
     };
   }
 };
@@ -53,7 +53,7 @@ export const updateStaff = async (id: number, data: any): Promise<Response> => {
   } catch (error: any) {
     return {
       status:
-        error.response && error.response.status ? error.response.status : 0,
+        error.response && error.response.status ? error.response.status : 0, data: error.response.data
     };
   }
 };

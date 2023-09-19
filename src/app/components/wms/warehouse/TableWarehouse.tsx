@@ -47,6 +47,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "name",
   "principal",
   "receiving_area",
+  "state",
   "actions",
 ];
 
@@ -80,26 +81,26 @@ const WarehouseTable = () => {
 
   const columns = React.useMemo(() => {
     return [
-      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
+      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: false },
       {
         name: intl.formatMessage({ id: "principal" }),
         uid: "principal",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "receiving_area" }),
         uid: "receiving_area",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "state" }),
         uid: "state",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "country" }),
         uid: "country",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -151,22 +152,6 @@ const WarehouseTable = () => {
 
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
-
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort(
-      (a: CargoStationWarehouseForm, b: CargoStationWarehouseForm) => {
-        const first = a[
-          sortDescriptor.column as keyof CargoStationWarehouseForm
-        ] as number;
-        const second = b[
-          sortDescriptor.column as keyof CargoStationWarehouseForm
-        ] as number;
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-        return sortDescriptor.direction === "descending" ? -cmp : cmp;
-      }
-    );
-  }, [sortDescriptor, items]);
 
   const getLabelByLanguage = (state: any) => {
     if (locale === 'es') {
@@ -448,11 +433,9 @@ const WarehouseTable = () => {
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
         >
           <TableHeader columns={headerColumns}>
             {(column) => (
@@ -467,7 +450,7 @@ const WarehouseTable = () => {
           </TableHeader>
           <TableBody
             emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
               <TableRow key={item.id}>

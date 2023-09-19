@@ -40,7 +40,7 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
     phone: id && staff ? staff.phone : "",
     observations: id && staff ? staff.observations : "",
     // @ts-ignore
-    state: id && staff && staff.state ? staff.state.value : null,
+    state: id && staff && staff.state ? staff.state.value : 'normal',
     organization_id:
       id && staff
         ? staff.organization_id !== null
@@ -113,7 +113,7 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
 
   const formatBody = (values: StaffForm): StaffForm => {
     return {
-      state: values.state ? values.state : null,
+      state: values.state ? values.state : 'normal',
       organization_id: values.organization_id ? Number(values.organization_id) : null,
       role_id: values.role_id ? Number(values.role_id) : null,
       username: values.username,
@@ -149,6 +149,14 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
       router.push(`/${locale}/wms/staff`);
     } else {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      if (response.status === 409) {
+        message = intl.formatMessage({ id: "username_email_already_exists" });
+        if (response.data && response.data.message && (response.data.message === "username already exists")) {
+          message = intl.formatMessage({ id: "username_already_exists" });
+        } else if (response.data && response.data.message && (response.data.message === "email already exists")) {
+          message = intl.formatMessage({ id: "email_already_exists" });
+        }
+      }
       showMsg(message, { type: "error" });
     }
   };

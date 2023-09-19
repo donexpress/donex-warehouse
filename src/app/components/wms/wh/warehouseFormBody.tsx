@@ -76,6 +76,14 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
       router.push(`/${locale}/wms/warehouses`);
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      if (response.status === 409) {
+        message = intl.formatMessage({ id: "warehouse_code_name_already_exists" });
+        if (response.data && response.data.message && (response.data.message === "name already exists")) {
+          message = intl.formatMessage({ id: "warehouse_name_already_exists" });
+        } else if (response.data && response.data.message && (response.data.message === "code already exists")) {
+          message = intl.formatMessage({ id: "warehouse_code_already_exists" });
+        }
+      }
       showMsg(message, { type: "error" });
     }
   }

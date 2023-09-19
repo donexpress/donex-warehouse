@@ -69,52 +69,52 @@ const WhTable = () => {
       {
         name: intl.formatMessage({ id: "warehouse_name" }),
         uid: "name",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "warehouse_code" }),
         uid: "code",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "country" }),
         uid: "country",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "contact" }),
         uid: "contact",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "address" }),
         uid: "address_1",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "address" }) + ' 2',
         uid: "address_2",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "postal_code" }),
         uid: "cp",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "phone" }),
         uid: "phone",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "email" }),
         uid: "email",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];

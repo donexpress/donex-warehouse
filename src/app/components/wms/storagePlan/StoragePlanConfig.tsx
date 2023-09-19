@@ -305,29 +305,29 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                 <div className='storage-plan-data'>
                   <div style={{ paddingTop: '10px' }}>
                     <div className='storage-plan-data__table bg-default-100' style={{ padding: '5px 0px 5px 5px', borderRadius: '5px 5px 0 0' }}>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'customer_order_number' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'customer_order_number' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'user' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'user' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'storage' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'storage' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'number_of_boxes' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'number_of_boxes' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'country' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'country' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'client_weight' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'client_weight' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'client_volume' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'client_volume' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'observations' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'observations' })}</span>
                       </div>
                     </div>
                     <div className='storage-plan-data__table storage-plan-header' style={{ padding: '5px 0px 5px 5px', borderRadius: '0 0 5px 5px' }}>
@@ -425,35 +425,35 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           <div className='elements-center'>
                             <input type="checkbox" name="selectAll" checked={selectAllPackingListItems} onChange={handleCheckboxChange} />
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'box_number' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'box_number' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'expansion_box_number' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'expansion_box_number' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'outgoing_order' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'outgoing_order' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'transfer_order_number' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'transfer_order_number' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'bill_lading_number' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'bill_lading_number' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'client_weight' })}(kg) / {intl.formatMessage({ id: 'dimensions' })}(cm)</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'client_weight' })}(kg) / {intl.formatMessage({ id: 'dimensions' })}(cm)</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'storage_weight' })}(kg) / {intl.formatMessage({ id: 'dimensions' })}(cm)</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'storage_weight' })}(kg) / {intl.formatMessage({ id: 'dimensions' })}(cm)</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'location' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'location' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'storage_time' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'storage_time' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'delivery_time' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'delivery_time' })}</span>
                           </div>
                         </div>
                         {rows.map((row, index) => (

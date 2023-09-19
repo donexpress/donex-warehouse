@@ -246,13 +246,13 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                         <div className='warehouse-data__table storage-plan-header' style={{ borderRadius: '5px' }}>
                             <div>
                                 <div className='warehouse-data__sub-table'>
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 5px', borderTopLeftRadius: '5px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 5px', borderTopLeftRadius: '5px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'warehouse_code' })}</span>
                                     </div>
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'warehouse_name' })}</span>
                                     </div>
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'country' })}</span>
                                     </div>
 
@@ -266,13 +266,13 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                                         { warehouse.country }
                                     </div>
                                     
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 5px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 5px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'number_of_partitions' })}</span>
                                     </div>
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'number_of_shelves' })}</span>
                                     </div>
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'total_volume' })} (m³)</span>
                                     </div>
 
@@ -286,13 +286,13 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                                         { '--' }
                                     </div>
                                     
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 5px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 5px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'used_volume' })} (m³)</span>
                                     </div>
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'state' })}</span>
                                     </div>
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 2px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'creation_time' })}</span>
                                     </div>
 
@@ -307,7 +307,7 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                                     </div>
                                 </div>
                                 <div>
-                                    <div className='elements-center bg-default-100' style={{ padding: '7px 2px 7px 5px' }}>
+                                    <div className='elements-center-start bg-default-100' style={{ padding: '7px 2px 7px 5px' }}>
                                       <span className='text-center'>{intl.formatMessage({ id: 'remark' })}</span>
                                     </div>
                                     <div className='storage-plan-header' style={{ padding: '5px 2px 5px 5px', borderBottomLeftRadius: '5px' }}>
@@ -316,7 +316,7 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                                 </div>
                             </div>
                             <div className='storage-plan-header' style={{ borderBottomRightRadius: '5px' }}>
-                                <div className='elements-center bg-default-100' style={{ padding: '7px 0px 7px 2px', height: '32px', borderTopRightRadius: '5px' }}>
+                                <div className='elements-center-start bg-default-100' style={{ padding: '7px 0px 7px 2px', height: '32px', borderTopRightRadius: '5px' }}>
                                   <span className='text-center'>{intl.formatMessage({ id: 'address_information' })}</span>
                                 </div>
 
@@ -432,19 +432,19 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                           <div className='elements-center'>
                             <input type="checkbox" name="selectAll" checked={selectAllShelvesItems} onChange={handleCheckboxChange} />
                           </div>
-                          <div className='elements-center'>
+                          <div className='elements-center-start'>
                             <span className='text-center'>{intl.formatMessage({ id: 'shelf_number' })}</span>
                           </div>
-                          <div className='elements-center'>
+                          <div className='elements-center-start'>
                             <span className='text-center'>{intl.formatMessage({ id: 'location_size' })} (cm)</span>
                           </div>
-                          <div className='elements-center'>
+                          <div className='elements-center-start'>
                             <span className='text-center'>{intl.formatMessage({ id: 'layers' })}</span>
                           </div>
-                          <div className='elements-center'>
+                          <div className='elements-center-start'>
                             <span className='text-center'>{intl.formatMessage({ id: 'columns' })}</span>
                           </div>
-                          <div className='elements-center'>
+                          <div className='elements-center-start'>
                             <span className='text-center'>{intl.formatMessage({ id: 'number_of_locations' })}</span>
                           </div>
                         </div>

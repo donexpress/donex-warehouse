@@ -81,7 +81,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         return response;
       };
   
-      const formatBody = (values: StoragePlan): StoragePlan => {
+      const formatBody = (values: StoragePlan): StoragePlan => {console.log(values);
         return {
                 user_id: values.user_id ? Number(values.user_id) : null,
                 warehouse_id: values.warehouse_id ? Number(values.warehouse_id) : null,
@@ -91,8 +91,19 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: values.state ? values.state : 'to be storage',
+                state: getState(values.state, values.rejected_boxes, values.return),
               };
+      }
+
+      const getState = (state: string | undefined, rejected: boolean = false, returns: boolean = false) => {
+        if (rejected) {
+          return 'refused';
+        } else if (returns) {
+          return 'returns';
+        } else if (state) {
+          return state;
+        }
+        return 'to be storage';
       }
 
       const tableIsValid = () => {

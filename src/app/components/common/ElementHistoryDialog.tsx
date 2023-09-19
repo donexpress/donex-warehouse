@@ -4,6 +4,7 @@ import { useIntl } from "react-intl";
 import { History as HistorySP, StoragePlan, PackingList } from "../../../types/storage_plan";
 import { User } from '../../../types/user';
 import { Warehouse } from '../../../types/warehouse';
+import { PackageShelf } from '../../../types/package_shelf';
 import '../../../styles/generic.dialog.scss';
 import '../../../styles/wms/user.form.scss';
 import Lightbox from 'react-18-image-lightbox';
@@ -84,7 +85,75 @@ const PackingListDialog = ({ close, historySP, title, users, warehouses }: Param
                       <b>{intl.formatMessage({ id: "type" })}:</b>&nbsp;&nbsp;
                       {historySP.type === 'packing_list' ? intl.formatMessage({ id: "packing_list_item" }) : ''}
                       {historySP.type === 'storage_plan' ? intl.formatMessage({ id: "storagePlan" }) : ''}
+                      {historySP.type === 'shelf_package' ? intl.formatMessage({ id: "package_location_on_shelf" }) : ''}
                     </div>
+                    {historySP.type === 'shelf_package' &&
+                      <div className='w-full'>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "box_number" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.box_number : '' }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "expansion_box_number" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.case_number : '' }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "location" })}:</div>
+                          <div>
+                          {`${intl.formatMessage({ id: 'partition' })}: ${((historySP.data) as PackageShelf).shelf ? ((historySP.data) as PackageShelf).shelf?.partition_table : ''}
+                                                        ${intl.formatMessage({ id: 'shelf' })}: ${((historySP.data) as PackageShelf).shelf ? ((historySP.data) as PackageShelf).shelf?.number_of_shelves : ''}
+                                                        ${intl.formatMessage({ id: 'layer' })}: ${((historySP.data) as PackageShelf).layer}
+                                                        ${intl.formatMessage({ id: 'column' })}: ${((historySP.data) as PackageShelf).column}`}
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "transfer_order_number" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.order_transfer_number : '' }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "amount" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.amount : '' }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "client_weight" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.client_weight : '' }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "client_length" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.client_length : '' }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "client_width" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.client_width : '' }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "client_height" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.client_height : '' }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "price" })}:</div>
+                          <div>
+                            { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.price : '' }
+                          </div>
+                        </div>
+                      </div>
+                    }
                     {historySP.type === 'packing_list' &&
                       <div className='w-full'>
                         <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>

@@ -39,7 +39,7 @@ const CargoStationWarehouseFormBody = ({
     principal: id && warehouse ? warehouse.principal : "",
     contact_phone: id && warehouse ? warehouse.contact_phone : "",
     // @ts-ignore
-    state: id && warehouse && warehouse.state ? warehouse.state.value : null,
+    state: id && warehouse && warehouse.state ? warehouse.state.value : 'normal',
     address: id && warehouse ? warehouse.address : "",
     city: id && warehouse ? warehouse.city : "",
     province: id && warehouse ? warehouse.province : "",
@@ -120,7 +120,7 @@ const CargoStationWarehouseFormBody = ({
   ): CargoStationWarehouseForm => {
     return {
       ...values,
-      state: values.state ? values.state : null,
+      state: values.state ? values.state : 'normal',
     };
   };
 
@@ -149,6 +149,9 @@ const CargoStationWarehouseFormBody = ({
       router.push(`/${locale}/wms/warehouse_cargo_station`);
     } else {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      if (response.status === 409 && response.data.message === "name already exists") {
+        message = intl.formatMessage({ id: "site_name_already_exists" });
+      }
       showMsg(message, { type: "error" });
     }
   };

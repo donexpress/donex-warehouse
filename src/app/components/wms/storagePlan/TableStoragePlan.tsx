@@ -29,7 +29,7 @@ import { showMsg, storagePlanDataToExcel } from "../../../../helpers";
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import { getStoragePlans, removeStoragePlanById, updateStoragePlanById } from '../../../../services/api.storage_plan';
+import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount } from '../../../../services/api.storage_plan';
 import { StoragePlan, StoragePlanListProps } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
@@ -66,10 +66,18 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   const [statusSelected, setStatusSelected] = useState<string>('to be storage');
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  
+  const [stgPCount, setStgPCount] = useState(storagePCount);
 
   const [showCancelAllDialog, setShowCancelAllDialog] = useState<boolean>(false);
   const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
   const [cancelElement, setCancelElement] = useState<StoragePlan | null>(null);
+
+  const [showReturnDialog, setShowReturnDialog] = useState<boolean>(false);
+  const [returnElement, setReturnElement] = useState<StoragePlan | null>(null);
+  
+  const [showDeclineDialog, setShowDeclineDialog] = useState<boolean>(false);
+  const [declineElement, setDeclineElement] = useState<StoragePlan | null>(null);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -92,41 +100,41 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
 
   const getColumns = React.useMemo(() => {
     const columns = [
-      { name: "ID", uid: "id", sortable: true },
+      { name: "ID", uid: "id", sortable: false },
       {
         name: intl.formatMessage({ id: "warehouse_order_number" }),
         uid: "order_number",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "customer_order_number" }),
         uid: "customer_order_number",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "user" }),
         uid: "user_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "storage" }),
         uid: "warehouse_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "number_of_boxes" }),
         uid: "box_amount",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "delivery_time" }),
         uid: "delivered_time",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -221,6 +229,12 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
                   <DropdownItem className={statusSelected !== 'to be storage' ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
+                  <DropdownItem className={statusSelected === 'refused' ? 'do-not-show-dropdown-item' : ''} onClick={() => openDeclineStoragePlanDialog(storageP)}>
+                    {intl.formatMessage({ id: "decline" })}
+                  </DropdownItem>
+                  <DropdownItem className={statusSelected === 'returns' ? 'do-not-show-dropdown-item' : ''} onClick={() => openReturnStoragePlanDialog(storageP)}>
+                    {intl.formatMessage({ id: "returns" })}
+                  </DropdownItem>
                   <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl)}>
                     {intl.formatMessage({ id: "export" })}
                   </DropdownItem>
@@ -273,14 +287,14 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   };
 
   const getCountByState = (state: any) => {
-    if (storagePCount) {
+    if (stgPCount) {
       switch(state.value) {
-        case 'to be storage': return ` (${storagePCount.to_be_storage})`;
-        case 'into warehouse': return ` (${storagePCount.into_warehouse})`;
-        case 'stocked': return ` (${storagePCount.stocked})`;
-        case 'cancelled': return ` (${storagePCount.cancelled})`;
-        case 'returns': return ` (${storagePCount.returns})`;
-        case 'refused': return ` (${storagePCount.refused})`;
+        case 'to be storage': return ` (${stgPCount.to_be_storage})`;
+        case 'into warehouse': return ` (${stgPCount.into_warehouse})`;
+        case 'stocked': return ` (${stgPCount.stocked})`;
+        case 'cancelled': return ` (${stgPCount.cancelled})`;
+        case 'returns': return ` (${stgPCount.returns})`;
+        case 'refused': return ` (${stgPCount.refused})`;
       }
     }
     return '';
@@ -427,6 +441,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     intl,
     statusSelected,
     selectedItems,
+    stgPCount,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -452,7 +467,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   }, [
     selectedKeys,
     items.length,
-    sortedItems.length,
+    items.length,
     page,
     storagePlans.length,
     rowsPerPage,
@@ -473,11 +488,15 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const loadStoragePlans = async () => {
+  const loadStoragePlans = async (loadCount: boolean = false) => {
     setLoading(true);
     const storagePlanss = await getStoragePlans(statusSelected);
     
     setStoragePlans(storagePlanss !== null ? storagePlanss : []);
+    if (loadCount) {
+      const storagePCount = await storagePlanCount();
+      setStgPCount(storagePCount ? storagePCount : undefined);
+    }
     setLoading(false);
   };
 
@@ -519,7 +538,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     setLoading(false);
   };
   
-  const formatBodyToCancel = (values: StoragePlan): StoragePlan => {
+  const formatBodyToCancel = (values: StoragePlan, state: string = ''): StoragePlan => {
     return {
             user_id: values.user_id ? Number(values.user_id) : null,
             warehouse_id: values.warehouse_id ? Number(values.warehouse_id) : null,
@@ -529,7 +548,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
             observations: values.observations,
             rejected_boxes: values.rejected_boxes,
             return: values.return,
-            state: 'cancelled',
+            state: state !== '' ? state : 'cancelled',
           };
   }
 
@@ -580,7 +599,39 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
         showMsg(message, { type: "error" });
       }
       closeCancelStoragePlanDialog();
-      await loadStoragePlans();
+      await loadStoragePlans(true);
+    }
+  }
+
+  const handleReturn = async() => {
+    if (returnElement !== null) {
+      setLoading(true);
+      const response: Response = await updateStoragePlanById(Number(returnElement.id), formatBodyToCancel(returnElement, 'returns'));
+      if (response.status >= 200 && response.status <= 299) {
+        const message = intl.formatMessage({ id: 'successfullyActionMsg' });
+        showMsg(message, { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        showMsg(message, { type: "error" });
+      }
+      closeReturnStoragePlanDialog();
+      await loadStoragePlans(true);
+    }
+  }
+
+  const handleDecline = async() => {
+    if (declineElement !== null) {
+      setLoading(true);
+      const response: Response = await updateStoragePlanById(Number(declineElement.id), formatBodyToCancel(declineElement, 'refused'));
+      if (response.status >= 200 && response.status <= 299) {
+        const message = intl.formatMessage({ id: 'successfullyActionMsg' });
+        showMsg(message, { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        showMsg(message, { type: "error" });
+      }
+      closeDeclineStoragePlanDialog();
+      await loadStoragePlans(true);
     }
   }
 
@@ -593,6 +644,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     setShowCancelDialog(true);
   }
 
+  const openReturnStoragePlanDialog = (sp: StoragePlan) => {
+    setReturnElement(sp);
+    setShowReturnDialog(true);
+  }
+
+  const openDeclineStoragePlanDialog = (sp: StoragePlan) => {
+    setDeclineElement(sp);
+    setShowDeclineDialog(true);
+  }
+
   const closeCancelAllStoragePlanDialog = () => {
     setShowCancelAllDialog(false);
   }
@@ -600,6 +661,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   const closeCancelStoragePlanDialog = () => {
     setCancelElement(null);
     setShowCancelDialog(false);
+  }
+
+  const closeReturnStoragePlanDialog = () => {
+    setReturnElement(null);
+    setShowReturnDialog(false);
+  }
+
+  const closeDeclineStoragePlanDialog = () => {
+    setDeclineElement(null);
+    setShowDeclineDialog(false);
   }
 
   const selectedItemsFn = (selection: Selection) => {
@@ -624,11 +695,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
           onSelectionChange={(keys: Selection) => {selectedItemsFn(keys)}}
-          onSortChange={setSortDescriptor}
         >
           <TableHeader columns={headerColumns}>
             {(column) => (
@@ -643,7 +712,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
           </TableHeader>
           <TableBody
             emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
-            items={loadingItems ? [] : sortedItems}
+            items={loadingItems ? [] : items}
           >
             {(item) => (
               <TableRow key={item.id}>
@@ -657,6 +726,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showCancelAllDialog && <ConfirmationDialog close={closeCancelAllStoragePlanDialog} confirm={handleCancelAll} />}
         {showCancelDialog && <ConfirmationDialog close={closeCancelStoragePlanDialog} confirm={handleCancel} />}
+        {showReturnDialog && <ConfirmationDialog close={closeReturnStoragePlanDialog} confirm={handleReturn} />}
+        {showDeclineDialog && <ConfirmationDialog close={closeDeclineStoragePlanDialog} confirm={handleDecline} />}
       </Loading>
     </>
   );

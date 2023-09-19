@@ -59,8 +59,8 @@ export type StoragePlan = {
 };
 
 export type History = {
-  type: "packing_list" | "storage_plan";
-  data: PackingList | StoragePlan;
+  type: "packing_list" | "storage_plan" | "shelf_package";
+  data: PackingList | StoragePlan | PackageShelf;
 }
 
 export type StoragePlanProps = {

@@ -38,13 +38,13 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     flex: 1,
-    border: '1pt solid #080f25',
+    border: '1pt solid #cccccc',
     borderWidth: 1,
     padding: 5,
     textAlign: 'left',
     fontSize: 8,
-    backgroundColor: '#080f25',
-    color: '#aeb9e1',
+    backgroundColor: '#f6f6f6',
+    color: '#333333',
   },
   headerCell: {
     backgroundColor: '#37446b',
@@ -56,6 +56,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 5,
     fontSize: 8,
+  },
+  minorCell: {
+    flex: 2
+  },
+  majorCell: {
+    flex: 3
   },
   image: {
     width: '100%',
@@ -130,20 +136,20 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
   
           <View style={styles.table}>
             <View style={styles.tableRow}>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'box_number' })}</Text>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'expansion_box_number' })}</Text>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'location' })}</Text>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'storage_time' })}</Text>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'delivery_time' })}</Text>
+              <Text style={[styles.headerCell, styles.majorCell]}>{intl.formatMessage({ id: 'box_number' })}</Text>
+              <Text style={[styles.headerCell, styles.majorCell]}>{intl.formatMessage({ id: 'expansion_box_number' })}</Text>
+              <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'location' })}</Text>
+              <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'storage_time' })}</Text>
+              <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'delivery_time' })}</Text>
             </View>
             {
               storagePlan.packing_list?.map((pl: PackingList, index: number) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{ pl.box_number }</Text>
-                  <Text style={styles.tableCell}>{ pl.case_number }</Text>
-                  <Text style={styles.tableCell}>{ packageShelfFormat(pl.package_shelf) }</Text>
-                  <Text style={styles.tableCell}>{ '--' }</Text>
-                  <Text style={styles.tableCell}>{ getDateFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }{ ' ' }{ getHourFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }</Text>
+                  <Text style={[styles.tableCell, styles.majorCell]}>{ pl.box_number }</Text>
+                  <Text style={[styles.tableCell, styles.majorCell]}>{ pl.case_number }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ packageShelfFormat(pl.package_shelf) }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ '--' }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ getDateFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }{ ' ' }{ getHourFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }</Text>
                 </View>
               ))
             }
