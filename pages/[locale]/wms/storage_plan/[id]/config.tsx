@@ -8,7 +8,7 @@ import { getWhs } from '../../../../../src/services/api.wh';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 import { Warehouse } from '@/types/warehouseerege1992';
 
-const ConfigStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanProps) => {console.log(storagePlan)
+const ConfigStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanProps) => {
   
   return (
   <ProtectedRoute>

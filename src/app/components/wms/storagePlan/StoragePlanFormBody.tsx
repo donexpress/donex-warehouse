@@ -91,7 +91,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: values.state ? values.state : 1,
+                state: values.state ? values.state : 'to be storage',
               };
       }
 
@@ -306,7 +306,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             selectLabel={intl.formatMessage({ id: 'select_warehouse' })}
                             options={getWarehousesFormatted(warehouses)}
                             customClass="custom-input"
-                            disabled={ isFromDetails || (!!id && storagePlan && storagePlan.state !== 1) }
+                            disabled={ isFromDetails || (!!id && storagePlan && storagePlan.state !== 'to be storage') }
                             required
                           />
                         </div>

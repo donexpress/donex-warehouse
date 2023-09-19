@@ -124,7 +124,7 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
         setShelfs(
           elements.map((sh: Shelf, ind: number) => ({
               value: Number(sh.id),
-              label: (warehouse as Warehouse).code + String(sh.partition_table).padStart(2, '0') + String(ind+1).padStart(2, '0'),
+              label: (warehouse as Warehouse).code + String(sh.partition_table).padStart(2, '0') + String(sh.number_of_shelves).padStart(2, '0'),
             }))
         )
       } else {

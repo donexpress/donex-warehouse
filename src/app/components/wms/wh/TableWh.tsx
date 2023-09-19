@@ -176,6 +176,9 @@ const WhTable = () => {
                 <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Edit" })}
                 </DropdownItem>
+                <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
+                  {intl.formatMessage({ id: "config" })}
+                </DropdownItem>
                 <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Delete" })}
                 </DropdownItem>
@@ -183,6 +186,12 @@ const WhTable = () => {
             </Dropdown>
           </div>
         );
+      case "name": return (
+        <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.name}</span>
+      );
+      case "code": return (
+        <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.code}</span>
+      );
       default:
         return cellValue;
     }
@@ -362,6 +371,11 @@ const WhTable = () => {
   const handleAdd = () => {
     setLoading(true);
     router.push(`/${locale}/wms/warehouses/insert`);
+  };
+
+  const handleConfig = (id: number) => {
+    setLoading(true);
+    router.push(`/${locale}/wms/warehouses/${id}/config`);
   };
 
   const close = () => {
