@@ -101,7 +101,7 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
           <>
             <ExitPlanBox exitPlan={exitPlan} />
             <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user}/>
-            {/* <OperationInstructionTable /> */}
+            <OperationInstructionTable />
           </>
         )}
       </div>
