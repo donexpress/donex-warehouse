@@ -293,6 +293,9 @@
 	"function": "Function",
 	"create_appendix": "Create appendix",
 	"destination": "Destination",
-	"delivery": "Delivery"
+	"delivery": "Delivery",
+	"operation_instruction_type": "Operation instruction type",
+	"number_delivery": "Waybill No. / Box No. / SKU",
+	"internal_remark": "Internal remark"
 
 }

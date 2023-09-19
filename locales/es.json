@@ -293,6 +293,9 @@
 	"function": "Función",
 	"create_appendix": "Crear apéndice",
 	"destination": "Destino",
-	"delivery": "Entrega"
+	"delivery": "Entrega",
+	"operation_instruction_type": "Tipo de instrucción de operación",
+	"number_delivery": "No. de guía de embarque / No. de caja / SKU",
+	"internal_remark": "Observaciones internas"
 
 }

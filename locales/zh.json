@@ -293,6 +293,9 @@
 	"function": "功能",
 	"create_appendix": "创建附录",
     "destination": "目的地",
-	"delivery": "送货"
+	"delivery": "送货",
+	"operation_instruction_type": "操作指令类型",
+	"number_delivery": "运单号/箱号/SKU",
+    "internal_remark": "内部评论"
 
 }
