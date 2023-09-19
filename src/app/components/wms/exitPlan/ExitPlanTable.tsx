@@ -27,6 +27,7 @@ import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import {
   countExitPlans,
+  getExitPlanDestinations,
   getExitPlansByState,
   getExitPlansState,
   removeExitPlan,
@@ -35,6 +36,7 @@ import {
 import {
   ExitPlan,
   ExitPlanState,
+  State,
   StateCount,
 } from "../../../../types/exit_plan";
 import { capitalize, getDateFormat, getHourFormat, getLanguage } from "../../../../helpers/utils";
@@ -91,6 +93,8 @@ const ExitPlanTable = () => {
   const [count, setCount] = useState<StateCount | null>(null);
 
   const hasSearchFilter = Boolean(filterValue);
+
+  const [destinations, setDestinations] = useState<State[]>([])
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -428,7 +432,7 @@ const ExitPlanTable = () => {
             </Button>
           </div>
         </div>
-        <FilterExitPlan onFinish={onFinishFilter}/>
+        <FilterExitPlan onFinish={onFinishFilter} destionations={destinations}/>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
@@ -541,6 +545,8 @@ const ExitPlanTable = () => {
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
     const count = await countExitPlans();
+    const destinations = await getExitPlanDestinations()
+    setDestinations(destinations.destinations)
     setCount(count);
     setExitPlanState(states);
     setLoading(false);
