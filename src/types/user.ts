@@ -5,6 +5,12 @@ import { CargoStationWarehouseForm } from "./index";
 import { PaymentMethod } from './payment_methods';
 import { UserLevel } from './user_levels';
 import { UserState } from './user_state';
+import { RoleType } from './profile';
+
+export type UserListProps = {
+    role: RoleType | '';
+    userStateList: any[];
+};
 
 export type User = {
     id: number;
@@ -31,6 +37,7 @@ export type User = {
     hidde_transfer_order: boolean;
     reset_password: boolean;
     warehouses: CargoStationWarehouseForm;
+    warehouse?: CargoStationWarehouseForm;
     regional_divisions: RegionalDivision;
     subsidiaries: Subsidiary;
     finantial_representatives: Staff | null;

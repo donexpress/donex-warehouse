@@ -28,6 +28,7 @@
 	"warehouse_code_name_already_exists": "El nombre o código del almacén ya existe.",
 	"warehouse_name_already_exists": "El nombre del almacén ya existe.",
 	"warehouse_code_already_exists": "El código del almacén ya existe.",
+	"user_with_problem": "Existe un problema con este usuario. Por favor, contacte con un administrador para obtener una solución.",
 	"returns": "Devolver",
 	"decline": "Rechazar",
 	"package_location_on_shelf": "Ubicación de paquete en estante",

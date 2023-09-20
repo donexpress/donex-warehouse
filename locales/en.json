@@ -28,6 +28,7 @@
 	"warehouse_code_name_already_exists": "Name or code warehouse already exists",
 	"warehouse_name_already_exists": "Warehouse name already exists",
 	"warehouse_code_already_exists": "Warehouse code already exists",
+	"user_with_problem": "We have a problem with this user. Please contact an administrator for a solution.",
 	"returns": "Return",
 	"decline": "Decline",
 	"package_location_on_shelf": "Package location on shelf",

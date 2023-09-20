@@ -7,7 +7,7 @@ import { getUsers } from '../../../../src/services/api.users';
 import { getWhs } from '../../../../src/services/api.wh';
 import { GetServerSidePropsContext } from 'next';
 
-const InsertStoragePlan = ({ warehouses, users }: StoragePlanProps) => {
+const InsertStoragePlan = ({ warehouses, users }: StoragePlanProps) => {console.log(warehouses)
   
   return (
   <ProtectedRoute>

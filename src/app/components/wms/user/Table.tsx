@@ -32,6 +32,7 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
+import { UserListProps } from '../../../../types/user';
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -48,7 +49,25 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const UserTable = () => {
+const getLabelByLanguage = (state: any, locale: string): string => {
+  if (locale === 'es') {
+    return state.es_name;
+  } else if (locale === 'zh') {
+    return state.zh_name;
+  }
+  return state.name;
+};
+
+const getUserStateList = (states: any[], locale: string):{ name: string, uid: string}[] => {
+  return states.map((state: any) => {
+    return {
+      name: String(getLabelByLanguage(state, locale)),
+      uid: String(state.value),
+    }
+  })
+}
+
+const UserTable = ({ role, userStateList }: UserListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -74,46 +93,42 @@ const UserTable = () => {
 
   const [page, setPage] = useState(1);
 
-  const statusOptions = [
-    { name: "Active", uid: "active" },
-    { name: "Paused", uid: "paused" },
-    { name: "Vacation", uid: "vacation" },
-  ];
+  const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>(getUserStateList(userStateList, String(locale)));
 
   const hasSearchFilter = Boolean(filterValue);
 
   const getColumns = React.useMemo(() => {
     const columns = [
-      { name: "ID", uid: "id", sortable: true },
+      { name: "ID", uid: "id", sortable: false },
       {
         name: intl.formatMessage({ id: "customer_number" }),
         uid: "customer_number",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "username" }),
         uid: "username",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "contact" }),
         uid: "contact",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "payment_method" }),
         uid: "payment_method_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "user_level" }),
         uid: "user_level_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "state" }),
         uid: "state",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -209,7 +224,7 @@ const UserTable = () => {
                   <DropdownItem onClick={() => handleEdit(user["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleDelete(user["id"])}>
+                  <DropdownItem className={ role !== "ADMIN" ? 'do-not-show-dropdown-item' : '' } onClick={() => handleDelete(user["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
                 </DropdownMenu>
@@ -397,6 +412,10 @@ const UserTable = () => {
   useEffect(() => {
     loadUsers();
   }, []);
+
+  useEffect(() => {
+    setStatusOptions(getUserStateList(userStateList, String(locale)));
+  }, [locale, userStateList]);
 
   useEffect(() => {
     setLoading(true);

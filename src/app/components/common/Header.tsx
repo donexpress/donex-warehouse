@@ -6,7 +6,7 @@ import logoDE from "../../../assets/icons/logo_desktop.svg";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SelectLanguage from "./SelectLanguage";
 import { removeAllCookies, getCookie } from "../../../helpers/cookieUtils";
-import { UserProfile } from "../../../types";
+import { Profile } from "../../../types/profile";
 import { useIntl } from "react-intl";
 import { isOMS, isWMS } from "../../../helpers";
 import HorizontalMenu from "./HorizontalMenu";
@@ -18,7 +18,7 @@ const Header = () => {
   const router = useRouter();
   const { locale } = router.query;
   const [anchorEl, setAnchorEl] = useState(null);
-  const [profile, setProfile] = useState<UserProfile>({ username: "" });
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   const handleMenuOpen = (event: any) => {
     setAnchorEl(event.currentTarget);

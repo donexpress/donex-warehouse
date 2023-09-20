@@ -25,7 +25,7 @@ import { capitalize } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import { Staff } from "@/types/stafferege1992";
+import { Staff, StaffListProps, StaffState } from "@/types/stafferege1992";
 import PaginationTable from "../../common/Pagination";
 import { getStaff, removeStaff } from "@/services/api.stafferege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
@@ -46,7 +46,25 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const StaffTable = () => {
+const getLabelByLanguage = (state: StaffState, locale: string): string => {
+  if (locale === 'es') {
+    return state.es_name;
+  } else if (locale === 'zh') {
+    return state.zh_name;
+  }
+  return state.name;
+};
+
+const getStateList = (states: StaffState[], locale: string):{ name: string, uid: string}[] => {
+  return states.map((state: StaffState) => {
+    return {
+      name: getLabelByLanguage(state, locale),
+      uid: state.value,
+    }
+  })
+}
+
+const StaffTable = ({ role, staffStates }: StaffListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -72,11 +90,7 @@ const StaffTable = () => {
 
   const [page, setPage] = useState(1);
 
-  const statusOptions = [
-    { name: "Active", uid: "active" },
-    { name: "Paused", uid: "paused" },
-    { name: "Vacation", uid: "vacation" },
-  ];
+  const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>(getStateList(staffStates, String(locale)));
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -161,7 +175,8 @@ const StaffTable = () => {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(String(user.state))
+        // @ts-ignore
+        Array.from(statusFilter).includes(user.state ? String(user.state.value) : '')
       );
     }
 
@@ -218,7 +233,7 @@ const StaffTable = () => {
                   <DropdownItem onClick={() => handleEdit(user["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleDelete(user["id"])}>
+                  <DropdownItem className={ role !== "ADMIN" ? 'do-not-show-dropdown-item' : '' } onClick={() => handleDelete(user["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
                 </DropdownMenu>
@@ -406,6 +421,10 @@ const StaffTable = () => {
   useEffect(() => {
     loadStaffs();
   }, []);
+
+  useEffect(() => {
+    setStatusOptions(getStateList(staffStates, String(locale)));
+  }, [locale, staffStates]);
 
   useEffect(() => {
     setLoading(true);

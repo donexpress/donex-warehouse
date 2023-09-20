@@ -51,7 +51,25 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const WarehouseTable = () => {
+const getLabelByLanguage = (state: StateWarehouse, locale: string): string => {
+  if (locale === 'es') {
+    return state.es_name;
+  } else if (locale === 'zh') {
+    return state.zh_name;
+  }
+  return state.name;
+};
+
+const getStateList = (states: StateWarehouse[], locale: string):{ name: string, uid: string}[] => {
+  return states.map((state: StateWarehouse) => {
+    return {
+      name: getLabelByLanguage(state, locale),
+      uid: state.value,
+    }
+  })
+}
+
+const WarehouseTable = ({ states }: WarehouseListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -76,6 +94,8 @@ const WarehouseTable = () => {
     column: "name",
     direction: "ascending",
   });
+
+  const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>(getStateList(states, String(locale)));
 
   const [page, setPage] = useState(1);
 
@@ -138,6 +158,15 @@ const WarehouseTable = () => {
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase())
+      );
+    }
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
+      filteredUsers = filteredUsers.filter((user) =>
+        // @ts-ignore
+        Array.from(statusFilter).includes(user.state ? String(user.state.value) : '')
       );
     }
 
@@ -247,6 +276,31 @@ const WarehouseTable = () => {
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
+                  {intl.formatMessage({ id: "filters" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
+              >
+                {statusOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  className="bnt-select"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
                   {intl.formatMessage({ id: "columns" })}
                 </Button>
               </DropdownTrigger>
@@ -344,6 +398,10 @@ const WarehouseTable = () => {
   useEffect(() => {
     loadWarehouses();
   }, []);
+
+  useEffect(() => {
+    setStatusOptions(getStateList(states, String(locale)));
+  }, [locale, states]);
 
   useEffect(() => {
     setLoading(true);

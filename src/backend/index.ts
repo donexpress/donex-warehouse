@@ -16,10 +16,6 @@ export const removeUserPath = (id: number) => {
   return `${BASE_URL}/api/v1/user/${id}`;
 };
 
-export const getProfilePath = () => {
-  return BASE_URL + "/api/users/profile";
-};
-
 export const userStatePath = () => {
   return BASE_URL + "/api/v1/user_state";
 };
