@@ -87,11 +87,11 @@ export const storagePlanPath = (status: string = '') => {
 
 export const storagePlanStatePath = () => {
   return BASE_URL + "/api/v1/storage_plan/states";
-}
+};
 
 export const storagePlanCountPath = () => {
   return BASE_URL + "/api/v1/storage_plan/count";
-}
+};
 
 export const storagePlanByOrderNumberPath = (order_number: string) => {
   const params = `?query=${order_number}`;
@@ -100,6 +100,10 @@ export const storagePlanByOrderNumberPath = (order_number: string) => {
 
 export const countStoragePlanPath = () => {
   return BASE_URL + "/api/v1/storage_plan/count";
+};
+
+export const selfPath = () => {
+  return BASE_URL + "/api/v1/self";
 };
 
 export const packingListPath = () => {

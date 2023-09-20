@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textAlign: 'left',
     width: '100%',
+    fontWeight: 'bold'
   },
   logo: {
     width: 100,
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     border: '1pt solid #cccccc',
     borderWidth: 1,
     padding: 5,
-    textAlign: 'left',
+    textAlign: 'center',
     fontSize: 8,
     backgroundColor: '#f6f6f6',
     color: '#333333',
