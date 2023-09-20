@@ -1,11 +1,12 @@
 import axios from 'axios';
-import { countStoragePlanPath, storagePlanByOrderNumberPath, storagePlanPath } from '../backend';
+import { countStoragePlanPath, storagePlanByOrderNumberPath, storagePlanPath, storagePlanStatePath, storagePlanCountPath } from '../backend';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
 import { Response } from '../types/index';
-import { StoragePlan } from '../types/storage_plan';
+import { StoragePlan, StoragePlanState, StoragePlanCount } from '../types/storage_plan';
+import { StateCount } from '@/types/exit_planerege1992';
 
-export const countStoragePlan = async ():Promise<{count: number}> => {
+export const countStoragePlan = async ():Promise<StateCount> => {
     const response = await axios.get(countStoragePlanPath())
     return response.data
 }
@@ -48,6 +49,16 @@ export const getStoragePlanById = async (storagePlanId: number, context?: GetSer
   }
 }
 
+export const storagePlanCount = async (context?: GetServerSidePropsContext):Promise<StoragePlanCount | null> => {
+  const path = storagePlanCountPath();
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}
+
 export const removeStoragePlanById = async (storagePlanId: number):Promise<any | null> => {
   const path = storagePlanPath() + `/${storagePlanId}`;
   try {
@@ -58,7 +69,7 @@ export const removeStoragePlanById = async (storagePlanId: number):Promise<any |
   }
 }
 
-export const getStoragePlans = async (status: number = 0, context?: GetServerSidePropsContext):Promise<StoragePlan[] | null> => {
+export const getStoragePlans = async (status: string = '', context?: GetServerSidePropsContext):Promise<StoragePlan[] | null> => {
   const path = storagePlanPath(status);
   try {
     const response = await axios.get(path, getHeaders(context));
@@ -76,5 +87,14 @@ export const getStoragePlanByOrder_number = async(order_number: string, context?
   } catch (error) {
     return null;
   }
+}
 
+export const getStoragePlansState = async (context?: GetServerSidePropsContext):Promise<{ states: StoragePlanState[] } | null> => {
+  const path = storagePlanStatePath();
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
 }

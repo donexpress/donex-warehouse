@@ -1,4 +1,5 @@
 import { Shelf } from './shelf';
+import { PackingList } from './storage_plan';
 
 export type PackageShelf = {
     id?: number;
@@ -10,4 +11,5 @@ export type PackageShelf = {
     created_at?: string;
     updated_at?: string;
     shelf?: Shelf;
+    package?: PackingList;
 };

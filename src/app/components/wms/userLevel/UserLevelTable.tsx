@@ -59,11 +59,11 @@ const UserLevelTable = () => {
 
   const headerColumns = useMemo(() => {
     return [
-      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
+      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: false },
       {
         name: intl.formatMessage({ id: "designated_service" }),
         uid: "service_id",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -239,7 +239,7 @@ const UserLevelTable = () => {
   }, [
     selectedKeys,
     items.length,
-    sortedItems.length,
+    items.length,
     page,
     userLevels.length,
     rowsPerPage,
@@ -318,11 +318,9 @@ const UserLevelTable = () => {
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
         >
           <TableHeader columns={headerColumns}>
             {(column) => (
@@ -337,7 +335,7 @@ const UserLevelTable = () => {
           </TableHeader>
           <TableBody
             emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
               <TableRow key={item.id}>

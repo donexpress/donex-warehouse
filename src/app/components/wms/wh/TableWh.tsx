@@ -69,52 +69,52 @@ const WhTable = () => {
       {
         name: intl.formatMessage({ id: "warehouse_name" }),
         uid: "name",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "warehouse_code" }),
         uid: "code",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "country" }),
         uid: "country",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "contact" }),
         uid: "contact",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "address" }),
         uid: "address_1",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "address" }) + ' 2',
         uid: "address_2",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "postal_code" }),
         uid: "cp",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "phone" }),
         uid: "phone",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "email" }),
         uid: "email",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -176,6 +176,9 @@ const WhTable = () => {
                 <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Edit" })}
                 </DropdownItem>
+                <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
+                  {intl.formatMessage({ id: "config" })}
+                </DropdownItem>
                 <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Delete" })}
                 </DropdownItem>
@@ -183,6 +186,12 @@ const WhTable = () => {
             </Dropdown>
           </div>
         );
+      case "name": return (
+        <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.name}</span>
+      );
+      case "code": return (
+        <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.code}</span>
+      );
       default:
         return cellValue;
     }
@@ -362,6 +371,11 @@ const WhTable = () => {
   const handleAdd = () => {
     setLoading(true);
     router.push(`/${locale}/wms/warehouses/insert`);
+  };
+
+  const handleConfig = (id: number) => {
+    setLoading(true);
+    router.push(`/${locale}/wms/warehouses/${id}/config`);
   };
 
   const close = () => {

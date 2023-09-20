@@ -58,7 +58,7 @@ const UserFormBody = ({
           : null
         : null,
     // @ts-ignore
-    state: id && user && user.user_state ? user.user_state.value : null,
+    state: id && user && user.user_state ? user.user_state.value : 'normal',
     contact: id && user ? user.contact : "",
     company: id && user ? user.company : "",
     email: id && user ? user.email : "",
@@ -187,7 +187,7 @@ const UserFormBody = ({
       payment_method_id: values.payment_method_id
         ? Number(values.payment_method_id)
         : null,
-      state: values.state ? values.state : null,
+      state: values.state ? values.state : 'normal',
       user_level_id: values.user_level_id ? Number(values.user_level_id) : null,
       finantial_representative: values.finantial_representative
         ? Number(values.finantial_representative)
@@ -226,6 +226,14 @@ const UserFormBody = ({
       router.push(`/${locale}/wms/users`);
     } else {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      if (response.status === 409) {
+        message = intl.formatMessage({ id: "username_email_already_exists" });
+        if (response.data && response.data.message && (response.data.message === "username already exists")) {
+          message = intl.formatMessage({ id: "username_already_exists" });
+        } else if (response.data && response.data.message && (response.data.message === "email already exists")) {
+          message = intl.formatMessage({ id: "email_already_exists" });
+        }
+      }
       showMsg(message, { type: "error" });
     }
   };

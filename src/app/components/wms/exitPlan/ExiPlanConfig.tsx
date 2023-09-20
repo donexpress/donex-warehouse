@@ -8,6 +8,7 @@ import { getDateFormat, getHourFormat } from "../../../../helpers/utils";
 import { ExitPlanProps } from "../../../../types/exit_plan";
 import ExitPlanBox from "./ExitPlanBox";
 import ExitPlanAppendix from "./ExitPlanAppendix";
+import OperationInstructionTable from "../operationInstruction/OperationInstructionTable";
 
 const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
   const router = useRouter();
@@ -100,6 +101,7 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
           <>
             <ExitPlanBox exitPlan={exitPlan} />
             <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user}/>
+            <OperationInstructionTable />
           </>
         )}
       </div>

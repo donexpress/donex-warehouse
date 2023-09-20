@@ -17,6 +17,7 @@ import { countService } from '@/services/api.serviceerege1992';
 import { useIntl } from 'react-intl';
 import { countExitPlans } from '@/services/api.exit_planerege1992';
 import { countStoragePlan } from '@/services/api.storage_planerege1992';
+import { countWhs } from '@/services/api.wherege1992';
 import { countLine } from '@/services/api.lineserege1992';
 
 const RootWMS = () => {
@@ -47,10 +48,10 @@ const RootWMS = () => {
     countPaymentMethod().then(paymentMethod => setPaymentMethod(paymentMethod.count))
     countRole().then(role => setRole(role.count))
     countOrganization().then(organization => setOrganization(organization.count))
-    countWarehouse().then(warehouse => setWarehouse(warehouse.count))
+    countWhs().then(warehouse => setWarehouse(warehouse.count))
     countService().then(service => setService(service.count))
-    countStoragePlan().then(storagePlan => setStoragePlan(storagePlan.count))
-    countExitPlans().then(exitPLan => setExitPlans(exitPLan.count))
+    countStoragePlan().then(storagePlan => setStoragePlan(storagePlan.total))
+    countExitPlans().then(exitPLan => setExitPlans(exitPLan.total))
     countWarehouse().then(warehouse => setCargoStations(warehouse.count))
     countLine().then(line => setLine(line.count))
   }
@@ -69,13 +70,13 @@ const RootWMS = () => {
           <DashboardCard ammount={paymentMethod} text={intl.formatMessage({ id: 'payment_methods' })} Icon={FaCreditCard} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={role} text={intl.formatMessage({ id: 'roles' })} Icon={FaUserTie} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={organization} text={intl.formatMessage({ id: 'departments' })} Icon={FaLandmark} url={`/${locale}/wms/users`}/>
-          <DashboardCard ammount={warehouse} text={intl.formatMessage({ id: 'warehouses' })} Icon={FaWarehouse} url={`/${locale}/wms/users`}/>
+          <DashboardCard ammount={warehouse} text={intl.formatMessage({ id: 'warehouses' })} Icon={FaWarehouse} url={`/${locale}/wms/warehouses`}/>
           <DashboardCard ammount={service} text={intl.formatMessage({ id: 'services' })} Icon={FaServicestack} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={suppliers} text={intl.formatMessage({ id: 'suppliers' })} Icon={FaTruckFront} url={`/${locale}/wms/users`}/>
           <DashboardCard ammount={line} text={intl.formatMessage({ id: 'lineClassification' })} Icon={FaSackXmark} url={`/${locale}/wms/line_classification`}/>
           <DashboardCard ammount={storagePlan} text={intl.formatMessage({ id: 'storage_plans' })} Icon={FaTruckLoading} url={`/${locale}/wms/storage_plan`}/>
           <DashboardCard ammount={exitPLans} text={intl.formatMessage({ id: 'exitPlans' })} Icon={FaTruckMoving} url={`/${locale}/wms/exit_plan`}/>
-          <DashboardCard ammount={exitPLans} text={intl.formatMessage({ id: 'cargo_stations' })} Icon={FaTruck} url={`/${locale}/wms/warehouse_cargo_station`}/>
+          <DashboardCard ammount={cargoStations} text={intl.formatMessage({ id: 'cargo_stations' })} Icon={FaTruck} url={`/${locale}/wms/warehouse_cargo_station`}/>
         </div>
       </Layout>
     </ProtectedRoute>

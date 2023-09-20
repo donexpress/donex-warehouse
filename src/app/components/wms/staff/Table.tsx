@@ -82,46 +82,46 @@ const StaffTable = () => {
 
   const getColumns = React.useMemo(() => {
     const columns = [
-      { name: "ID", uid: "id", sortable: true },
+      { name: "ID", uid: "id", sortable: false },
       {
         name: intl.formatMessage({ id: "username" }),
         uid: "username",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "chinese_name" }),
         uid: "chinesse_name",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "fullname" }),
         uid: "english_name",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "email" }),
         uid: "email",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "phone" }),
         uid: "phone",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "organization_id" }),
         uid: "organization_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "role_id" }),
         uid: "role_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "state" }),
         uid: "state",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -396,7 +396,7 @@ const StaffTable = () => {
     items.length,
     page,
     hasSearchFilter,
-    sortedItems.length,
+    items.length,
     staffs.length,
     rowsPerPage,
     intl,
@@ -468,11 +468,9 @@ const StaffTable = () => {
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
         >
           <TableHeader columns={headerColumns}>
             {(column) => (
@@ -487,7 +485,7 @@ const StaffTable = () => {
           </TableHeader>
           <TableBody
             emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
               <TableRow key={item.id}>

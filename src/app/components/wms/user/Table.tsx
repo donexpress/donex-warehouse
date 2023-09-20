@@ -44,6 +44,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "username",
   "contact",
   "payment_method",
+  "state",
   "actions",
 ];
 

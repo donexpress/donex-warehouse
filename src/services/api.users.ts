@@ -102,13 +102,12 @@ export const createUser = async(data: any): Promise<Response> => {
   const path = userPath();
   try {
     const response = await axios.post(path, data, getHeaders());
-    
     if (response.status && (response.status >= 200 && response.status <= 299)) {
       return {...response.data, status: response.status};
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
+    return { status: error.response && error.response.status ? error.response.status : 0, data: error.response.data };
   }
 }
 
@@ -127,6 +126,6 @@ export const updateUser = async(id:number, data: any): Promise<Response> => {
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
+    return { status: error.response && error.response.status ? error.response.status : 0, data: error.response.data };
   }
 }

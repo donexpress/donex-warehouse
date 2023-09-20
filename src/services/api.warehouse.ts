@@ -27,7 +27,7 @@ export const createCargoTerminal = async (values: CargoStationWarehouseForm): Pr
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
+    return { status: error.response && error.response.status ? error.response.status : 0, data: error.response.data };
   }
 };
 
@@ -51,7 +51,7 @@ export const updateWarehouseById = async (warehouseId: number, warehouse: CargoS
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
+    return { status: error.response && error.response.status ? error.response.status : 0, data: error.response.data };
   }
 }
 

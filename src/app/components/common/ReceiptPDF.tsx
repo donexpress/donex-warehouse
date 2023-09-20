@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textAlign: 'left',
     width: '100%',
+    fontWeight: 'bold'
   },
   logo: {
     width: 100,
@@ -38,13 +39,13 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     flex: 1,
-    border: '1pt solid #080f25',
+    border: '1pt solid #cccccc',
     borderWidth: 1,
     padding: 5,
-    textAlign: 'left',
+    textAlign: 'center',
     fontSize: 8,
-    backgroundColor: '#080f25',
-    color: '#aeb9e1',
+    backgroundColor: '#f6f6f6',
+    color: '#333333',
   },
   headerCell: {
     backgroundColor: '#37446b',
@@ -56,6 +57,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 5,
     fontSize: 8,
+  },
+  minorCell: {
+    flex: 2
+  },
+  majorCell: {
+    flex: 3
   },
   image: {
     width: '100%',
@@ -96,10 +103,17 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
     return [];
   }
 
+  const getSecureUrl = (url: string): string => {
+    if (url.startsWith('http://')) {
+      return `https://${url.slice(7)}`;
+    }
+    return url;
+  };
+
   return (
     <Document>
         <Page size="A4" style={styles.page}>
-          <Image src="http://dc0-bucket.oss-us-west-1.aliyuncs.com/8Y2QlTD9eyFgyWt773lwMUJXGN0xDNHT.png" style={styles.logo} />
+          <Image src="https://dc0-bucket.oss-us-west-1.aliyuncs.com/8Y2QlTD9eyFgyWt773lwMUJXGN0xDNHT.png" style={styles.logo} />
   
           <Text style={styles.title}>{intl.formatMessage({ id: 'entry_plan_receipt' })}</Text>
           <Text style={styles.subtitle}>{intl.formatMessage({ id: 'entry_plan_data' })}</Text>
@@ -123,38 +137,40 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
   
           <View style={styles.table}>
             <View style={styles.tableRow}>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'box_number' })}</Text>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'expansion_box_number' })}</Text>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'location' })}</Text>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'storage_time' })}</Text>
-              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'delivery_time' })}</Text>
+              <Text style={[styles.headerCell, styles.majorCell]}>{intl.formatMessage({ id: 'box_number' })}</Text>
+              <Text style={[styles.headerCell, styles.majorCell]}>{intl.formatMessage({ id: 'expansion_box_number' })}</Text>
+              <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'location' })}</Text>
+              <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'storage_time' })}</Text>
+              <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'delivery_time' })}</Text>
             </View>
             {
               storagePlan.packing_list?.map((pl: PackingList, index: number) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{ pl.box_number }</Text>
-                  <Text style={styles.tableCell}>{ pl.case_number }</Text>
-                  <Text style={styles.tableCell}>{ packageShelfFormat(pl.package_shelf) }</Text>
-                  <Text style={styles.tableCell}>{ '--' }</Text>
-                  <Text style={styles.tableCell}>{ getDateFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }{ ' ' }{ getHourFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }</Text>
+                  <Text style={[styles.tableCell, styles.majorCell]}>{ pl.box_number }</Text>
+                  <Text style={[styles.tableCell, styles.majorCell]}>{ pl.case_number }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ packageShelfFormat(pl.package_shelf) }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ '--' }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ getDateFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }{ ' ' }{ getHourFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }</Text>
                 </View>
               ))
             }
           </View>
+        </Page>
 
-          {atLeastOneHasOperatorPicture(storagePlan.packing_list) &&
+        {atLeastOneHasOperatorPicture(storagePlan.packing_list) &&
+          <Page size="A4" style={styles.page}>
             <Text style={styles.subtitle}>{intl.formatMessage({ id: 'entry_plan_proof' })}</Text>
-          }
-
-          {getPackingListWithOperatorPicture(storagePlan.packing_list).map((pl: PackingList, index) => (
+            {getPackingListWithOperatorPicture(storagePlan.packing_list).map((pl: PackingList, index) => (
               <Image
                 key={index}
-                src={pl.operator_picture}
+                src={getSecureUrl(pl.operator_picture ? pl.operator_picture : '')}
                 style={styles.image}
               />
             ))
-          }
-        </Page>
+            }
+          </Page>
+        }
+        
       </Document>
   );
 };

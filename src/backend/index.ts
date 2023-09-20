@@ -80,9 +80,17 @@ export const countUserLevelPath = () => {
   return BASE_URL + "/api/v1/user_level/count";
 };
 
-export const storagePlanPath = (status: number = 0) => {
-  const params = status !== 0 ? `?state=${status}` : "";
+export const storagePlanPath = (status: string = '') => {
+  const params = status !== '' ? `?state=${status}` : "";
   return BASE_URL + "/api/v1/storage_plan" + params;
+};
+
+export const storagePlanStatePath = () => {
+  return BASE_URL + "/api/v1/storage_plan/states";
+};
+
+export const storagePlanCountPath = () => {
+  return BASE_URL + "/api/v1/storage_plan/count";
 };
 
 export const storagePlanByOrderNumberPath = (order_number: string) => {
@@ -92,6 +100,10 @@ export const storagePlanByOrderNumberPath = (order_number: string) => {
 
 export const countStoragePlanPath = () => {
   return BASE_URL + "/api/v1/storage_plan/count";
+};
+
+export const selfPath = () => {
+  return BASE_URL + "/api/v1/self";
 };
 
 export const packingListPath = () => {
@@ -156,6 +168,14 @@ export const packageShelfPath = () => {
 export const appendixPath = () => {
   return BASE_URL + "/api/v1/appendix";
 };
+
+export const shelfPath = () => {
+  return BASE_URL + "/api/v1/shelf";
+}
+
+export const operationInstructionPath = () => {
+  return BASE_URL +  '/api/v1/operation_instruction'
+}
 
 export const linePath = (page?: number, rowsPerPage?: number) => {
   let params = "";

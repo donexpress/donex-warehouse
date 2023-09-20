@@ -12,12 +12,10 @@ import {
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
 import { Button } from "@nextui-org/react";
-import { ExitPlan, ExitPlanProps } from "../../../../types/exit_plan";
+import { ExitPlan, ExitPlanProps, State } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
-import { getUsers } from "../../../../services/api.users";
 import { Warehouse } from "../../../../types/warehouse";
-import { getWhs } from "../../../../services/api.wh";
-import { indexCountries } from "../../../../services/api.countries";
+import { getHourFormat, getLanguage } from "@/helpers/utilserege1992";
 
 const ExitPlanFormBody = ({
   id,
@@ -26,6 +24,7 @@ const ExitPlanFormBody = ({
   countries,
   users,
   warehouses,
+  destinations,
 }: ExitPlanProps) => {
   const router = useRouter();
   const { locale } = router.query;
@@ -35,6 +34,8 @@ const ExitPlanFormBody = ({
   const date = new Date(
     exitPlan ? (exitPlan.delivered_time ? exitPlan.delivered_time : "") : ""
   );
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+  const [destinationSelected, setDestinationSelected] = useState<string>("");
   const initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
     warehouse_id:
@@ -45,16 +46,14 @@ const ExitPlanFormBody = ({
     country: id && exitPlan ? exitPlan.country : "",
     delivered_time:
       id && exitPlan
-        ? `${date.getFullYear()}-${
-            date.getMonth() > 9 ? date.getMonth() : "0" + date.getMonth()
-          }-${date.getDate() > 9 ? date.getDate() : "0" + date.getDate()}`
-        : "",
+        ? date.toISOString().slice(0,16) : "",
     observations: id && exitPlan ? exitPlan.observations : "",
     type: id && exitPlan ? exitPlan.type : -1,
     user_id:
       id && exitPlan && exitPlan.user && exitPlan.user.id
         ? exitPlan.user.id
         : undefined,
+    destination: id && exitPlan ? exitPlan.destination: ''
   };
 
   console.log(initialValues, exitPlan?.warehouse_id);
@@ -71,8 +70,7 @@ const ExitPlanFormBody = ({
     }
     if (isWMS()) {
       if (id) {
-        // await modify(id, values);
-        console.log(values);
+        await modify(id, values);
       } else {
         await create(values);
       }
@@ -80,6 +78,8 @@ const ExitPlanFormBody = ({
   };
 
   const create = async (values: ExitPlan) => {
+    const d = destinations?.destinations.find(el => el.value === destinationSelected)
+    values.destination = d?.value
     const response: Response = await createExitPlan(values);
     treatmentToResponse(response);
   };
@@ -134,10 +134,8 @@ const ExitPlanFormBody = ({
     }
   };
 
-  const getValueChangeWarehouse = (value: any) => {
-    if (value !== filter_warehouse) {
-      set_filter_warehouse(value);
-    }
+  const changeDestination = (value: any) => {
+    setDestinationSelected(value);
   };
 
   const getStatesFormattedCountries = (
@@ -150,6 +148,21 @@ const ExitPlanFormBody = ({
         label: country.emoji + " " + country.name,
       });
     });
+    return response;
+  };
+
+  const getDestinationFormatted = (
+    destination: { destinations: State[] } | undefined
+  ): ValueSelect[] => {
+    let response: ValueSelect[] = [];
+    if (destination) {
+      destination.destinations.forEach((dest) => {
+        response.push({
+          label: dest[getLanguage(intl)],
+          value: dest.value,
+        });
+      });
+    }
     return response;
   };
 
@@ -221,13 +234,26 @@ const ExitPlanFormBody = ({
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
+                    type="select-filter"
+                    name="destination"
+                    placeholder={intl.formatMessage({
+                      id: "destination",
+                    })}
+                    getValueChangeFn={changeDestination}
+                    options={getDestinationFormatted(destinations)}
+                    customClass="select-filter"
+                    disabled={isFromDetails}
+                  />
+                </div>
+                <div className="w-full sm:w-[49%]">
+                  <GenericInput
                     type="text"
                     name="address"
                     placeholder={intl.formatMessage({
                       id: "address",
                     })}
                     customClass="custom-input"
-                    disabled={isFromDetails}
+                    disabled={isFromDetails || destinationSelected !== 'private_address'}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
@@ -243,7 +269,7 @@ const ExitPlanFormBody = ({
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
-                    type="date"
+                    type="datetime-local"
                     name="delivered_time"
                     placeholder={intl.formatMessage({
                       id: "delivery_time",
