@@ -16,4 +16,6 @@ export enum RouteMenu {
     LIST_PAYMENT_METHODS = 'payment_methods',
     INSERT_USER_LEVEL = 'user_levels/insert',
     LIST_USER_LEVELS = 'user_levels',
+    INSERT_LINE_CLASSIFICATION = 'line_classification/insert',
+    LIST_LINE_CLASSIFICATION = 'line_classification',
 };
