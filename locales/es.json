@@ -65,7 +65,7 @@
 	"search": "Buscar",
 	"create": "Adicionar",
 	"id": "ID",
-	"nickname": "Apodo", 
+	"nickname": "Apodo",
 	"email": "Correo electrónico",
 	"phone": "Teléfono",
 	"mobile_phone": "Teléfono móvil",
@@ -168,7 +168,7 @@
 	"stocked_state": "Abastecido",
 	"cancelled_state": "Cancelado",
 	"loading_items": "Cargando elementos...",
-	
+
 	"box_number": "Número de caja",
 	"case_number": "Número de orden",
 	"client_weight": "Peso del cliente",
@@ -257,6 +257,7 @@
     "file_name": "Nombre del archivo",
 	"owner": "Dueño",
 	"function": "Función",
-	"create_appendix": "Crear apéndice"
-
+	"create_appendix": "Crear apéndice",
+	"contain_channels": "Contiene canales",
+	"include_order_account": "Incluye cuenta de pedido"
 }

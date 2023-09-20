@@ -70,7 +70,7 @@ export const menuWMS = (intl: IntlShape) => {
         {
           id: 3.3,
           label: intl.formatMessage({ id: "lineClassification" }),
-          route: "#",
+          route: RouteMenu.LIST_LINE_CLASSIFICATION,
         },
         {
           id: 3.4,
