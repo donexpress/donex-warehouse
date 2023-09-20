@@ -1,5 +1,5 @@
 export type OperationInstruction = {
-    operation_instruction_type: string[],
+    operation_instruction_type: any[],
     warehouse_id: number,
     output_plan_id: number,
     user_id: number,
