@@ -76,7 +76,7 @@
 	"search": "Search",
 	"create": "Add",
 	"id": "ID",
-	"nickname": "Nickname", 
+	"nickname": "Nickname",
 	"email": "Email",
 	"phone": "Phone",
 	"mobile_phone": "Mobile phone",
@@ -179,7 +179,7 @@
 	"stocked_state": "Stocked",
 	"cancelled_state": "Cancelled",
 	"loading_items": "Loading items...",
-	
+
 	"box_number": "Box number",
 	"case_number": "Transfer order number",
 	"client_weight": "Client weight",
@@ -297,6 +297,7 @@
 	"delivery": "Delivery",
 	"operation_instruction_type": "Operation instruction type",
 	"number_delivery": "Waybill No. / Box No. / SKU",
-	"internal_remark": "Internal remark"
-
+	"internal_remark": "Internal remark",
+	"contain_channels": "Contains channels",
+	"include_order_account": "Includes order account"
 }

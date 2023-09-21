@@ -1,6 +1,7 @@
 import { StaticImageData } from "next/image";
 import { Service } from './service';
 import { User } from './user';
+import { Line } from './line';
 import { Staff, StaffState } from './staff';
 import { PaymentMethod } from './payment_methods';
 import { UserState } from './user_state';
@@ -138,8 +139,8 @@ export type WarehouseListProps = {
 };
 
 export type ValueSelect = {
-  value: string | number; 
-  label: string 
+  value: string | number;
+  label: string
 };
 
 export type LoginResponse = {
@@ -195,6 +196,28 @@ export type StaffForm = {
     default_cargo_station_id: number | null;
     change_password_on_login: boolean;
     allow_search: boolean;
+};
+
+export type StaffFormProps = {
+  id?: number;
+  staff?: Staff;
+  isFromDetails?: boolean;
+  staffStates: StaffState[];
+  roles: Role[];
+  organizations: Organization[];
+  affiliations: CargoStationWarehouseForm[];
+};
+
+export type LineForm = {
+  name: string;
+  contain_channels?: string;
+  include_order_account?: string;
+};
+
+export type LineFormProps = {
+  id?: number;
+  line?: Line;
+  isFromDetails?: boolean;
 };
 
 export type Response = {

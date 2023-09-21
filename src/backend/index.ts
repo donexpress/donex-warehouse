@@ -172,3 +172,19 @@ export const shelfPath = () => {
 export const operationInstructionPath = () => {
   return BASE_URL +  '/api/v1/operation_instruction'
 }
+
+export const linePath = (page?: number, rowsPerPage?: number) => {
+  let params = "";
+  if (page && rowsPerPage) {
+    params = `?current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  return BASE_URL + "/api/v1/line_classification" + params;
+};
+
+export const countLinePath = () => {
+  return BASE_URL + "/api/v1/line_classification/count";
+};
+
+export const removeLinePath = (id: number) => {
+  return `${BASE_URL}/api/v1/line_classification/${id}`;
+};
