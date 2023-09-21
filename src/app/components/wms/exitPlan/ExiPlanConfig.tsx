@@ -97,11 +97,11 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
             </div>
           </div>
         </div>
-        {exitPlan && exitPlan.user && (
+        {exitPlan && exitPlan.user && exitPlan.id && (
           <>
             <ExitPlanBox exitPlan={exitPlan} />
             <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user}/>
-            <OperationInstructionTable />
+            <OperationInstructionTable exit_plan_id={exitPlan.id} />
           </>
         )}
       </div>
