@@ -22,7 +22,7 @@ import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import { PlusIcon } from "../../common/PlusIcon";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { useRouter } from "next/router";
-import { OperationInstruction } from "@/types/operation_instructionerege1992";
+import { OperationInstruction, InstructionTypeList, InstructionType } from "@/types/operation_instructionerege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -227,11 +227,27 @@ const OperationInstructionTable = () => {
             </Dropdown>
           </div>
         );
+      case "operation_instruction_type": {
+        const instructionTypes: InstructionTypeList = user.operation_instruction_type;
+        const values: string[] = instructionTypes.instruction_type.map((instruction: InstructionType) => {
+          return getInstructionLabelByLanguage(instruction);
+        });
+        return values.join(', ');
+      }  
       default:
         console.log(cellValue)
         return cellValue;
     }
-  }, [operationInstructions]);
+  }, [operationInstructions, locale]);
+
+  const getInstructionLabelByLanguage = (instruction: InstructionType) => {
+    if (locale === 'es') {
+      return instruction.es_name;
+    } else if (locale === 'zh') {
+      return instruction.zh_name;
+    }
+    return instruction.name;
+  };
 
   const changeTab = (tab: number) => {};
   return (
