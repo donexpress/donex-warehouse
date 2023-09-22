@@ -1,4 +1,9 @@
+import { ExitPlan } from "./exit_plan";
+import { User } from "./user";
+import { Warehouse } from "./warehouse";
+
 export type OperationInstruction = {
+    id?: number, 
     operation_instruction_type: string[],
     warehouse_id: number,
     output_plan_id: number,
@@ -8,7 +13,11 @@ export type OperationInstruction = {
     remark: any,
     internal_remark: any,
     client_display: boolean,
-    instruction_type?: string[]
+    state?: string,
+    instruction_type?: string[],
+    user?: User,
+    warehouse?: Warehouse,
+    output_plan?: ExitPlan 
  }
 
  export type InstructionTypeList = {

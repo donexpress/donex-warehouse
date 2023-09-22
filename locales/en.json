@@ -306,6 +306,10 @@
 	"internal_remark": "Internal remark",
 	"contain_channels": "Contains channels",
 	"include_order_account": "Includes order account",
+	"processing": "Processing",
+	"processed": "Processed",
+	"cancelled": "Cancelled",
+	"operation_instruction": "Operation instruction",
 
 	"area_code": "Area code",
 	"area_name": "Area Name",

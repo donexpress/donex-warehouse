@@ -7,7 +7,8 @@ export type Appendix = {
     id?: number
     meta?: any
     name: string
-    output_plan_id: number
+    output_plan_id?: number
+    operation_instruction_id?: number
     updated_at?: string
     url: string
     user_id: number
