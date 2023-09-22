@@ -188,3 +188,19 @@ export const countLinePath = () => {
 export const removeLinePath = (id: number) => {
   return `${BASE_URL}/api/v1/line_classification/${id}`;
 };
+
+export const divisionPath = (page?: number, rowsPerPage?: number) => {
+  let params = "";
+  if (page && rowsPerPage) {
+    params = `?current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  return BASE_URL + "/api/v1/regional_division" + params;
+};
+
+export const countDivisionPath = () => {
+  return BASE_URL + "/api/v1/regional_division/count";
+};
+
+export const removeDivisionPath = (id: number) => {
+  return `${BASE_URL}/api/v1/regional_division/${id}`;
+};

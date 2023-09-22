@@ -301,5 +301,26 @@
 	"number_delivery": "Waybill No. / Box No. / SKU",
 	"internal_remark": "Internal remark",
 	"contain_channels": "Contains channels",
-	"include_order_account": "Includes order account"
+	"include_order_account": "Includes order account",
+
+	"area_code": "Area code",
+	"area_name": "Area Name",
+	"contain_country": "Contains country",
+	"zip_start_with": "Zip code starts with",
+	"num_ruler_pakage_follow": "Package tracking number rule",
+	"reception_area": "Reception area",
+	"delivery_area": "Delivery area",
+
+	"route_sheet_number_variable": "Waybill number variable",
+	"inc4": "{inc4}: Four-digit auto increment number",
+	"inc5": "{inc5}: Five-digit auto increment number",
+	"inc6": "{inc6}: Six auto increment numbers",
+	"inc7": "{inc7}: Siete números de incremento automático",
+	"inc8": "{inc8}: Eight-digit autoincremental number",
+	"zone_code": "{zone_code}: Zone code",
+	"y2": "{y2}: Double digit year",
+	"y": "{y}: Year",
+	"m": "{m}: Month",
+	"d": "{d}: Day"
+
 }
