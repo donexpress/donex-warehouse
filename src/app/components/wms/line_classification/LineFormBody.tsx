@@ -102,7 +102,7 @@ const LineFormBody = ({ id, line, isFromDetails }: LineFormProps) => {
           {({ isSubmitting, isValid }) => (
             <Form className="flex flex-col gap-3">
               <div className="flex gap-3 flex-wrap justify-between">
-                <div className="w-full sm:w-[99%]">
+                <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="text"
                     name="name"
@@ -113,7 +113,7 @@ const LineFormBody = ({ id, line, isFromDetails }: LineFormProps) => {
                   />
                 </div>
 
-                <div className="w-full sm:w-[99%]">
+                <div className="w-full sm:w-[49%]">
                   <GenericInput
                       type="text"
                       name="contain_channels"
@@ -123,7 +123,7 @@ const LineFormBody = ({ id, line, isFromDetails }: LineFormProps) => {
                   />
                 </div>
 
-                <div className="w-full sm:w-[99%]">
+                <div className="w-full sm:w-[49%]">
                   <GenericInput
                       type="text"
                       name="include_order_account"

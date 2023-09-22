@@ -120,7 +120,7 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                         },
                         {
                             label: intl.formatMessage({ id: 'regionalDivision' }),
-                            route: '#'
+                            route: RouteMenu.LIST_REGIONAL_DIVISION
                         },
                         {
                             label: intl.formatMessage({ id: 'warehouseStation' }),
@@ -155,7 +155,7 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                         },
                         {
                             label: intl.formatMessage({ id: 'organization' }),
-                            route: '#'
+                            route: RouteMenu.LIST_ORGANIZATION
                         },
                         {
                             label: intl.formatMessage({ id: 'employeeRole' }),

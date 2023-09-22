@@ -15,23 +15,23 @@ import {
   Chip,
   Selection,
   ChipProps,
-  SortDescriptor,
 } from "@nextui-org/react";
 import { PlusIcon } from "./../../common/PlusIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
+
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-// import { Line } from "@/types/lineerege1992";
-import { Line } from "../../../../types/line";
-import PaginationTable from "../../common/Pagination";
-import { getLine, removeLine } from "@/services/api.lineserege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
+import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
+import {RegionalDivision, RegionalDivisionListProps} from "../../../../types/regional_division";
+import { countDivision, getRegionalDivision } from "@/services/api.regional_divisionerege1992";
+import {removeDivision} from "../../../../services/api.regional_division";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -40,20 +40,26 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
+  "area_code",
   "name",
-  "contain_channels",
-  "include_order_account",
+  "company",
+  "contain_country",
   "actions",
 ];
 
-const LinesTable = () => {
+const TableRegionalDivision = ({ regionalDivisionsTypes, divisionsCount }: RegionalDivisionListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
-  const [lines, setLines] = useState<Line[]>([]);
+  const [regionalDivisions, setRegionalDivisions] = useState<RegionalDivision[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
+  const [statusSelected, setStatusSelected] = useState<string>(regionalDivisionsTypes[0].value);
+  const [loadingItems, setLoadingItems] = useState<boolean>(false);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+
+  const [regDivisionsCount, setRegDivisionsCount] = useState(divisionsCount);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -65,10 +71,6 @@ const LinesTable = () => {
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
-    column: "id",
-    direction: "descending",
-  });
 
   const [page, setPage] = useState(1);
 
@@ -78,18 +80,23 @@ const LinesTable = () => {
     const columns = [
       { name: "ID", uid: "id", sortable: true },
       {
-        name: intl.formatMessage({ id: "name" }),
+        name: intl.formatMessage({ id: "area_code" }),
+        uid: "area_code",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "area_name" }),
         uid: "name",
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "contain_channels" }),
-        uid: "contain_channels",
+        name: intl.formatMessage({ id: "company" }),
+        uid: "company",
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "include_order_account" }),
-        uid: "include_order_account",
+        name: intl.formatMessage({ id: "contain_country" }),
+        uid: "contain_country",
         sortable: true,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -108,30 +115,23 @@ const LinesTable = () => {
   }, [visibleColumns, intl]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredLines = [...lines];
+    let filteredRegionalDivisions = [...regionalDivisions];
 
     if (hasSearchFilter) {
-      filteredLines = filteredLines.filter(
-          (storageP) =>
-              storageP.name
-                  ?.toLowerCase()
-                  ?.includes(filterValue.toLowerCase()) ||
-              storageP.contain_channels
-                  ?.toString()
-                  ?.toLowerCase()
-                  ?.includes(filterValue.toLowerCase()) ||
-              storageP.include_order_account
-                  ?.toString()
-                  ?.toLowerCase()
-                  ?.includes(filterValue.toLowerCase())
+      filteredRegionalDivisions = filteredRegionalDivisions.filter(
+        (divisionR) =>
+            divisionR.name
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase()) ||
+            divisionR.area_code
+            ?.toString()
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase())
       );
     }
 
-    return filteredLines;
-  }, [lines, filterValue, statusFilter]);
-
-
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+    return filteredRegionalDivisions;
+  }, [regionalDivisions, filterValue, statusFilter]);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -140,25 +140,15 @@ const LinesTable = () => {
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
 
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: Line, b: Line) => {
-      const first = a[sortDescriptor.column as keyof Line] as number;
-      const second = b[sortDescriptor.column as keyof Line] as number;
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [sortDescriptor, items]);
-
   const renderCell = React.useCallback(
-    (user: any, columnKey: React.Key) => {
-      const cellValue = user[columnKey];
+    (divisionR: any, columnKey: React.Key) => {
+      const cellValue = divisionR[columnKey];
       switch (columnKey) {
         case "status":
           return (
             <Chip
               className="capitalize"
-              color={statusColorMap[user.status]}
+              color={statusColorMap[divisionR.status]}
               size="sm"
               variant="flat"
             >
@@ -175,40 +165,25 @@ const LinesTable = () => {
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
-                  <DropdownItem onClick={() => handleShow(user["id"])}>
+                  <DropdownItem onClick={() => handleShow(divisionR["id"])}>
                     {intl.formatMessage({ id: "View" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleEdit(user["id"])}>
+                  <DropdownItem onClick={() => handleEdit(divisionR["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleDelete(user["id"])}>
+                  <DropdownItem onClick={() => handleDelete(divisionR["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </div>
           );
-        case "organization_id":
-          return user.organization ? user.organization.name : "";
-        case "role_id":
-          return user.role ? user.role.name : "";
-        case "state":
-          return user.state ? getLabelByLanguage(user.state) : "";
         default:
           return cellValue;
       }
     },
-    [intl]
+    [intl, statusSelected]
   );
-
-  const getLabelByLanguage = (state: any) => {
-    if (locale === 'es') {
-      return state.es_name;
-    } else if (locale === 'zh') {
-      return state.zh_name;
-    }
-    return state.name;
-  };
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -232,9 +207,21 @@ const LinesTable = () => {
     setPage(1);
   }, []);
 
+  const changeTab = async(tab: string) => {
+    if (tab !== statusSelected && !loadingItems) {
+      await setStatusSelected(tab);
+      await setLoadingItems(true);
+      const regionalDivisionss = await getRegionalDivision();
+      // const filteredRD = regionalDivisionss
+
+      await setLoadingItems(false);
+      await setRegionalDivisions(regionalDivisionss !== null ? regionalDivisionss : []);
+    }
+  }
+
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -282,7 +269,7 @@ const LinesTable = () => {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {intl.formatMessage({ id: "total_results" }, { in: lines.length })}
+            {intl.formatMessage({ id: "total_results" }, { in: regionalDivisions.length })}
           </span>
           <label className="flex items-center text-default-400 text-small">
             {intl.formatMessage({ id: "rows_page" })}
@@ -296,6 +283,20 @@ const LinesTable = () => {
             </select>
           </label>
         </div>
+        <div className="bg-gray-200 pt-1">
+          <div className="overflow-x-auto tab-system-table bg-content1">
+            <ul className="flex space-x-4">
+              {regionalDivisionsTypes.map((column, index) => (
+                  <li key={index} className="whitespace-nowrap">
+                    <button className={ statusSelected === column.value ? "px-4 py-3 tab-selected" : "px-4 py-3 tab-default" }
+                      onClick={() => changeTab(column.value)}>
+                      {column.label}
+                    </button>
+                  </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     );
   }, [
@@ -304,9 +305,12 @@ const LinesTable = () => {
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    lines.length,
+    regionalDivisions.length,
     hasSearchFilter,
     intl,
+    statusSelected,
+    selectedItems,
+    regDivisionsCount,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -321,7 +325,7 @@ const LinesTable = () => {
               )}`}
         </span>
         <PaginationTable
-          totalRecords={filteredItems.slice(0, lines.length).length}
+          totalRecords={filteredItems.slice(0, regionalDivisions.length).length}
           pageLimit={rowsPerPage}
           pageNeighbours={1}
           page={page}
@@ -332,17 +336,17 @@ const LinesTable = () => {
   }, [
     selectedKeys,
     items.length,
+    items.length,
     page,
-    hasSearchFilter,
-    sortedItems.length,
-    lines.length,
+    regionalDivisions.length,
     rowsPerPage,
+    hasSearchFilter,
     intl,
   ]);
   /** end*/
 
   useEffect(() => {
-    loadLines();
+    loadRegionalDivisions();
   }, []);
 
   useEffect(() => {
@@ -353,11 +357,15 @@ const LinesTable = () => {
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const loadLines = async () => {
+  const loadRegionalDivisions = async (loadCount: boolean = false) => {
     setLoading(true);
-    const _lines = await getLine();
-    setLines(_lines);
+    const regionalDivisionss = await getRegionalDivision();
 
+    setRegionalDivisions(regionalDivisionss !== null ? regionalDivisionss : []);
+    if (loadCount) {
+      const divisionCount = await countDivision();
+      setRegDivisionsCount(divisionCount ? divisionCount : undefined);
+    }
     setLoading(false);
   };
 
@@ -368,17 +376,22 @@ const LinesTable = () => {
 
   const handleEdit = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/line_classification/${id}/update`);
+    router.push(`/${locale}/wms/regional_division/${id}/update`);
+  };
+
+  const handleConfig = (id: number) => {
+    setLoading(true);
+    router.push(`/${locale}/wms/regional_division/${id}/config`);
   };
 
   const handleShow = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/line_classification/${id}/show`);
+    router.push(`/${locale}/wms/regional_division/${id}/show`);
   };
 
   const handleAdd = () => {
     setLoading(true);
-    router.push(`/${locale}/wms/line_classification/insert_line`);
+    router.push(`/${locale}/wms/regional_division/insert`);
   };
 
   const close = () => {
@@ -388,16 +401,26 @@ const LinesTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeLine(deleteElement);
+    const reponse = await removeDivision(deleteElement);
     close();
-    await loadLines();
+    await loadRegionalDivisions();
     setLoading(false);
   };
+
+  const selectedItemsFn = (selection: Selection) => {
+    setSelectedKeys(selection);
+    if (selection === 'all') {
+      setSelectedItems(regionalDivisions.map((rd: RegionalDivision) => Number(rd.id)));
+    } else {
+      setSelectedItems(Array.from(selection.values()).map(cadena => parseInt(cadena.toString())))
+    }
+  }
+
   return (
     <>
       <Loading loading={loading}>
         <Table
-          aria-label="LINE"
+          aria-label="USER"
           isHeaderSticky
           bottomContent={bottomContent}
           bottomContentPlacement="outside"
@@ -406,11 +429,9 @@ const LinesTable = () => {
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
-          onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
+          onSelectionChange={(keys: Selection) => {selectedItemsFn(keys)}}
         >
           <TableHeader columns={headerColumns}>
             {(column) => (
@@ -424,8 +445,8 @@ const LinesTable = () => {
             )}
           </TableHeader>
           <TableBody
-            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
+            items={loadingItems ? [] : items}
           >
             {(item) => (
               <TableRow key={item.id}>
@@ -441,4 +462,5 @@ const LinesTable = () => {
     </>
   );
 };
-export default LinesTable;
+
+export default TableRegionalDivision;

@@ -1,5 +1,5 @@
-import { RouteMenu } from "./../helpers/enums";
-import { IntlShape } from "react-intl";
+import {RouteMenu} from "./../helpers/enums";
+import {IntlShape} from "react-intl";
 
 export const menuWMS = (intl: IntlShape) => {
   return [
@@ -75,7 +75,7 @@ export const menuWMS = (intl: IntlShape) => {
         {
           id: 3.4,
           label: intl.formatMessage({ id: "regionalDivision" }),
-          route: "#",
+          route: RouteMenu.LIST_REGIONAL_DIVISION,
         },
         {
           id: 3.5,
@@ -97,7 +97,7 @@ export const menuWMS = (intl: IntlShape) => {
         {
           id: 4.2,
           label: intl.formatMessage({ id: "organization" }),
-          route: "#",
+          route: RouteMenu.LIST_ORGANIZATION,
         },
         {
           id: 4.3,

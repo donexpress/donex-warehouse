@@ -298,5 +298,27 @@
   "number_delivery": "运单号/箱号/SKU",
   "internal_remark": "内部评论",
   "contain_channels": "包含頻道",
-  "include_order_account": "包括訂單帳戶"
+  "include_order_account": "包括訂單帳戶",
+
+  "area_code": "區號",
+  "area_name": "區域名稱",
+  "contain_country": "包含國家",
+  "zip_start_with": "郵遞區號開頭為",
+  "num_ruler_pakage_follow": "包裹追蹤號碼規則",
+  "reception_area": "接待區",
+  "delivery_area": "送貨範圍",
+
+  "route_sheet_number_variable": "運單號可變",
+  "inc4": "{inc4}: 四位自動遞增編號",
+  "inc5": "{inc5}: 五位數自動遞增編號",
+  "inc6": "{inc6}: 六個自動遞增數字",
+  "inc7": "{inc7}: 七個自動遞增數字",
+  "inc8": "{inc8}: 八位自增數",
+  "zone_code": "{zone_code}: 區號",
+  "y2": "{y2}: 兩位數年份",
+  "y": "{y}: 年",
+  "m": "{m}: 月",
+  "d": "{d}: 天"
+
+
 }

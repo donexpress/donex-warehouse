@@ -298,6 +298,27 @@
 	"delivery": "Entrega",
 	"operation_instruction_type": "Tipo de instrucción de operación",
 	"number_delivery": "No. de guía de embarque / No. de caja / SKU",
-	"internal_remark": "Observaciones internas"
+	"internal_remark": "Observaciones internas",
+
+	"area_code": "Código de Área",
+	"area_name": "Nombre del Área",
+	"contain_country": "Contiene país",
+	"zip_start_with": "El código postal comienza con",
+	"num_ruler_pakage_follow": "Regla de números de seguimiento de paquetes",
+	"reception_area": "Área de recepción",
+	"delivery_area": "Zona de entrega",
+
+	"route_sheet_number_variable": "Variable de número de hoja de ruta",
+	"inc4": "{inc4}: Número de incremento automático de cuatro dígitos",
+	"inc5": "{inc5}: Número de incremento automático de cinco dígitos",
+	"inc6": "{inc6}: Seis números de incremento automático",
+	"inc7": "{inc7}: Siete números de incremento automático",
+	"inc8": "{inc8}: Número autoincremental de ocho dígitos",
+	"zone_code": "{zone_code}: Código de zona",
+	"y2": "{y2}: Año de dos dígitos",
+	"y": "{y}: Año",
+	"m": "{m}: Mes",
+	"d": "{d}: Día"
+
 
 }
