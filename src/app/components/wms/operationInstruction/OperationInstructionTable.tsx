@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useIntl } from "react-intl";
 import { capitalize, getDateFormat, getHourFormat, getLanguage } from "../../../../helpers/utils";
 import { ExitPlanState } from "@/types/exit_planerege1992";
-import { deleteOperationInstructions, getOperationInstructionStates, getOperationInstructions } from "../../../../services/api.operation_instruction";
+import { deleteOperationInstructions, getOperationInstructionStates, getOperationInstructions, getOperationInstructionsByOutputPlan } from "../../../../services/api.operation_instruction";
 import {
   Button,
   Dropdown,
@@ -37,7 +37,11 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const OperationInstructionTable = () => {
+interface Props {
+  exit_plan_id: number
+}
+
+const OperationInstructionTable = ({exit_plan_id}: Props) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -65,7 +69,8 @@ const OperationInstructionTable = () => {
   }, []);
   const loadStates = async () => {
     const states = await getOperationInstructionStates();
-    const opi = await getOperationInstructions()
+    const opi = await getOperationInstructionsByOutputPlan(exit_plan_id)
+    console.log(opi)
     setOperationInstructions(opi)
     setOperationInstructionState(states);
   };
@@ -126,13 +131,17 @@ const OperationInstructionTable = () => {
   }, [intl]);
 
   const handleAdd = () => {
-    router.push(`/${locale}/wms/operation_instruction/insert`);
+    router.push({pathname: `/${locale}/wms/operation_instruction/insert`, search: `?exit_plan_id=${exit_plan_id}`});
 
   };
 
-  const handleShow = (id: number) => {}
+  const handleShow = (id: number) => {
+    router.push({pathname: `/${locale}/wms/operation_instruction/${id}/show`});
+  }
 
-  const handleEdit = (id: number) => {}
+  const handleEdit = (id: number) => {
+    router.push({pathname: `/${locale}/wms/operation_instruction/${id}/update`});
+  }
 
   const handleCancel = (id: number) => {}
 
@@ -143,6 +152,7 @@ const OperationInstructionTable = () => {
 
   const confirm = async() => {
     const result  = await deleteOperationInstructions(selectedId)
+    await loadStates()
     close()
   }
 
@@ -233,7 +243,13 @@ const OperationInstructionTable = () => {
           return getInstructionLabelByLanguage(instruction);
         });
         return values.join(', ');
-      }  
+      }
+      case "warehouse_id": {
+        return user.warehouse.name
+      }
+      case "output_plan_id": {
+        return user.output_plan.output_number
+      }
       default:
         console.log(cellValue)
         return cellValue;

@@ -1,5 +1,5 @@
 export type OperationInstruction = {
-    operation_instruction_type: string,
+    operation_instruction_type: string[],
     warehouse_id: number,
     output_plan_id: number,
     user_id: number,
@@ -7,7 +7,8 @@ export type OperationInstruction = {
     number_delivery: string,
     remark: any,
     internal_remark: any,
-    client_display: boolean
+    client_display: boolean,
+    instruction_type?: string[]
  }
 
  export type InstructionTypeList = {
