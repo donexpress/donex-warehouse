@@ -96,7 +96,8 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
     const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         // @ts-ignore
         const {value} = event.target;
-        setSelectedType(regionalDivisionsTypes.find(t=> t.value == value));
+        console.log(value);
+        setSelectedType(regionalDivisionsTypes.find(t=> t.value == Number(value)));
     }
 
     return (

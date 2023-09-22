@@ -47,7 +47,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const TableRegionalDivision = ({ regionalDivisionsTypes, divisionsCount }: RegionalDivisionListProps) => {
+const TableRegionalDivision = ({ regionalDivisionsTypes }: RegionalDivisionListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -55,11 +55,9 @@ const TableRegionalDivision = ({ regionalDivisionsTypes, divisionsCount }: Regio
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [statusSelected, setStatusSelected] = useState<string>(regionalDivisionsTypes[0].value);
+  const [statusSelected, setStatusSelected] = useState<number>(regionalDivisionsTypes[0].value);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-
-  const [regDivisionsCount, setRegDivisionsCount] = useState(divisionsCount);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -207,7 +205,7 @@ const TableRegionalDivision = ({ regionalDivisionsTypes, divisionsCount }: Regio
     setPage(1);
   }, []);
 
-  const changeTab = async(tab: string) => {
+  const changeTab = async(tab: number) => {
     if (tab !== statusSelected && !loadingItems) {
       await setStatusSelected(tab);
       await setLoadingItems(true);
@@ -310,7 +308,6 @@ const TableRegionalDivision = ({ regionalDivisionsTypes, divisionsCount }: Regio
     intl,
     statusSelected,
     selectedItems,
-    regDivisionsCount,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -362,10 +359,6 @@ const TableRegionalDivision = ({ regionalDivisionsTypes, divisionsCount }: Regio
     const regionalDivisionss = await getRegionalDivision();
 
     setRegionalDivisions(regionalDivisionss !== null ? regionalDivisionss : []);
-    if (loadCount) {
-      const divisionCount = await countDivision();
-      setRegDivisionsCount(divisionCount ? divisionCount : undefined);
-    }
     setLoading(false);
   };
 

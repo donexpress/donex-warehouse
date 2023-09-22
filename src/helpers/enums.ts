@@ -19,5 +19,5 @@ export enum RouteMenu {
     INSERT_LINE_CLASSIFICATION = 'line_classification/insert',
     LIST_LINE_CLASSIFICATION = 'line_classification',
     LIST_REGIONAL_DIVISION = 'regional_division',
-    LIST_ORGANIZATION = 'organization',
+    LIST_ORGANIZATION = 'users',
 };
