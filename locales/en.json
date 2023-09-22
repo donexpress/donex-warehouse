@@ -299,5 +299,9 @@
 	"number_delivery": "Waybill No. / Box No. / SKU",
 	"internal_remark": "Internal remark",
 	"contain_channels": "Contains channels",
-	"include_order_account": "Includes order account"
+	"include_order_account": "Includes order account",
+	"processing": "Processing",
+	"processed": "Processed",
+	"cancelled": "Cancelled",
+	"operation_instruction": "Operation instruction"
 }

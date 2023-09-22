@@ -38,6 +38,22 @@ export const getAppendagesByExitPlanId = async (
   }
 };
 
+export const getAppendagesByOperationInstructionId = async (
+  exitPlanId: number,
+  context?: GetServerSidePropsContext
+): Promise<Appendix[] | null> => {
+  const path = appendixPath();
+  try {
+    const response = await axios.get(
+      `${path}/by_operation_instruction/${exitPlanId}`,
+      getHeaders(context)
+    );
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export const deleteAppendix = async (
   appendixId: number,
   context?: GetServerSidePropsContext

@@ -299,5 +299,10 @@
 	"number_delivery": "No. de guía de embarque / No. de caja / SKU",
 	"internal_remark": "Observaciones internas",
 	"contain_channels": "Contiene canales",
-	"include_order_account": "Incluye cuenta de pedido"
+	"include_order_account": "Incluye cuenta de pedido",
+	"processing": "Procesando",
+	"processed": "Procesada",
+	"cancelled": "Cancelada",
+	"operation_instruction": "Instrucción de operación"
+
 }

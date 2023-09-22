@@ -39,7 +39,12 @@ import {
   State,
   StateCount,
 } from "../../../../types/exit_plan";
-import { capitalize, getDateFormat, getHourFormat, getLanguage } from "../../../../helpers/utils";
+import {
+  capitalize,
+  getDateFormat,
+  getHourFormat,
+  getLanguage,
+} from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
 import { showMsg } from "../../../../helpers";
@@ -94,7 +99,7 @@ const ExitPlanTable = () => {
 
   const hasSearchFilter = Boolean(filterValue);
 
-  const [destinations, setDestinations] = useState<State[]>([])
+  const [destinations, setDestinations] = useState<State[]>([]);
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -288,6 +293,9 @@ const ExitPlanTable = () => {
                 >
                   {intl.formatMessage({ id: "return" })}
                 </DropdownItem>
+                <DropdownItem onClick={() => handleOperationInstruction(user)}>
+                  {intl.formatMessage({ id: "operation_instruction" })}
+                </DropdownItem>
                 <DropdownItem
                   className={
                     user.state.value !== "pending"
@@ -310,13 +318,17 @@ const ExitPlanTable = () => {
       case "warehouse":
         return <span>{user["warehouse"]["name"]}</span>;
       case "destination":
-        if(user["destination_ref"]) {
-          return <span>{user['destination_ref'][getLanguage(intl)]}</span>
+        if (user["destination_ref"]) {
+          return <span>{user["destination_ref"][getLanguage(intl)]}</span>;
         } else {
-          return <span>-</span>
+          return <span>-</span>;
         }
       case "delivered_time":
-        return <span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>
+        return (
+          <span>
+            {getDateFormat(cellValue)}, {getHourFormat(cellValue)}
+          </span>
+        );
       case "output_number":
         return (
           <CopyColumnToClipboard
@@ -381,8 +393,8 @@ const ExitPlanTable = () => {
   };
 
   const onFinishFilter = (data: ExitPlan[]) => {
-    setExitPlans(data)
-  }
+    setExitPlans(data);
+  };
 
   const topContent = React.useMemo(() => {
     return (
@@ -432,7 +444,10 @@ const ExitPlanTable = () => {
             </Button>
           </div>
         </div>
-        <FilterExitPlan onFinish={onFinishFilter} destionations={destinations}/>
+        <FilterExitPlan
+          onFinish={onFinishFilter}
+          destionations={destinations}
+        />
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
@@ -466,7 +481,9 @@ const ExitPlanTable = () => {
                       {state[getLanguage(intl)]}
                       {count && (
                         <>
-                          {state.value === "all" && <span> ({count.total})</span>}
+                          {state.value === "all" && (
+                            <span> ({count.total})</span>
+                          )}
                           {state.value !== "all" && (
                             // @ts-ignore
                             <span> ({count[state.value]})</span>
@@ -545,8 +562,8 @@ const ExitPlanTable = () => {
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
     const count = await countExitPlans();
-    const destinations = await getExitPlanDestinations()
-    setDestinations(destinations.destinations)
+    const destinations = await getExitPlanDestinations();
+    setDestinations(destinations.destinations);
     setCount(count);
     setExitPlanState(states);
     setLoading(false);
@@ -591,6 +608,17 @@ const ExitPlanTable = () => {
     ]);
     setChangeExitPlanId(exitPlan.id ? exitPlan.id : -1);
     setShowListPackage(true);
+  };
+
+  const handleOperationInstruction = (exitPlan: ExitPlan) => {
+    if (
+      exitPlan.operation_instructions &&
+      exitPlan.operation_instructions.length > 0
+    ) {
+      router.push(`/${locale}/wms/exit_plan/${exitPlan.id}/config`);
+    } else {
+      router.push(`/${locale}/wms/operation_instruction/insert?exit_plan_id=${exitPlan.id}`)
+    }
   };
 
   const closeListPackage = () => {
