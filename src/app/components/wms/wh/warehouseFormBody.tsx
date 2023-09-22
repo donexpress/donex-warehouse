@@ -45,7 +45,12 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
   
       const cancelSend = () => {
           if (isWMS()) {
-            router.push(`/${locale}/wms/warehouses`);
+            const goBack = router.query.goBack;
+            if (goBack && goBack === 'config' && !!id) {
+              router.push(`/${locale}/wms/warehouses/${id}/config`);
+            } else {
+              router.push(`/${locale}/wms/warehouses`);
+            }
           }
       };
   
@@ -73,7 +78,13 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
     if (response.status >= 200 && response.status <= 299) {
       const message = id ? intl.formatMessage({ id: 'changedsuccessfullyMsg' }) : intl.formatMessage({ id: 'successfullyMsg' });
       showMsg(message, { type: "success" });
-      router.push(`/${locale}/wms/warehouses`);
+      
+      const goBack = router.query.goBack;
+      if (goBack && goBack === 'config' && !!id) {
+        router.push(`/${locale}/wms/warehouses/${id}/config`);
+      } else {
+        router.push(`/${locale}/wms/warehouses`);
+      }
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
       if (response.status === 409) {

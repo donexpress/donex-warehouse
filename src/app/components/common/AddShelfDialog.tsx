@@ -160,7 +160,7 @@ const AddShelfDialog = ({ close, confirm, title, partition_table, warehouse, she
                       <GenericInput
                         type="number"
                         name="column_ammount"
-                        placeholder={intl.formatMessage({ id: 'columns' })}
+                        placeholder={intl.formatMessage({ id: 'levels' })}
                         customClass="custom-input"
                         minValue={0}
                         onChangeFunction={handleInputChange}

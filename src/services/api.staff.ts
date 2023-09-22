@@ -19,9 +19,13 @@ export const countStaff = async (
   return response.data;
 };
 
-export const removeStaff = async (id: number) => {
-  const response = await axios.delete(removeStaffPath(id), getHeaders());
-  return response.data;
+export const removeStaff = async (id: number):Promise<Response> => {
+  try {
+    const response = await axios.delete(removeStaffPath(id), getHeaders());
+    return { status: response.status, data: response.data };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
 };
 
 export const createStaff = async (data: any): Promise<Response> => {

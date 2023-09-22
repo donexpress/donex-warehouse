@@ -6,10 +6,11 @@ import { Formik, Form } from "formik";
 import GenericInput from "./GenericInput";
 import { useIntl } from "react-intl";
 import { AppProps, LoginBody, LoginResponse } from "../../../types";
+import { Profile } from '../../../types/profile';
 import "../../../styles/common.scss";
 import SelectLanguage from "./SelectLanguage";
 import generateValidationSchema from "../../../validation/generateValidationSchema";
-import { login } from "../../../services/api.users";
+import { login, indexProfile } from "../../../services/api.users";
 import { setCookie } from "../../../helpers/cookieUtils";
 import { showMsg } from "../../../helpers";
 import { useRouter } from "next/router";
@@ -32,23 +33,36 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
       response.status <= 299 &&
       response.token !== undefined
     ) {
-      showMsg(intl.formatMessage({ id: "successLoginMsg" }), {
-        type: "success",
-      });
-
       if (inWMS) {
         setCookie("tokenWMS", response.token);
-        setCookie("profileWMS", JSON.stringify({ username: values.username }));
-        router.push(`/${locale}/wms`);
       } else {
         setCookie("tokenOMS", response.token);
-        setCookie("profileOMS", JSON.stringify({ username: values.username }));
-        router.push(`/${locale}/oms`);
+      }
+
+      const profile: Profile | null = await indexProfile();
+      if (profile !== null) {
+        showMsg(intl.formatMessage({ id: "successLoginMsg" }), {
+          type: "success",
+        });
+  
+        if (inWMS) {
+          setCookie("profileWMS", profile);
+          router.push(`/${locale}/wms`);
+        } else {
+          setCookie("profileOMS", profile);
+          router.push(`/${locale}/oms`);
+        }
+      } else {
+        let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+        showMsg(message, { type: "error" });
       }
     } else {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       if (response.status === 401) {
         message = intl.formatMessage({ id: "dontExistUserPasswordMsg" });
+        if (response.message === "We have a problem with this user. Please contact an administrator for a solution.") {
+          message = intl.formatMessage({ id: "user_with_problem" });
+        }
       }
       showMsg(message, { type: "error" });
     }

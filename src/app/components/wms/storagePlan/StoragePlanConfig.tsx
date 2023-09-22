@@ -73,7 +73,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
       };
 
       const goToEdit = () => {
-        router.push(`/${locale}/wms/storage_plan/${id}/update`)
+        router.push(`/${locale}/wms/storage_plan/${id}/update?goBack=config`)
       };
 
       const handleUpdateRow = (id: number, updatedValues: PackingList) => {

@@ -48,13 +48,13 @@ export const getPaymentMethodById = async (paymentMethodId: number, context?: Ge
   }
 }
 
-export const removePaymentMethodById = async (paymentMethodId: number):Promise<any | null> => {
+export const removePaymentMethodById = async (paymentMethodId: number):Promise<Response> => {
   const path = paymentMethodPath() + `/${paymentMethodId}`;
   try {
     const response = await axios.delete(path, getHeaders());
-    return response.data;
-  } catch (error) {
-    return null;
+    return { status: response.status, data: response.data };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
   }
 }
 

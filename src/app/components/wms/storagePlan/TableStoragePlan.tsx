@@ -23,7 +23,7 @@ import { ExportIcon } from "./../../common/ExportIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
-import { capitalize } from "../../../../helpers/utils";
+import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
 import { showMsg, storagePlanDataToExcel } from "../../../../helpers";
 
 import { useIntl } from "react-intl";
@@ -207,6 +207,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
               {cellValue}
             </Chip>
           );
+        case "delivered_time":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         case "actions":
           return (
             <div className="relative flex justify-end items-center gap-2">
@@ -229,12 +231,12 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
                   <DropdownItem className={statusSelected !== 'to be storage' ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
-                  <DropdownItem className={statusSelected === 'refused' ? 'do-not-show-dropdown-item' : ''} onClick={() => openDeclineStoragePlanDialog(storageP)}>
+                  {/* <DropdownItem className={statusSelected === 'refused' ? 'do-not-show-dropdown-item' : ''} onClick={() => openDeclineStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "decline" })}
                   </DropdownItem>
                   <DropdownItem className={statusSelected === 'returns' ? 'do-not-show-dropdown-item' : ''} onClick={() => openReturnStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "returns" })}
-                  </DropdownItem>
+                  </DropdownItem> */}
                   <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl)}>
                     {intl.formatMessage({ id: "export" })}
                   </DropdownItem>
@@ -532,7 +534,13 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeStoragePlanById(deleteElement);
+    const response = await removeStoragePlanById(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadStoragePlans();
     setLoading(false);

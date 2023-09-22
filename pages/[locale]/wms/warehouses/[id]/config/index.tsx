@@ -5,7 +5,7 @@ import WarehouseConfig from '../../../../../../src/app/components/wms/wh/Warehou
 import { WarehouseConfigProps } from '../../../../../../src/types/warehouse';
 import { getWhById } from '../../../../../../src/services/api.wh';
 
-const ConfigWarehouse = ({ warehouse, id }: WarehouseConfigProps) => {console.log(warehouse)
+const ConfigWarehouse = ({ warehouse, id }: WarehouseConfigProps) => {
     
     return (
     <ProtectedRoute>

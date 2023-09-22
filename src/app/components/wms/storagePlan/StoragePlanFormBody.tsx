@@ -16,6 +16,7 @@ import { Warehouse } from '../../../../types/warehouse';
 import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 import CheckboxesStoragePlan from './CheckboxesStoragePlan';
+import SelectUserStoragePlan from './SelectUserStoragePlan';
 
 const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails }: StoragePlanProps) => {
     const router = useRouter();
@@ -36,13 +37,14 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         label: "6"
       }
     ];
+    const [warehouseOfUser, setWarehouseOfUser] = useState<number>(-1);
     
     const initialValues: StoragePlan = {
         customer_order_number: (id && storagePlan) ? storagePlan.customer_order_number : '',
         user_id: (id && storagePlan) ? storagePlan.user_id : null,
         warehouse_id: (id && storagePlan) ? storagePlan.warehouse_id : null,
         box_amount: (id && storagePlan) ? storagePlan.box_amount : 0,
-        delivered_time: (id && storagePlan) ? (storagePlan.delivered_time ? storagePlan.delivered_time.substring(0,10) : null) : null,
+        delivered_time: (id && storagePlan) ? (storagePlan.delivered_time ? storagePlan.delivered_time.substring(0,16) : null) : null,
         observations: (id && storagePlan) ? storagePlan.observations : '',
         rejected_boxes: (id && storagePlan) ? storagePlan.rejected_boxes : false,
         return: (id && storagePlan) ? storagePlan.return : false,
@@ -54,8 +56,13 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     };
   
       const cancelSend = () => {
+          const goBack = router.query.goBack;
           if (isWMS()) {
-            router.push(`/${locale}/wms/storage_plan`);
+            if (goBack && goBack === 'config' && !!id) {
+              router.push(`/${locale}/wms/storage_plan/${id}/config`);
+            } else {
+              router.push(`/${locale}/wms/storage_plan`);
+            }
           }
       };
 
@@ -70,8 +77,19 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         return response;
       };
 
-      const getWarehousesFormatted = (warehouseAll: Warehouse[]): ValueSelect[] => {
+      const getWarehousesFormatted = (warehouseAll: Warehouse[], warehouseOfU: number = -1): ValueSelect[] => {
         let response: ValueSelect[] = [];
+        if (warehouseOfU !== -1) {
+          const warehouseOfUserList = warehouseAll.filter((wh: Warehouse) => wh.id === warehouseOfU);
+          if (warehouseOfUserList.length > 0) {
+            return warehouseOfUserList.map((wh: Warehouse) => {
+              return {
+                value: Number(wh.id),
+                label: wh.name + ` (${wh.code})`
+              }
+            })
+          }
+        }
         warehouseAll.forEach((warehouse) => {
           response.push({
             value: Number(warehouse.id),
@@ -81,7 +99,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         return response;
       };
   
-      const formatBody = (values: StoragePlan): StoragePlan => {console.log(values);
+      const formatBody = (values: StoragePlan): StoragePlan => {
         return {
                 user_id: values.user_id ? Number(values.user_id) : null,
                 warehouse_id: values.warehouse_id ? Number(values.warehouse_id) : null,
@@ -91,16 +109,12 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: getState(values.state, values.rejected_boxes, values.return),
+                state: getState(values.state),
               };
       }
 
-      const getState = (state: string | undefined, rejected: boolean = false, returns: boolean = false) => {
-        if (rejected) {
-          return 'refused';
-        } else if (returns) {
-          return 'returns';
-        } else if (state) {
+      const getState = (state: string | undefined) => {
+        if (state) {
           return state;
         }
         return 'to be storage';
@@ -172,7 +186,12 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         const response: Response = await updateStoragePlanById(storagePlanId, formatBody(values));
         if (response.status >= 200 && response.status <= 299) {
           showMsg(intl.formatMessage({ id: 'changedsuccessfullyMsg' }), { type: "success" });
-          router.push(`/${locale}/wms/storage_plan`);
+          const goBack = router.query.goBack;
+          if (goBack && goBack === 'config' && !!id) {
+            router.push(`/${locale}/wms/storage_plan/${id}/config`);
+          } else {
+            router.push(`/${locale}/wms/storage_plan`);
+          }
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
           showMsg(message, { type: "error" });
@@ -270,6 +289,10 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         setRows(updatedRows);
       };
 
+      const changeWarehouse = (id: number) => {
+        setWarehouseOfUser(id);
+      };
+
     return (
         <div className='user-form-body shadow-small' style={{ paddingRight: '0px' }}>
             <h1 className="text-xl font-semibold">
@@ -301,23 +324,16 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           />
                         </div>
                         <div className="w-full sm:w-[49%]">
-                          <GenericInput
-                            type="select"
-                            name="user_id"
-                            selectLabel={intl.formatMessage({ id: 'select_user' })}
-                            options={getUsersFormatted(users)}
-                            customClass="custom-input"
-                            disabled={ isFromDetails }
-                          />
+                          <SelectUserStoragePlan options={getUsersFormatted(users)} users={users} warehouses={warehouses} changeWarehouse={changeWarehouse} isFromDetails={!!isFromDetails}></SelectUserStoragePlan>
                         </div>
                         <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="select"
                             name="warehouse_id"
                             selectLabel={intl.formatMessage({ id: 'select_warehouse' })}
-                            options={getWarehousesFormatted(warehouses)}
+                            options={getWarehousesFormatted(warehouses, warehouseOfUser)}
                             customClass="custom-input"
-                            disabled={ isFromDetails || (!!id && storagePlan && storagePlan.state !== 'to be storage') }
+                            disabled={ isFromDetails || (!!id && storagePlan && storagePlan.state !== 'to be storage') || (warehouseOfUser !== -1) }
                             required
                           />
                         </div>
@@ -335,7 +351,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                         </div>
                         <div className="w-full sm:w-[49%]">
                           <GenericInput
-                            type="date"
+                            type="datetime-local"
                             name="delivered_time"
                             placeholder={intl.formatMessage({ id: 'delivery_time' })}
                             customClass="custom-input"

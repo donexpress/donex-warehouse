@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import { HistoryStoragePlanProps, History as HistorySP, StoragePlan, PackingList } from '../../../../types/storage_plan';
 import { PackageShelf } from '../../../../types/package_shelf';
 import ElementHistoryDialog from '../../common/ElementHistoryDialog';
+import { getDateFormat, getHourFormat } from '../../../../helpers/utils';
 
 const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStoragePlanProps) => {
     const router = useRouter();
@@ -95,12 +96,12 @@ const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStora
                                             </div>
                                             <div style={{ marginBottom: '5px' }}>
                                                 {
-                                                    getDateFromStr(historySP.data.updated_at)
+                                                    historySP.data.updated_at ? getDateFormat(historySP.data.updated_at) : ''
                                                 }
                                             </div>
                                             <div>
                                                 {
-                                                    getHourFromStr(historySP.data.updated_at)
+                                                    historySP.data.updated_at ? getHourFormat(historySP.data.updated_at) : ''
                                                 }
                                             </div>
                                         </div>

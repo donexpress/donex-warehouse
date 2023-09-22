@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { 
   countUsersPath,
-  getProfilePath,
+  selfPath,
   loginPath,
   paymentMethodPath,
   removeUserPath,
@@ -9,7 +9,8 @@ import {
   userPath,
   userStatePath
  } from '../backend';
-import { LoginBody, LoginResponse, UserProfile, Response } from '../types/index';
+import { LoginBody, LoginResponse, Response } from '../types/index';
+import { Profile } from '../types/profile';
 import { getHeaders, isWMS } from '../helpers';
 import { User } from '@/types/usererege1992';
 import { UserState, UserStateDefault } from '@/types/user_stateerege1992';
@@ -33,7 +34,7 @@ export const login = async (values: LoginBody): Promise<LoginResponse> => {
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
+    return { status: error.response && error.response.status ? error.response.status : 0, message: (error.response.data && error.response.data.message) ? error.response.data.message : '' };
   }
 };
 
@@ -59,21 +60,12 @@ export const getPaymentMethods = async (context?: GetServerSidePropsContext):Pro
   }
 }
 
-export const indexProfile = async (): Promise<UserProfile | null> => {
-  const path = getProfilePath();
+export const indexProfile = async (context?: GetServerSidePropsContext): Promise<Profile | null> => {
+  const path = selfPath();
   try {
-    //const response = await axios.get(path);
-    const data: UserProfile = {
-      id: 1,
-      username: 'connor92', 
-      fullname: 'Connor Street Eugene',
-      profile_image: 'https://img.freepik.com/foto-gratis/joven-confiado_1098-20868.jpg?t=st=1681790781~exp=1681791381~hmac=e7a9f1fd2c2ff3892d470cd5a02a18d08db3ef4524596f1dbaa5cde540254dda',
-      phone_number: '1234***5678',
-      email: 'test***135@gmail.com'
-    };
-    return data;
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -93,9 +85,13 @@ export const getUserStates = async(context?: GetServerSidePropsContext): Promise
   return response.data
 }
 
-export const removeUser = async(id: number) => {
-  const response = await axios.delete(removeUserPath(id), getHeaders())
-  return response.data
+export const removeUser = async(id: number): Promise<Response> => {
+  try {
+    const response = await axios.delete(removeUserPath(id), getHeaders())
+    return { status: response.status, data: response.data }
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
 }
 
 export const createUser = async(data: any): Promise<Response> => {

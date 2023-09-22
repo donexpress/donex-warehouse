@@ -1,6 +1,12 @@
 import { CargoStationWarehouseForm } from './index';
 import { Role } from './role';
 import { Organization } from './organization';
+import { RoleType } from './profile';
+
+export type StaffListProps = {
+    role: RoleType | '';
+    staffStates: StaffState[];
+};
 
 export type Staff = {
     id: number;

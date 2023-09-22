@@ -16,15 +16,6 @@ export type LanguageObj = {
   flag: StaticImageData | string;
 }
 
-export type UserProfile = {
-  id?: number;
-  username: string;
-  fullname?: string;
-  profile_image?: string;
-  phone_number?: string;
-  email?: string;
-};
-
 export type MessageOpts = {
   type?: TypeOptions;
   position?: TypePositions;
@@ -144,10 +135,7 @@ export type UserFormProps = {
 };
 
 export type WarehouseListProps = {
-  warehouseList: CargoStationWarehouseForm[];
   states: StateWarehouse[];
-  countries: Country[];
-  receptionAreas: any[];
 };
 
 export type ValueSelect = {
@@ -158,6 +146,7 @@ export type ValueSelect = {
 export type LoginResponse = {
   status: number;
   token?: string;
+  message?: string;
 };
 
 export type Country = {
