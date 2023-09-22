@@ -59,6 +59,7 @@ const RootWMS = () => {
     countDivision().then(division => setRegionalDivision(division.count))
   }
 
+
   return (
   <ProtectedRoute>
       <Layout>
@@ -81,7 +82,6 @@ const RootWMS = () => {
           <DashboardCard ammount={exitPLans} text={intl.formatMessage({ id: 'exitPlans' })} Icon={FaTruckMoving} url={`/${locale}/wms/exit_plan`}/>
           <DashboardCard ammount={cargoStations} text={intl.formatMessage({ id: 'cargo_stations' })} Icon={FaTruck} url={`/${locale}/wms/warehouse_cargo_station`}/>
           <DashboardCard ammount={regionalDivision} text={intl.formatMessage({ id: 'regionalDivision' })} Icon={FaTruck} url={`/${locale}/wms/regional_division`}/>
-          <DashboardCard ammount={organization} text={intl.formatMessage({ id: 'organization' })} Icon={FaTruck} url={`/${locale}/wms/organization`}/>
         </div>
       </Layout>
     </ProtectedRoute>

@@ -2,16 +2,13 @@ import axios from 'axios';
 import {
     countDivisionPath,
     divisionPath,
-    RegionalDivisionPath,
-    removeDivisionPath, storagePlanCountPath,
-    storagePlanPath,
-    subsidiaryPath
+    removeDivisionPath,
 } from '../backend';
 import { RegionalDivision } from '@/types/regional_divisionerege1992';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
 import {Response} from "../types";
-import {StoragePlanCount} from "../types/storage_plan";
+import {RegionalDivisionCount} from "../types/regional_division";
 
 
 export const getRegionalDivision = async(context?: GetServerSidePropsContext): Promise<RegionalDivision[] | null> => {
@@ -24,7 +21,7 @@ export const getRegionalDivision = async(context?: GetServerSidePropsContext): P
     }
 }
 
-export const countDivision = async (context?: GetServerSidePropsContext):Promise<StoragePlanCount | null> => {
+export const countDivision = async (context?: GetServerSidePropsContext):Promise<RegionalDivisionCount | null> => {
     const path = countDivisionPath();
     try {
         const response = await axios.get(path, getHeaders(context));
