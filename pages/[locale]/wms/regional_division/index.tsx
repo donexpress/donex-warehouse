@@ -7,7 +7,7 @@ import {useIntl} from "react-intl";
 import {countDivision} from "../../../../src/services/api.regional_division";
 import {RegionalDivisionCountProps} from "../../../../src/types/regional_division";
 
-const Index = ({divisionsCount} : RegionalDivisionCountProps) => {
+const Index = () => {
   const intl = useIntl();
   const regionalDivisionsTypes = [{value: 1, label: intl.formatMessage({ id: "reception_area" })}, {value: 2, label: intl.formatMessage({ id: "delivery_area" })}];
   return (
@@ -17,19 +17,19 @@ const Index = ({divisionsCount} : RegionalDivisionCountProps) => {
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
-        <TableRegionalDivision regionalDivisionsTypes={regionalDivisionsTypes ? regionalDivisionsTypes : []} divisionsCount={divisionsCount}/>
+        <TableRegionalDivision regionalDivisionsTypes={regionalDivisionsTypes ? regionalDivisionsTypes : []} />
       </ProtectedRoute>
     </Layout>
   );
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const divisionsCount = await countDivision(context);
-
-    return {
-        props: {
-            divisionsCount
-        }
-    }
-}
+// export async function getServerSideProps(context: GetServerSidePropsContext) {
+//     const divisionsCount = await countDivision(context);
+//
+//     return {
+//         props: {
+//             divisionsCount
+//         }
+//     }
+// }
 export default Index;

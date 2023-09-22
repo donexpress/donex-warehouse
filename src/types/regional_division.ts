@@ -36,7 +36,7 @@ export type RegionalDivisionFormProps = {
 
 export type RegionalDivisionListProps = {
     regionalDivisionList?: RegionalDivision[];
-    regionalDivisionsTypes: StoragePlanState[];
+    regionalDivisionsTypes: {value: number, label: string}[];
     divisionsCount?: RegionalDivisionCount;
 };
 
