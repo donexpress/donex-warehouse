@@ -32,6 +32,7 @@ import { UserLevel, UserLevelListProps } from "../../../../types/user_levels";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { Service } from "@/types/serviceerege1992";
+import { showMsg } from "../../../../helpers";
 
 const UserLevelTable = () => {
   const intl = useIntl();
@@ -300,7 +301,13 @@ const UserLevelTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeUserLevelById(deleteElement);
+    const response = await removeUserLevelById(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadWarehouses();
     setLoading(false);
