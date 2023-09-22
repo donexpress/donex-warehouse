@@ -2,10 +2,7 @@ import ProtectedRoute from "@/app/components/common/ProtectedRouteerege1992";
 import Layout from "@/app/layouterege1992";
 import Head from "next/head";
 import TableRegionalDivision from "../../../../src/app/components/wms/regional_division/TableRegionalDivision";
-import {GetServerSidePropsContext} from "next";
 import {useIntl} from "react-intl";
-import {countDivision} from "../../../../src/services/api.regional_division";
-import {RegionalDivisionCountProps} from "../../../../src/types/regional_division";
 
 const Index = () => {
   const intl = useIntl();
