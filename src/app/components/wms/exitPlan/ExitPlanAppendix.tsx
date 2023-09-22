@@ -5,17 +5,19 @@ import { useIntl } from "react-intl";
 import AddAppendixDialog from "./AddAppendixDialog";
 import { ExitPlan } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
-import { deleteAppendix, getAppendagesByExitPlanId } from "../../../../services/api.appendix";
+import { deleteAppendix, getAppendagesByExitPlanId, getAppendagesByOperationInstructionId } from "../../../../services/api.appendix";
 import { Appendix } from "../../../../types/appendix";
 import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { showMsg } from "@/helperserege1992";
+import { OperationInstruction } from "@/types/operation_instructionerege1992";
 
 interface Props {
-  exitPlan: ExitPlan;
+  exitPlan?: ExitPlan;
+  operationInstruction?: OperationInstruction;
   owner: User;
 }
-const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
+const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
   const intl = useIntl();
   const [showAppendixDialog, setShowAppendixDialog] = useState<boolean>(false);
   const [appendages, setAppendages] = useState<Appendix[]>([]);
@@ -38,9 +40,15 @@ const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
   };
 
   const loadAppendages = async () => {
-    const result = await getAppendagesByExitPlanId(
-      exitPlan.id ? exitPlan.id : -1
-    );
+    let result = null
+    if(exitPlan) {
+      result = await getAppendagesByExitPlanId(
+        exitPlan.id ? exitPlan.id : -1
+      );
+    } else {
+      result = await getAppendagesByOperationInstructionId(operationInstruction?.id ? operationInstruction.id : -1)
+    }
+    
     if (result) {
       setAppendages(result);
     }
@@ -155,6 +163,7 @@ const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
         <AddAppendixDialog
           exitPlan={exitPlan}
           owner={owner}
+          operationInstruction={operationInstruction}
           close={closeAppendixDialog}
           confirm={confirmAppendixDialog}
           title={intl.formatMessage({ id: "create_appendix" })}

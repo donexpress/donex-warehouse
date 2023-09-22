@@ -9,13 +9,15 @@ import { User } from "../../../../types/user";
 import { ExitPlan } from "../../../../types/exit_plan";
 import { createAppendix } from "@/services/api.appendixerege1992";
 import { Appendix } from "@/types/appendixerege1992";
+import { OperationInstruction } from "@/types/operation_instructionerege1992";
 
 interface Props {
   close: () => any;
   confirm: () => any;
   title: string;
   owner: User;
-  exitPlan: ExitPlan;
+  exitPlan?: ExitPlan;
+  operationInstruction?: OperationInstruction;
 }
 
 const AddAppendixDialog = ({
@@ -24,12 +26,22 @@ const AddAppendixDialog = ({
   title,
   exitPlan,
   owner,
+  operationInstruction,
 }: Props) => {
   const intl = useIntl();
+
+  const calcExitplan = (): string =>  {
+    if(exitPlan && exitPlan.output_number) {
+      return exitPlan.output_number
+    } else if(operationInstruction && operationInstruction.output_plan && operationInstruction.output_plan.output_number) {
+      return operationInstruction.output_plan.output_number
+    }
+    return ""
+  }
   const [initialValues, setInitialValues] = useState({
     name: "",
     user: owner.nickname,
-    exit_plan: exitPlan.output_number ? exitPlan.output_number : '',
+    exit_plan: calcExitplan(),
     function: "",
     url: "",
   });
@@ -51,15 +63,28 @@ const AddAppendixDialog = ({
     function: string;
     url: string;
   }) => {
-    const appendix: Appendix = {
+    let appendix: Appendix | null = null;
+    if (exitPlan) {
+      appendix = {
         name: values.name,
         user_id: owner.id,
         output_plan_id: exitPlan.id ? exitPlan.id : -1,
         function: values.function,
-        url: values.url
+        url: values.url,
+      };
+    } else if(operationInstruction) {
+      appendix = {
+        name: values.name,
+        user_id: owner.id,
+        function: values.function,
+        url: values.url,
+        operation_instruction_id: operationInstruction.id
+      };
+    } 
+    if(appendix) {
+      const response = await createAppendix(appendix);
+      confirm();
     }
-    const response = await createAppendix(appendix);
-    confirm()
   };
 
   return (

@@ -1,4 +1,5 @@
 import { Country } from ".";
+import { OperationInstruction } from "./operation_instruction";
 import { PackingList, StoragePlan } from "./storage_plan";
 import { User } from "./user";
 import { Warehouse } from "./warehouse";
@@ -28,6 +29,7 @@ export type ExitPlan = {
   state?: State
   packing_lists?: PackingList[];
   destination?: string;
+  operation_instructions?: OperationInstruction[]
   destination_ref?: {
     name: string;
     es_name: string;

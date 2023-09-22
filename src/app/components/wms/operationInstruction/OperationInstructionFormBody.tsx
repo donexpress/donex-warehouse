@@ -9,9 +9,13 @@ import { ValueSelect } from "@/typeserege1992";
 import { getLanguage } from "@/helpers/utilserege1992";
 import { Warehouse } from "@/types/warehouseerege1992";
 import { Button } from "@nextui-org/react";
-import { createOperationInstruction, updateOperationInstruction } from "@/services/api.operation_instructionerege1992";
+import {
+  createOperationInstruction,
+  updateOperationInstruction,
+} from "@/services/api.operation_instructionerege1992";
 import { useRouter } from "next/router";
 import { User } from "@/types/usererege1992";
+import ExitPlanAppendix from "../exitPlan/ExitPlanAppendix";
 
 interface Props {
   types: State[];
@@ -81,8 +85,6 @@ const OperationInstructionFormBody = ({
         : 0,
   };
 
-  console.log(initialValues);
-
   const handleSubmit = async (values: OperationInstruction) => {
     const instruction_type: string[] = [];
     types.forEach((type) => {
@@ -96,13 +98,20 @@ const OperationInstructionFormBody = ({
     });
     values.operation_instruction_type = instruction_type;
     if (isModify) {
-      await updateOperationInstruction(id ? id :-1, values)
+      console.log(values);
+      await updateOperationInstruction(id ? id : -1, values);
     } else {
       await createOperationInstruction(values);
     }
-    router.push(`/${locale}/wms/exit_plan/`);
+    if (exit_plan_id) {
+      router.push(`/${locale}/wms/exit_plan/${exit_plan_id}/config`);
+    } else {
+      router.push(`/${locale}/wms/exit_plan/${operationInstruction?.output_plan_id}/config`);
+    }
   };
-  const goToEdit = () => {};
+  const goToEdit = () => {
+    router.push(`/${locale}/wms/exit_plan/${operationInstruction?.output_plan_id}/update`);
+  };
   const cancelSend = () => {};
 
   const getTypesFormatted = (types: State[]): ValueSelect[] => {
@@ -157,7 +166,7 @@ const OperationInstructionFormBody = ({
             ? intl.formatMessage({ id: "vizualice" })
             : intl.formatMessage({ id: "modify" })
           : intl.formatMessage({ id: "insert" })}{" "}
-        {intl.formatMessage({ id: "exitPlan" })}
+        {intl.formatMessage({ id: "operation_instruction" })}
       </h1>
       <div className="user-form-body__container">
         <Formik
@@ -289,6 +298,8 @@ const OperationInstructionFormBody = ({
           )}
         </Formik>
       </div>
+      {/* @ts-ignore */}
+      {/* <ExitPlanAppendix owner={exitPlans.find((el) => el.id === Number(exit_plan_id))} operationInstruction={operationInstruction} /> */}
     </div>
   );
 };

@@ -302,6 +302,10 @@
 	"operation_instruction_type": "Tipo de instrucción de operación",
 	"number_delivery": "No. de guía de embarque / No. de caja / SKU",
 	"internal_remark": "Observaciones internas",
+	"processing": "Procesando",
+	"processed": "Procesada",
+	"cancelled": "Cancelada",
+	"operation_instruction": "Instrucción de operación",
 
 	"area_code": "Código de Área",
 	"area_name": "Nombre del Área",
