@@ -59,13 +59,13 @@ export const storagePlanCount = async (context?: GetServerSidePropsContext):Prom
   }
 }
 
-export const removeStoragePlanById = async (storagePlanId: number):Promise<any | null> => {
+export const removeStoragePlanById = async (storagePlanId: number):Promise<Response> => {
   const path = storagePlanPath() + `/${storagePlanId}`;
   try {
     const response = await axios.delete(path, getHeaders());
-    return response.data;
-  } catch (error) {
-    return null;
+    return { status: response.status, data: response.data };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
   }
 }
 

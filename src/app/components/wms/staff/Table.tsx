@@ -31,6 +31,7 @@ import { getStaff, removeStaff } from "@/services/api.stafferege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
+import { showMsg } from "../../../../helpers";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -469,7 +470,13 @@ const StaffTable = ({ role, staffStates }: StaffListProps) => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeStaff(deleteElement);
+    const response = await removeStaff(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadStaffs();
     setLoading(false);

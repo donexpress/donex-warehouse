@@ -32,6 +32,7 @@ import { SearchIcon } from "./../../common/SearchIcon";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
+import { showMsg } from "../../../../helpers";
 
 const PaymentMethodTable = () => {
   const intl = useIntl();
@@ -287,7 +288,13 @@ const PaymentMethodTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removePaymentMethodById(deleteElement);
+    const response = await removePaymentMethodById(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadWarehouses();
 

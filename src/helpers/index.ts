@@ -7,6 +7,7 @@ import { StoragePlan } from '../types/storage_plan';
 import * as FileSaver from "file-saver";
 import XLSX from "sheetjs-style";
 import { IntlShape } from 'react-intl';
+import { getDateFormat, getHourFormat } from './utils';
 
 const baseMessageOpts: Pick<MessageOpts, 'type' | 'position' | 'autoClose' | 'hideProgressBar' | 'closeOnClick' | 'pauseOnHover' | 'draggable' | 'theme'> = {
   type: 'success',
@@ -136,7 +137,7 @@ export const storagePlanDataToExcel = (storagePlans: StoragePlan[], intl: IntlSh
     sPlan[key3] = sp.user ? sp.user.username : '';
     sPlan[key4] = sp.warehouse ? (`${sp.warehouse.name} (${sp.warehouse.code})`) : '';
     sPlan[key5] = sp.box_amount.toString();
-    sPlan[key6] = `${getDateFromStr(sp.delivered_time ? sp.delivered_time : undefined)} ${getHourFromStr(sp.delivered_time ? sp.delivered_time : undefined)}`;
+    sPlan[key6] = `${sp.delivered_time ? getDateFormat(sp.delivered_time) : ''} ${sp.delivered_time ? getHourFormat(sp.delivered_time) : ''}`;
     sPlan[key7] = sp.observations;
     dataToExport.push(sPlan);
   });

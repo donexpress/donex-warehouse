@@ -56,8 +56,13 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     };
   
       const cancelSend = () => {
+          const goBack = router.query.goBack;
           if (isWMS()) {
-            router.push(`/${locale}/wms/storage_plan`);
+            if (goBack && goBack === 'config' && !!id) {
+              router.push(`/${locale}/wms/storage_plan/${id}/config`);
+            } else {
+              router.push(`/${locale}/wms/storage_plan`);
+            }
           }
       };
 
@@ -104,16 +109,12 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: getState(values.state, values.rejected_boxes, values.return),
+                state: getState(values.state),
               };
       }
 
-      const getState = (state: string | undefined, rejected: boolean = false, returns: boolean = false) => {
-        if (rejected) {
-          return 'refused';
-        } else if (returns) {
-          return 'returns';
-        } else if (state) {
+      const getState = (state: string | undefined) => {
+        if (state) {
           return state;
         }
         return 'to be storage';
@@ -185,7 +186,12 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         const response: Response = await updateStoragePlanById(storagePlanId, formatBody(values));
         if (response.status >= 200 && response.status <= 299) {
           showMsg(intl.formatMessage({ id: 'changedsuccessfullyMsg' }), { type: "success" });
-          router.push(`/${locale}/wms/storage_plan`);
+          const goBack = router.query.goBack;
+          if (goBack && goBack === 'config' && !!id) {
+            router.push(`/${locale}/wms/storage_plan/${id}/config`);
+          } else {
+            router.push(`/${locale}/wms/storage_plan`);
+          }
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
           showMsg(message, { type: "error" });

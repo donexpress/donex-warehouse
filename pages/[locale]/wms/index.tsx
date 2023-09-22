@@ -19,6 +19,7 @@ import { countExitPlans } from '@/services/api.exit_planerege1992';
 import { countStoragePlan } from '@/services/api.storage_planerege1992';
 import { countWhs } from '@/services/api.wherege1992';
 import { countLine } from '@/services/api.lineserege1992';
+import { countDivision } from '@/services/api.regional_divisionerege1992';
 
 const RootWMS = () => {
   const [user, setUser] = useState<number>(0)
@@ -34,6 +35,7 @@ const RootWMS = () => {
   const [storagePlan, setStoragePlan] = useState<number>(0)
   const [exitPLans, setExitPlans] = useState<number>(0)
   const [cargoStations, setCargoStations] = useState<number>(0)
+  const [regionalDivision, setRegionalDivision] = useState<number>(0)
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
@@ -54,7 +56,9 @@ const RootWMS = () => {
     countExitPlans().then(exitPLan => setExitPlans(exitPLan.total))
     countWarehouse().then(warehouse => setCargoStations(warehouse.count))
     countLine().then(line => setLine(line.count))
+    countDivision().then(division => setRegionalDivision(division.count))
   }
+
 
   return (
   <ProtectedRoute>
@@ -77,6 +81,7 @@ const RootWMS = () => {
           <DashboardCard ammount={storagePlan} text={intl.formatMessage({ id: 'storage_plans' })} Icon={FaTruckLoading} url={`/${locale}/wms/storage_plan`}/>
           <DashboardCard ammount={exitPLans} text={intl.formatMessage({ id: 'exitPlans' })} Icon={FaTruckMoving} url={`/${locale}/wms/exit_plan`}/>
           <DashboardCard ammount={cargoStations} text={intl.formatMessage({ id: 'cargo_stations' })} Icon={FaTruck} url={`/${locale}/wms/warehouse_cargo_station`}/>
+          <DashboardCard ammount={regionalDivision} text={intl.formatMessage({ id: 'regionalDivision' })} Icon={FaTruck} url={`/${locale}/wms/regional_division`}/>
         </div>
       </Layout>
     </ProtectedRoute>

@@ -3,12 +3,14 @@ import { Button } from "@nextui-org/react";
 import '../../../../styles/wms/user.form.scss';
 import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
-import { Shelf, ShelfConfigProps } from '../../../../types/shelf'
+import { Shelf, ShelfConfigProps, ShelfConfig } from '../../../../types/shelf'
 import { PackageShelf } from '../../../../types/package_shelf'
 import { PackingList } from '../../../../types/storage_plan'
 import { Response } from '../../../../types'
 import { updateShelfById } from '../../../../services/api.shelf';
 import { showMsg } from '../../../../helpers'
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import LocationLabelsPDF from '../../common/LocationLabelsPDF';
 
 const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => {
     const router = useRouter();
@@ -17,6 +19,7 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
     const [sendRequest, setSendRequest] = useState<boolean>(false);
     const [layers, setLayers] = useState<number>(shelf.layers);
     const [columns, setColumns] = useState<number>(shelf.column_ammount);
+    const [shelfConfig, setShelfConfig] = useState<ShelfConfig>(shelf);
     const [packageByCell, setPackageByCell] = useState<string[][][]>([]);
 
     useEffect(() => {
@@ -63,6 +66,7 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
             if (response.status >= 200 && response.status <= 299) {
                 showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
                 setLayers(layers + value);
+                setShelfConfig({...shelfConfig, layers: layers + value});
                 setSendRequest(false);
             } else {
                 setSendRequest(false);
@@ -77,6 +81,7 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
             if (response.status >= 200 && response.status <= 299) {
                 showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
                 setColumns(columns + value);
+                setShelfConfig({...shelfConfig, column_ammount: columns + value});
                 setSendRequest(false);
             } else {
                 setSendRequest(false);
@@ -140,6 +145,18 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
                     >
                       {intl.formatMessage({ id: 'remove_column' })}
                     </Button>
+                    <Button
+                      color="primary"
+                      type="button"
+                      className='px-4'
+                      isDisabled={sendRequest}
+                    >
+                        <PDFDownloadLink document={<LocationLabelsPDF warehouse={warehouse} shelfs={[shelfConfig]} intl={intl} />} fileName="location_labels.pdf">
+                          {({ blob, url, loading, error }) =>
+                            intl.formatMessage({ id: "generate_labels" })
+                          }
+                        </PDFDownloadLink>
+                    </Button>
                   </div>
                   <div className='w-full' style={{ padding: '16px 0 0' }}>
                     <div className='boxes-container'>
@@ -168,61 +185,6 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
                             }
                         </div>
                     </div>
-                    {/* {
-                        storagePlan && storagePlan.history && (
-                            <div className='w-full' style={{ borderLeft: 'dashed 2px white' }}>
-                            {storagePlan.history.map((historySP: HistorySP, index: number) => (
-                                <div className='w-full' key={index} style={{ padding: '0 15px', textAlign: 'left', position: 'relative', minHeight: '20px', background: index%2 === 0 ? 'none' : '#37446b' }} onClick={() => {openElementHistoryDialog(historySP)}}>
-                                    <div style={{ height: '25px', width: '25px', borderRadius: '50%', background: '#9CA5AE', position: 'absolute', top: '0', left: '-13px', zIndex: '10' }}></div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '190px 1fr', columnGap: '20px', padding: '10px 0 10px 15px' }}>
-                                        <div className='elements-center-start'>
-                                            <div style={{ display: 'inline-block', marginBottom: '10px', padding: '3px 10px', background: 'white', color: '#333', borderRadius: '15px' }}>
-                                                {
-                                                    historySP.type === 'packing_list' && <span style={{fontSize: '11px'}}>{intl.formatMessage({ id: 'packing_list_item' })}</span>
-                                                }
-                                                {
-                                                    historySP.type === 'storage_plan' && <span style={{fontSize: '11px'}}>{intl.formatMessage({ id: 'storagePlan' })}</span>
-                                                }
-                                            </div>
-                                            <div style={{ marginBottom: '5px' }}>
-                                                {
-                                                    getDateFromStr(historySP.data.updated_at)
-                                                }
-                                            </div>
-                                            <div>
-                                                {
-                                                    getHourFromStr(historySP.data.updated_at)
-                                                }
-                                            </div>
-                                        </div>
-                                        <div className='elements-center-start'>
-                                            {
-                                                historySP.type === 'packing_list' && 
-                                                <div className='elements-center-start'>
-                                                    <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'box_number' })}</span>
-                                                    <div style={{ paddingBottom: '10px' }}>{((historySP.data) as PackingList).box_number}</div>
-                                                    <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'expansion_box_number' })}</span>
-                                                    <div style={{ paddingBottom: '10px' }}>{((historySP.data) as PackingList).case_number}</div>
-                                                    <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'amount' })}</span>
-                                                    <div>{((historySP.data) as PackingList).amount}</div>
-                                                </div>
-                                            }
-                                            {
-                                                historySP.type === 'storage_plan' && 
-                                                <div className='elements-center-start'>
-                                                    <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'customer_order_number' })}</span>
-                                                    <div style={{ paddingBottom: '10px' }}>{((historySP.data) as StoragePlan).customer_order_number}</div>
-                                                    <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'warehouse_order_number' })}</span>
-                                                    <div>{((historySP.data) as StoragePlan).order_number}</div>
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                            </div>
-                        )
-                    } */}
                   </div>
                 </div>
             </div>

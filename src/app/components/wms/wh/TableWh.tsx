@@ -31,6 +31,7 @@ import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { capitalize } from "../../../../helpers/utils";
+import { showMsg } from "../../../../helpers";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
@@ -385,7 +386,13 @@ const WhTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeWhById(deleteElement);
+    const response = await removeWhById(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadWarehouses();
 

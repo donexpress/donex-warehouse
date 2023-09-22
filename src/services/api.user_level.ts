@@ -48,13 +48,13 @@ export const getUserLevelById = async (userLevelId: number, context?: GetServerS
   }
 }
 
-export const removeUserLevelById = async (userLevelId: number):Promise<any | null> => {
+export const removeUserLevelById = async (userLevelId: number):Promise<Response> => {
   const path = userLevelPath() + `/${userLevelId}`;
   try {
     const response = await axios.delete(path, getHeaders());
-    return response.data;
-  } catch (error) {
-    return null;
+    return { status: response.status, data: response.data };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
   }
 }
 

@@ -42,6 +42,7 @@ import "./../../../../styles/generic.input.scss";
 import { indexCountries } from "@/services/api.countrieserege1992";
 import { getRegionalDivision } from "@/services/api.regional_divisionerege1992";
 import { Loading } from "../../common/Loading";
+import { showMsg } from "../../../../helpers";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
@@ -472,7 +473,13 @@ const WarehouseTable = ({ states }: WarehouseListProps) => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeWarehouseById(deleteElement);
+    const response = await removeWarehouseById(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadWarehouses();
     setLoading(false);

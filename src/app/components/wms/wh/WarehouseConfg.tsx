@@ -15,6 +15,8 @@ import { Shelf } from '../../../../types/shelf';
 import { removeShelfById } from '../../../../services/api.shelf';
 import AddShelfDialog from '../../common/AddShelfDialog';
 import ConfirmationDialog from "../../common/ConfirmationDialog";
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import LocationLabelsPDF from '../../common/LocationLabelsPDF';
 
 type PartitionsItem = {
   partition_number: number;
@@ -110,7 +112,7 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
     };
 
     const goToEdit = () => {
-      router.push(`/${locale}/wms/warehouses/${id}/update`)
+      router.push(`/${locale}/wms/warehouses/${id}/update?goBack=config`)
     };
 
     const goToShelf = (shelfId: number) => {
@@ -399,7 +401,7 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                             <span>{intl.formatMessage({ id: "shelves" })}</span>
                           </div>
                         </div>
-                        <div className='elements-row-end'>
+                        <div className='elements-row-end-config'>
                           <Button
                             color="primary"
                             onClick={() => handleAddShelves()}
@@ -410,9 +412,21 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                           <Button
                             color="primary"
                             onClick={() => openDeleteDialog()}
+                            style={{ marginRight: '10px' }}
                             isDisabled={(shelvesToShowSelected.length === 0)  || (shelvesToShowSelected.length === shelvesToShow.length)}
                           >
                             {intl.formatMessage({ id: "remove_shelves" })}
+                          </Button>
+                          <Button
+                            color="primary"
+                            type="button"
+                            isDisabled={(shelvesToShowSelected.length === 0)}
+                          >
+                            <PDFDownloadLink document={<LocationLabelsPDF warehouse={warehouse} shelfs={shelvesToShowSelected} intl={intl} />} fileName="location_labels.pdf">
+                              {({ blob, url, loading, error }) =>
+                                intl.formatMessage({ id: "generate_labels" })
+                              }
+                            </PDFDownloadLink>
                           </Button>
                         </div>
                         <div className='elements-row-start show-sp-mobile'>
@@ -442,7 +456,7 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                             <span className='text-center'>{intl.formatMessage({ id: 'layers' })}</span>
                           </div>
                           <div className='elements-center-start'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'columns' })}</span>
+                            <span className='text-center'>{intl.formatMessage({ id: 'levels' })}</span>
                           </div>
                           <div className='elements-center-start'>
                             <span className='text-center'>{intl.formatMessage({ id: 'number_of_locations' })}</span>
