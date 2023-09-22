@@ -169,6 +169,10 @@ export const shelfPath = () => {
   return BASE_URL + "/api/v1/shelf";
 }
 
+export const countsPath = () => {
+  return BASE_URL + "/api/v1/counts";
+};
+
 export const operationInstructionPath = () => {
   return BASE_URL +  '/api/v1/operation_instruction'
 }

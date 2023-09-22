@@ -17,7 +17,12 @@ const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStora
     const [showElementHistoryDialog, setShowElementHistoryDialog] = useState<boolean>(false);
   
     const cancelSend = () => {
-        router.push(`/${locale}/wms/storage_plan/${id}/config`);
+        const goBack = router.query.goBack;
+        if (goBack && goBack === 'config') {
+          router.push(`/${locale}/wms/storage_plan/${id}/config`);
+        } else {
+          router.push(`/${locale}/wms/storage_plan`);
+        }
     };
 
     const openElementHistoryDialog = async(element: HistorySP) => {

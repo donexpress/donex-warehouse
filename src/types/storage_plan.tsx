@@ -40,6 +40,10 @@ export type StoragePlan = {
     observations: string;
     rejected_boxes: boolean;
     return: boolean;
+    reference_number?: string | null;
+    pr_number?: string | null;
+    images?: string[] | null;
+    is_images?: boolean;
     packing_list?: PackingList[];
     country?: string;
     weight?: string;
@@ -69,6 +73,11 @@ export type StoragePlanProps = {
   isFromDetails?: boolean;
   users: User[];
   warehouses: Warehouse[];
+};
+
+export type StoragePlanConfigProps = {
+  id: number;
+  storagePlan: StoragePlan;
 };
 
 export type PackingListProps = {

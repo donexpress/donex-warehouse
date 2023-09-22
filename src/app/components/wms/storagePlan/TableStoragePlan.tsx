@@ -37,6 +37,7 @@ import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import ReceiptPDF from '../../common/ReceiptPDF';
+import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
@@ -93,6 +94,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     column: "customer_order_number",
     direction: "descending",
   });
+  const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>([]);
 
   const [page, setPage] = useState(1);
 
@@ -124,6 +126,21 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
       {
         name: intl.formatMessage({ id: "number_of_boxes" }),
         uid: "box_amount",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "reference_number" }),
+        uid: "reference_number",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "pr_number" }),
+        uid: "pr_number",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "state" }),
+        uid: "state",
         sortable: false,
       },
       {
@@ -168,7 +185,25 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
           storageP.warehouse_id
             ?.toString()
             ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase()) ||
+          storageP.reference_number
+            ?.toString()
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase()) ||
+          storageP.pr_number
+            ?.toString()
+            ?.toLowerCase()
             ?.includes(filterValue.toLowerCase())
+
+      );
+    }
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
+      filteredStoragePlans = filteredStoragePlans.filter((sp) =>
+        // @ts-ignore
+        Array.from(statusFilter).includes(sp.rejected_boxes ? 'rejected_boxes' : (sp.return ? 'return' : 'normal'))
       );
     }
 
@@ -228,6 +263,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
                   <DropdownItem onClick={() => handleConfig(storageP["id"])}>
                     {intl.formatMessage({ id: "config" })}
                   </DropdownItem>
+                  <DropdownItem className={(!storageP["history"] || (storageP["history"].length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleHistory(storageP["id"])}>
+                    {intl.formatMessage({ id: "history" })}
+                  </DropdownItem>
                   <DropdownItem className={statusSelected !== 'to be storage' ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
@@ -247,6 +285,13 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
+                  <DropdownItem className={(statusSelected !== 'stocked' && statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''}>
+                    <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={storageP["packing_list"] ? storageP["packing_list"] : []} warehouseCode={String(storageP["warehouse"]?.code)} orderNumber={String(storageP["order_number"])} intl={intl} />} fileName="entry_plan_labels.pdf">
+                      {({ blob, url, loading, error }) =>
+                        intl.formatMessage({ id: "generate_labels" })
+                      }
+                    </PDFDownloadLink>
+                  </DropdownItem>
                   <DropdownItem onClick={() => handleDelete(storageP["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
@@ -255,6 +300,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
             </div>
           );
         case "user_id": return storageP.user ? storageP.user.username : '';
+        case "state": return storageP.rejected_boxes ? intl.formatMessage({ id: "rejected_boxes" }) : (storageP.return ? intl.formatMessage({ id: "return" }) : intl.formatMessage({ id: "normal" }));
         case "warehouse_id": return storageP.warehouse ? (`${storageP.warehouse.name} (${storageP.warehouse.code})`) : '';
         case "order_number": return (
           
@@ -341,6 +387,31 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  className="bnt-select"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  {intl.formatMessage({ id: "filters" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
+              >
+                {statusOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -483,6 +554,23 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   }, []);
 
   useEffect(() => {
+    setStatusOptions([
+      {
+        name: intl.formatMessage({ id: "normal" }),
+        uid: 'normal'
+      },
+      {
+        name: intl.formatMessage({ id: "return" }),
+        uid: 'return'
+      },
+      {
+        name: intl.formatMessage({ id: "rejected_boxes" }),
+        uid: 'rejected_boxes'
+      }
+    ]);
+  }, [intl]);
+
+  useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => {
       setLoading(false);
@@ -510,6 +598,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   const handleEdit = (id: number) => {
     setLoading(true);
     router.push(`/${locale}/wms/storage_plan/${id}/update`);
+  };
+
+  const handleHistory = (id: number) => {
+    setLoading(true);
+    router.push(`/${locale}/wms/storage_plan/${id}/history`);
   };
 
   const handleConfig = (id: number) => {

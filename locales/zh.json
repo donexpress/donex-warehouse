@@ -31,6 +31,7 @@
 	"user_with_problem": "我們對該用戶有疑問。 請聯絡管理員尋求解決方案。",
 	"returns": "返回",
 	"decline": "衰退",
+	"normal": "普通的",
 	"package_location_on_shelf": "包裝在貨架上的位置",
     "documents": "文件",
     "storageAndTransshipment": "存儲和轉運",
@@ -173,6 +174,9 @@
 	"packing_list": "装箱单",
 	"cargo_information": "货箱信息",
 	"config": "設置",
+	"reference_number": "參考編號",
+	"pr_number": "提貨單",
+	"images": "圖片",
 
   "to_be_stored_state": "待入库",
   "warehouse_entry_state": "入库中",

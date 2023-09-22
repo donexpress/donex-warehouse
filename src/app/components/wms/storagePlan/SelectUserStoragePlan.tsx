@@ -24,7 +24,7 @@ const SelectUserStoragePlan: React.FC<RowStoragePlanProps> = ({ isFromDetails = 
       const { name, value, type, checked } = event.target;
       const fieldValue = type === "checkbox" ? checked : value;
 
-      if (name === 'user_id') {console.log(fieldValue)
+      if (name === 'user_id') {
         const filterUser = users.filter((user: User) => user.id === Number(fieldValue));
         if (filterUser.length > 0) {
             if (filterUser[0].warehouse) {

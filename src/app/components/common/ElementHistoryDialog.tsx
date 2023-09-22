@@ -269,6 +269,18 @@ const PackingListDialog = ({ close, historySP, title, users, warehouses }: Param
                           </div>
                         </div>
                         <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "reference_number" })}:</div>
+                          <div>
+                            { ((historySP.data) as StoragePlan).reference_number }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                          <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "pr_number" })}:</div>
+                          <div>
+                            { ((historySP.data) as StoragePlan).pr_number }
+                          </div>
+                        </div>
+                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
                           <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "client_weight" })}:</div>
                           <div>
                             { ((historySP.data) as StoragePlan).weight }

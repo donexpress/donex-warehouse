@@ -239,6 +239,23 @@ export type File = {
   name: string;
 };
 
+export type Counts = {
+  user_count: number;
+  staff_count: number;
+  role_count: number;
+  level_count: number;
+  payment_level_count: number;
+  organization_count: number;
+  warehouse_count: number;
+  service_count: number;
+  supplier_count: number;
+  storage_plan_count: number;
+  output_plan_count: number;
+  cargo_station_count: number;
+  line_clasification_count: number;
+  regional_division_count: number;
+};
+
 export type TypeOptions = "success" | "error" | "info" | "warning";
 export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
 export type TypeThemes = "light" | "dark";
