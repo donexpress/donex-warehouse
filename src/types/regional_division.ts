@@ -40,6 +40,10 @@ export type RegionalDivisionListProps = {
     divisionsCount?: RegionalDivisionCount;
 };
 
+export type RegionalDivisionCountProps = {
+    divisionsCount: RegionalDivisionCount;
+};
+
 export type RegionalDivisionCount = {
     count: number
 };

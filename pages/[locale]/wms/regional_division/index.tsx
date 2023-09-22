@@ -5,8 +5,9 @@ import TableRegionalDivision from "../../../../src/app/components/wms/regional_d
 import {GetServerSidePropsContext} from "next";
 import {useIntl} from "react-intl";
 import {countDivision} from "../../../../src/services/api.regional_division";
+import {RegionalDivisionCountProps} from "../../../../src/types/regional_division";
 
-const Index = ({divisionsCount}) => {
+const Index = ({divisionsCount} : RegionalDivisionCountProps) => {
   const intl = useIntl();
   const regionalDivisionsTypes = [{value: 1, label: intl.formatMessage({ id: "reception_area" })}, {value: 2, label: intl.formatMessage({ id: "delivery_area" })}];
   return (

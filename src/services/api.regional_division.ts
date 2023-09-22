@@ -8,6 +8,7 @@ import { RegionalDivision } from '@/types/regional_divisionerege1992';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
 import {Response} from "../types";
+import {RegionalDivisionCountProps} from "../types/regional_division";
 
 
 export const getRegionalDivision = async(context?: GetServerSidePropsContext): Promise<RegionalDivision[] | null> => {
@@ -22,7 +23,7 @@ export const getRegionalDivision = async(context?: GetServerSidePropsContext): P
 
 export const countDivision = async (
     context?: GetServerSidePropsContext
-): Promise<{ count: number }> => {
+): Promise<RegionalDivisionCountProps> => {
     const response = await axios.get(countDivisionPath(), getHeaders(context));
     return response.data;
 };
