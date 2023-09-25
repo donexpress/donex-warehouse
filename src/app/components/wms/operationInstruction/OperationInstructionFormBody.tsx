@@ -49,6 +49,23 @@ const OperationInstructionFormBody = ({
     });
     return pos;
   };
+
+  const getOwner = (): User | undefined => {
+    let user_id = -1
+    if(exit_plan_id) {
+      const tmp = exitPlans.find(el => el.id === Number(exit_plan_id))
+      if(tmp && tmp.user_id) {
+        user_id = tmp.user_id
+      }
+    } else {
+      const tmp = operationInstruction?.user_id
+      if(tmp) {
+        user_id = tmp
+      }
+    }
+    const owner = users.find(el => el.id === user_id)
+    return owner
+  }
   const initialValues: OperationInstruction = {
     client_display: id ? false : false,
     internal_remark: id ? "" : "",
@@ -106,13 +123,25 @@ const OperationInstructionFormBody = ({
     if (exit_plan_id) {
       router.push(`/${locale}/wms/exit_plan/${exit_plan_id}/config`);
     } else {
-      router.push(`/${locale}/wms/exit_plan/${operationInstruction?.output_plan_id}/config`);
+      router.push(
+        `/${locale}/wms/operation_instruction`
+      );
     }
   };
   const goToEdit = () => {
-    router.push(`/${locale}/wms/exit_plan/${operationInstruction?.output_plan_id}/update`);
+    router.push(
+      `/${locale}/wms/operation_instruction/${operationInstruction?.id}/update`
+    );
   };
-  const cancelSend = () => {};
+  const cancelSend = () => {
+    if (exit_plan_id) {
+      router.push(`/${locale}/wms/exit_plan/${exit_plan_id}/config`);
+    } else {
+      router.push(
+        `/${locale}/wms/operation_instruction`
+      );
+    }
+  };
 
   const getTypesFormatted = (types: State[]): ValueSelect[] => {
     let response: ValueSelect[] = [];
@@ -298,8 +327,11 @@ const OperationInstructionFormBody = ({
           )}
         </Formik>
       </div>
-      {/* @ts-ignore */}
-      {/* <ExitPlanAppendix owner={exitPlans.find((el) => el.id === Number(exit_plan_id))} operationInstruction={operationInstruction} /> */}
+      {id && exitPlans && (
+        // @ts-ignore
+        <ExitPlanAppendix owner={getOwner()} operationInstruction={operationInstruction}
+        />
+      )}
     </div>
   );
 };

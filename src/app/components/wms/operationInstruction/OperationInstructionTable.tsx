@@ -8,6 +8,7 @@ import {
 } from "../../../../helpers/utils";
 import { ExitPlanState } from "@/types/exit_planerege1992";
 import {
+  countOperationInstruction,
   deleteOperationInstructions,
   getOperationInstructionStates,
   getOperationInstructions,
@@ -20,6 +21,7 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Input,
   Selection,
   SortDescriptor,
   Table,
@@ -37,9 +39,14 @@ import {
   OperationInstruction,
   InstructionTypeList,
   InstructionType,
+  OperationInstructionCount,
 } from "@/types/operation_instructionerege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import OperationInstructionConfirmationDialog from "./OperationInstructionConfirmationDialog";
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
+import { SearchIcon } from "../../common/SearchIcon";
+import "./../../../../styles/generic.input.scss";
+import "../../../../styles/wms/user.table.scss";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
@@ -54,7 +61,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 interface Props {
-  exit_plan_id: number;
+  exit_plan_id?: number;
 }
 
 const OperationInstructionTable = ({ exit_plan_id }: Props) => {
@@ -88,19 +95,52 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
   ] = useState<boolean>(false);
   const [dialogTexts, setDialogTexts] = useState<string[]>([]);
   const [dialogIds, setDialogIds] = useState<number[]>([]);
-  const [dialogType, setDialogType] = useState<"processed" | "processing" | "cancelled" | "" >(
-    ""
-  );
+  const [dialogType, setDialogType] = useState<
+    "processed" | "processing" | "cancelled" | ""
+  >("");
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [count, setCount] = useState<OperationInstructionCount | null>(null);
 
   useEffect(() => {
     loadStates();
   }, [statusSelected]);
   const loadStates = async () => {
     const states: ExitPlanState = await getOperationInstructionStates();
-    const list_state =  states.states.find(el => el.position === statusSelected)
-    const opi = await getOperationInstructionsByOutputPlan(exit_plan_id, list_state?.value === 'all' ? "": list_state?.value );
+    const count: OperationInstructionCount = await countOperationInstruction(
+      exit_plan_id
+    );
+    setCount(count);
+    const list_state = states.states.find(
+      (el) => el.position === statusSelected
+    );
+    let opi = null;
+    if (exit_plan_id) {
+      opi = await getOperationInstructionsByOutputPlan(
+        exit_plan_id,
+        list_state?.value === "all" ? "" : list_state?.value
+      );
+    } else {
+      opi = await getOperationInstructions(
+        list_state?.value === "all" ? "" : list_state?.value
+      );
+    }
     setOperationInstructions(opi);
     setOperationInstructionState(states);
+  };
+
+  const getCount = (
+    column:
+      | "total"
+      | "audited"
+      | "pending"
+      | "processed"
+      | "processing"
+      | "cancelled"
+  ): number => {
+    if (count) {
+      return count[column];
+    }
+    return 0;
   };
 
   const getColumns = React.useMemo(() => {
@@ -159,10 +199,16 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
   }, [intl]);
 
   const handleAdd = () => {
-    router.push({
-      pathname: `/${locale}/wms/operation_instruction/insert`,
-      search: `?exit_plan_id=${exit_plan_id}`,
-    });
+    if (exit_plan_id) {
+      router.push({
+        pathname: `/${locale}/wms/operation_instruction/insert`,
+        search: `?exit_plan_id=${exit_plan_id}`,
+      });
+    } else {
+      router.push({
+        pathname: `/${locale}/wms/operation_instruction/insert`,
+      });
+    }
   };
 
   const handleShow = (id: number) => {
@@ -188,6 +234,20 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     }
   };
 
+  const handleMultiCancel = () => {
+    let txt: string[] = [];
+    setDialogIds(selectedItems);
+    const op = operationInstructions.map((el) => {
+      if (selectedItems.find((si) => si === el.id)) {
+        // @ts-ignore
+        txt = txt.concat(el.operation_instruction_type.instruction_type);
+      }
+    });
+    setDialogTexts(txt);
+    setDialogType("cancelled");
+    setDisplayOperationInstructionConfirmation(true);
+  };
+
   const handleDelete = async (id: number) => {
     setSelectedId(id);
     setDisplayConfirmation(true);
@@ -202,6 +262,21 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
   const close = () => {
     setSelectedId(-1);
     setDisplayConfirmation(false);
+  };
+
+  const selectedItemsFn = (selection: Selection) => {
+    setSelectedKeys(selection);
+    if (selection === "all") {
+      setSelectedItems(
+        operationInstructions.map((sp: OperationInstruction) => Number(sp.id))
+      );
+    } else {
+      setSelectedItems(
+        Array.from(selection.values()).map((cadena) =>
+          parseInt(cadena.toString())
+        )
+      );
+    }
   };
 
   const headerColumns = React.useMemo(() => {
@@ -334,6 +409,9 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
         case "output_plan_id": {
           return user.output_plan.output_number;
         }
+        case "number_delivery": {
+          return <CopyColumnToClipboard value={cellValue} />;
+        }
         default:
           console.log(cellValue);
           return cellValue;
@@ -352,7 +430,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
   };
 
   const changeTab = (tab: number) => {
-    setStatusSelected(tab)
+    setStatusSelected(tab);
   };
 
   const handleProcessing = (id: number) => {
@@ -366,6 +444,20 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     }
   };
 
+  const handleMultiProcessing = () => {
+    let txt: string[] = [];
+    setDialogIds(selectedItems);
+    const op = operationInstructions.map((el) => {
+      if (selectedItems.find((si) => si === el.id)) {
+        // @ts-ignore
+        txt = txt.concat(el.operation_instruction_type.instruction_type);
+      }
+    });
+    setDialogTexts(txt);
+    setDialogType("processing");
+    setDisplayOperationInstructionConfirmation(true);
+  };
+
   const handleProcessed = (id: number) => {
     const op = operationInstructions.find((el) => el.id === id);
     if (op) {
@@ -377,6 +469,20 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     }
   };
 
+  const handleMultiProcess = () => {
+    let txt: string[] = [];
+    setDialogIds(selectedItems);
+    const op = operationInstructions.map((el) => {
+      if (selectedItems.find((si) => si === el.id)) {
+        // @ts-ignore
+        txt = txt.concat(el.operation_instruction_type.instruction_type);
+      }
+    });
+    setDialogTexts(txt);
+    setDialogType("processed");
+    setDisplayOperationInstructionConfirmation(true);
+  };
+
   const handleReturn = (id: number) => {
     const op = operationInstructions.find((el) => el.id === id);
     if (op) {
@@ -386,53 +492,147 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
       setDialogType("processing");
       setDisplayOperationInstructionConfirmation(true);
     }
-  }
+  };
+
+  const handleMultiReturn = () => {
+    let txt: string[] = [];
+    setDialogIds(selectedItems);
+    const op = operationInstructions.map((el) => {
+      if (selectedItems.find((si) => si === el.id)) {
+        // @ts-ignore
+        txt = txt.concat(el.operation_instruction_type.instruction_type);
+      }
+    });
+    setDialogTexts(txt);
+    setDialogType("processing");
+    setDisplayOperationInstructionConfirmation(true);
+  };
 
   const closeOperationInstructionCnfirmations = () => {
     setDialogIds([]);
     setDialogTexts([]);
     setDialogType("");
-    loadStates()
+    setSelectedItems([]);
+    loadStates();
     setDisplayOperationInstructionConfirmation(false);
   };
 
   const confirmOperationInstructionCnfirmations = async () => {
-    const payload: OperationInstruction | undefined =
-      operationInstructions.find((el) => el.id === dialogIds[0]);
-    if (payload) {
-      switch (dialogType) {
-        case "processed":
-          payload.state = "processed";
-          break;
-        case "processing":
-          payload.state = "processing";
-          break;
-        case "cancelled":
+    const promises = dialogIds.map((id) => {
+      const payload: OperationInstruction | undefined =
+        operationInstructions.find((el) => el.id === id);
+      if (payload) {
+        switch (dialogType) {
+          case "processed":
+            payload.state = "processed";
+            break;
+          case "processing":
+            payload.state = "processing";
+            break;
+          case "cancelled":
             payload.state = "cancelled";
             break;
+        }
+        const instruction_type: string[] = [];
+        // @ts-ignore
+        payload.operation_instruction_type.instruction_type.forEach((type) => {
+          instruction_type.push(type.value);
+        });
+        payload.operation_instruction_type = instruction_type;
+        delete payload.user;
+        delete payload.warehouse;
+        delete payload.instruction_type;
+        delete payload.output_plan;
+        // const result = await updateOperationInstruction(dialogIds[0], payload);
+        return updateOperationInstruction(id, payload);
       }
-      const instruction_type: string[] = [];
-      // @ts-ignore
-      payload.operation_instruction_type.instruction_type.forEach((type) => {
-        instruction_type.push(type.value);
-      });
-      payload.operation_instruction_type = instruction_type;
-      delete payload.user;
-      delete payload.warehouse;
-      delete payload.instruction_type;
-      delete payload.output_plan;
-      const result = await updateOperationInstruction(dialogIds[0], payload);
-    }
+    });
+    const reuslt = await Promise.all(promises);
     closeOperationInstructionCnfirmations();
   };
 
   const getTitle = (): string => {
-        return intl.formatMessage({ id: dialogType });
+    return intl.formatMessage({ id: dialogType });
   };
+
+  const onSearchChange = useCallback((value?: string) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
+
+  const onClear = useCallback(() => {
+    setFilterValue("");
+    setPage(1);
+  }, []);
 
   return (
     <div style={{ marginTop: "20px" }}>
       <div className="bg-gray-200 pt-1">
+        <div
+          className={`flex gap-3 ${
+            exit_plan_id ? "" : "justify-between items-end"
+          }`}
+          style={
+            exit_plan_id
+              ? {
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginRight: "20px",
+                  marginBottom: "10px",
+                }
+              : {}
+          }
+        >
+          {exit_plan_id === undefined && (
+            <Input
+              isClearable
+              className="w-full sm:max-w-[33%] search-input"
+              placeholder=""
+              startContent={<SearchIcon />}
+              value={filterValue}
+              onClear={() => onClear()}
+              onValueChange={onSearchChange}
+            />
+          )}
+          <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  className="bnt-select"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  {intl.formatMessage({ id: "columns" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={visibleColumns}
+                selectionMode="multiple"
+                onSelectionChange={setVisibleColumns}
+              >
+                {getColumns.map((column) => (
+                  <DropdownItem key={column.uid} className="capitalize">
+                    {capitalize(column.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Button
+              color="primary"
+              endContent={<PlusIcon />}
+              onClick={() => handleAdd()}
+            >
+              {intl.formatMessage({ id: "create" })}
+            </Button>
+          </div>
+        </div>
         <div
           className="flex gap-3"
           style={{
@@ -440,67 +640,99 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             justifyContent: "flex-end",
             marginRight: "20px",
             marginBottom: "10px",
+            marginTop: "10px",
           }}
         >
-          <Dropdown>
-            <DropdownTrigger className="hidden sm:flex">
-              <Button
-                className="bnt-select"
-                endContent={<ChevronDownIcon className="text-small" />}
-                variant="flat"
-              >
-                {intl.formatMessage({ id: "columns" })}
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              disallowEmptySelection
-              aria-label="Table Columns"
-              closeOnSelect={false}
-              selectedKeys={visibleColumns}
-              selectionMode="multiple"
-              onSelectionChange={setVisibleColumns}
+          {statusSelected === 1 && (
+            <Button
+              color="primary"
+              onClick={() => handleMultiProcessing()}
+              disabled={selectedItems.length === 0}
             >
-              {getColumns.map((column) => (
-                <DropdownItem key={column.uid} className="capitalize">
-                  {capitalize(column.name)}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
-          <Button
-            color="primary"
-            endContent={<PlusIcon />}
-            onClick={() => handleAdd()}
-          >
-            {intl.formatMessage({ id: "create" })}
-          </Button>
+              {intl.formatMessage({ id: "processing" })}
+            </Button>
+          )}
+
+          {statusSelected === 1 && (
+            <Button
+              color="primary"
+              onClick={() => handleMultiCancel()}
+              disabled={selectedItems.length === 0}
+            >
+              {intl.formatMessage({ id: "cancel" })}
+            </Button>
+          )}
+
+          {statusSelected === 2 && (
+            <Button
+              color="primary"
+              onClick={() => handleMultiProcess()}
+              disabled={selectedItems.length === 0}
+            >
+              {intl.formatMessage({ id: "processed" })}
+            </Button>
+          )}
+          {statusSelected === 3 && (
+            <Button
+              color="primary"
+              onClick={() => handleMultiReturn()}
+              disabled={selectedItems.length === 0}
+            >
+              {intl.formatMessage({ id: "return" })}
+            </Button>
+          )}
         </div>
-        <div className="overflow-x-auto tab-system-table bg-content1">
+        <div className="overflow-x-auto tab-system-table bg-content1" style={{marginBottom: exit_plan_id ? 0 :10}}>
           <ul
             className="flex space-x-4"
             style={{
               backgroundColor: "#37446b",
               borderRadius: "5px",
-              width: "99%",
+              width: exit_plan_id ? "99%" :"100%",
             }}
           >
             {operationInstructionState &&
-              operationInstructionState.states.map((state: any, index) => (
-                <li className="whitespace-nowrap" key={index}>
-                  <button
-                    className={
-                      statusSelected === state.position
-                        ? "px-4 py-3 tab-selected"
-                        : "px-4 py-3 tab-default"
-                    }
-                    onClick={() => changeTab(state.position)}
-                  >
-                    {state[getLanguage(intl)]}
-                    {state.position === statusSelected &&
-                      ` (${operationInstructionState.states.length})`}
-                  </button>
-                </li>
-              ))}
+              operationInstructionState.states.map((state: any, index) => {
+                if (exit_plan_id !== undefined && state.value !== "all") {
+                  return (
+                    <li className="whitespace-nowrap" key={index}>
+                      <button
+                        className={
+                          statusSelected === state.position
+                            ? "px-4 py-3 tab-selected"
+                            : "px-4 py-3 tab-default"
+                        }
+                        onClick={() => changeTab(state.position)}
+                      >
+                        {state[getLanguage(intl)]}(
+                        {getCount(
+                          state.value === "all" ? "total" : state.value
+                        )}
+                        )
+                      </button>
+                    </li>
+                  );
+                } else if (exit_plan_id === undefined) {
+                  return (
+                    <li className="whitespace-nowrap" key={index}>
+                      <button
+                        className={
+                          statusSelected === state.position
+                            ? "px-4 py-3 tab-selected"
+                            : "px-4 py-3 tab-default"
+                        }
+                        onClick={() => changeTab(state.position)}
+                      >
+                        {state[getLanguage(intl)]}(
+                        {getCount(
+                          state.value === "all" ? "total" : state.value
+                        )}
+                        )
+                      </button>
+                    </li>
+                  );
+                }
+              })}
           </ul>
         </div>
       </div>
@@ -517,7 +749,10 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
         sortDescriptor={sortDescriptor}
         // topContent={topContent}
         topContentPlacement="outside"
-        onSelectionChange={setSelectedKeys}
+        onSelectionChange={(keys: Selection) => {
+          selectedItemsFn(keys);
+        }}
+        // onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
       >
         <TableHeader columns={headerColumns}>
