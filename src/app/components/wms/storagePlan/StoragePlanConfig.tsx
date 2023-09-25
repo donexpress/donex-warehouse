@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
 import { updatePackingListById, removePackingListById } from '../../../../services/api.packing_list';
 import { updateStoragePlanById, createStoragePlan} from '../../../../services/api.storage_plan';
-import { StoragePlanProps, PackingList, StoragePlan } from '../../../../types/storage_plan';
+import { StoragePlanConfigProps, PackingList, StoragePlan } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
 import { Response } from '../../../../types/index';
 import { Warehouse } from '../../../../types/warehouse';
@@ -21,6 +21,7 @@ import { Formik, Form } from 'formik';
 import PackingListDialog from '../../common/PackingListDialog';
 import BatchOnShelvesDialog from '../../common/BatchOnShelvesDialog';
 import ReceiptPDF from '../../common/ReceiptPDF';
+import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
@@ -33,7 +34,7 @@ const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boole
   });
 };
 
-const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanProps) => {
+const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
@@ -56,20 +57,18 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
           }
       };
 
-      const getUserLabel = (usersAll: User[], userId: number): string | number => {
-        const response: User[] = usersAll.filter((user) => user.id === userId);
-        if (response && response.length > 0) {
-          return response[0].customer_number + ' - ' +  response[0].username;
+      const getUserLabel = (): string | number => {
+        if (storagePlan && storagePlan.user) {
+          return storagePlan.user.customer_number + ' - ' +  storagePlan.user.username;
         }
-        return userId;
+        return '';
       };
 
-      const getWarehouseLabel = (warehouseAll: Warehouse[], warehouseId: number): string | number => {
-        const response: Warehouse[] = warehouseAll.filter((warehouse) => warehouse.id === warehouseId);
-        if (response && response.length > 0) {
-          return response[0].name + ` (${response[0].code})`;
+      const getWarehouseLabel = (): string | number => {
+        if (storagePlan?.warehouse) {
+          return storagePlan?.warehouse.name + ` (${storagePlan?.warehouse.code})`;
         }
-        return warehouseId;
+        return '';
       };
 
       const goToEdit = () => {
@@ -98,7 +97,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
             setShowBatchOnShelvesDialog(true);
           } break;
           case 6: {
-            router.push(`/${locale}/wms/storage_plan/${id}/history`)
+            router.push(`/${locale}/wms/storage_plan/${id}/history?goBack=config`)
           } break;
           case 7: {
             //Fast delivery
@@ -321,11 +320,17 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                         <span className=''>{intl.formatMessage({ id: 'country' })}</span>
                       </div>
                       <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'reference_number' })}</span>
+                      </div>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'pr_number' })}</span>
+                      </div>
+                      {/* <div className='elements-center-start'>
                         <span className=''>{intl.formatMessage({ id: 'client_weight' })}</span>
                       </div>
                       <div className='elements-center-start'>
                         <span className=''>{intl.formatMessage({ id: 'client_volume' })}</span>
-                      </div>
+                      </div> */}
                       <div className='elements-center-start'>
                         <span className=''>{intl.formatMessage({ id: 'observations' })}</span>
                       </div>
@@ -335,10 +340,10 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                         {storagePlan?.customer_order_number}
                       </div>
                       <div>
-                        {getUserLabel(users, Number(storagePlan?.user_id))}
+                        {getUserLabel()}
                       </div>
                       <div>
-                        {getWarehouseLabel(warehouses, Number(storagePlan?.warehouse_id))}
+                        {getWarehouseLabel()}
                       </div>
                       <div>
                         {boxNumber}
@@ -347,11 +352,17 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                         {storagePlan?.country}
                       </div>
                       <div>
+                        {storagePlan?.reference_number}
+                      </div>
+                      <div>
+                        {storagePlan?.pr_number}
+                      </div>
+                      {/* <div>
                         {storagePlan?.weight}
                       </div>
                       <div>
                         {storagePlan?.volume}
-                      </div>
+                      </div> */}
                       <div>
                         {storagePlan?.observations}
                       </div>
@@ -392,13 +403,20 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                               }
                             </PDFDownloadLink>
                           </DropdownItem>
+                          <DropdownItem className={(storagePlan && (storagePlan.state !== 'stocked' && storagePlan.state !== 'into warehouse')) ? 'do-not-show-dropdown-item' : ''}>
+                            <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={rows} warehouseCode={String(storagePlan.warehouse?.code)} orderNumber={String(storagePlan.order_number)} intl={intl} />} fileName="entry_plan_labels.pdf">
+                              {({ blob, url, loading, error }) =>
+                                intl.formatMessage({ id: "generate_labels" })
+                              }
+                            </PDFDownloadLink>
+                          </DropdownItem>
                           <DropdownItem className={(selectedRows.length === 0 || (storagePlan && (storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
                           </DropdownItem>
                           <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (storagePlan.state === 'stocked' || storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
                             {intl.formatMessage({ id: "split_bill" })}
                           </DropdownItem>
-                          <DropdownItem onClick={() => handleAction(6)}>
+                          <DropdownItem className={(!storagePlan?.history || (storagePlan?.history && storagePlan?.history.length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(6)}>
                             {intl.formatMessage({ id: "history" })}
                           </DropdownItem>
                           <DropdownItem onClick={() => handleAction(3)}>

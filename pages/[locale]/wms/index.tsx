@@ -8,6 +8,8 @@ import { FaSackXmark, FaTruckFront, FaUser } from 'react-icons/fa6';
 import { useRouter } from 'next/router';
 import { countUserLevel } from '@/services/api.user_levelerege1992';
 import { FaCreditCard, FaLandmark, FaServicestack, FaTruck, FaTruckLoading, FaTruckMoving, FaUniversalAccess, FaUserTag, FaUserTie, FaWarehouse } from 'react-icons/fa';
+import { getAllCounts } from '../../../src/services/api.home';
+import { Counts } from '../../../src/types';
 import { countStaff } from '@/services/api.stafferege1992';
 import { countPaymentMethod } from '@/services/api.payment_methoderege1992';
 import { countRole } from '@/services/api.roleerege1992';
@@ -44,19 +46,37 @@ const RootWMS = () => {
   },[])
 
   const setup = async () => {
-    countUsers().then(user => setUser(user.count))
-    countUserLevel().then(userLevel => setUserLevel(userLevel.count))
-    countStaff().then(staff => setStaff(staff.count))
-    countPaymentMethod().then(paymentMethod => setPaymentMethod(paymentMethod.count))
-    countRole().then(role => setRole(role.count))
-    countOrganization().then(organization => setOrganization(organization.count))
-    countWhs().then(warehouse => setWarehouse(warehouse.count))
-    countService().then(service => setService(service.count))
-    countStoragePlan().then(storagePlan => setStoragePlan(storagePlan.total))
-    countExitPlans().then(exitPLan => setExitPlans(exitPLan.total))
-    countWarehouse().then(warehouse => setCargoStations(warehouse.count))
-    countLine().then(line => setLine(line.count))
-    countDivision().then(division => setRegionalDivision(division.count))
+    getAllCounts().then((counts: Counts | null) => {
+      if (counts !== null) {
+        setUser(counts.user_count);
+        setUserLevel(counts.level_count);
+        setStaff(counts.staff_count);
+        setPaymentMethod(counts.payment_level_count);
+        setRole(counts.role_count);
+        setOrganization(counts.organization_count);
+        setWarehouse(counts.warehouse_count);
+        setService(counts.service_count);
+        setStoragePlan(counts.storage_plan_count);
+        setExitPlans(counts.output_plan_count);
+        setCargoStations(counts.cargo_station_count);
+        setLine(counts.line_clasification_count);
+        setSuppliers(counts.supplier_count);
+        setRegionalDivision(counts.regional_division_count);
+      }
+    })
+    //countUsers().then(user => setUser(user.count))
+    //countUserLevel().then(userLevel => setUserLevel(userLevel.count))
+    //countStaff().then(staff => setStaff(staff.count))
+    //countPaymentMethod().then(paymentMethod => setPaymentMethod(paymentMethod.count))
+    //countRole().then(role => setRole(role.count))
+    //countOrganization().then(organization => setOrganization(organization.count))
+    //countWhs().then(warehouse => setWarehouse(warehouse.count))
+    //countService().then(service => setService(service.count))
+    //countStoragePlan().then(storagePlan => setStoragePlan(storagePlan.total))
+    //countExitPlans().then(exitPLan => setExitPlans(exitPLan.total))
+    //countWarehouse().then(warehouse => setCargoStations(warehouse.count))
+    //countLine().then(line => setLine(line.count))
+    //countDivision().then(division => setRegionalDivision(division.count))
   }
 
 

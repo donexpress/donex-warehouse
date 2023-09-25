@@ -17,6 +17,22 @@ import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 import CheckboxesStoragePlan from './CheckboxesStoragePlan';
 import SelectUserStoragePlan from './SelectUserStoragePlan';
+import CustomerOrderNumberStoragePlan from './CustomerOrderNumberStoragePlan';
+
+const getWarehouseIdOfUser = (userId: number | null, users: User[], warehouses: Warehouse[]) => {
+  if (userId) {
+    const filterUser = users.filter((user: User) => user.id === Number(userId))
+    if (filterUser.length > 0) {
+        if (filterUser[0].warehouse) {
+            const filterWarehouse = warehouses.filter((warehouse: Warehouse) => warehouse.id === filterUser[0].warehouse?.id);
+            if (filterWarehouse.length > 0) {
+              return Number(filterWarehouse[0].id);
+            }
+        }
+    }
+  }
+  return -1;
+}
 
 const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails }: StoragePlanProps) => {
     const router = useRouter();
@@ -37,7 +53,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         label: "6"
       }
     ];
-    const [warehouseOfUser, setWarehouseOfUser] = useState<number>(-1);
+    const [warehouseOfUser, setWarehouseOfUser] = useState<number>(!!id && storagePlan && storagePlan.user_id ? getWarehouseIdOfUser(storagePlan.user_id, users, warehouses) : -1);
     
     const initialValues: StoragePlan = {
         customer_order_number: (id && storagePlan) ? storagePlan.customer_order_number : '',
@@ -52,6 +68,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         show_expansion_box_number: false,
         prefix_expansion_box_number: 'FBA',
         digits_box_number: 6,
+        reference_number: (id && storagePlan) ? storagePlan.reference_number : null,
+        pr_number: (id && storagePlan) ? storagePlan.pr_number : null,
         rows: [],
     };
   
@@ -110,6 +128,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
                 state: getState(values.state),
+                reference_number: values.reference_number,
+                pr_number: values.pr_number
               };
       }
 
@@ -293,6 +313,13 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         setWarehouseOfUser(id);
       };
 
+      const changeCustomerOrderNumber = (value: string) => {
+        if (value && value !== ''){
+          setPrefixExpansionBoxNumber(value);
+          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: value, dBN: digitsBoxNumber });
+        }
+      };
+
     return (
         <div className='user-form-body shadow-small' style={{ paddingRight: '0px' }}>
             <h1 className="text-xl font-semibold">
@@ -314,14 +341,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                     <Form className='flex flex-col gap-3'>
                       <div className='flex gap-3 flex-wrap justify-between' style={{ paddingRight: '16px' }}>
                         <div className="w-full sm:w-[49%]">
-                          <GenericInput
-                            type="text"
-                            name="customer_order_number"
-                            placeholder={intl.formatMessage({ id: 'customer_order_number' })}
-                            customClass="custom-input"
-                            disabled={ isFromDetails }
-                            required
-                          />
+                          <CustomerOrderNumberStoragePlan isFromDetails={!!isFromDetails} changeCustomerOrderNumber={changeCustomerOrderNumber}></CustomerOrderNumberStoragePlan>
                         </div>
                         <div className="w-full sm:w-[49%]">
                           <SelectUserStoragePlan options={getUsersFormatted(users)} users={users} warehouses={warehouses} changeWarehouse={changeWarehouse} isFromDetails={!!isFromDetails}></SelectUserStoragePlan>
@@ -339,11 +359,29 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                         </div>
                         <div className="w-full sm:w-[49%]">
                           <GenericInput
+                            type="text"
+                            name="reference_number"
+                            placeholder={intl.formatMessage({ id: 'reference_number' })}
+                            customClass="custom-input"
+                            disabled={ isFromDetails }
+                          />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
+                          <GenericInput
+                            type="text"
+                            name="pr_number"
+                            placeholder={intl.formatMessage({ id: 'pr_number' })}
+                            customClass="custom-input"
+                            disabled={ isFromDetails }
+                          />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
+                          <GenericInput
                             type="number"
                             name="box_amount"
                             placeholder={intl.formatMessage({ id: 'number_of_boxes' })}
                             customClass="custom-input"
-                            disabled={ isFromDetails }
+                            disabled={ !!id }
                             minValue={0}
                             onChangeFunction={handleInputChange}
                             required

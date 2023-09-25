@@ -14,8 +14,9 @@ import { PackingListProps, StoragePlan, PackingList, BoxNumberLabelFn } from '..
 import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 
-const getInitialLabel = (packingList: PackingList[] | undefined): string => {
-    let label = 'FBA';
+const getInitialLabel = (storagePlan: StoragePlan): string => {
+    const packingList: PackingList[] | undefined = storagePlan.packing_list;
+    let label = storagePlan.customer_order_number;
     if (packingList !== undefined && packingList.length !== 0) {
         const prefixes: string[] = [];
         
@@ -116,7 +117,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
         ])
         :
         getPackingListFromSP(!!isFromModifyPackingList, storagePlan.packing_list));
-    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>(getInitialLabel(storagePlan.packing_list));
+    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>(getInitialLabel(storagePlan));
     const [digitsBoxNumber, setDigitsBoxNumber] = useState<number>(getInitialDigits(storagePlan.packing_list));
     const digitsBoxNumberOptions: ValueSelect[] = [
       {

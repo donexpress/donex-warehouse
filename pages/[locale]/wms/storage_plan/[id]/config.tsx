@@ -2,13 +2,10 @@ import Head from 'next/head';
 import Layout from '../../../../../src/app/layout';
 import ProtectedRoute from '../../../../../src/app/components/common/ProtectedRoute';
 import StoragePlanConfig from '../../../../../src/app/components/wms/storagePlan/StoragePlanConfig';
-import { StoragePlanProps, History } from '../../../../../src/types/storage_plan';
-import { getUsers } from '../../../../../src/services/api.users';
-import { getWhs } from '../../../../../src/services/api.wh';
+import { StoragePlanConfigProps } from '../../../../../src/types/storage_plan';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
-import { Warehouse } from '@/types/warehouseerege1992';
 
-const ConfigStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanProps) => {
+const ConfigStoragePlan = ({ id, storagePlan }: StoragePlanConfigProps) => {
   
   return (
   <ProtectedRoute>
@@ -17,7 +14,7 @@ const ConfigStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanPr
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StoragePlanConfig warehouses={warehouses ? warehouses : []} users={users ? users : []} storagePlan={storagePlan} id={id} />
+        <StoragePlanConfig storagePlan={storagePlan} id={id} />
       </Layout>
     </ProtectedRoute>
     );
@@ -26,16 +23,9 @@ const ConfigStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanPr
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
   let storagePlan = await getStoragePlanById(id, context);
-  if (storagePlan && storagePlan?.history) {
-    storagePlan.history = [] as History[];
-  }
-  const users = await getUsers(context);
-  const warehouses = [] as Warehouse[];
 
   return {
     props: {
-        warehouses,
-        users,
         storagePlan,
         id,
     }
