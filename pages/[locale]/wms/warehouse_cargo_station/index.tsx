@@ -24,8 +24,9 @@ const WarehouseCargoStation = ({
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const statesObj = await indexStateWarehouse(context);
-
-  const states = statesObj !== null ? Object.values(statesObj) : null;
+  
+  // @ts-ignore
+  const states = statesObj.states ? statesObj.states : [];
   return {
     props: {
       states

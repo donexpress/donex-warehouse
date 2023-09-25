@@ -37,7 +37,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
   }
   
-  const staffStates = staffStatesObj !== null ? Object.values(staffStatesObj) : [];
+  // @ts-ignore
+  const staffStates = staffStatesObj.states;
   return {
     props: {
       role,

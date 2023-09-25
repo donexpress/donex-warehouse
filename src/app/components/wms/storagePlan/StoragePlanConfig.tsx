@@ -218,7 +218,7 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
             updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'stocked'));
           }
         } else if (atLeastOneHasPackageShelf(elements)) {
-          if (storagePlan && storagePlan.state && storagePlan.state !== 'into warehouse') {
+          if (storagePlan && storagePlan.state && storagePlan.state !== 'into warehouse' && storagePlan.state !== 'stocked') {
             updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'into warehouse'));
           }
         }
@@ -351,11 +351,23 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
                       <div>
                         {storagePlan?.country}
                       </div>
-                      <div>
-                        {storagePlan?.reference_number}
+                      <div className='spc'>
+                        {storagePlan?.reference_number &&
+                          <CopyColumnToClipboard
+                            value={
+                              storagePlan?.reference_number
+                            }
+                          />
+                        } 
                       </div>
-                      <div>
-                        {storagePlan?.pr_number}
+                      <div className='spc'>
+                        {storagePlan?.pr_number &&
+                          <CopyColumnToClipboard
+                            value={
+                              storagePlan?.pr_number
+                            }
+                          />
+                        }
                       </div>
                       {/* <div>
                         {storagePlan?.weight}
@@ -494,10 +506,27 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
                             <div>{'--'}</div>
                             <div>{'--'}</div>
                             <div>{'--'}</div>
-                            <div>{(row.package_shelf && row.package_shelf.length > 0) ? `${intl.formatMessage({ id: 'partition' })}: ${(row.package_shelf && row.package_shelf.length > 0 && row.package_shelf[0].shelf) ? row.package_shelf[0].shelf.partition_table : ''}
-      ${intl.formatMessage({ id: 'shelf' })}: ${(row.package_shelf && row.package_shelf.length > 0 && row.package_shelf[0].shelf) ? row.package_shelf[0].shelf.number_of_shelves : ''}
-      ${intl.formatMessage({ id: 'layer' })}: ${(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].layer : ''}
-      ${intl.formatMessage({ id: 'column' })}: ${(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].column : ''}` : ''}</div>
+                            <div>
+                            {
+                              (row.package_shelf && row.package_shelf.length > 0) ? (
+                                <>
+                                  {storagePlan.warehouse ? (
+                                    <>
+                                      {storagePlan.warehouse.code}-{String(row.package_shelf[0].shelf?.partition_table).padStart(2, '0')}-{String(row.package_shelf[0].shelf?.number_of_shelves).padStart(2, '0')}-{String(row.package_shelf[0].layer).padStart(2, '0')}-{String(row.package_shelf[0].column).padStart(2, '0')}
+                                      <br />
+                                    </>
+                                  ) : null}
+                                  {intl.formatMessage({ id: 'partition' })}: {(row.package_shelf && row.package_shelf.length > 0 && row.package_shelf[0].shelf) ? row.package_shelf[0].shelf.partition_table : ''}
+                                  &nbsp;
+                                  {intl.formatMessage({ id: 'shelf' })}: {(row.package_shelf && row.package_shelf.length > 0 && row.package_shelf[0].shelf) ? row.package_shelf[0].shelf.number_of_shelves : ''}
+                                  <br />
+                                  {intl.formatMessage({ id: 'layer' })}: {(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].layer : ''}
+                                  &nbsp;
+                                  {intl.formatMessage({ id: 'column' })}: {(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].column : ''}
+                                </>
+                              ) : null
+                            }
+                            </div>
                             <div>{'--'}</div>
                             <div>{'--'}</div>
                           </div>

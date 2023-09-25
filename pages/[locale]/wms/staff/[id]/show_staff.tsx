@@ -46,7 +46,8 @@ export async function getServerSideProps(context: any) {
   const organizations = await getOrganizations(context);
   const affiliations = await getWarehouses(context);
 
-  const staffStates = staffStatesObj !== null ? Object.values(staffStatesObj) : null;
+  // @ts-ignore
+  const staffStates = staffStatesObj.states;
   return {
     props: {
       id,

@@ -11,6 +11,66 @@
     padding-top: 5px;
 }
 
+.upload-evidence-header-dialog {
+    display: grid;
+    grid-template-columns: 1fr 100px;
+    column-gap: 5px;
+}
+
+.upload-evidence-body-dialog {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-height: calc(100vh - 240px);
+    overflow: auto;
+    padding-top: 5px;
+}
+
+.upload_button {
+    background: #080f25;
+    opacity: .8;
+    border-radius: 5px;
+    color: #aeb9e1;
+    cursor: pointer;
+    height: 34px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 8px;
+    padding-bottom: 5px;
+    width: 100px;
+    font-size: 13px;
+    text-align: center;
+    border: solid 1px #ccc;
+    user-select: none;
+    display: grid;
+    grid-template-columns: 1fr 20px;
+    column-gap: 10px;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.del-evidence-img {
+    display: none;
+}
+
+.container-evidence {
+    position: relative;
+
+    &:hover {
+        .del-evidence-img {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            display: flex;
+            border-radius: 8px;
+            padding: 4px;
+            height: 30px;
+        }
+    }
+}
+
 @media only screen and (max-width: 640px) {
     .fields-shelf-dialog {
         grid-template-columns: 1fr;
