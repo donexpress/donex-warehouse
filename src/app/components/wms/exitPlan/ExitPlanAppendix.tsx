@@ -47,6 +47,7 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
       );
     } else {
       result = await getAppendagesByOperationInstructionId(operationInstruction?.id ? operationInstruction.id : -1)
+      console.log(owner)
     }
     
     if (result) {

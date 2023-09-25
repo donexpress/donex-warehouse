@@ -35,6 +35,25 @@ export const getOperationInstructionType = async (context?: GetServerSidePropsCo
   }
 }
 
+export const countOperationInstruction = async (exit_plan_id?: number,context?: GetServerSidePropsContext) => {
+  let path: string = operationInstructionPath() + `/count`
+  if(exit_plan_id) {
+    path += `?output_plan_id=${exit_plan_id}`
+  }
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    if(response.status && response.status >=200 && response.status <= 299) {
+      return {...response.data, status: response.status}
+    }
+    return {status: response.status ? response.status : 0}
+  } catch(error: any) {
+    return {
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    };
+  }
+}
+
 export const createOperationInstruction = async (data: any, context?: GetServerSidePropsContext) => {
   const path = operationInstructionPath()
   try {
