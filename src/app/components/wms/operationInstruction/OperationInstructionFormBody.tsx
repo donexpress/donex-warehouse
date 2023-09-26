@@ -16,6 +16,7 @@ import {
 import { useRouter } from "next/router";
 import { User } from "@/types/usererege1992";
 import ExitPlanAppendix from "../exitPlan/ExitPlanAppendix";
+import { isOMS } from "@/helperserege1992";
 
 interface Props {
   types: State[];
@@ -109,21 +110,21 @@ const OperationInstructionFormBody = ({
       await createOperationInstruction(values);
     }
     if (exit_plan_id) {
-      router.push(`/${locale}/wms/exit_plan/${exit_plan_id}/config`);
+      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/exit_plan/${exit_plan_id}/config`);
     } else {
-      router.push(`/${locale}/wms/operation_instruction`);
+      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/operation_instruction`);
     }
   };
   const goToEdit = () => {
     router.push(
-      `/${locale}/wms/operation_instruction/${operationInstruction?.id}/update`
+      `/${locale}/${isOMS() ? 'oms': 'wms'}/operation_instruction/${operationInstruction?.id}/update`
     );
   };
   const cancelSend = () => {
     if (exit_plan_id) {
-      router.push(`/${locale}/wms/exit_plan/${exit_plan_id}/config`);
+      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/exit_plan/${exit_plan_id}/config`);
     } else {
-      router.push(`/${locale}/wms/operation_instruction`);
+      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/operation_instruction`);
     }
   };
 

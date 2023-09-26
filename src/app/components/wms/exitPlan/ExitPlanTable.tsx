@@ -47,7 +47,7 @@ import {
 } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
-import { showMsg } from "../../../../helpers";
+import { isOMS, showMsg } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import FilterExitPlan from "./FilterExitPlan";
 
@@ -63,6 +63,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 const ExitPlanTable = () => {
   const intl = useIntl();
   const router = useRouter();
+  const checkOMS = isOMS();
   const { locale } = router.query;
   const [exitPlans, setExitPlans] = useState<ExitPlan[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -254,7 +255,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "pending"
+                    user.state.value !== "pending" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -264,7 +265,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "to_be_processed"
+                    user.state.value !== "to_be_processed" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -274,7 +275,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "processing"
+                    user.state.value !== "processing" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -284,8 +285,9 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "dispatched" &&
-                    user.state.value !== "to_be_processed"
+                    (user.state.value !== "dispatched" &&
+                      user.state.value !== "to_be_processed") ||
+                    checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -306,7 +308,10 @@ const ExitPlanTable = () => {
                 >
                   {intl.formatMessage({ id: "cancel" })}
                 </DropdownItem>
-                <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
+                <DropdownItem
+                  className={checkOMS ? "do-not-show-dropdown-item" : ""}
+                  onClick={() => handleDelete(Number(user["id"]))}
+                >
                   {intl.formatMessage({ id: "Delete" })}
                 </DropdownItem>
               </DropdownMenu>
@@ -333,7 +338,7 @@ const ExitPlanTable = () => {
         return (
           <CopyColumnToClipboard
             value={
-              <a href={`/${locale}/wms/exit_plan/${user["id"]}/config`}>
+              <a href={`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${user["id"]}/config`}>
                 {cellValue}
               </a>
             }
@@ -615,9 +620,11 @@ const ExitPlanTable = () => {
       exitPlan.operation_instructions &&
       exitPlan.operation_instructions.length > 0
     ) {
-      router.push(`/${locale}/wms/exit_plan/${exitPlan.id}/config`);
+      router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${exitPlan.id}/config`);
     } else {
-      router.push(`/${locale}/wms/operation_instruction/insert?exit_plan_id=${exitPlan.id}`)
+      router.push(
+        `/${locale}/${checkOMS ? 'oms': 'wms'}/operation_instruction/insert?exit_plan_id=${exitPlan.id}`
+      );
     }
   };
 
@@ -673,22 +680,22 @@ const ExitPlanTable = () => {
 
   const handleEdit = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/${id}/update`);
+    router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${id}/update`);
   };
 
   const handleShow = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/${id}/show`);
+    router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${id}/show`);
   };
 
   const handleAdd = () => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/insert`);
+    router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/insert`);
   };
 
   const handleConfig = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/${id}/config`);
+    router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${id}/config`);
   };
 
   const close = () => {
