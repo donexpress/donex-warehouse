@@ -47,6 +47,7 @@ import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import { SearchIcon } from "../../common/SearchIcon";
 import "./../../../../styles/generic.input.scss";
 import "../../../../styles/wms/user.table.scss";
+import { showMsg } from "@/helperserege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
@@ -115,14 +116,9 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     );
     let opi = null;
     if (exit_plan_id) {
-      opi = await getOperationInstructionsByOutputPlan(
-        exit_plan_id,
-        list_state?.value === "all" ? "" : list_state?.value
-      );
+      opi = await getOperationInstructionsByOutputPlan(exit_plan_id, list_state?.value);
     } else {
-      opi = await getOperationInstructions(
-        list_state?.value === "all" ? "" : list_state?.value
-      );
+      opi = await getOperationInstructions(list_state?.value);
     }
     setOperationInstructions(opi);
     setOperationInstructionState(states);
@@ -223,6 +219,10 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     });
   };
 
+  const handleConfig = (id: number) => {
+    router.push(`/${locale}/wms/operation_instruction/${id}/config`)
+  }
+
   const handleCancel = (id: number) => {
     const op = operationInstructions.find((el) => el.id === id);
     if (op) {
@@ -256,6 +256,9 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
   const confirm = async () => {
     const result = await deleteOperationInstructions(selectedId);
     await loadStates();
+    showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+      type: "success",
+    });
     close();
   };
 
@@ -373,6 +376,11 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
                     onClick={() => handleReturn(Number(user["id"]))}
                   >
                     {intl.formatMessage({ id: "return" })}
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleConfig(Number(user["id"]))}
+                  >
+                    {intl.formatMessage({ id: "config" })}
                   </DropdownItem>
                   <DropdownItem
                     className={

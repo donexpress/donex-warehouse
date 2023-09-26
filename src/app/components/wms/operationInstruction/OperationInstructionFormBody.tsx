@@ -41,6 +41,10 @@ const OperationInstructionFormBody = ({
   const intl = useIntl();
   const router = useRouter();
   const { locale, exit_plan_id } = router.query;
+  const [filterType, setFilterType] = useState<{
+    filter: ExitPlan | Warehouse | User | undefined;
+    type: string;
+  }>({ filter: undefined, type: "none" });
 
   const getPositions = (operationInstruction: any): string[] => {
     const pos: string[] = [];
@@ -50,22 +54,6 @@ const OperationInstructionFormBody = ({
     return pos;
   };
 
-  const getOwner = (): User | undefined => {
-    let user_id = -1
-    if(exit_plan_id) {
-      const tmp = exitPlans.find(el => el.id === Number(exit_plan_id))
-      if(tmp && tmp.user_id) {
-        user_id = tmp.user_id
-      }
-    } else {
-      const tmp = operationInstruction?.user_id
-      if(tmp) {
-        user_id = tmp
-      }
-    }
-    const owner = users.find(el => el.id === user_id)
-    return owner
-  }
   const initialValues: OperationInstruction = {
     client_display: id ? false : false,
     internal_remark: id ? "" : "",
@@ -123,9 +111,7 @@ const OperationInstructionFormBody = ({
     if (exit_plan_id) {
       router.push(`/${locale}/wms/exit_plan/${exit_plan_id}/config`);
     } else {
-      router.push(
-        `/${locale}/wms/operation_instruction`
-      );
+      router.push(`/${locale}/wms/operation_instruction`);
     }
   };
   const goToEdit = () => {
@@ -137,9 +123,7 @@ const OperationInstructionFormBody = ({
     if (exit_plan_id) {
       router.push(`/${locale}/wms/exit_plan/${exit_plan_id}/config`);
     } else {
-      router.push(
-        `/${locale}/wms/operation_instruction`
-      );
+      router.push(`/${locale}/wms/operation_instruction`);
     }
   };
 
@@ -155,12 +139,34 @@ const OperationInstructionFormBody = ({
   };
 
   const getwarehouseFormatted = (warehouses: Warehouse[]): ValueSelect[] => {
+    const warehouses_ids: number[] = [];
+    if (filterType.type === "exit_plan") {
+      const tmp = filterType.filter as ExitPlan;
+      if (tmp.warehouse_id) {
+        warehouses_ids.push(tmp.warehouse_id);
+      }
+    }
+    // if (filterType.type === "user") {
+    //   const tmp = filterType.filter as User;
+    //   if (tmp.warehouse_id) {
+    //     warehouses_ids.push(tmp.warehouse_id);
+    //   }
+    // }
     let response: ValueSelect[] = [];
     warehouses.forEach((warehouse) => {
-      response.push({
-        value: Number(warehouse.id),
-        label: warehouse.name,
-      });
+      if (warehouses_ids.length > 0) {
+        if (warehouses_ids.find((el) => el === warehouse.id)) {
+          response.push({
+            value: Number(warehouse.id),
+            label: warehouse.name,
+          });
+        }
+      } else {
+        response.push({
+          value: Number(warehouse.id),
+          label: warehouse.name,
+        });
+      }
     });
     return response;
   };
@@ -177,14 +183,51 @@ const OperationInstructionFormBody = ({
   };
 
   const getUserFormatted = (usrs: User[]): ValueSelect[] => {
+    const users_ids: number[] = [];
+    if (filterType.type === "exit_plan") {
+      const tmp = filterType.filter as ExitPlan;
+      if (tmp.user_id) {
+        users_ids.push(tmp.user_id);
+      }
+    }
     let response: ValueSelect[] = [];
     usrs.forEach((user) => {
-      response.push({
-        value: Number(user.id),
-        label: user.nickname,
-      });
+      if (users_ids.length > 0) {
+        if (users_ids.find((el) => el === user.id)) {
+          response.push({
+            value: Number(user.id),
+            label: user.nickname,
+          });
+        }
+      } else {
+        response.push({
+          value: Number(user.id),
+          label: user.nickname,
+        });
+      }
     });
     return response;
+  };
+
+  const changeValueExitPlan = (value: number) => {
+    const exitPlan = exitPlans.find((el) => el.id === value);
+    if (exitPlan) {
+      setFilterType({ filter: exitPlan, type: "exit_plan" });
+    }
+  };
+
+  const changeValueUser = (value: number) => {
+    const user = users.find((el) => el.id === value);
+    if (user) {
+      setFilterType({ filter: user, type: "user" });
+    }
+  };
+
+  const changeValueWarehouse = (value: number) => {
+    const warehouse = warehouses.find((el) => el.id === value);
+    if (warehouse) {
+      setFilterType({ filter: warehouse, type: "warehouse" });
+    }
   };
 
   return (
@@ -226,6 +269,7 @@ const OperationInstructionFormBody = ({
                     name="warehouse_id"
                     placeholder={intl.formatMessage({ id: "warehouse" })}
                     options={getwarehouseFormatted(warehouses)}
+                    getValueChangeFn={changeValueWarehouse}
                     customClass="select-filter"
                     disabled={
                       isFromDetails || exit_plan_id !== undefined || isModify
@@ -239,6 +283,7 @@ const OperationInstructionFormBody = ({
                     name="output_plan_id"
                     placeholder={intl.formatMessage({ id: "exitPlan" })}
                     options={getExitPlanFormatted(exitPlans)}
+                    getValueChangeFn={changeValueExitPlan}
                     customClass="select-filter"
                     isMulti={false}
                     disabled={
@@ -254,6 +299,7 @@ const OperationInstructionFormBody = ({
                     placeholder={intl.formatMessage({ id: "user" })}
                     options={getUserFormatted(users)}
                     customClass="select-filter"
+                    getValueChangeFn={changeValueUser}
                     isMulti={false}
                     disabled={
                       isFromDetails || exit_plan_id !== undefined || isModify
@@ -327,11 +373,6 @@ const OperationInstructionFormBody = ({
           )}
         </Formik>
       </div>
-      {id && exitPlans && (
-        // @ts-ignore
-        <ExitPlanAppendix owner={getOwner()} operationInstruction={operationInstruction}
-        />
-      )}
     </div>
   );
 };
