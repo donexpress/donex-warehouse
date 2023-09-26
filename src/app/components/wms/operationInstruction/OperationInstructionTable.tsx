@@ -47,7 +47,7 @@ import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import { SearchIcon } from "../../common/SearchIcon";
 import "./../../../../styles/generic.input.scss";
 import "../../../../styles/wms/user.table.scss";
-import { showMsg } from "@/helperserege1992";
+import { isOMS, isWMS, showMsg } from "@/helperserege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
@@ -116,7 +116,10 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     );
     let opi = null;
     if (exit_plan_id) {
-      opi = await getOperationInstructionsByOutputPlan(exit_plan_id, list_state?.value);
+      opi = await getOperationInstructionsByOutputPlan(
+        exit_plan_id,
+        list_state?.value
+      );
     } else {
       opi = await getOperationInstructions(list_state?.value);
     }
@@ -197,31 +200,41 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
   const handleAdd = () => {
     if (exit_plan_id) {
       router.push({
-        pathname: `/${locale}/wms/operation_instruction/insert`,
+        pathname: `/${locale}/${
+          isOMS() ? "oms" : "wms"
+        }/operation_instruction/insert`,
         search: `?exit_plan_id=${exit_plan_id}`,
       });
     } else {
       router.push({
-        pathname: `/${locale}/wms/operation_instruction/insert`,
+        pathname: `/${locale}/${
+          isOMS() ? "oms" : "wms"
+        }/operation_instruction/insert`,
       });
     }
   };
 
   const handleShow = (id: number) => {
     router.push({
-      pathname: `/${locale}/wms/operation_instruction/${id}/show`,
+      pathname: `/${locale}/${
+        isOMS() ? "oms" : "wms"
+      }/operation_instruction/${id}/show`,
     });
   };
 
   const handleEdit = (id: number) => {
     router.push({
-      pathname: `/${locale}/wms/operation_instruction/${id}/update`,
+      pathname: `/${locale}/${
+        isOMS() ? "oms" : "wms"
+      }/operation_instruction/${id}/update`,
     });
   };
 
   const handleConfig = (id: number) => {
-    router.push(`/${locale}/wms/operation_instruction/${id}/config`)
-  }
+    router.push(
+      `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${id}/config`
+    );
+  };
 
   const handleCancel = (id: number) => {
     const op = operationInstructions.find((el) => el.id === id);
@@ -349,7 +362,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
                   </DropdownItem>
                   <DropdownItem
                     className={
-                      user.state !== "pending"
+                      user.state !== "pending" || isOMS()
                         ? "do-not-show-dropdown-item"
                         : ""
                     }
@@ -359,7 +372,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
                   </DropdownItem>
                   <DropdownItem
                     className={
-                      user.state !== "processing"
+                      user.state !== "processing" || isOMS()
                         ? "do-not-show-dropdown-item"
                         : ""
                     }
@@ -369,7 +382,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
                   </DropdownItem>
                   <DropdownItem
                     className={
-                      user.state !== "processed"
+                      user.state !== "processed" || isOMS()
                         ? "do-not-show-dropdown-item"
                         : ""
                     }
@@ -393,6 +406,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
                   <DropdownItem
+                    className={isOMS() ? "do-not-show-dropdown-item" : ""}
                     onClick={() => handleDelete(Number(user["id"]))}
                   >
                     {intl.formatMessage({ id: "Delete" })}
@@ -651,7 +665,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             marginTop: "10px",
           }}
         >
-          {statusSelected === 1 && (
+          {statusSelected === 1 && isWMS() && (
             <Button
               color="primary"
               onClick={() => handleMultiProcessing()}
@@ -661,7 +675,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             </Button>
           )}
 
-          {statusSelected === 1 && (
+          {statusSelected === 1 && isWMS() && (
             <Button
               color="primary"
               onClick={() => handleMultiCancel()}
@@ -671,7 +685,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             </Button>
           )}
 
-          {statusSelected === 2 && (
+          {statusSelected === 2 && isWMS() && (
             <Button
               color="primary"
               onClick={() => handleMultiProcess()}
@@ -680,7 +694,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
               {intl.formatMessage({ id: "processed" })}
             </Button>
           )}
-          {statusSelected === 3 && (
+          {statusSelected === 3 && isWMS() && (
             <Button
               color="primary"
               onClick={() => handleMultiReturn()}
@@ -690,13 +704,16 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             </Button>
           )}
         </div>
-        <div className="overflow-x-auto tab-system-table bg-content1" style={{marginBottom: exit_plan_id ? 0 :10}}>
+        <div
+          className="overflow-x-auto tab-system-table bg-content1"
+          style={{ marginBottom: exit_plan_id ? 0 : 10 }}
+        >
           <ul
             className="flex space-x-4"
             style={{
               backgroundColor: "#37446b",
               borderRadius: "5px",
-              width: exit_plan_id ? "99%" :"100%",
+              width: exit_plan_id ? "99%" : "100%",
             }}
           >
             {operationInstructionState &&

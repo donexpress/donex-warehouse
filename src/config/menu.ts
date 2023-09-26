@@ -136,7 +136,7 @@ export const menuOMS = (intl: IntlShape) => {
         {
           id: 2.2,
           label: intl.formatMessage({ id: "exitPlan" }),
-          route: "#",
+          route: RouteMenu.EXIT_PLAN,
         },
         {
           id: 2.3,
@@ -146,7 +146,7 @@ export const menuOMS = (intl: IntlShape) => {
         {
           id: 2.4,
           label: intl.formatMessage({ id: "operatingInstructions" }),
-          route: "#",
+          route: RouteMenu.OPERATING_INSTRUCTIONS,
         },
       ],
     },

@@ -34,7 +34,7 @@ const ExitPlanFormBody = ({
   const date = new Date(
     exitPlan ? (exitPlan.delivered_time ? exitPlan.delivered_time : "") : ""
   );
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   const [destinationSelected, setDestinationSelected] = useState<string>("");
   const initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
@@ -44,16 +44,15 @@ const ExitPlanFormBody = ({
         : undefined,
     city: id && exitPlan ? exitPlan.city : "",
     country: id && exitPlan ? exitPlan.country : "",
-    delivered_time:
-      id && exitPlan
-        ? date.toISOString().slice(0,16) : "",
+    delivered_time: id && exitPlan ? date.toISOString().slice(0, 16) : "",
     observations: id && exitPlan ? exitPlan.observations : "",
     type: id && exitPlan ? exitPlan.type : -1,
-    user_id:
-      id && exitPlan && exitPlan.user && exitPlan.user.id
-        ? exitPlan.user.id
-        : undefined,
-    destination: id && exitPlan ? exitPlan.destination: ''
+    user_id: isOMS()
+      ? users[0].id
+      : id && exitPlan && exitPlan.user && exitPlan.user.id
+      ? exitPlan.user.id
+      : undefined,
+    destination: id && exitPlan ? exitPlan.destination : "",
   };
 
   console.log(initialValues, exitPlan?.warehouse_id);
@@ -68,18 +67,18 @@ const ExitPlanFormBody = ({
     if (values.delivered_time === "") {
       values.delivered_time = null;
     }
-    if (isWMS()) {
-      if (id) {
-        await modify(id, values);
-      } else {
-        await create(values);
-      }
+    if (id) {
+      await modify(id, values);
+    } else {
+      await create(values);
     }
   };
 
   const create = async (values: ExitPlan) => {
-    const d = destinations?.destinations.find(el => el.value === destinationSelected)
-    values.destination = d?.value
+    const d = destinations?.destinations.find(
+      (el) => el.value === destinationSelected
+    );
+    values.destination = d?.value;
     const response: Response = await createExitPlan(values);
     treatmentToResponse(response);
   };
@@ -95,7 +94,7 @@ const ExitPlanFormBody = ({
         ? intl.formatMessage({ id: "changedsuccessfullyMsg" })
         : intl.formatMessage({ id: "successfullyMsg" });
       showMsg(message, { type: "success" });
-      router.push(`/${locale}/wms/exit_plan`);
+      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/exit_plan`);
     } else {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       showMsg(message, { type: "error" });
@@ -103,7 +102,7 @@ const ExitPlanFormBody = ({
   };
 
   const goToEdit = () => {
-    router.push(`/${locale}/wms/exit_plan/${id}/update`);
+    router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/exit_plan/${id}/update`);
   };
 
   const getUsersFormatted = (users: User[]): ValueSelect[] => {
@@ -194,7 +193,7 @@ const ExitPlanFormBody = ({
                     customClass="select-filter"
                     isMulti={false}
                     getValueChangeFn={getValueChange}
-                    disabled={isFromDetails}
+                    disabled={isFromDetails || isOMS()}
                     required
                   />
                 </div>
@@ -253,7 +252,9 @@ const ExitPlanFormBody = ({
                       id: "address",
                     })}
                     customClass="custom-input"
-                    disabled={isFromDetails || destinationSelected !== 'private_address'}
+                    disabled={
+                      isFromDetails || destinationSelected !== "private_address"
+                    }
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
