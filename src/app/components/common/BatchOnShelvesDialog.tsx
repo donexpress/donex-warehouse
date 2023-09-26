@@ -63,6 +63,7 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
 
   const handleSubmit = async (values: BatchOnShelves) => {
     const shelfId = Number(values.shelf_id);
+    const shelf = allShelfs.filter((sh: Shelf) => sh.id === shelfId);
     const aux = values.location_id?.toString().split('-');
     if (aux && (aux.length === 2)) {
       const layer = Number(aux[0]);
@@ -84,6 +85,9 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
           if (response.status >= 200 && response.status <= 299) {
             c++;
             const data: PackageShelf = {...packingList.package_shelf[0], ...bodyParams};
+            if (shelf.length > 0) {
+              data.shelf = shelf[0];
+            }
             packingList.package_shelf = [data];
             packingListItems.push(packingList);
           }
@@ -92,6 +96,9 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
           if (response.status >= 200 && response.status <= 299) {
             c++;
             const data: PackageShelf = response.data;
+            if (shelf.length > 0) {
+              data.shelf = shelf[0];
+            }
             packingList.package_shelf = [data];
             packingListItems.push(packingList);
           }

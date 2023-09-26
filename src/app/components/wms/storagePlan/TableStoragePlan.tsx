@@ -19,6 +19,7 @@ import {
 } from "@nextui-org/react";
 import { PlusIcon } from "./../../common/PlusIcon";
 import { CancelIcon } from "./../../common/CancelIcon";
+import { CameraIcon } from "./../../common/CameraIcon";
 import { ExportIcon } from "./../../common/ExportIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
@@ -30,13 +31,15 @@ import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
 import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount } from '../../../../services/api.storage_plan';
-import { StoragePlan, StoragePlanListProps } from "../../../../types/storage_plan";
+import { PackingList, StoragePlan, StoragePlanListProps } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
+import UploadEvidenceDialog from "../../common/UploadEvidenceDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import ReceiptPDF from '../../common/ReceiptPDF';
+import EvidencePDF from '../../common/EvidencePDF';
 import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
@@ -74,11 +77,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
   const [cancelElement, setCancelElement] = useState<StoragePlan | null>(null);
 
-  const [showReturnDialog, setShowReturnDialog] = useState<boolean>(false);
-  const [returnElement, setReturnElement] = useState<StoragePlan | null>(null);
-  
-  const [showDeclineDialog, setShowDeclineDialog] = useState<boolean>(false);
-  const [declineElement, setDeclineElement] = useState<StoragePlan | null>(null);
+  const [showForceEntryDialog, setShowForceEntryDialog] = useState<boolean>(false);
+  const [forceEntryElement, setForceEntryElement] = useState<StoragePlan | null>(null);
+
+  const [showUploadEvidenceDialog, setShowUploadEvidenceDialog] = useState<boolean>(false);
+  const [uploadEvidenceElement, setUploadEvidenceElement] = useState<StoragePlan | null>(null);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -124,8 +127,13 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
         sortable: false,
       },
       {
-        name: intl.formatMessage({ id: "number_of_boxes" }),
+        name: intl.formatMessage({ id: "number_of_boxes_entered" }),
         uid: "box_amount",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "number_of_boxes_stored" }),
+        uid: "number_of_boxes_stored",
         sortable: false,
       },
       {
@@ -269,12 +277,19 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
                   <DropdownItem className={statusSelected !== 'to be storage' ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
-                  {/* <DropdownItem className={statusSelected === 'refused' ? 'do-not-show-dropdown-item' : ''} onClick={() => openDeclineStoragePlanDialog(storageP)}>
-                    {intl.formatMessage({ id: "decline" })}
+                  <DropdownItem className={statusSelected !== 'into warehouse' ? 'do-not-show-dropdown-item' : ''} onClick={() => openForceEntryStoragePlanDialog(storageP)}>
+                    {intl.formatMessage({ id: "force_entry" })}
                   </DropdownItem>
-                  <DropdownItem className={statusSelected === 'returns' ? 'do-not-show-dropdown-item' : ''} onClick={() => openReturnStoragePlanDialog(storageP)}>
-                    {intl.formatMessage({ id: "returns" })}
-                  </DropdownItem> */}
+                  <DropdownItem className={(statusSelected !== 'into warehouse' && statusSelected !== 'stocked') ? 'do-not-show-dropdown-item' : ''} onClick={() => openUploadEvidenceStoragePlanDialog(storageP)}>
+                    {intl.formatMessage({ id: "upload_evidence" })}
+                  </DropdownItem>
+                  <DropdownItem className={((statusSelected !== 'into warehouse' && statusSelected !== 'stocked') || !storageP.images || (storageP.images && storageP.images.length === 0)) ? 'do-not-show-dropdown-item' : ''}>
+                    <PDFDownloadLink document={<EvidencePDF storagePlan={storageP as StoragePlan} intl={intl} />} fileName="evidence_pdf.pdf">
+                      {({ blob, url, loading, error }) =>
+                        intl.formatMessage({ id: "generate_evidence" })
+                      }
+                    </PDFDownloadLink>
+                  </DropdownItem>
                   <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl)}>
                     {intl.formatMessage({ id: "export" })}
                   </DropdownItem>
@@ -309,6 +324,23 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
               <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(storageP["id"])}}>{storageP.order_number}</span>
             }
           />
+        );
+        case "reference_number": return (
+          <CopyColumnToClipboard
+            value={
+              <span>{storageP.reference_number}</span>
+            }
+          />
+        );
+        case "pr_number": return (
+          <CopyColumnToClipboard
+            value={
+              <span>{storageP.pr_number}</span>
+            }
+          />
+        );
+        case "number_of_boxes_stored": return (
+          storageP.packing_list && storageP.packing_list.length > 0 ? (storageP.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : ''
         );
         default:
           return cellValue;
@@ -364,12 +396,13 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   
   const changeTab = async(tab: string) => {
     if (tab !== statusSelected && !loadingItems) {
-      await setStatusSelected(tab);
       await setLoadingItems(true);
+      await setStatusSelected(tab);
       const storagePlanss = await getStoragePlans(tab);
-      
+      await setStoragePlans(storagePlanss !== null ? storagePlanss : []);      
       await setLoadingItems(false);
-      await setStoragePlans(storagePlanss !== null ? storagePlanss : []);
+      setSelectedItems([]);
+      setSelectedKeys(new Set([]));
     }
   }
 
@@ -447,9 +480,22 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
           </div>
         </div>
         <div className="elements-row-end">
+            {
+              (statusSelected === 'into warehouse' || statusSelected === 'stocked') && (
+                <Button
+                  color="primary"
+                  style={{ width: '160px', marginLeft: '10px' }}
+                  endContent={<CameraIcon />}
+                  onClick={() => openUploadEvidenceStoragePlanDialog()}
+                  isDisabled={selectedItems.length === 0 || selectedItems.length > 1}
+                >
+                  {intl.formatMessage({ id: "upload_evidence" })}
+                </Button>
+              )
+            }
             <Button
               color="primary"
-              style={{ width: '121px' }}
+              style={{ width: '121px', marginLeft: '10px' }}
               endContent={<ExportIcon />}
               onClick={() => handleExportStoragePlanData()}
               isDisabled={selectedItems.length === 0}
@@ -580,9 +626,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
 
   const loadStoragePlans = async (loadCount: boolean = false) => {
     setLoading(true);
+    await setLoadingItems(true);
     const storagePlanss = await getStoragePlans(statusSelected);
     
     setStoragePlans(storagePlanss !== null ? storagePlanss : []);
+    await setLoadingItems(false);
     if (loadCount) {
       const storagePCount = await storagePlanCount();
       setStgPCount(storagePCount ? storagePCount : undefined);
@@ -704,10 +752,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     }
   }
 
-  const handleReturn = async() => {
-    if (returnElement !== null) {
+  const handleForceEntry = async() => {
+    if (forceEntryElement !== null) {
       setLoading(true);
-      const response: Response = await updateStoragePlanById(Number(returnElement.id), formatBodyToCancel(returnElement, 'returns'));
+      const response: Response = await updateStoragePlanById(Number(forceEntryElement.id), formatBodyToCancel(forceEntryElement, 'stocked'));
       if (response.status >= 200 && response.status <= 299) {
         const message = intl.formatMessage({ id: 'successfullyActionMsg' });
         showMsg(message, { type: "success" });
@@ -715,25 +763,44 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
         let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
         showMsg(message, { type: "error" });
       }
-      closeReturnStoragePlanDialog();
+      closeForceEntryStoragePlanDialog();
       await loadStoragePlans(true);
     }
   }
 
-  const handleDecline = async() => {
-    if (declineElement !== null) {
+  const handleUploadEvidence = async(images: string[]) => {
+    if (uploadEvidenceElement !== null) {
       setLoading(true);
-      const response: Response = await updateStoragePlanById(Number(declineElement.id), formatBodyToCancel(declineElement, 'refused'));
+      const response: Response = await updateStoragePlanById(Number(uploadEvidenceElement.id), formatBodyToUploadEvidence(uploadEvidenceElement, images));
       if (response.status >= 200 && response.status <= 299) {
+        setStoragePlans(storagePlans.map((sp: StoragePlan) => {
+          return uploadEvidenceElement.id !== sp.id ? sp : {...sp, images: images, is_images: (images && images.length > 1)};
+        }));
         const message = intl.formatMessage({ id: 'successfullyActionMsg' });
         showMsg(message, { type: "success" });
       } else {
         let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
         showMsg(message, { type: "error" });
       }
-      closeDeclineStoragePlanDialog();
-      await loadStoragePlans(true);
+      setLoading(false);
+      closeUploadEvidenceStoragePlanDialog();
     }
+  }
+  
+  const formatBodyToUploadEvidence = (values: StoragePlan, images: string[]): StoragePlan => {
+    return {
+            user_id: values.user_id ? Number(values.user_id) : null,
+            warehouse_id: values.warehouse_id ? Number(values.warehouse_id) : null,
+            customer_order_number: values.customer_order_number,
+            box_amount: values.box_amount,
+            delivered_time: values.delivered_time,
+            observations: values.observations,
+            rejected_boxes: values.rejected_boxes,
+            return: values.return,
+            state: values.state,
+            images: images,
+            is_images: (images && images.length !== 0),
+          };
   }
 
   const openCancelAllStoragePlanDialog = () => {
@@ -745,14 +812,25 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     setShowCancelDialog(true);
   }
 
-  const openReturnStoragePlanDialog = (sp: StoragePlan) => {
-    setReturnElement(sp);
-    setShowReturnDialog(true);
+  const openForceEntryStoragePlanDialog = (sp: StoragePlan) => {
+    setForceEntryElement(sp);
+    setShowForceEntryDialog(true);
   }
 
-  const openDeclineStoragePlanDialog = (sp: StoragePlan) => {
-    setDeclineElement(sp);
-    setShowDeclineDialog(true);
+  const openUploadEvidenceStoragePlanDialog = async(storagePl: StoragePlan | null = null) => {
+    if (storagePl !== null || selectedItems.length === 1) {
+      let items: StoragePlan[] = [];
+      if (storagePl !== null) {
+        items = [storagePl];
+      } else {
+        const index = selectedItems[0];
+        items = storagePlans.filter((sp: StoragePlan) => sp.id === index);
+      }
+      if (items.length > 0) {
+        await setUploadEvidenceElement(items[0]);
+        setShowUploadEvidenceDialog(true);
+      }
+    }
   }
 
   const closeCancelAllStoragePlanDialog = () => {
@@ -764,14 +842,14 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     setShowCancelDialog(false);
   }
 
-  const closeReturnStoragePlanDialog = () => {
-    setReturnElement(null);
-    setShowReturnDialog(false);
+  const closeForceEntryStoragePlanDialog = () => {
+    setForceEntryElement(null);
+    setShowForceEntryDialog(false);
   }
 
-  const closeDeclineStoragePlanDialog = () => {
-    setDeclineElement(null);
-    setShowDeclineDialog(false);
+  const closeUploadEvidenceStoragePlanDialog = () => {
+    setUploadEvidenceElement(null);
+    setShowUploadEvidenceDialog(false);
   }
 
   const selectedItemsFn = (selection: Selection) => {
@@ -827,8 +905,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showCancelAllDialog && <ConfirmationDialog close={closeCancelAllStoragePlanDialog} confirm={handleCancelAll} />}
         {showCancelDialog && <ConfirmationDialog close={closeCancelStoragePlanDialog} confirm={handleCancel} />}
-        {showReturnDialog && <ConfirmationDialog close={closeReturnStoragePlanDialog} confirm={handleReturn} />}
-        {showDeclineDialog && <ConfirmationDialog close={closeDeclineStoragePlanDialog} confirm={handleDecline} />}
+        {showForceEntryDialog && <ConfirmationDialog close={closeForceEntryStoragePlanDialog} confirm={handleForceEntry} />}
+        {showUploadEvidenceDialog && <UploadEvidenceDialog close={closeUploadEvidenceStoragePlanDialog} confirm={handleUploadEvidence} storagePlan={(uploadEvidenceElement as StoragePlan)} title={intl.formatMessage({ id: "upload_evidence" })} />}
       </Loading>
     </>
   );

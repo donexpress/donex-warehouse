@@ -59,6 +59,11 @@
     cursor: pointer;
 }
 
+.spc div {
+    width: auto !important;
+    overflow-wrap: break-word;
+}
+
 @media only screen and (max-width: 1250px) {
     .storage-plan-data {
         width: calc(100vw - 64px);

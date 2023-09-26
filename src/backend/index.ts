@@ -17,7 +17,7 @@ export const removeUserPath = (id: number) => {
 };
 
 export const userStatePath = () => {
-  return BASE_URL + "/api/v1/user_state";
+  return BASE_URL + "/api/v1/user/states";
 };
 
 export const staffPath = (page?: number, rowsPerPage?: number) => {
@@ -49,7 +49,7 @@ export const WarehousePath = () => {
 };
 
 export const getStateWarehousePath = () => {
-  return BASE_URL + "/api/v1/cargo_station_state";
+  return BASE_URL + "/api/v1/cargo_station/states";
 };
 
 export const warehousePath = () => {
@@ -127,7 +127,7 @@ export const rolePath = () => {
 };
 
 export const staffStatePath = () => {
-  return BASE_URL + "/api/v1/staff_state";
+  return BASE_URL + "/api/v1/staff/states";
 };
 
 export const organizationPath = () => {

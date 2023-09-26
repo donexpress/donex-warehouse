@@ -39,7 +39,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   const userStateListObj = await getUserStates(context);
 
-  const userStateList = (userStateListObj && (userStateListObj !== null)) ? Object.values(userStateListObj) : [];
+  // @ts-ignore
+  const userStateList = (userStateListObj && (userStateListObj !== null)) ? userStateListObj.states : [];
   
   return {
     props: {
