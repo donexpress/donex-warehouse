@@ -143,6 +143,7 @@
 	"upload_evidence": "Upload evidence",
 	"generate_evidence": "Generate evidence",
 	"evidence_generated": "Evidence generated",
+	"evidence": "Evidence",
 	"no_images": "There is still no recorded evidence",
 	"delivery_time": "Delivery time",
 	"select_nation": "Select country",
@@ -182,7 +183,7 @@
 	"cargo_information": "Cargo information",
 	"config": "Set up",
 	"reference_number": "Reference number",
-	"pr_number": "PR number",
+	"pr_number": "BL number",
 	"images": "Images",
 
 	"to_be_stored_state": "To be stored",

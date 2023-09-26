@@ -7,7 +7,7 @@ import { getUsers } from '../../../../../src/services/api.users';
 import { getWhs } from '../../../../../src/services/api.wh';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const HistoryStoragePlan = ({ id, storagePlan, warehouses, users }: HistoryStoragePlanProps) => {console.log(storagePlan)
+const HistoryStoragePlan = ({ id, storagePlan, warehouses, users, inWMS = true }: HistoryStoragePlanProps) => {console.log(storagePlan)
   
   return (
   <ProtectedRoute>
@@ -16,7 +16,7 @@ const HistoryStoragePlan = ({ id, storagePlan, warehouses, users }: HistoryStora
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StoragePlanHistory storagePlan={storagePlan} id={id} warehouses={warehouses ? warehouses : []} users={users ? users : []} />
+        <StoragePlanHistory inWMS={ inWMS } storagePlan={storagePlan} id={id} warehouses={warehouses ? warehouses : []} users={users ? users : []} />
       </Layout>
     </ProtectedRoute>
     );

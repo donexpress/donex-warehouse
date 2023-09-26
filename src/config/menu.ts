@@ -131,7 +131,7 @@ export const menuOMS = (intl: IntlShape) => {
         {
           id: 2.1,
           label: intl.formatMessage({ id: "storagePlan" }),
-          route: "#",
+          route: RouteMenu.STORAGE_PLAN,
         },
         {
           id: 2.2,

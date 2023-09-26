@@ -59,7 +59,16 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListProps) => {
+const INITIAL_VISIBLE_COLUMNS_OMS = [
+  "order_number",
+  "customer_order_number",
+  "box_amount",
+  "number_of_boxes_stored",
+  "evidence",
+  "actions",
+];
+
+const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePlanListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -89,7 +98,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
     new Set([])
   );
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
-    new Set(INITIAL_VISIBLE_COLUMNS)
+    new Set(inWMS ? INITIAL_VISIBLE_COLUMNS : INITIAL_VISIBLE_COLUMNS_OMS)
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -104,7 +113,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
   const hasSearchFilter = Boolean(filterValue);
 
   const getColumns = React.useMemo(() => {
-    const columns = [
+    const columns = inWMS ? [
       { name: "ID", uid: "id", sortable: false },
       {
         name: intl.formatMessage({ id: "warehouse_order_number" }),
@@ -134,6 +143,69 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
       {
         name: intl.formatMessage({ id: "number_of_boxes_stored" }),
         uid: "number_of_boxes_stored",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "evidence" }),
+        uid: "evidence",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "reference_number" }),
+        uid: "reference_number",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "pr_number" }),
+        uid: "pr_number",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "state" }),
+        uid: "state",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "delivery_time" }),
+        uid: "delivered_time",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "observations" }),
+        uid: "observations",
+        sortable: false,
+      },
+      { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
+    ] :  [
+      { name: "ID", uid: "id", sortable: false },
+      {
+        name: intl.formatMessage({ id: "warehouse_order_number" }),
+        uid: "order_number",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "customer_order_number" }),
+        uid: "customer_order_number",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "number_of_boxes_entered" }),
+        uid: "box_amount",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "number_of_boxes_stored" }),
+        uid: "number_of_boxes_stored",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "evidence" }),
+        uid: "evidence",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "storage" }),
+        uid: "warehouse_id",
         sortable: false,
       },
       {
@@ -280,7 +352,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
                   <DropdownItem className={statusSelected !== 'into warehouse' ? 'do-not-show-dropdown-item' : ''} onClick={() => openForceEntryStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "force_entry" })}
                   </DropdownItem>
-                  <DropdownItem className={(statusSelected !== 'into warehouse' && statusSelected !== 'stocked') ? 'do-not-show-dropdown-item' : ''} onClick={() => openUploadEvidenceStoragePlanDialog(storageP)}>
+                  <DropdownItem className={(!inWMS || (statusSelected !== 'into warehouse' && statusSelected !== 'stocked')) ? 'do-not-show-dropdown-item' : ''} onClick={() => openUploadEvidenceStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "upload_evidence" })}
                   </DropdownItem>
                   <DropdownItem className={((statusSelected !== 'into warehouse' && statusSelected !== 'stocked') || !storageP.images || (storageP.images && storageP.images.length === 0)) ? 'do-not-show-dropdown-item' : ''}>
@@ -315,10 +387,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
             </div>
           );
         case "user_id": return storageP.user ? storageP.user.username : '';
+        case "evidence": return storageP.images ? (storageP.images.length) : 0;
         case "state": return storageP.rejected_boxes ? intl.formatMessage({ id: "rejected_boxes" }) : (storageP.return ? intl.formatMessage({ id: "return" }) : intl.formatMessage({ id: "normal" }));
         case "warehouse_id": return storageP.warehouse ? (`${storageP.warehouse.name} (${storageP.warehouse.code})`) : '';
         case "order_number": return (
-          
           <CopyColumnToClipboard
             value={
               <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(storageP["id"])}}>{storageP.order_number}</span>
@@ -481,7 +553,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
         </div>
         <div className="elements-row-end">
             {
-              (statusSelected === 'into warehouse' || statusSelected === 'stocked') && (
+              (inWMS && (statusSelected === 'into warehouse' || statusSelected === 'stocked')) && (
                 <Button
                   color="primary"
                   style={{ width: '160px', marginLeft: '10px' }}
@@ -645,27 +717,27 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount }: StoragePlanListP
 
   const handleEdit = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/storage_plan/${id}/update`);
+    router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/update`);
   };
 
   const handleHistory = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/storage_plan/${id}/history`);
+    router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/history`);
   };
 
   const handleConfig = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/storage_plan/${id}/config`);
+    router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
   };
 
   const handleShow = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/storage_plan/${id}/show`);
+    router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/show`);
   };
 
   const handleAdd = () => {
     setLoading(true);
-    router.push(`/${locale}/wms/storage_plan/insert`);
+    router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/insert`);
   };
 
   const close = () => {

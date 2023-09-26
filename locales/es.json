@@ -143,6 +143,7 @@
 	"upload_evidence": "Subir evidencias",
 	"generate_evidence": "Generar evidencias",
 	"evidence_generated": "Evidencias generadas",
+	"evidence": "Evidencias",
 	"no_images": "Aún no existen evidencias registradas",
 	"delivery_time": "Tiempo de entrega",
 	"select_nation": "Seleccione la Nación",
@@ -182,7 +183,7 @@
 	"cargo_information": "Información de carga",
 	"config": "Configurar",
 	"reference_number": "Número de referencia",
-	"pr_number": "Número de PR",
+	"pr_number": "Número de BL",
 	"images": "Imágenes",
 
 	"to_be_stored_state": "Para ser almacenado",

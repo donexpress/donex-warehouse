@@ -34,7 +34,7 @@ const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boole
   });
 };
 
-const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
+const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
@@ -52,9 +52,7 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
     };
   
       const cancelSend = () => {
-          if (isWMS()) {
-            router.push(`/${locale}/wms/storage_plan`);
-          }
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
       };
 
       const getUserLabel = (): string | number => {
@@ -72,7 +70,7 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
       };
 
       const goToEdit = () => {
-        router.push(`/${locale}/wms/storage_plan/${id}/update?goBack=config`)
+        router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/update?goBack=config`)
       };
 
       const handleUpdateRow = (id: number, updatedValues: PackingList) => {
@@ -82,13 +80,13 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
       const handleAction = (action: number) => {
         switch(action) {
           case 1: {
-            router.push(`/${locale}/wms/storage_plan/${id}/add_packing_list`)
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/add_packing_list`)
           } break;
           case 2: {
             setShowRemoveBoxDialog(true);
           } break;
           case 3: {
-            router.push(`/${locale}/wms/storage_plan/${id}/modify_packing_list`)
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/modify_packing_list`)
           } break;
           case 4: {
             setShowSplitBillDialog(true);
@@ -97,7 +95,7 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
             setShowBatchOnShelvesDialog(true);
           } break;
           case 6: {
-            router.push(`/${locale}/wms/storage_plan/${id}/history?goBack=config`)
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/history?goBack=config`)
           } break;
           case 7: {
             //Fast delivery
@@ -307,15 +305,48 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
                       <div className='elements-center-start'>
                         <span className=''>{intl.formatMessage({ id: 'customer_order_number' })}</span>
                       </div>
-                      <div className='elements-center-start'>
-                        <span className=''>{intl.formatMessage({ id: 'user' })}</span>
-                      </div>
-                      <div className='elements-center-start'>
-                        <span className=''>{intl.formatMessage({ id: 'storage' })}</span>
-                      </div>
-                      <div className='elements-center-start'>
-                        <span className=''>{intl.formatMessage({ id: 'number_of_boxes' })}</span>
-                      </div>
+                      {
+                        inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'user' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'storage' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'number_of_boxes' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        !inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'number_of_boxes_entered' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        !inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'number_of_boxes_stored' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        !inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'evidence' })}</span>
+                          </div>
+                        )
+                      }
                       <div className='elements-center-start'>
                         <span className=''>{intl.formatMessage({ id: 'country' })}</span>
                       </div>
@@ -339,15 +370,37 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
                       <div>
                         {storagePlan?.customer_order_number}
                       </div>
-                      <div>
-                        {getUserLabel()}
-                      </div>
-                      <div>
-                        {getWarehouseLabel()}
-                      </div>
+                      {
+                        inWMS && (
+                          <div>
+                            {getUserLabel()}
+                          </div>
+                        )
+                      }
+                      {
+                        inWMS && (
+                          <div>
+                            {getWarehouseLabel()}
+                          </div>
+                        )
+                      }
                       <div>
                         {boxNumber}
                       </div>
+                      {
+                        !inWMS && (
+                          <div>
+                            { rows.length > 0 ? (rows.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0' }
+                          </div>
+                        )
+                      }
+                      {
+                        !inWMS && (
+                          <div>
+                            { storagePlan.images ? storagePlan.images.length : '0' }
+                          </div>
+                        )
+                      }
                       <div>
                         {storagePlan?.country}
                       </div>
@@ -542,9 +595,9 @@ const StoragePlanConfig = ({ id, storagePlan }: StoragePlanConfigProps) => {
                         <Form>
                           <div className='boxes-container'>
                             <div>
-                              <RowStoragePlanHeader onlyReadly={true} />
+                              <RowStoragePlanHeader onlyReadly={true} inWMS={inWMS} />
                               {rows.map((row, index) => (
-                                <RowStoragePlan key={index} initialValues={{ ...row, id: index }}
+                                <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
                                 onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} onlyReadly={true} />
                               ))}
                             </div>

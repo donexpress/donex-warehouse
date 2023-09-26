@@ -48,7 +48,7 @@ const UploadEvidenceDialog = ({ close, confirm, title, storagePlan }: Params) =>
                 
                 <ImageUploader onImageUpload={uploadImageClient}>
                   <div
-                    className="upload_button"
+                    className="upload_button_evidence"
                   >
                       <span>
                         {intl.formatMessage({ id: "upload" })}

@@ -32,9 +32,10 @@ interface RowStoragePlanProps {
   initialValues: RowData;
   onUpdate: (updatedValues: RowData) => void;
   onlyReadly?: boolean;
+  inWMS: boolean;
 }
 
-const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate, onlyReadly = false }) => {
+const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate, onlyReadly = false, inWMS }) => {
   const intl = useIntl();
   const [showImage, setShowImage] = useState<boolean>(false);
   const [imageToShow, setImageToShow] = useState<string>('');
@@ -106,7 +107,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
   }
 
   return (
-    <div className={!onlyReadly ? 'boxes-container__table' :  'boxes-container__table boxes-container-table-only-readly'}>
+    <div className={!onlyReadly ? `${inWMS ? 'boxes-container__table' : 'boxes-container__table-oms'}` :  `${inWMS ? 'boxes-container__table boxes-container-table-only-readly' : 'boxes-container__table-oms boxes-container-table-only-readly-oms'}`}>
       <GenericInput
         type="text"
         name="box_number"
@@ -257,20 +258,24 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
           }
         </div>
       </div>
-      <div className='upload-filed-container'>
-        <div className='elements-row-center'>
-          {
-            initialValues.operator_picture && (initialValues.operator_picture !== '') &&
-            <div onClick={() => zoomImage(String(initialValues.operator_picture))} className='upload_button' style={{ marginRight: '10px' }}>{intl.formatMessage({ id: 'View' })}</div>
-          }
-          {
-            !onlyReadly &&
-            <ImageUploader onImageUpload={uploadImageStaff}>
-              <div className='upload_button'>{intl.formatMessage({ id: (initialValues.operator_picture && (initialValues.operator_picture !== '')) ? 'modify' : 'upload' })}</div>
-            </ImageUploader>
-          }
-        </div>
-      </div>
+      {
+        inWMS && (
+          <div className='upload-filed-container'>
+            <div className='elements-row-center'>
+              {
+                initialValues.operator_picture && (initialValues.operator_picture !== '') &&
+                <div onClick={() => zoomImage(String(initialValues.operator_picture))} className='upload_button' style={{ marginRight: '10px' }}>{intl.formatMessage({ id: 'View' })}</div>
+              }
+              {
+                !onlyReadly &&
+                <ImageUploader onImageUpload={uploadImageStaff}>
+                  <div className='upload_button'>{intl.formatMessage({ id: (initialValues.operator_picture && (initialValues.operator_picture !== '')) ? 'modify' : 'upload' })}</div>
+                </ImageUploader>
+              }
+            </div>
+          </div>
+        )
+      }
       {showImage && (
         <Lightbox
           mainSrc={imageToShow}

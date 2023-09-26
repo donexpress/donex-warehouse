@@ -6,7 +6,7 @@ import { getStoragePlansState, storagePlanCount } from '../../../../src/services
 import { GetServerSidePropsContext } from 'next';
 import { StoragePlanListProps } from '../../../../src/types/storage_plan'
 
-const StoragePlanIndex = ({ storagePlanStates, storagePCount, inWMS = true }: StoragePlanListProps) => {console.log(storagePlanStates)
+const StoragePlanIndex = ({ storagePlanStates, storagePCount, inWMS = false }: StoragePlanListProps) => {console.log(storagePlanStates)
   return (
     <Layout>
       <Head>
