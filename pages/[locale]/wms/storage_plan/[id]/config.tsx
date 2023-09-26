@@ -5,7 +5,7 @@ import StoragePlanConfig from '../../../../../src/app/components/wms/storagePlan
 import { StoragePlanConfigProps } from '../../../../../src/types/storage_plan';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const ConfigStoragePlan = ({ id, storagePlan }: StoragePlanConfigProps) => {
+const ConfigStoragePlan = ({ id, storagePlan, inWMS = true }: StoragePlanConfigProps) => {
   
   return (
   <ProtectedRoute>
@@ -14,7 +14,7 @@ const ConfigStoragePlan = ({ id, storagePlan }: StoragePlanConfigProps) => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StoragePlanConfig storagePlan={storagePlan} id={id} />
+        <StoragePlanConfig storagePlan={storagePlan} id={id} inWMS={ inWMS } />
       </Layout>
     </ProtectedRoute>
     );

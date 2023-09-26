@@ -5,7 +5,7 @@ import PackingListForm from '../../../../../src/app/components/wms/storagePlan/P
 import { PackingListProps } from '../../../../../src/types/storage_plan';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const ModifyPackingList = ({ id, storagePlan, inWMS = true }: PackingListProps) => {console.log(storagePlan)
+const AddPackingList = ({ id, storagePlan, inWMS = false }: PackingListProps) => {console.log(storagePlan)
   
   return (
   <ProtectedRoute>
@@ -14,7 +14,7 @@ const ModifyPackingList = ({ id, storagePlan, inWMS = true }: PackingListProps) 
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <PackingListForm storagePlan={storagePlan} id={id} isFromModifyPackingList={true} inWMS={inWMS} />
+        <PackingListForm storagePlan={storagePlan} id={id} isFromAddPackingList={true} inWMS={inWMS} />
       </Layout>
     </ProtectedRoute>
     );
@@ -32,4 +32,4 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default ModifyPackingList;
+export default AddPackingList;

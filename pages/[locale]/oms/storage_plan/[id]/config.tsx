@@ -1,11 +1,11 @@
 import Head from 'next/head';
 import Layout from '../../../../../src/app/layout';
 import ProtectedRoute from '../../../../../src/app/components/common/ProtectedRoute';
-import PackingListForm from '../../../../../src/app/components/wms/storagePlan/PackingListForm';
-import { PackingListProps } from '../../../../../src/types/storage_plan';
+import StoragePlanConfig from '../../../../../src/app/components/wms/storagePlan/StoragePlanConfig';
+import { StoragePlanConfigProps } from '../../../../../src/types/storage_plan';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const ModifyPackingList = ({ id, storagePlan, inWMS = true }: PackingListProps) => {console.log(storagePlan)
+const ConfigStoragePlan = ({ id, storagePlan, inWMS = false }: StoragePlanConfigProps) => {
   
   return (
   <ProtectedRoute>
@@ -14,7 +14,7 @@ const ModifyPackingList = ({ id, storagePlan, inWMS = true }: PackingListProps) 
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <PackingListForm storagePlan={storagePlan} id={id} isFromModifyPackingList={true} inWMS={inWMS} />
+        <StoragePlanConfig storagePlan={storagePlan} id={id} inWMS={ inWMS } />
       </Layout>
     </ProtectedRoute>
     );
@@ -22,7 +22,7 @@ const ModifyPackingList = ({ id, storagePlan, inWMS = true }: PackingListProps) 
 
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
-  const storagePlan = await getStoragePlanById(id, context);
+  let storagePlan = await getStoragePlanById(id, context);
 
   return {
     props: {
@@ -32,4 +32,4 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default ModifyPackingList;
+export default ConfigStoragePlan;

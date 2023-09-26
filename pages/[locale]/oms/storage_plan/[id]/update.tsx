@@ -7,7 +7,7 @@ import { getUsers } from '../../../../../src/services/api.users';
 import { getWhs } from '../../../../../src/services/api.wh';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const ShowStoragePlan = ({ warehouses, users, id, storagePlan, inWMS = true }: StoragePlanProps) => {
+const UpdateStoragePlan = ({ warehouses, users, id, storagePlan, inWMS = false }: StoragePlanProps) => {
   
   return (
   <ProtectedRoute>
@@ -16,7 +16,7 @@ const ShowStoragePlan = ({ warehouses, users, id, storagePlan, inWMS = true }: S
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StoragePlanFormBody inWMS={inWMS} warehouses={warehouses ? warehouses : []} users={users ? users : []} storagePlan={storagePlan} id={id} isFromDetails={true} />
+        <StoragePlanFormBody inWMS={inWMS} warehouses={warehouses ? warehouses : []} users={users ? users : []} storagePlan={storagePlan} id={id} />
       </Layout>
     </ProtectedRoute>
     );
@@ -38,4 +38,4 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default ShowStoragePlan;
+export default UpdateStoragePlan;

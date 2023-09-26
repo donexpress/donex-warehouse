@@ -34,7 +34,7 @@ const getWarehouseIdOfUser = (userId: number | null, users: User[], warehouses: 
   return -1;
 }
 
-const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails }: StoragePlanProps) => {
+const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails, inWMS }: StoragePlanProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
@@ -75,13 +75,11 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
   
       const cancelSend = () => {
           const goBack = router.query.goBack;
-          if (isWMS()) {
             if (goBack && goBack === 'config' && !!id) {
-              router.push(`/${locale}/wms/storage_plan/${id}/config`);
+              router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
             } else {
-              router.push(`/${locale}/wms/storage_plan`);
+              router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
             }
-          }
       };
 
       const getUsersFormatted = (usersAll: User[]): ValueSelect[] => {
@@ -153,13 +151,11 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
       }
   
       const handleSubmit = async (values: StoragePlan) => {
-          if (isWMS()) {
             if (id) {
               await modify(id, values);
             } else {
               await create(values);
             }
-          }
       };
 
       const formatBodyPackingList = (pl: PackingList, storagePlanId: number): PackingList => {
@@ -195,7 +191,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
             }
           }
           showMsg(intl.formatMessage({ id: 'successfullyMsg' }), { type: "success" });
-          router.push(`/${locale}/wms/storage_plan`);
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
           showMsg(message, { type: "error" });
@@ -208,9 +204,9 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
           showMsg(intl.formatMessage({ id: 'changedsuccessfullyMsg' }), { type: "success" });
           const goBack = router.query.goBack;
           if (goBack && goBack === 'config' && !!id) {
-            router.push(`/${locale}/wms/storage_plan/${id}/config`);
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
           } else {
-            router.push(`/${locale}/wms/storage_plan`);
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
           }
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
@@ -219,7 +215,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
       }
 
       const goToEdit = () => {
-        router.push(`/${locale}/wms/storage_plan/${id}/update`)
+        router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/update`)
       };
       
       const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -343,9 +339,13 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                         <div className="w-full sm:w-[49%]">
                           <CustomerOrderNumberStoragePlan isFromDetails={!!isFromDetails} changeCustomerOrderNumber={changeCustomerOrderNumber}></CustomerOrderNumberStoragePlan>
                         </div>
-                        <div className="w-full sm:w-[49%]">
-                          <SelectUserStoragePlan options={getUsersFormatted(users)} users={users} warehouses={warehouses} changeWarehouse={changeWarehouse} isFromDetails={!!isFromDetails}></SelectUserStoragePlan>
-                        </div>
+                        {
+                          inWMS && (
+                            <div className="w-full sm:w-[49%]">
+                              <SelectUserStoragePlan options={getUsersFormatted(users)} users={users} warehouses={warehouses} changeWarehouse={changeWarehouse} isFromDetails={!!isFromDetails}></SelectUserStoragePlan>
+                            </div>
+                          )
+                        }
                         <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="select"
@@ -453,9 +453,9 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             </div>
                             <div className='boxes-container'>
                               <div>
-                                <RowStoragePlanHeader />
+                                <RowStoragePlanHeader inWMS={inWMS} />
                                 {rows.map((row, index) => (
-                                  <RowStoragePlan key={index} initialValues={{ ...row, id: index }}
+                                  <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
                                   onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
                                 ))}
                               </div>

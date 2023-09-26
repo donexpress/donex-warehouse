@@ -9,7 +9,7 @@ import { PackageShelf } from '../../../../types/package_shelf';
 import ElementHistoryDialog from '../../common/ElementHistoryDialog';
 import { getDateFormat, getHourFormat } from '../../../../helpers/utils';
 
-const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStoragePlanProps) => {
+const StoragePlanHistory = ({ id, storagePlan, warehouses, users, inWMS }: HistoryStoragePlanProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
@@ -19,9 +19,9 @@ const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStora
     const cancelSend = () => {
         const goBack = router.query.goBack;
         if (goBack && goBack === 'config') {
-          router.push(`/${locale}/wms/storage_plan/${id}/config`);
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
         } else {
-          router.push(`/${locale}/wms/storage_plan`);
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
         }
     };
 

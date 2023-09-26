@@ -73,11 +73,13 @@ export type StoragePlanProps = {
   isFromDetails?: boolean;
   users: User[];
   warehouses: Warehouse[];
+  inWMS: boolean;
 };
 
 export type StoragePlanConfigProps = {
   id: number;
   storagePlan: StoragePlan;
+  inWMS: boolean;
 };
 
 export type PackingListProps = {
@@ -85,6 +87,7 @@ export type PackingListProps = {
   storagePlan: StoragePlan;
   isFromAddPackingList?: boolean;
   isFromModifyPackingList?: boolean;
+  inWMS: boolean;
 }
 
 export type HistoryStoragePlanProps = {
@@ -92,12 +95,14 @@ export type HistoryStoragePlanProps = {
   storagePlan: StoragePlan;
   users: User[];
   warehouses: Warehouse[];
+  inWMS: boolean;
 }
 
 export type StoragePlanListProps = {
   storagePlanList?: StoragePlan[];
   storagePlanStates: StoragePlanState[];
   storagePCount?: StoragePlanCount;
+  inWMS: boolean;
 };
 
 export type BoxNumberLabelFn = { 

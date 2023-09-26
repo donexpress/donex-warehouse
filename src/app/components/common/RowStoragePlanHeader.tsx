@@ -4,12 +4,13 @@ import { useIntl } from 'react-intl';
 
 interface RowStoragePlanHeaderProps {
   onlyReadly?: boolean;
+  inWMS: boolean;
 }
-const RowStoragePlanHeader: React.FC<RowStoragePlanHeaderProps> = ({ onlyReadly = false }) => {
+const RowStoragePlanHeader: React.FC<RowStoragePlanHeaderProps> = ({ onlyReadly = false, inWMS }) => {
   const intl = useIntl();
 
   return (
-    <div className={!onlyReadly ? 'boxes-container__table bg-default-100' :  'boxes-container__table bg-default-100 boxes-container-table-only-readly'} style={{ padding: '5px 0px 5px 0px', borderRadius: '5px 5px 0 0', marginRight: '16px' }}>
+    <div className={!onlyReadly ? `${inWMS ? 'boxes-container__table': 'boxes-container__table-oms'} bg-default-100` :  `${inWMS ? 'boxes-container__table' : 'boxes-container__table-oms'} bg-default-100 ${inWMS ? 'boxes-container-table-only-readly' : 'boxes-container-table-only-readly-oms'}`} style={{ padding: '5px 0px 5px 0px', borderRadius: '5px 5px 0 0', marginRight: '16px' }}>
         <div className='elements-center'>
           <span className='text-center'>{intl.formatMessage({ id: 'box_number' })} {!onlyReadly ? '*' : ''}</span>
         </div>
@@ -59,9 +60,13 @@ const RowStoragePlanHeader: React.FC<RowStoragePlanHeaderProps> = ({ onlyReadly 
         <div className='elements-center'>
           <span className='text-center'>{intl.formatMessage({ id: 'client_image' })}</span>
         </div>
-        <div className='elements-center'>
-          <span className='text-center'>{intl.formatMessage({ id: 'staff_image' })}</span>
-        </div>
+        {
+          inWMS && (
+            <div className='elements-center'>
+              <span className='text-center'>{intl.formatMessage({ id: 'staff_image' })}</span>
+            </div>
+          )
+        }
     </div>
   );
 };
