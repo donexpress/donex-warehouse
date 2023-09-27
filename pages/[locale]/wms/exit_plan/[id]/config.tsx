@@ -6,10 +6,10 @@ import { getUsers } from "../../../../../src/services/api.users";
 import { getWhs } from "../../../../../src/services/api.wh";
 import { getStoragePlanById } from "../../../../../src/services/api.storage_plan";
 import ExitPlanConfig from "../../../../../src/app/components/wms/exitPlan/ExiPlanConfig";
-import { getExitPlansById } from "../../../../../src/services/api.exit_plan";
+import { getExitPlanDestinationsAddresses, getExitPlansById } from "../../../../../src/services/api.exit_plan";
 import { ExitPlan, ExitPlanProps } from "@/types/exit_planerege1992";
 
-const Config = ({ id, exitPlan, users, warehouses }: ExitPlanProps) => {
+const Config = ({ id, exitPlan, users, warehouses, addresses }: ExitPlanProps) => {
   return (
     <ProtectedRoute>
       <Layout>
@@ -18,6 +18,7 @@ const Config = ({ id, exitPlan, users, warehouses }: ExitPlanProps) => {
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
         <ExitPlanConfig
+          addresses={addresses}
           id={id}
           exitPlan={exitPlan}
           users={users}
@@ -35,6 +36,7 @@ export async function getServerSideProps(context: any) {
   const users = await getUsers(context);
   const warehouses = await getWhs(context);
   const exitPlan = await getExitPlansById(id)
+  const addresses = await getExitPlanDestinationsAddresses(context)
 
   return {
     props: {
@@ -43,6 +45,7 @@ export async function getServerSideProps(context: any) {
       storagePlan,
       exitPlan,
       id,
+      addresses
     },
   };
 }
