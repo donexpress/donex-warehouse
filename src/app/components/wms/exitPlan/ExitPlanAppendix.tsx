@@ -65,6 +65,13 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
     }
   }
 
+  const handleVisualice = (id: number) => {
+    const appendix = appendages.find(el => el.id === id)
+    if( appendix ) {
+      window.open(appendix.url, appendix.name )
+    }
+  }
+
   return (
     <>
       <div style={{ paddingTop: "20px" }}>
@@ -142,15 +149,22 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
               <span className="text-center">{appendix.function}</span>
             </div>
             <div className="elements-center">
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button isIconOnly size="sm" variant="light">
+              <Dropdown aria-labelledby="action-menu">
+                <DropdownTrigger aria-labelledby="action-menu">
+                  <Button isIconOnly size="sm" variant="light" aria-labelledby="action-menu">
                     <VerticalDotsIcon className="text-default-300" />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem
-                    onClick={() => handleDelete(appendix.id ? appendix.id : -1)}
+                  aria-labelledby="visualice-button"
+                    onClick={() => handleVisualice(appendix.id ? appendix.id : -1)}
+                  >
+                    {intl.formatMessage({ id: "vizualice" })}
+                  </DropdownItem>
+                  <DropdownItem
+                  aria-labelledby="delete-button"
+                  onClick={() => handleDelete(appendix.id ? appendix.id : -1)}
                   >
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>

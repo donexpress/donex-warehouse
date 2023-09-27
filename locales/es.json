@@ -338,7 +338,14 @@
 	"y2": "{y2}: Año de dos dígitos",
 	"y": "{y}: Año",
 	"m": "{m}: Mes",
-	"d": "{d}: Día"
+	"d": "{d}: Día",
+	"exit_plan_receipt": "Comprobante del plan de salida",
+	"exit_plan_data": "Datos del plan de salida",
+	"exit_plan_boxes": "Cajas del plan de salida",
+	"operation_instructions": "Instrucción de operaciones",
+	"warehouse_id": "Almacén",
+	"user_id": "Usuario",
+	"output_plan_id": "Plan de salida"
 
 
 }

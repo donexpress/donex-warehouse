@@ -338,6 +338,13 @@
 	"y2": "{y2}: Double digit year",
 	"y": "{y}: Year",
 	"m": "{m}: Month",
-	"d": "{d}: Day"
+	"d": "{d}: Day",
+	"exit_plan_receipt": "Proof of exit plan",
+	"exit_plan_data": "Exit plan details",
+	"exit_plan_boxes": "Exit plan boxes",
+	"operation_instructions": "Operations instruction",
+	"warehouse_id": "Warehouse",
+	"user_id": "User",
+	"output_plan_id": "Exit plan"
 
 }

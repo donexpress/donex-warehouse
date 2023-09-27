@@ -130,6 +130,16 @@ export const getExitPlanDestinations = async (
   return response.data;
 };
 
+export const getExitPlanDestinationsAddresses = async (
+  context?: GetServerSidePropsContext
+): Promise<{ destinations: State[] }> => {
+  const response = await axios.get(
+    `${exitPlanPath()}/addresses`,
+    getHeaders(context)
+  );
+  return response.data;
+};
+
 export const getExitPlanByFilter = async (filter:any, context?: GetServerSidePropsContext): Promise<ExitPlan[]> => {
   const response = await axios.post<ExitPlan[]>(`${exitPlanPath()}/filter`,filter, getHeaders(context))
   return response.data

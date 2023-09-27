@@ -11,11 +11,16 @@ import { PackingList, StoragePlan } from "../../../../types/storage_plan";
 import { useRouter } from "next/router";
 import { ExitPlan } from "../../../../types/exit_plan";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
-import { getExitPlansById, updateExitPlan } from "../../../../services/api.exit_plan";
+import {
+  getExitPlansById,
+  updateExitPlan,
+} from "../../../../services/api.exit_plan";
 import AddExitPlanDialog from "./AddExitPlanDialog";
 import { getPackingListsByCaseNumber } from "../../../../services/api.packing_list";
 import { getStoragePlanByOrder_number } from "../../../../services/api.storage_plan";
 import { showMsg } from "../../../../helpers";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import InventoryList from "./InventoryList";
 
 interface Props {
   exitPlan: ExitPlan;
@@ -154,17 +159,20 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         );
         exist = tmp ? tmp[0] : null;
         if (tmp && exitPlan) {
-          const storage_plan = tmp[0];
-          storage_plan.packing_list?.forEach((pl) => {
-            // @ts-ignore
-            const tmp_added = exitPlan.case_numbers?.find(
-              (value) => value === pl.case_number
-            );
-            if (tmp_added === undefined) {
+          tmp.forEach(t => {
+            const storage_plan = t;
+            storage_plan.packing_list?.forEach((pl) => {
               // @ts-ignore
-              exitPlan.case_numbers.push(pl.case_number);
-            }
-          });
+              const tmp_added = exitPlan.case_numbers?.find(
+                (value) => value === pl.case_number
+              );
+              if (tmp_added === undefined) {
+                // @ts-ignore
+                exitPlan.case_numbers.push(pl.case_number);
+              }
+            });
+          })
+          
         }
       }
       if (exitPlan.id && exist) {
@@ -227,8 +235,17 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 <DropdownItem onClick={() => handleAction(1)}>
                   {intl.formatMessage({ id: "add" })}
                 </DropdownItem>
-                <DropdownItem onClick={() => handleAction(2)}>
-                  {intl.formatMessage({ id: "print_inventory_list" })}
+                <DropdownItem>
+                  <PDFDownloadLink
+                    document={
+                      <InventoryList intl={intl} exitPlan={exitPlan} boxes={rows}/>
+                    }
+                    fileName={`${exitPlan.output_number}.pdf`}
+                  >
+                    {({ blob, url, loading, error }) =>
+                      intl.formatMessage({ id: "print_inventory_list" })
+                    }
+                  </PDFDownloadLink>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -323,9 +340,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               </div>
               <div className="elements-center">{"--"}</div>
               <div className="elements-center">{"--"}</div>
-              <div className="elements-center">
-                {row.packing_lists?.box_number}
-              </div>
+              <div className="elements-center">{row.packing_lists?.amount}</div>
               <div className="elements-center">{"--"}</div>
               <div className="elements-center">{"--"}</div>
               <div style={{ display: "flex", justifyContent: "center" }}>
