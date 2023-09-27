@@ -25,6 +25,7 @@ const ExitPlanFormBody = ({
   users,
   warehouses,
   destinations,
+  addresses,
 }: ExitPlanProps) => {
   const router = useRouter();
   const { locale } = router.query;
@@ -43,7 +44,7 @@ const ExitPlanFormBody = ({
         ? exitPlan.warehouse_id
         : undefined,
     city: id && exitPlan ? exitPlan.city : "",
-    country: id && exitPlan ? exitPlan.country : "",
+    country: id && exitPlan ? exitPlan.country : "Mexico",
     delivered_time: id && exitPlan ? date.toISOString().slice(0, 16) : "",
     observations: id && exitPlan ? exitPlan.observations : "",
     type: id && exitPlan ? exitPlan.type : -1,
@@ -62,6 +63,9 @@ const ExitPlanFormBody = ({
       router.push(`/${locale}/wms/exit_plan`);
     }
   };
+
+  console.log("------------ADDRESSES----------------");
+  console.log(addresses);
 
   const handleSubmit = async (values: ExitPlan) => {
     if (values.delivered_time === "") {
@@ -94,7 +98,7 @@ const ExitPlanFormBody = ({
         ? intl.formatMessage({ id: "changedsuccessfullyMsg" })
         : intl.formatMessage({ id: "successfullyMsg" });
       showMsg(message, { type: "success" });
-      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/exit_plan`);
+      router.push(`/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan`);
     } else {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       showMsg(message, { type: "error" });
@@ -102,7 +106,7 @@ const ExitPlanFormBody = ({
   };
 
   const goToEdit = () => {
-    router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/exit_plan/${id}/update`);
+    router.push(`/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${id}/update`);
   };
 
   const getUsersFormatted = (users: User[]): ValueSelect[] => {
@@ -159,6 +163,22 @@ const ExitPlanFormBody = ({
         response.push({
           label: dest[getLanguage(intl)],
           value: dest.value,
+        });
+      });
+    }
+    return response;
+  };
+
+  const getStatesFormattedAddresses = (addresses: {
+    addresses: { amazon: State[]; meli: State[] };
+  }): ValueSelect[] => {
+    const response: ValueSelect[] = [];
+    if (destinationSelected && destinationSelected !== "private_address") {
+      // @ts-ignore
+      addresses.addresses[destinationSelected].forEach((el) => {
+        response.push({
+          label: el[getLanguage(intl)],
+          value: el.value,
         });
       });
     }
@@ -244,19 +264,36 @@ const ExitPlanFormBody = ({
                     disabled={isFromDetails}
                   />
                 </div>
-                <div className="w-full sm:w-[49%]">
-                  <GenericInput
-                    type="text"
-                    name="address"
-                    placeholder={intl.formatMessage({
-                      id: "address",
-                    })}
-                    customClass="custom-input"
-                    disabled={
-                      isFromDetails || destinationSelected !== "private_address"
-                    }
-                  />
-                </div>
+                {destinationSelected === "private_address" && (
+                  <div className="w-full sm:w-[49%]">
+                    <GenericInput
+                      type="text"
+                      name="address"
+                      placeholder={intl.formatMessage({
+                        id: "address",
+                      })}
+                      customClass="custom-input"
+                      disabled={
+                        isFromDetails ||
+                        destinationSelected !== "private_address"
+                      }
+                    />
+                  </div>
+                )}
+
+                {destinationSelected !== "private_address" && (
+                  <div className="w-full sm:w-[49%]">
+                    <GenericInput
+                      type="select-filter"
+                      name="address"
+                      placeholder={intl.formatMessage({ id: "address" })}
+                      options={getStatesFormattedAddresses(addresses)}
+                      customClass="select-filter"
+                      disabled={isFromDetails}
+                    />
+                  </div>
+                )}
+
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="text"

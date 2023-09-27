@@ -47,6 +47,7 @@ export type ExitPlanProps = {
   countries: Country[];
   warehouses: Warehouse[];
   destinations?: {destinations: State[]}
+  addresses: {addresses: {amazon:State[], meli:State[]}}
 };
 
 export type ExitPlanState = {

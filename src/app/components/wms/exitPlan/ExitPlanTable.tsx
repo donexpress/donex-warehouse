@@ -528,7 +528,7 @@ const ExitPlanTable = () => {
               )}`}
         </span>
         <PaginationTable
-          totalRecords={getCountByPosition()}
+          totalRecords={filteredItems.slice(0, exitPlans.length).length}
           pageLimit={rowsPerPage}
           pageNeighbours={1}
           page={page}
