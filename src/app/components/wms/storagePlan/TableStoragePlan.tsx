@@ -41,6 +41,7 @@ import { Loading } from "../../common/Loading";
 import ReceiptPDF from '../../common/ReceiptPDF';
 import EvidencePDF from '../../common/EvidencePDF';
 import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
+import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
@@ -101,7 +102,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     new Set(inWMS ? INITIAL_VISIBLE_COLUMNS : INITIAL_VISIBLE_COLUMNS_OMS)
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "customer_order_number",
     direction: "descending",
@@ -255,6 +256,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     if (hasSearchFilter) {
         filteredStoragePlans = filteredStoragePlans.filter(
         (storageP) =>
+          storageP.order_number
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase()) ||
           storageP.customer_order_number
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||
@@ -274,7 +278,6 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase())
-
       );
     }
     if (
@@ -362,8 +365,15 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl)}>
+                  <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl, visibleColumns)}>
                     {intl.formatMessage({ id: "export" })}
+                  </DropdownItem>
+                  <DropdownItem>
+                    <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={[storageP]} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
+                      {({ blob, url, loading, error }) =>
+                        intl.formatMessage({ id: "export_pdf" })
+                      }
+                    </PDFDownloadLink>
                   </DropdownItem>
                   <DropdownItem className={statusSelected !== 'stocked' ? 'do-not-show-dropdown-item' : ''}>
                     <PDFDownloadLink document={<ReceiptPDF storagePlan={storageP as StoragePlan} intl={intl} />} fileName="receipt_pdf.pdf">
@@ -379,9 +389,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleDelete(storageP["id"])}>
+                  {/* <DropdownItem onClick={() => handleDelete(storageP["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
-                  </DropdownItem>
+                  </DropdownItem> */}
                 </DropdownMenu>
               </Dropdown>
             </div>
@@ -412,7 +422,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
           />
         );
         case "number_of_boxes_stored": return (
-          storageP.packing_list && storageP.packing_list.length > 0 ? (storageP.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : ''
+          storageP.packing_list && storageP.packing_list.length > 0 ? (storageP.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0'
         );
         default:
           return cellValue;
@@ -476,6 +486,45 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       setSelectedItems([]);
       setSelectedKeys(new Set([]));
     }
+  }
+
+  const getSelectedStoragePlans = (): StoragePlan[] => {
+    let its: StoragePlan[] = [];
+    for (let i = 0; i < selectedItems.length; i++) {
+      const index = selectedItems[i];
+      const item = storagePlans.filter((sp: StoragePlan) => sp.id === index);
+      if (filterValue && (filterValue !== "")) {
+        const isSearchable = item[0].order_number
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase()) ||
+        item[0].customer_order_number
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase()) ||
+        item[0].user_id
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase()) ||
+        item[0].warehouse_id
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase()) ||
+        item[0].reference_number
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase()) ||
+        item[0].pr_number
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase());
+
+        if (isSearchable) {
+          its.push(item[0]);
+        }
+      } else {
+        its.push(item[0]);
+      }
+    }
+    return its;
   }
 
   const topContent = React.useMemo(() => {
@@ -567,6 +616,19 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             }
             <Button
               color="primary"
+              style={{ width: '140px', marginLeft: '10px' }}
+              endContent={<ExportIcon />}
+              isDisabled={selectedItems.length === 0}
+            >
+              <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={getSelectedStoragePlans()} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
+                {({ blob, url, loading, error }) =>
+                  intl.formatMessage({ id: "export_pdf" })
+                }
+              </PDFDownloadLink>
+            </Button>
+
+            <Button
+              color="primary"
               style={{ width: '121px', marginLeft: '10px' }}
               endContent={<ExportIcon />}
               onClick={() => handleExportStoragePlanData()}
@@ -598,9 +660,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -774,13 +836,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   }
 
   const handleExportStoragePlanData = () => {
-    let items: StoragePlan[] = [];
-    for (let i = 0; i < selectedItems.length; i++) {
-      const index = selectedItems[i];
-      const item = storagePlans.filter((sp: StoragePlan) => sp.id === index);
-      items.push(item[0]);
-    }
-    storagePlanDataToExcel(items, intl);
+    storagePlanDataToExcel(getSelectedStoragePlans(), intl, visibleColumns);
   }
 
   const handleCancelAll = async() => {

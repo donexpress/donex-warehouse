@@ -190,6 +190,7 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
           >
             {({ isSubmitting, isValid }) => (
               <Form className='flex flex-col gap-3'>
+                <div className="upload-evidence-body-dialog w-full">
                 <div className='flex gap-3 flex-wrap justify-between'>
                   <div className="w-full">
                     <GenericInput
@@ -231,6 +232,7 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
                           { pl.box_number }
                       </div>
                     ))}
+                </div>
                 </div>
                 <div className="elements-row-end w-full">
                   <Button

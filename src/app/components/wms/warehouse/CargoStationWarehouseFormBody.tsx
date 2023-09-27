@@ -43,7 +43,7 @@ const CargoStationWarehouseFormBody = ({
     address: id && warehouse ? warehouse.address : "",
     city: id && warehouse ? warehouse.city : "",
     province: id && warehouse ? warehouse.province : "",
-    country: id && warehouse ? warehouse.country : "",
+    country: id && warehouse ? warehouse.country : "Mexico",
     cp: id && warehouse ? warehouse.cp : "",
     shared_warehouse_system_code:
       id && warehouse ? warehouse.shared_warehouse_system_code : "",

@@ -244,6 +244,7 @@
 	"layer": "Row",
 	"column": "Level",
 	"export": "Export",
+	"export_pdf": "Export PDF",
 	"number_of_partitions": "Number of partitions",
 	"number_of_shelves": "Number of shelves",
 	"total_volume": "Total volume",

@@ -55,7 +55,7 @@ const WhTable = () => {
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -180,9 +180,9 @@ const WhTable = () => {
                 <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
                 </DropdownItem>
-                <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
+                {/* <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Delete" })}
-                </DropdownItem>
+                </DropdownItem> */}
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -281,9 +281,9 @@ const WhTable = () => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>

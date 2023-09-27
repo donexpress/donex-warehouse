@@ -244,6 +244,7 @@
   "layer": "排",
   "column": "等級",
   "export": "出口",
+  "export_pdf": "匯出PDF",
   "number_of_partitions": "分区数",
   "number_of_shelves": "货架数",
   "total_volume": "总容积",
