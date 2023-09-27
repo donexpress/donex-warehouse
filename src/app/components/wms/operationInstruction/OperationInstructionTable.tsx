@@ -48,6 +48,9 @@ import { SearchIcon } from "../../common/SearchIcon";
 import "./../../../../styles/generic.input.scss";
 import "../../../../styles/wms/user.table.scss";
 import { isOMS, isWMS, showMsg } from "@/helperserege1992";
+import PaginationTable from "../../common/Pagination";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import ExportTable from "./ExportTable";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
@@ -591,6 +594,54 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     setPage(1);
   }, []);
 
+  const onRowsPerPageChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setRowsPerPage(Number(e.target.value));
+      setPage(1);
+    },
+    []
+  );
+
+  const bottomContent = React.useMemo(() => {
+    return (
+      <div className="py-2 px-2 flex justify-between items-center">
+        <span className="w-[30%] text-small text-default-400">
+          {selectedKeys === "all"
+            ? `${intl.formatMessage({ id: "selected_all" })}`
+            : `${intl.formatMessage(
+                { id: "selected" },
+                { in: selectedKeys.size, end: filteredItems.length }
+              )}`}
+        </span>
+        <PaginationTable
+          totalRecords={
+            filteredItems.slice(0, operationInstructions.length).length
+          }
+          pageLimit={rowsPerPage}
+          pageNeighbours={1}
+          page={page}
+          onPageChanged={setPage}
+        />
+      </div>
+    );
+  }, [
+    selectedKeys,
+    items.length,
+    sortedItems.length,
+    page,
+    operationInstructions.length,
+    rowsPerPage,
+    hasSearchFilter,
+    onSearchChange,
+    onRowsPerPageChange,
+    intl,
+  ]);
+
+  const getVisibleColumns = (): string[] => {
+    const t = (Array.from(visibleColumns)) as string[]
+    return t.filter(el => el !==  'actions')
+  }
+
   return (
     <div style={{ marginTop: "20px" }}>
       <div className="bg-gray-200 pt-1">
@@ -665,6 +716,18 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             marginTop: "10px",
           }}
         >
+          <Button
+            color="primary"
+          >
+            <PDFDownloadLink
+              document={<ExportTable intl={intl} data={operationInstructions} columns={getVisibleColumns()} />}
+              fileName="operation_instructions_pdf.pdf"
+            >
+              {({ blob, url, loading, error }) =>
+                intl.formatMessage({ id: "export" })
+              }
+            </PDFDownloadLink>
+          </Button>
           {statusSelected === 1 && isWMS() && (
             <Button
               color="primary"
@@ -764,8 +827,8 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
       <Table
         aria-label="OUTPUT-PLAN"
         isHeaderSticky
-        // bottomContent={bottomContent}
-        // bottomContentPlacement="outside"
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
         classNames={{
           wrapper: "max-h-[382px] no-padding-left",
         }}
