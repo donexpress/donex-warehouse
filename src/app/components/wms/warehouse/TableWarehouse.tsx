@@ -200,6 +200,8 @@ const WarehouseTable = ({ states }: WarehouseListProps) => {
           return getReceptionAreaLabel(cellValue);
         case "state":
           return user.state ? getLabelByLanguage(user.state) : '';
+        case "name":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.name}</span>;
         case "country":
           return getCountryLabel(cellValue);
         case "actions":
@@ -258,7 +260,7 @@ const WarehouseTable = ({ states }: WarehouseListProps) => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -488,18 +490,16 @@ const WarehouseTable = ({ states }: WarehouseListProps) => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="WARE-HOUSE"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
         >
           <TableHeader columns={headerColumns}>
@@ -526,6 +526,8 @@ const WarehouseTable = ({ states }: WarehouseListProps) => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>

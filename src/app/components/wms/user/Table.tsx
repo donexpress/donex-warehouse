@@ -238,6 +238,10 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
             return user.user_level ? user.user_level.name : "";
         case "state": 
             return user.user_state ? getLabelByLanguage(user.user_state) : "";
+        case "customer_number":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.customer_number}</span>;
+        case "username":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.username}</span>;
         default:
           return cellValue;
       }
@@ -278,7 +282,7 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -476,19 +480,17 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="USER"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
           sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
           onSortChange={setSortDescriptor}
         >
@@ -516,6 +518,8 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>

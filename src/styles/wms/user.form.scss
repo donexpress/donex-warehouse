@@ -25,6 +25,12 @@
     }
 }
 
+.boxes-container-values {
+    max-height: 940px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
 .boxes-container-table-only-readly {
     display: grid;
     grid-template-columns: 140px 200px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 240px 240px !important;

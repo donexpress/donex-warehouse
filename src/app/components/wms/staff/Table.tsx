@@ -245,6 +245,8 @@ const StaffTable = ({ role, staffStates }: StaffListProps) => {
           return user.organization ? user.organization.name : "";
         case "role_id": 
           return user.role ? user.role.name : "";
+        case "username":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.username}</span>;
         case "state": 
           return user.state ? getLabelByLanguage(user.state) : "";
         default:
@@ -287,7 +289,7 @@ const StaffTable = ({ role, staffStates }: StaffListProps) => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -484,18 +486,16 @@ const StaffTable = ({ role, staffStates }: StaffListProps) => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="STAFF"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
         >
           <TableHeader columns={headerColumns}>
@@ -522,6 +522,8 @@ const StaffTable = ({ role, staffStates }: StaffListProps) => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>

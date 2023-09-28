@@ -539,6 +539,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             <span className=''>{intl.formatMessage({ id: 'delivery_time' })}</span>
                           </div>
                         </div>
+                        <div className='boxes-container-values'>
                         {rows.map((row, index) => (
                           <div key={index} className='info-packing-list__table storage-plan-header' style={{ padding: '8px 0px 8px 5px'}}>
                             <div className='elements-start-center'>
@@ -584,6 +585,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             <div>{'--'}</div>
                           </div>
                         ))}
+                        </div>
                       </div>
                     </div>
                   )
@@ -596,10 +598,12 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                           <div className='boxes-container'>
                             <div>
                               <RowStoragePlanHeader onlyReadly={true} inWMS={inWMS} />
-                              {rows.map((row, index) => (
-                                <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
-                                onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} onlyReadly={true} />
-                              ))}
+                              <div className='boxes-container-values'>
+                                {rows.map((row, index) => (
+                                  <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
+                                  onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} onlyReadly={true} />
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </Form>

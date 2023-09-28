@@ -454,10 +454,12 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             <div className='boxes-container'>
                               <div>
                                 <RowStoragePlanHeader inWMS={inWMS} />
-                                {rows.map((row, index) => (
-                                  <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
-                                  onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
-                                ))}
+                                <div className='boxes-container-values'>
+                                  {rows.map((row, index) => (
+                                    <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
+                                    onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>

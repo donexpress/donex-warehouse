@@ -529,7 +529,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -719,7 +719,6 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     );
   }, [
     selectedKeys,
-    items.length,
     items.length,
     page,
     storagePlans.length,
@@ -992,18 +991,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="USER"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={(keys: Selection) => {selectedItemsFn(keys)}}
         >
           <TableHeader columns={headerColumns}>
@@ -1030,6 +1027,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showCancelAllDialog && <ConfirmationDialog close={closeCancelAllStoragePlanDialog} confirm={handleCancelAll} />}
         {showCancelDialog && <ConfirmationDialog close={closeCancelStoragePlanDialog} confirm={handleCancel} />}

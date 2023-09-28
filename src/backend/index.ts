@@ -76,8 +76,11 @@ export const countUserLevelPath = () => {
   return BASE_URL + "/api/v1/user_level/count";
 };
 
-export const storagePlanPath = (status: string = '') => {
-  const params = status !== '' ? `?state=${status}` : "";
+export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number) => {
+  let params = status !== '' ? `?state=${status}` : "";
+  if (page && rowsPerPage) {
+    params = `${ params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
   return BASE_URL + "/api/v1/storage_plan" + params;
 };
 
