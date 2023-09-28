@@ -6,7 +6,7 @@ import { Button,
   DropdownItem, } from "@nextui-org/react";
 import '../../../../styles/wms/user.form.scss';
 import '../../../../styles/wms/storage.plan.config.scss';
-import { showMsg, isOMS, isWMS } from '../../../../helpers';
+import { showMsg, isOMS, isWMS, storagePlanDataToExcel } from '../../../../helpers';
 import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
 import { updatePackingListById, removePackingListById } from '../../../../services/api.packing_list';
@@ -50,6 +50,14 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
     const initialValues = {
         rows: [],
     };
+
+    const valuesToExportPDF = new Set([
+      "order_number",
+      "customer_order_number",
+      "user_id",
+      "warehouse_id",
+      "box_amount",
+    ]);
   
       const cancelSend = () => {
           router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
@@ -461,10 +469,13 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                           {/* <DropdownItem className={((storagePlan && (storagePlan.state === 'to be storage' || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
                             {intl.formatMessage({ id: "fast_delivery" })}
                           </DropdownItem> */}
-                          <DropdownItem className={(storagePlan && (storagePlan.state !== 'stocked')) ? 'do-not-show-dropdown-item' : ''}>
-                            <PDFDownloadLink document={<ReceiptPDF storagePlan={storagePlan as StoragePlan} intl={intl} />} fileName="receipt_pdf.pdf">
+                          {/* <DropdownItem onClick={() => storagePlanDataToExcel([storagePlan], intl, "all")}>
+                            {intl.formatMessage({ id: "export" })}
+                          </DropdownItem> */}
+                          <DropdownItem>
+                            <PDFDownloadLink document={<ReceiptPDF storagePlan={storagePlan as StoragePlan} intl={intl} />} fileName="inventory_pdf.pdf">
                               {({ blob, url, loading, error }) =>
-                                intl.formatMessage({ id: "generate_receipt" })
+                                intl.formatMessage({ id: "generate_pdf_inventory" })
                               }
                             </PDFDownloadLink>
                           </DropdownItem>

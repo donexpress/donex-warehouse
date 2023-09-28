@@ -115,7 +115,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
         <Page size="A4" style={styles.page}>
           <Image src="https://dc0-bucket.oss-us-west-1.aliyuncs.com/8Y2QlTD9eyFgyWt773lwMUJXGN0xDNHT.png" style={styles.logo} />
   
-          <Text style={styles.title}>{intl.formatMessage({ id: 'entry_plan_receipt' })}</Text>
+          <Text style={styles.title}>{intl.formatMessage({ id: 'entry_plan_inventory' })}</Text>
           <Text style={styles.subtitle}>{intl.formatMessage({ id: 'entry_plan_data' })}</Text>
   
           <View style={styles.table}>

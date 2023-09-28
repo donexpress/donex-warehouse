@@ -375,10 +375,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  <DropdownItem className={statusSelected !== 'stocked' ? 'do-not-show-dropdown-item' : ''}>
-                    <PDFDownloadLink document={<ReceiptPDF storagePlan={storageP as StoragePlan} intl={intl} />} fileName="receipt_pdf.pdf">
+                  <DropdownItem>
+                    <PDFDownloadLink document={<ReceiptPDF storagePlan={storageP as StoragePlan} intl={intl} />} fileName="inventory_pdf.pdf">
                       {({ blob, url, loading, error }) =>
-                        intl.formatMessage({ id: "generate_receipt" })
+                        intl.formatMessage({ id: "generate_pdf_inventory" })
                       }
                     </PDFDownloadLink>
                   </DropdownItem>

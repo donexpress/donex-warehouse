@@ -241,6 +241,8 @@
 	"entry_plan_data": "Entry plan data",
 	"entry_plan_receipt": "Entry plan receipt",
 	"entry_plan_proof": "Entry plan proof",
+	"generate_pdf_inventory": "Generate PDF inventory",
+	"entry_plan_inventory": "Entry Plan Inventory",
 	"layer": "Row",
 	"column": "Level",
 	"export": "Export",

@@ -241,6 +241,8 @@
 	"entry_plan_data": "Datos del plan de entrada",
 	"entry_plan_receipt": "Comprobante de plan de entrada",
 	"entry_plan_proof": "Constancia de plan de entrada",
+	"generate_pdf_inventory": "Generar inventario PDF",
+	"entry_plan_inventory": "Inventario de plan de entrada",
 	"layer": "Fila",
 	"column": "Nivel",
 	"export": "Exportar",
