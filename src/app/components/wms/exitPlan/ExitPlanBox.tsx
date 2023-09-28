@@ -127,8 +127,10 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     setShowAddDialog(false);
   };
 
-  const addNewData = async (data: any) => {
-    console.log(data.case_number);
+  const addNewData = async (data: {
+    case_number: string;
+    warehouse_order_number: string;
+  }) => {
     if (exitPlan) {
       if (!exitPlan.case_numbers) {
         exitPlan.case_numbers = [];
@@ -136,21 +138,25 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       let exist: PackingList | StoragePlan | null = null;
       let added: string | undefined = undefined;
       if (data.case_number) {
-        exist = await getPackingListsByCaseNumber(data.case_number);
-        if (!exist) {
-          showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
-            type: "error",
-          });
-        }
-        added = exitPlan.case_numbers?.find(
-          (value) => value === data.case_number
-        );
-        if (added === undefined) {
-          exitPlan.case_numbers.push(data.case_number);
-        } else {
-          showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
-            type: "warning",
-          });
+        const arr = data.case_number.split(",");
+        for (let i = 0; i < arr.length; i++) {
+          const caseNumber = arr[i].trim();
+          exist = await getPackingListsByCaseNumber(caseNumber);
+          if (!exist) {
+            showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+              type: "error",
+            });
+          }
+          added = exitPlan.case_numbers?.find(
+            (value) => value === data.case_number
+          );
+          if (added === undefined) {
+            exitPlan.case_numbers.push(data.case_number);
+          } else {
+            showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+              type: "warning",
+            });
+          }
         }
       }
       if (data.warehouse_order_number) {
@@ -159,7 +165,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         );
         exist = tmp ? tmp[0] : null;
         if (tmp && exitPlan) {
-          tmp.forEach(t => {
+          tmp.forEach((t) => {
             const storage_plan = t;
             storage_plan.packing_list?.forEach((pl) => {
               // @ts-ignore
@@ -169,12 +175,16 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               if (tmp_added === undefined) {
                 // @ts-ignore
                 exitPlan.case_numbers.push(pl.case_number);
+              } else {
+                showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+                  type: "warning",
+                });
               }
             });
-          })
-          
+          });
         }
       }
+      // update portion
       if (exitPlan.id && exist) {
         await updateExitPlan(exitPlan.id, {
           case_numbers: exitPlan.case_numbers,
@@ -238,7 +248,11 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 <DropdownItem>
                   <PDFDownloadLink
                     document={
-                      <InventoryList intl={intl} exitPlan={exitPlan} boxes={rows}/>
+                      <InventoryList
+                        intl={intl}
+                        exitPlan={exitPlan}
+                        boxes={rows}
+                      />
                     }
                     fileName={`${exitPlan.output_number}.pdf`}
                   >

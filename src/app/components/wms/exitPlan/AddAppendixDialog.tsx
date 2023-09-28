@@ -146,7 +146,7 @@ const AddAppendixDialog = ({
                         customClass="custom-input"
                       />
                     </div>
-                    <ImageUploader onImageUpload={uploadImageClient}>
+                    <ImageUploader isFile onImageUpload={uploadImageClient}>
                       <div
                         className="upload_button"
                         style={{

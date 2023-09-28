@@ -338,12 +338,18 @@ const ExitPlanTable = () => {
         return (
           <CopyColumnToClipboard
             value={
-              <a href={`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${user["id"]}/config`}>
+              <a
+                href={`/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${
+                  user["id"]
+                }/config`}
+              >
                 {cellValue}
               </a>
             }
           />
         );
+      case "address":
+        return user.address_ref ? <span>{user.address_ref[getLanguage(intl)]}</span> : <span>{cellValue}</span>;
       default:
         return cellValue;
     }
@@ -620,10 +626,14 @@ const ExitPlanTable = () => {
       exitPlan.operation_instructions &&
       exitPlan.operation_instructions.length > 0
     ) {
-      router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${exitPlan.id}/config`);
+      router.push(
+        `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${exitPlan.id}/config`
+      );
     } else {
       router.push(
-        `/${locale}/${checkOMS ? 'oms': 'wms'}/operation_instruction/insert?exit_plan_id=${exitPlan.id}`
+        `/${locale}/${
+          checkOMS ? "oms" : "wms"
+        }/operation_instruction/insert?exit_plan_id=${exitPlan.id}`
       );
     }
   };
@@ -680,22 +690,26 @@ const ExitPlanTable = () => {
 
   const handleEdit = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${id}/update`);
+    router.push(
+      `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${id}/update`
+    );
   };
 
   const handleShow = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${id}/show`);
+    router.push(`/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${id}/show`);
   };
 
   const handleAdd = () => {
     setLoading(true);
-    router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/insert`);
+    router.push(`/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/insert`);
   };
 
   const handleConfig = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/${checkOMS ? 'oms': 'wms'}/exit_plan/${id}/config`);
+    router.push(
+      `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${id}/config`
+    );
   };
 
   const close = () => {
