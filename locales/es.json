@@ -244,6 +244,7 @@
 	"layer": "Fila",
 	"column": "Nivel",
 	"export": "Exportar",
+	"export_pdf": "Exportar PDF",
 	"number_of_partitions": "Número de particiones",
 	"number_of_shelves": "Número de estantes",
 	"total_volume": "Volumen total",

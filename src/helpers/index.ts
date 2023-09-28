@@ -3,11 +3,12 @@ import { MessageOpts, TypeOptions } from '../types';
 import { getCookie } from './cookieUtils';
 import { AxiosRequestConfig } from 'axios';
 import { parse } from 'cookie';
-import { StoragePlan } from '../types/storage_plan';
+import { StoragePlan, PackingList } from '../types/storage_plan';
 import * as FileSaver from "file-saver";
 import XLSX from "sheetjs-style";
 import { IntlShape } from 'react-intl';
 import { getDateFormat, getHourFormat } from './utils';
+import { Selection } from "@nextui-org/react";
 
 const baseMessageOpts: Pick<MessageOpts, 'type' | 'position' | 'autoClose' | 'hideProgressBar' | 'closeOnClick' | 'pauseOnHover' | 'draggable' | 'theme'> = {
   type: 'success',
@@ -120,25 +121,60 @@ export const getHourFromStr = (date: string | undefined): string => {
   return '';
 }
 
-export const storagePlanDataToExcel = (storagePlans: StoragePlan[], intl: IntlShape) => {
+export const storagePlanDataToExcel = (storagePlans: StoragePlan[], intl: IntlShape, selection: Selection = "all") => {
   let dataToExport: object[] = [];
   const key1: string = intl.formatMessage({ id: 'warehouse_order_number' });
   const key2: string = intl.formatMessage({ id: 'customer_order_number' });
   const key3: string = intl.formatMessage({ id: 'user' });
   const key4: string = intl.formatMessage({ id: 'storage' });
-  const key5: string = intl.formatMessage({ id: 'number_of_boxes' });
-  const key6: string = intl.formatMessage({ id: 'delivery_time' });
-  const key7: string = intl.formatMessage({ id: 'observations' });
+  const key5: string = intl.formatMessage({ id: 'number_of_boxes_entered' });
+  const key6: string = intl.formatMessage({ id: 'number_of_boxes_stored' });
+  const key7: string = intl.formatMessage({ id: 'evidence' });
+  const key8: string = intl.formatMessage({ id: 'reference_number' });
+  const key9: string = intl.formatMessage({ id: 'pr_number' });
+  const key10: string = intl.formatMessage({ id: 'state' });
+  const key11: string = intl.formatMessage({ id: 'delivery_time' });
+  const key12: string = intl.formatMessage({ id: 'observations' });
 
   storagePlans.forEach((sp: StoragePlan) => {
     const sPlan: { [key: string]: string } = {};
-    sPlan[key1] = sp.order_number ? sp.order_number : '';
-    sPlan[key2] = sp.customer_order_number;
-    sPlan[key3] = sp.user ? sp.user.username : '';
-    sPlan[key4] = sp.warehouse ? (`${sp.warehouse.name} (${sp.warehouse.code})`) : '';
-    sPlan[key5] = sp.box_amount.toString();
-    sPlan[key6] = `${sp.delivered_time ? getDateFormat(sp.delivered_time) : ''} ${sp.delivered_time ? getHourFormat(sp.delivered_time) : ''}`;
-    sPlan[key7] = sp.observations;
+    if (selection === "all" || selection.has("order_number")) {
+      sPlan[key1] = sp.order_number ? sp.order_number : '';
+    }
+    if (selection === "all" || selection.has("customer_order_number")) {
+      sPlan[key2] = sp.customer_order_number;
+    }
+    if (selection === "all" || selection.has("user_id")) {
+      sPlan[key3] = sp.user ? sp.user.username : '';
+    }
+    if (selection === "all" || selection.has("warehouse_id")) {
+      sPlan[key4] = sp.warehouse ? (`${sp.warehouse.name} (${sp.warehouse.code})`) : '';
+    }
+    if (selection === "all" || selection.has("box_amount")) {
+      sPlan[key5] = sp.box_amount.toString();
+    }
+    if (selection === "all" || selection.has("number_of_boxes_stored")) {
+      sPlan[key6] = sp.packing_list && sp.packing_list.length > 0 ? (sp.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length.toString()) : '0';
+    }
+    if (selection === "all" || selection.has("evidence")) {
+      sPlan[key7] = sp.images ? (sp.images.length.toString()) : '0';
+    }
+    if (selection === "all" || selection.has("reference_number")) {
+      sPlan[key8] = sp.reference_number ? sp.reference_number: '';
+    }
+    if (selection === "all" || selection.has("pr_number")) {
+      sPlan[key9] = sp.pr_number ? sp.pr_number: '';
+    }
+    if (selection === "all" || selection.has("state")) {
+      sPlan[key10] = sp.rejected_boxes ? intl.formatMessage({ id: "rejected_boxes" }) : (sp.return ? intl.formatMessage({ id: "return" }) : intl.formatMessage({ id: "normal" }));
+    }
+    if (selection === "all" || selection.has("delivered_time")) {
+      sPlan[key11] = `${sp.delivered_time ? getDateFormat(sp.delivered_time) : ''} ${sp.delivered_time ? getHourFormat(sp.delivered_time) : ''}`;
+    }
+    if (selection === "all" || selection.has("observations")) {
+      sPlan[key12] = sp.observations;
+    }
+    
     dataToExport.push(sPlan);
   });
 

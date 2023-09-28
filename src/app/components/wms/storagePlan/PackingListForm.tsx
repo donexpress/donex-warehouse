@@ -385,10 +385,12 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
                         <div className='boxes-container'>
                           <div>
                             <RowStoragePlanHeader inWMS={inWMS} />
-                            {rows.map((row, index) => (
-                              <RowStoragePlan key={index} initialValues={{ ...row }} inWMS={inWMS}
-                              onUpdate={(updatedValues) => handleUpdateRow(Number(row.id), updatedValues)} />
-                            ))}
+                            <div className='boxes-container-values'>
+                              {rows.map((row, index) => (
+                                <RowStoragePlan key={index} initialValues={{ ...row }} inWMS={inWMS}
+                                onUpdate={(updatedValues) => handleUpdateRow(Number(row.id), updatedValues)} />
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>

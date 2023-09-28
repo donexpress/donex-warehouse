@@ -21,7 +21,7 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
       name: (id && warehouse) ? warehouse.name : '',
       contact: (id && warehouse) ? warehouse.contact : '',
       company: (id && warehouse) ? warehouse.company : '',
-      country: (id && warehouse) ? warehouse.country : '',
+      country: (id && warehouse) ? warehouse.country : 'Mexico',
       address_1: (id && warehouse) ? warehouse.address_1 : '',
       address_2: (id && warehouse) ? warehouse.address_2 : '',
       city: (id && warehouse) ? warehouse.city : '',

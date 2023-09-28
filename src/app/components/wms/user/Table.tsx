@@ -86,7 +86,7 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "customer_number",
     direction: "descending",
@@ -238,6 +238,10 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
             return user.user_level ? user.user_level.name : "";
         case "state": 
             return user.user_state ? getLabelByLanguage(user.user_state) : "";
+        case "customer_number":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.customer_number}</span>;
+        case "username":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.username}</span>;
         default:
           return cellValue;
       }
@@ -278,7 +282,7 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -359,9 +363,9 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -401,7 +405,7 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
   }, [
     selectedKeys,
     items.length,
-    sortedItems.length,
+    items.length,
     page,
     users.length,
     rowsPerPage,
@@ -476,19 +480,17 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="USER"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
           sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
           onSortChange={setSortDescriptor}
         >
@@ -505,7 +507,7 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
           </TableHeader>
           <TableBody
             emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
               <TableRow key={item.id}>
@@ -516,6 +518,8 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>
