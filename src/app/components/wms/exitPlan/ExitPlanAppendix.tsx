@@ -133,7 +133,7 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
               borderRadius: "5px 5px 5px 5px",
             }}
           >
-            <div className="elements-center">
+            <div className="elements-center" style={{wordBreak: 'break-all'}}>
               <span className="text-center">{appendix.name}</span>
             </div>
             <div className="elements-center">

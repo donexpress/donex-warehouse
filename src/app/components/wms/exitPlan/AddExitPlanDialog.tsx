@@ -33,7 +33,7 @@ const AddExitPlanDialog = ({ close, confirm, title }: Params) => {
                         type="text"
                         name="case_number"
                         placeholder={intl.formatMessage({
-                          id: "case_number",
+                          id: "expansion_box_number",
                         })}
                         customClass="custom-input"
                       />
