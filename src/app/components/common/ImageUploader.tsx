@@ -11,11 +11,13 @@ import SpinnerIconButton from "./SpinnerIconButton";
 interface ImageUploaderProps {
   children: ReactNode;
   onImageUpload: (filePath: string) => void;
+  isFile?: boolean 
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({
   children,
   onImageUpload,
+  isFile
 }) => {
   const [sendRequest, setSendRequest] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -62,7 +64,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       </div>
       <input
         type="file"
-        accept="image/*"
+        accept={isFile ? "": "image/*"}
         ref={fileInputRef}
         style={{ display: "none" }}
         onChange={handleFileChange}

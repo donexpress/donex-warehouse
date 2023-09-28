@@ -312,9 +312,14 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     let filteredUsers = [...operationInstructions];
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) => {
-        return user.number_delivery
-          ?.toLowerCase()
-          .includes(filterValue.toLowerCase());
+        return (
+          user.number_delivery
+            ?.toLowerCase()
+            .includes(filterValue.toLowerCase()) ||
+          user.output_plan?.output_number
+            ?.toLocaleLowerCase()
+            .includes(filterValue.toLowerCase())
+        );
       });
     }
     return filteredUsers;
@@ -638,9 +643,9 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
   ]);
 
   const getVisibleColumns = (): string[] => {
-    const t = (Array.from(visibleColumns)) as string[]
-    return t.filter(el => el !==  'actions')
-  }
+    const t = Array.from(visibleColumns) as string[];
+    return t.filter((el) => el !== "actions");
+  };
 
   return (
     <div style={{ marginTop: "20px" }}>
@@ -716,11 +721,15 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             marginTop: "10px",
           }}
         >
-          <Button
-            color="primary"
-          >
+          <Button color="primary">
             <PDFDownloadLink
-              document={<ExportTable intl={intl} data={operationInstructions} columns={getVisibleColumns()} />}
+              document={
+                <ExportTable
+                  intl={intl}
+                  data={operationInstructions}
+                  columns={getVisibleColumns()}
+                />
+              }
               fileName="operation_instructions_pdf.pdf"
             >
               {({ blob, url, loading, error }) =>

@@ -36,8 +36,8 @@ const ExitPlanFormBody = ({
     exitPlan ? (exitPlan.delivered_time ? exitPlan.delivered_time : "") : ""
   );
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  const [destinationSelected, setDestinationSelected] = useState<string>("");
-  const initialValues: ExitPlan = {
+  const [destinationSelected, setDestinationSelected] = useState<string>(id && exitPlan && exitPlan.destination ? exitPlan.destination : "");
+  let initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
     warehouse_id:
       id && exitPlan && exitPlan.warehouse_id
@@ -45,7 +45,7 @@ const ExitPlanFormBody = ({
         : undefined,
     city: id && exitPlan ? exitPlan.city : "",
     country: id && exitPlan ? exitPlan.country : "Mexico",
-    delivered_time: id && exitPlan ? date.toISOString().slice(0, 16) : "",
+    delivered_time: id && exitPlan && exitPlan.delivered_time ? date.toISOString().slice(0, 16) : "",
     observations: id && exitPlan ? exitPlan.observations : "",
     type: id && exitPlan ? exitPlan.type : -1,
     user_id: isOMS()
@@ -56,16 +56,12 @@ const ExitPlanFormBody = ({
     destination: id && exitPlan ? exitPlan.destination : "",
   };
 
-  console.log(initialValues, exitPlan?.warehouse_id);
-
   const cancelSend = () => {
     if (isWMS()) {
       router.push(`/${locale}/wms/exit_plan`);
     }
   };
 
-  console.log("------------ADDRESSES----------------");
-  console.log(addresses);
 
   const handleSubmit = async (values: ExitPlan) => {
     if (values.delivered_time === "") {
@@ -200,6 +196,7 @@ const ExitPlanFormBody = ({
           initialValues={initialValues}
           validationSchema={generateValidationSchemaExitPlan(intl)}
           onSubmit={handleSubmit}
+          enableReinitialize
         >
           {({ isSubmitting, isValid }) => (
             <Form className="flex flex-col gap-3">
@@ -280,7 +277,6 @@ const ExitPlanFormBody = ({
                     />
                   </div>
                 )}
-
                 {destinationSelected !== "private_address" && (
                   <div className="w-full sm:w-[49%]">
                     <GenericInput
