@@ -256,6 +256,21 @@ export type Counts = {
   regional_division_count: number;
 };
 
+export type BatchStoragePlans = {
+  customer_order_number: string;
+  user_id: number;
+  warehouse_id: number;
+  reference_number: string;
+  pr_number: string;
+  box_amount: number;
+  delivered_time: string;
+  observations: string;
+  return: boolean;
+  rejected_boxes: boolean;
+  expansion_box_number: string;
+  digits_box_number: number;
+};
+
 export type TypeOptions = "success" | "error" | "info" | "warning";
 export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
 export type TypeThemes = "light" | "dark";
