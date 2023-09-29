@@ -2,7 +2,7 @@ import axios from 'axios';
 import { countStoragePlanPath, storagePlanByOrderNumberPath, storagePlanPath, storagePlanStatePath, storagePlanCountPath } from '../backend';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
-import { Response } from '../types/index';
+import { Response, BatchStoragePlans } from '../types/index';
 import { StoragePlan, StoragePlanState, StoragePlanCount } from '../types/storage_plan';
 import { StateCount } from '@/types/exit_planerege1992';
 
@@ -13,6 +13,20 @@ export const countStoragePlan = async ():Promise<StateCount> => {
 
 export const createStoragePlan = async (values: StoragePlan): Promise<Response> => {
   const path = storagePlanPath();
+  try {
+    const response = await axios.post(path, values, getHeaders());
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {data: response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const createBatchStoragePlan = async (values: BatchStoragePlans[]): Promise<Response> => {
+  const path = storagePlanPath() + '/multi';
   try {
     const response = await axios.post(path, values, getHeaders());
     

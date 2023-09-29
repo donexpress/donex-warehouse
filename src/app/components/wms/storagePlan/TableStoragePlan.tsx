@@ -35,6 +35,7 @@ import { PackingList, StoragePlan, StoragePlanListProps } from "../../../../type
 import { Response } from "../../../../types";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import UploadEvidenceDialog from "../../common/UploadEvidenceDialog";
+import BatchOnStoragePlansDialog from "../../common/BatchOnStoragePlansDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
@@ -93,6 +94,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
   const [showUploadEvidenceDialog, setShowUploadEvidenceDialog] = useState<boolean>(false);
   const [uploadEvidenceElement, setUploadEvidenceElement] = useState<StoragePlan | null>(null);
+  
+  const [showBatchStoragePlansDialog, setShowBatchStoragePlansDialog] = useState<boolean>(false);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -625,6 +628,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                 </Button>
               )
             }
+
+            <Button
+              color="primary"
+              style={{ width: '121px', marginLeft: '10px' }}
+              endContent={<FaFileExcel style={{ fontSize: '22px', color: 'white' }} />}
+              onClick={() => openBatchOnStoragePlansDialog()}
+            >
+              {intl.formatMessage({ id: "import" })}
+            </Button>
+
             <Button
               color="primary"
               style={{ width: '140px', marginLeft: '10px' }}
@@ -971,6 +984,19 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     }
   }
 
+  const openBatchOnStoragePlansDialog = () => {
+    setShowBatchStoragePlansDialog(true);
+  }
+
+  const confirmBatchOnStoragePlansDialog = async() => {
+    closeBatchOnStoragePlansDialog();
+    await loadStoragePlans(true);
+  }
+
+  const closeBatchOnStoragePlansDialog = () => {
+    setShowBatchStoragePlansDialog(false);
+  }
+
   const closeCancelAllStoragePlanDialog = () => {
     setShowCancelAllDialog(false);
   }
@@ -1045,6 +1071,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         {showCancelDialog && <ConfirmationDialog close={closeCancelStoragePlanDialog} confirm={handleCancel} />}
         {showForceEntryDialog && <ConfirmationDialog close={closeForceEntryStoragePlanDialog} confirm={handleForceEntry} />}
         {showUploadEvidenceDialog && <UploadEvidenceDialog close={closeUploadEvidenceStoragePlanDialog} confirm={handleUploadEvidence} storagePlan={(uploadEvidenceElement as StoragePlan)} title={intl.formatMessage({ id: "upload_evidence" })} />}
+        {showBatchStoragePlansDialog && <BatchOnStoragePlansDialog close={closeBatchOnStoragePlansDialog} confirm={confirmBatchOnStoragePlansDialog} title={intl.formatMessage({ id: "import_entry_plans" })} />}
       </Loading>
     </>
   );
