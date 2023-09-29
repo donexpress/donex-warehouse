@@ -6,7 +6,7 @@ import {
   getHourFormat,
   getLanguage,
 } from "../../../../helpers/utils";
-import { ExitPlanState } from "@/types/exit_planerege1992";
+import { ExitPlan, ExitPlanState } from "@/types/exit_planerege1992";
 import {
   countOperationInstruction,
   deleteOperationInstructions,
@@ -47,17 +47,18 @@ import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import { SearchIcon } from "../../common/SearchIcon";
 import "./../../../../styles/generic.input.scss";
 import "../../../../styles/wms/user.table.scss";
-import { isOMS, isWMS, showMsg } from "@/helperserege1992";
+import { isOMS, isWMS, operationInstructionDataToExcel, showMsg } from "@/helperserege1992";
 import PaginationTable from "../../common/Pagination";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "./ExportTable";
+import { FaFileExcel, FaFilePdf } from "react-icons/fa";
+import { PackageShelf } from "@/types/package_shelferege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
   "warehouse_id",
   "output_plan_id",
   "user_id",
-  "type",
   "number_delivery",
   "remark",
   "internal_remark",
@@ -83,7 +84,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     column: "id",
     direction: "descending",
   });
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [filterValue, setFilterValue] = useState("");
   const hasSearchFilter = Boolean(filterValue);
   const [page, setPage] = useState(1);
@@ -155,11 +156,6 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
       },
       {
         name: intl.formatMessage({ id: "warehouse" }),
-        uid: "warehouse",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "warehouse" }),
         uid: "warehouse_id",
         sortable: true,
       },
@@ -181,6 +177,16 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
       {
         name: intl.formatMessage({ id: "internal_remark" }),
         uid: "internal_remark",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "user" }),
+        uid: "user_id",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "location" }),
+        uid: "location",
         sortable: true,
       },
       {
@@ -436,12 +442,17 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
         case "warehouse_id": {
           return user.warehouse.name;
         }
+        case "user_id": {
+          return user.user.username;
+        }
         case "output_plan_id": {
           return user.output_plan.output_number;
         }
         case "number_delivery": {
           return <CopyColumnToClipboard value={cellValue} />;
         }
+        case 'location':
+        return <span style={{maxWidth: "250px", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display:  'block'}}>{getLocation(user)}</span>
         default:
           console.log(cellValue);
           return cellValue;
@@ -644,7 +655,64 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
 
   const getVisibleColumns = (): string[] => {
     const t = Array.from(visibleColumns) as string[];
+    console.log(t)
+    console.log(visibleColumns)
     return t.filter((el) => el !== "actions");
+  };
+
+  const getSelectedOperationInstructions = (): OperationInstruction[] => {
+    let its: OperationInstruction[] = [];
+    for (let i = 0; i < selectedItems.length; i++) {
+      const index = selectedItems[i];
+      const item = operationInstructions.filter((sp: OperationInstruction) => sp.id === index);
+      if (filterValue && (filterValue !== "")) {
+        const isSearchable = item[0].number_delivery
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase()) ||
+        item[0].output_plan?.output_number
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase());
+        if (isSearchable) {
+          its.push(item[0]);
+        }
+      } else {
+        its.push(item[0]);
+      }
+    }
+    return its;
+  }
+
+  const handleExportExcel = () => {
+    operationInstructionDataToExcel(getSelectedOperationInstructions(), intl, getVisibleColumns());
+  }
+
+  const getLocation = (ep: OperationInstruction): string => {
+    let locations = ""
+    if(ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists?.length == 0) {
+      return '--'
+    }
+    if(ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists?.length > 1) {
+      return 'Multiple'
+    }
+    ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists.forEach(pl => {
+      locations+=packageShelfFormat(pl.package_shelf)
+    })
+    return locations
+  }
+
+  const packageShelfFormat = (packageShelfs: PackageShelf[] | undefined): string => {
+    if (packageShelfs && packageShelfs.length > 0) {
+      const packageShelf: PackageShelf = packageShelfs[0];
+      return `${intl.formatMessage({ id: "partition" })}: ${
+        packageShelf.shelf?.partition_table
+      }
+        ${intl.formatMessage({ id: "shelf" })}: ${
+        packageShelf.shelf?.number_of_shelves
+      }
+        ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
+        ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
+    }
+    return "";
   };
 
   return (
@@ -721,21 +789,38 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             marginTop: "10px",
           }}
         >
-          <Button color="primary">
+          <Button
+            color="primary"
+            isDisabled={selectedItems.length === 0}
+            endContent={
+              <FaFilePdf style={{ fontSize: "22px", color: "white" }} />
+            }
+          >
             <PDFDownloadLink
               document={
                 <ExportTable
                   intl={intl}
-                  data={operationInstructions}
+                  data={getSelectedOperationInstructions()}
                   columns={getVisibleColumns()}
                 />
               }
               fileName="operation_instructions_pdf.pdf"
             >
               {({ blob, url, loading, error }) =>
-                intl.formatMessage({ id: "export" })
+                intl.formatMessage({ id: "export_pdf" })
               }
             </PDFDownloadLink>
+          </Button>
+          <Button
+            color="primary"
+            style={{ width: "121px", marginLeft: "10px" }}
+            endContent={
+              <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
+            }
+            onClick={() => handleExportExcel()}
+            isDisabled={selectedItems.length === 0}
+          >
+            {intl.formatMessage({ id: "export" })}
           </Button>
           {statusSelected === 1 && isWMS() && (
             <Button
@@ -775,6 +860,22 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
               {intl.formatMessage({ id: "return" })}
             </Button>
           )}
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">
+            {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
+          </span>
+          <label className="flex items-center text-default-400 text-small">
+            {intl.formatMessage({ id: "rows_page" })}
+            <select
+              className="outline-none text-default-400 text-small m-1"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
         </div>
         <div
           className="overflow-x-auto tab-system-table bg-content1"
@@ -833,49 +934,52 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
           </ul>
         </div>
       </div>
-      <Table
-        aria-label="OUTPUT-PLAN"
-        isHeaderSticky
-        bottomContent={bottomContent}
-        bottomContentPlacement="outside"
-        classNames={{
-          wrapper: "max-h-[382px] no-padding-left",
-        }}
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
-        sortDescriptor={sortDescriptor}
-        // topContent={topContent}
-        topContentPlacement="outside"
-        onSelectionChange={(keys: Selection) => {
-          selectedItemsFn(keys);
-        }}
-        // onSelectionChange={setSelectedKeys}
-        onSortChange={setSortDescriptor}
-      >
-        <TableHeader columns={headerColumns}>
-          {(column: any) => (
-            <TableColumn
-              key={column.uid}
-              align={column.uid == "actions" ? "center" : "start"}
-              allowsSorting={column.sortable}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody
-          emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-          items={sortedItems}
+      <div className="overflow-x-auto tab-system-table">
+        <Table
+          aria-label="OUTPUT-PLAN"
+          isHeaderSticky
+          bottomContent={bottomContent}
+          bottomContentPlacement="outside"
+          classNames={{
+            wrapper: "max-h-[auto]",
+          }}
+          selectedKeys={selectedKeys}
+          selectionMode="multiple"
+          sortDescriptor={sortDescriptor}
+          // topContent={topContent}
+          topContentPlacement="outside"
+          onSelectionChange={(keys: Selection) => {
+            selectedItemsFn(keys);
+          }}
+          // onSelectionChange={setSelectedKeys}
+          onSortChange={setSortDescriptor}
         >
-          {(item: any) => (
-            <TableRow key={item.id}>
-              {(columnKey: any) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          <TableHeader columns={headerColumns}>
+            {(column: any) => (
+              <TableColumn
+                key={column.uid}
+                align={column.uid == "actions" ? "center" : "start"}
+                allowsSorting={column.sortable}
+              >
+                {column.name}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody
+            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
+            items={sortedItems}
+          >
+            {(item: any) => (
+              <TableRow key={item.id}>
+                {(columnKey: any) => (
+                  <TableCell>{renderCell(item, columnKey)}</TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
       {displayConfirmation && (
         <ConfirmationDialog close={close} confirm={confirm} />
       )}
