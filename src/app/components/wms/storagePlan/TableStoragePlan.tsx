@@ -25,7 +25,7 @@ import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
-import { showMsg, storagePlanDataToExcel } from "../../../../helpers";
+import { showMsg, storagePlanDataToExcel, packingListDataToExcel } from "../../../../helpers";
 
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
@@ -44,6 +44,7 @@ import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
+import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -375,6 +376,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
+                  <DropdownItem onClick={() => packingListDataToExcel(storageP, storageP.packing_list ? storageP.packing_list : [], intl, 'lg' )}>
+                    {intl.formatMessage({ id: "generate_xlsx_inventory" })}
+                  </DropdownItem>
                   <DropdownItem>
                     <PDFDownloadLink document={<ReceiptPDF storagePlan={storageP as StoragePlan} intl={intl} />} fileName="inventory_pdf.pdf">
                       {({ blob, url, loading, error }) =>
@@ -418,6 +422,13 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
           <CopyColumnToClipboard
             value={
               <span>{storageP.pr_number}</span>
+            }
+          />
+        );
+        case "customer_order_number": return (
+          <CopyColumnToClipboard
+            value={
+              <span>{storageP.customer_order_number}</span>
             }
           />
         );
@@ -617,7 +628,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             <Button
               color="primary"
               style={{ width: '140px', marginLeft: '10px' }}
-              endContent={<ExportIcon />}
+              endContent={<FaFilePdf style={{ fontSize: '22px', color: 'white' }} />}
               isDisabled={selectedItems.length === 0}
             >
               <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={getSelectedStoragePlans()} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
@@ -630,7 +641,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             <Button
               color="primary"
               style={{ width: '121px', marginLeft: '10px' }}
-              endContent={<ExportIcon />}
+              endContent={<FaFileExcel style={{ fontSize: '22px', color: 'white' }} />}
               onClick={() => handleExportStoragePlanData()}
               isDisabled={selectedItems.length === 0}
             >

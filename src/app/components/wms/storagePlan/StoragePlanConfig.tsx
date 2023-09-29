@@ -6,7 +6,7 @@ import { Button,
   DropdownItem, } from "@nextui-org/react";
 import '../../../../styles/wms/user.form.scss';
 import '../../../../styles/wms/storage.plan.config.scss';
-import { showMsg, isOMS, isWMS, storagePlanDataToExcel } from '../../../../helpers';
+import { showMsg, isOMS, isWMS, packingListDataToExcel } from '../../../../helpers';
 import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
 import { updatePackingListById, removePackingListById } from '../../../../services/api.packing_list';
@@ -24,6 +24,7 @@ import ReceiptPDF from '../../common/ReceiptPDF';
 import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
+import { getDateFormat, getHourFormat } from '../../../../helpers/utils';
 
 const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boolean = true): PackingList[] => {
   return packingLists.map((packingList: PackingList) => {
@@ -469,9 +470,9 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                           {/* <DropdownItem className={((storagePlan && (storagePlan.state === 'to be storage' || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
                             {intl.formatMessage({ id: "fast_delivery" })}
                           </DropdownItem> */}
-                          {/* <DropdownItem onClick={() => storagePlanDataToExcel([storagePlan], intl, "all")}>
-                            {intl.formatMessage({ id: "export" })}
-                          </DropdownItem> */}
+                          <DropdownItem onClick={() => packingListDataToExcel(storagePlan, rows, intl, tabToShow === 1 ? 'ic' : 'lg' )}>
+                            {intl.formatMessage({ id: "generate_xlsx_inventory" })}
+                          </DropdownItem>
                           <DropdownItem>
                             <PDFDownloadLink document={<ReceiptPDF storagePlan={storagePlan as StoragePlan} intl={intl} />} fileName="inventory_pdf.pdf">
                               {({ blob, url, loading, error }) =>
@@ -568,8 +569,10 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             </div>
                             <div>{'--'}</div>
                             <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div>
-                            <div>{'--'}</div>
-                            <div>{'--'}</div>
+                            <div>{storagePlan.pr_number ? (
+                              <CopyColumnToClipboard value={ storagePlan.pr_number } />
+                            ) : '--'}</div>
+                            <div>{`${row.client_weight} / ${row.client_length}*${row.client_width}*${row.client_height}`}</div>
                             <div>{'--'}</div>
                             <div>
                             {
@@ -589,11 +592,11 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                                   &nbsp;
                                   {intl.formatMessage({ id: 'column' })}: {(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].column : ''}
                                 </>
-                              ) : null
+                              ) : '--'
                             }
                             </div>
                             <div>{'--'}</div>
-                            <div>{'--'}</div>
+                            <div>{storagePlan.delivered_time ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '--'}</div>
                           </div>
                         ))}
                         </div>

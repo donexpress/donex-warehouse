@@ -3,7 +3,8 @@ import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/render
 import { StoragePlan, PackingList } from "../../../types/storage_plan";
 import { PackageShelf } from "../../../types/package_shelf";
 import { IntlShape } from 'react-intl';
-import { getDateFromStr, getHourFromStr } from '../../../helpers'
+import { getDateFromStr, getHourFromStr } from '../../../helpers';
+import { getDateFormat, getHourFormat } from '../../../helpers/utils';
 
 const styles = StyleSheet.create({
   page: {
@@ -150,7 +151,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
                   <Text style={[styles.tableCell, styles.majorCell]}>{ pl.case_number }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ packageShelfFormat(pl.package_shelf) }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ '--' }</Text>
-                  <Text style={[styles.tableCell, styles.minorCell]}>{ getDateFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }{ ' ' }{ getHourFromStr(storagePlan.delivered_time ? storagePlan.delivered_time : undefined) }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ storagePlan.delivered_time ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '' }</Text>
                 </View>
               ))
             }

@@ -197,6 +197,9 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
   return (
     <Document>
         <Page size="A4" orientation='landscape' style={styles.page}>
+          <Image src="https://dc0-bucket.oss-us-west-1.aliyuncs.com/8Y2QlTD9eyFgyWt773lwMUJXGN0xDNHT.png" style={styles.logo} />
+  
+          <Text style={styles.title}>{intl.formatMessage({ id: 'entry_plan_information' })}</Text>
           <View style={styles.table}>
             <View style={styles.tableRow}>
                 {

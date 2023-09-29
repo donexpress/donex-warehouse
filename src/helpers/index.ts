@@ -199,3 +199,102 @@ export const storagePlanDataToExcel = (storagePlans: StoragePlan[], intl: IntlSh
       fileExtension
   );
 }
+
+export const packingListDataToExcel = (storagePlan: StoragePlan, packingLists: PackingList[], intl: IntlShape, type: 'ic'| 'lg') => {
+  let dataToExport: object[] = [];
+  
+  if (type === 'ic') {
+    const key1: string = intl.formatMessage({ id: 'box_number' });
+    const key2: string = intl.formatMessage({ id: 'expansion_box_number' });
+    const key3: string = intl.formatMessage({ id: 'outgoing_order' });
+    const key4: string = intl.formatMessage({ id: 'transfer_order_number' });
+    const key5: string = intl.formatMessage({ id: 'bill_lading_number' });
+    const key6: string = `${intl.formatMessage({ id: 'client_weight' })}(kg) / ${intl.formatMessage({ id: 'dimensions' })}(cm)`;
+    const key7: string = `${intl.formatMessage({ id: 'storage_weight' })}(kg) / ${intl.formatMessage({ id: 'dimensions' })}(cm)`;
+    const key8: string = intl.formatMessage({ id: 'location' });
+    const key9: string = intl.formatMessage({ id: 'storage_time' });
+    const key10: string = intl.formatMessage({ id: 'delivery_time' });
+
+    packingLists.forEach((pl: PackingList) => {
+      const pList: { [key: string]: string } = {};
+
+      pList[key1] = pl.box_number;
+      pList[key2] = pl.case_number;
+      pList[key3] = '--';
+      pList[key4] = pl.order_transfer_number ? pl.order_transfer_number : '--';
+      pList[key5] = storagePlan.pr_number ? storagePlan.pr_number : '--';
+      pList[key6] = `${pl.client_weight} / ${pl.client_length}*${pl.client_width}*${pl.client_height}`;
+      pList[key7] = '--';
+      pList[key8] = (pl.package_shelf && pl.package_shelf.length > 0) ? (
+          (storagePlan.warehouse ? (
+            `${storagePlan.warehouse.code}-${String(pl.package_shelf[0].shelf?.partition_table).padStart(2, '0')}-${String(pl.package_shelf[0].shelf?.number_of_shelves).padStart(2, '0')}-${String(pl.package_shelf[0].layer).padStart(2, '0')}-${String(pl.package_shelf[0].column).padStart(2, '0')} `
+          ) : '') +
+          `${intl.formatMessage({ id: 'partition' })}: ${(pl.package_shelf && pl.package_shelf.length > 0 && pl.package_shelf[0].shelf) ? pl.package_shelf[0].shelf.partition_table : ''} ` +
+          `${intl.formatMessage({ id: 'shelf' })}: ${(pl.package_shelf && pl.package_shelf.length > 0 && pl.package_shelf[0].shelf) ? pl.package_shelf[0].shelf.number_of_shelves : ''} ` +
+          `${intl.formatMessage({ id: 'layer' })}: ${(pl.package_shelf && pl.package_shelf.length > 0) ? pl.package_shelf[0].layer : ''}  ` +
+          `${intl.formatMessage({ id: 'column' })}: ${(pl.package_shelf && pl.package_shelf.length > 0) ? pl.package_shelf[0].column : ''} `
+      ) : '--';
+      pList[key9] = '--';
+      pList[key10] = storagePlan.delivered_time ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '--';
+
+      dataToExport.push(pList);
+    });
+  } else {
+    const key1: string = intl.formatMessage({ id: 'box_number' });
+    const key2: string = intl.formatMessage({ id: 'expansion_box_number' });
+    const key3: string = intl.formatMessage({ id: 'transfer_order_number' });
+    const key4: string = intl.formatMessage({ id: 'amount' });
+    const key5: string = intl.formatMessage({ id: 'client_weight' });
+    const key6: string = intl.formatMessage({ id: 'client_length' });
+    const key7: string = intl.formatMessage({ id: 'client_width' });
+    const key8: string = intl.formatMessage({ id: 'client_height' });
+    const key9: string = intl.formatMessage({ id: 'product_name' });
+    const key10: string = intl.formatMessage({ id: 'english_product_name' });
+    const key11: string = intl.formatMessage({ id: 'price' });
+    const key12: string = intl.formatMessage({ id: 'material' });
+    const key13: string = intl.formatMessage({ id: 'customs_code' });
+    const key14: string = intl.formatMessage({ id: 'fnscu' });
+
+    packingLists.forEach((pl: PackingList) => {
+      const pList: { [key: string]: string } = {};
+
+      pList[key1] = pl.box_number;
+      pList[key2] = pl.case_number;
+      pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : '--';
+      pList[key4] = pl.amount.toString();
+      pList[key5] = pl.client_weight.toString();
+      pList[key6] = pl.client_length.toString();
+      pList[key7] = pl.client_width.toString();
+      pList[key8] = pl.client_height.toString();
+      pList[key9] = pl.product_name;
+      pList[key10] = pl.english_product_name;
+      pList[key11] = pl.price.toString();
+      pList[key12] = pl.material;
+      pList[key13] = pl.customs_code;
+      pList[key14] = pl.fnscu;
+
+      dataToExport.push(pList);
+    });
+  }
+
+  const date = new Date();
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `${intl.formatMessage({id: 'storage_plan_inventory'})}(` +
+      date.getDate() +
+      "-" +
+      (date.getMonth() + 1) +
+      "-" +
+      date.getFullYear() +
+      ")" +
+      fileExtension
+  );
+}
