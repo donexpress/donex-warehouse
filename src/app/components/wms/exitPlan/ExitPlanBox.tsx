@@ -21,6 +21,7 @@ import { getStoragePlanByOrder_number } from "../../../../services/api.storage_p
 import { showMsg } from "../../../../helpers";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InventoryList from "./InventoryList";
+import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
 
 interface Props {
   exitPlan: ExitPlan;
@@ -160,9 +161,16 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         }
       }
       if (data.warehouse_order_number) {
-        const tmp = await getStoragePlanByOrder_number(
-          data.warehouse_order_number
-        );
+        const arr = data.warehouse_order_number.split(",");
+        let tmp: StoragePlan[] = []
+        for (let i = 0; i < arr.length; i++) {
+          const t = await getStoragePlanByOrder_number(
+            arr[i]
+          );
+          if(t) {
+            tmp = tmp.concat(t)
+          }
+        }
         exist = tmp ? tmp[0] : null;
         if (tmp && exitPlan) {
           tmp.forEach((t) => {
@@ -355,8 +363,24 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               <div className="elements-center">{"--"}</div>
               <div className="elements-center">{"--"}</div>
               <div className="elements-center">{row.packing_lists?.amount}</div>
-              <div className="elements-center">{"--"}</div>
-              <div className="elements-center">{"--"}</div>
+              <div className="elements-center">
+                {getDateFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+                ,{" "}
+                {getHourFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+              </div>
+              <div className="elements-center">
+                {getDateFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+                ,{" "}
+                {getHourFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+              </div>
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <Dropdown>
                   <DropdownTrigger>

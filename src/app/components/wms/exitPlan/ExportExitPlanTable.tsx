@@ -8,8 +8,8 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import { IntlShape } from "react-intl";
-import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { getLanguage } from "@/helpers/utilserege1992";
+import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
 const styles = StyleSheet.create({
   page: {
@@ -80,27 +80,10 @@ const styles = StyleSheet.create({
 interface Props {
   intl: IntlShape;
   columns: string[];
-  data: OperationInstruction[];
+  data: ExitPlan[];
 }
 
-const ExportTable = ({ intl, columns, data }: Props) => {
-  const getType = (data: any[]): string[] => {
-    const result: string[] = [];
-    data.forEach((el) => {
-      result.push(el[getLanguage(intl)]);
-    });
-    return result;
-  };
-  const getLocation = (ep: OperationInstruction): string => {
-    let locations = "";
-    ep.output_plan &&
-      ep.output_plan.packing_lists &&
-      ep.output_plan.packing_lists.forEach((pl) => {
-        locations += packageShelfFormat(pl.package_shelf);
-      });
-    return locations;
-  };
-
+const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
   const packageShelfFormat = (
     packageShelfs: PackageShelf[] | undefined
   ): string => {
@@ -116,6 +99,13 @@ const ExportTable = ({ intl, columns, data }: Props) => {
         ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
     }
     return "";
+  };
+  const getLocation = (ep: ExitPlan): string => {
+    let locations = "";
+    ep.packing_lists?.forEach((pl) => {
+      locations += packageShelfFormat(pl.package_shelf);
+    });
+    return locations;
   };
   return (
     <Document>
@@ -140,33 +130,52 @@ const ExportTable = ({ intl, columns, data }: Props) => {
             <View style={styles.tableRow} key={index}>
               {columns.map((column, index) => {
                 switch (column) {
-                  case "operation_instruction_type":
-                    return (
-                      <Text key={index} style={styles.tableCell}>
-                        {getType(
-                          // @ts-ignore
-                          oi.operation_instruction_type.instruction_type
-                        ).join(", ")}
-                      </Text>
-                    );
-                  case "warehouse_id":
+                  case "warehouse":
                     return (
                       <Text key={index} style={styles.tableCell}>
                         {oi.warehouse?.name} - {oi.warehouse?.code}
                       </Text>
                     );
-                  case "output_plan_id":
+                  case "user":
                     return (
                       <Text key={index} style={styles.tableCell}>
-                        {oi.output_plan?.output_number}
+                        {oi.user?.username}
                       </Text>
                     );
-                  case "location":
+                  case "destination":
+                    if (oi.destination_ref) {
+                      return (
+                        <Text key={index} style={styles.tableCell}>
+                          {oi.destination_ref[getLanguage(intl)]}
+                        </Text>
+                      );
+                    }
                     return (
                       <Text key={index} style={styles.tableCell}>
-                        {getLocation(oi)}
+                        {oi.destination}
                       </Text>
                     );
+
+                  case "address":
+                    if (oi.address_ref) {
+                      return (
+                        <Text key={index} style={styles.tableCell}>
+                          {oi.address_ref[getLanguage(intl)]}
+                        </Text>
+                      );
+                    }
+                    return (
+                      <Text key={index} style={styles.tableCell}>
+                        {oi.address_ref}
+                      </Text>
+                    );
+
+                    case "location":
+                        return (
+                          <Text key={index} style={styles.tableCell}>
+                            {getLocation(oi)}
+                          </Text>
+                        );
                   default:
                     return (
                       <Text key={index} style={styles.tableCell}>
@@ -184,4 +193,4 @@ const ExportTable = ({ intl, columns, data }: Props) => {
   );
 };
 
-export default ExportTable;
+export default ExportExitPlanTable;

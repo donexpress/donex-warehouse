@@ -349,6 +349,8 @@
 	"operation_instructions": "操作说明",
   "warehouse_id": "倉庫",
 	"user_id": "用戶",
-	"output_plan_id": "退出計劃"
+	"output_plan_id": "退出計劃",
+	"box_amount": "箱号",
+  "output_number": "发货数量"
 
 }

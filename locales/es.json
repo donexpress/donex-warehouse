@@ -349,7 +349,8 @@
 	"operation_instructions": "Instrucción de operaciones",
 	"warehouse_id": "Almacén",
 	"user_id": "Usuario",
-	"output_plan_id": "Plan de salida"
-
+	"output_plan_id": "Plan de salida",
+	"box_amount": "Número de caja",
+	"output_number": "Número de entrega"
 
 }

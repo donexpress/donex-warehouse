@@ -36,7 +36,6 @@ const FilterExitPlan = ({ onFinish, destionations }: Props) => {
         label: dest[getLanguage(intl)],
       });
     });
-    console.log(response)
     return response;
   };
 

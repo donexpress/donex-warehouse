@@ -349,6 +349,8 @@
 	"operation_instructions": "Operations instruction",
 	"warehouse_id": "Warehouse",
 	"user_id": "User",
-	"output_plan_id": "Exit plan"
+	"output_plan_id": "Exit plan",
+	"box_amount": "Box number",
+	"output_number": "Delivery number"
 
 }

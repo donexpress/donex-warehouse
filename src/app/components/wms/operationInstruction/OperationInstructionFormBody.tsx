@@ -17,6 +17,8 @@ import { useRouter } from "next/router";
 import { User } from "@/types/usererege1992";
 import ExitPlanAppendix from "../exitPlan/ExitPlanAppendix";
 import { isOMS } from "@/helperserege1992";
+import LocationTable from "../../common/LocationTable";
+import "../../../../styles/wms/user.form.scss";
 
 interface Props {
   types: State[];
@@ -110,21 +112,31 @@ const OperationInstructionFormBody = ({
       await createOperationInstruction(values);
     }
     if (exit_plan_id) {
-      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/exit_plan/${exit_plan_id}/config`);
+      router.push(
+        `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exit_plan_id}/config`
+      );
     } else {
-      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/operation_instruction`);
+      router.push(
+        `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
+      );
     }
   };
   const goToEdit = () => {
     router.push(
-      `/${locale}/${isOMS() ? 'oms': 'wms'}/operation_instruction/${operationInstruction?.id}/update`
+      `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${
+        operationInstruction?.id
+      }/update`
     );
   };
   const cancelSend = () => {
     if (exit_plan_id) {
-      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/exit_plan/${exit_plan_id}/config`);
+      router.push(
+        `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exit_plan_id}/config`
+      );
     } else {
-      router.push(`/${locale}/${isOMS() ? 'oms': 'wms'}/operation_instruction`);
+      router.push(
+        `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
+      );
     }
   };
 
@@ -374,6 +386,12 @@ const OperationInstructionFormBody = ({
           )}
         </Formik>
       </div>
+      {isFromDetails && (
+        <LocationTable
+        // @ts-ignore
+          exitPlan={exitPlans.find((el) => el.id === operationInstruction?.output_plan_id)}
+        />
+      )}
     </div>
   );
 };

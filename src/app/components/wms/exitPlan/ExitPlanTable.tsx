@@ -47,9 +47,14 @@ import {
 } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
-import { isOMS, showMsg } from "../../../../helpers";
+import { exitPlanDataToExcel, isOMS, showMsg } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import FilterExitPlan from "./FilterExitPlan";
+import { FaFileExcel, FaFilePdf } from "react-icons/fa";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import ExportTable from "../operationInstruction/ExportTable";
+import ExportExitPlanTable from "./ExportExitPlanTable";
+import { PackageShelf } from "@/types/package_shelferege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -101,6 +106,7 @@ const ExitPlanTable = () => {
   const hasSearchFilter = Boolean(filterValue);
 
   const [destinations, setDestinations] = useState<State[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -161,17 +167,6 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "created_at" }),
-        uid: "created_at",
-        sortable: true,
-      },
-
-      {
-        name: intl.formatMessage({ id: "updated_at" }),
-        uid: "updated_at",
-        sortable: true,
-      },
-      {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
         sortable: true,
@@ -184,6 +179,22 @@ const ExitPlanTable = () => {
       {
         name: intl.formatMessage({ id: "delivery_time" }),
         uid: "delivered_time",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "location" }),
+        uid: "location",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: true,
+      },
+
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
         sortable: true,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -230,6 +241,23 @@ const ExitPlanTable = () => {
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
+
+  const selectedItemsFn = (selection: Selection) => {
+    setSelectedKeys(selection);
+    if (selection === "all") {
+      setSelectedItems(
+        exitPlans.map((ep: ExitPlan) => Number(ep.id))
+      );
+    }
+    else {
+      setSelectedItems(
+        Array.from(selection.values()).map((cadena) =>
+          parseInt(cadena.toString())
+        )
+      );
+      // setSelectedItems(Array.from(selection.values()).map((cadena) =>parseInt(cadena.toString())))
+    }
+  };
 
   const renderCell = useCallback((user: any, columnKey: React.Key) => {
     const cellValue = user[columnKey];
@@ -349,11 +377,46 @@ const ExitPlanTable = () => {
           />
         );
       case "address":
-        return user.address_ref ? <span>{user.address_ref[getLanguage(intl)]}</span> : <span>{cellValue}</span>;
+        return user.address_ref ? (
+          <span>{user.address_ref[getLanguage(intl)]}</span>
+        ) : (
+          <span>{cellValue}</span>
+        );
+      case 'location':
+        return <span style={{maxWidth: "250px", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display:  'block'}}>{getLocation(user)}</span>
       default:
         return cellValue;
     }
   }, []);
+
+  const getLocation = (ep: ExitPlan): string => {
+    let locations = ""
+    if(ep.packing_lists && ep.packing_lists?.length == 0) {
+      return '--'
+    }
+    if(ep.packing_lists && ep.packing_lists?.length > 1) {
+      return 'Multiple'
+    }
+    ep.packing_lists?.forEach(pl => {
+      locations+=packageShelfFormat(pl.package_shelf)
+    })
+    return locations
+  }
+
+  const packageShelfFormat = (packageShelfs: PackageShelf[] | undefined): string => {
+    if (packageShelfs && packageShelfs.length > 0) {
+      const packageShelf: PackageShelf = packageShelfs[0];
+      return `${intl.formatMessage({ id: "partition" })}: ${
+        packageShelf.shelf?.partition_table
+      }
+        ${intl.formatMessage({ id: "shelf" })}: ${
+        packageShelf.shelf?.number_of_shelves
+      }
+        ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
+        ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
+    }
+    return "";
+  };
 
   const onRowsPerPageChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -407,6 +470,37 @@ const ExitPlanTable = () => {
     setExitPlans(data);
   };
 
+  const getSelectedExitPlans = (): ExitPlan[] => {
+    let its: ExitPlan[] = [];
+    for (let i = 0; i < selectedItems.length; i++) {
+      const index = selectedItems[i];
+      const item = exitPlans.filter((ep: ExitPlan) => ep.id === index);
+      if (filterValue && (filterValue !== "")) {
+        const isSearchable = item[0].output_number
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase());
+        if (isSearchable) {
+          its.push(item[0]);
+        }
+      } else {
+        if(item[0]) {
+          its.push(item[0]);
+        }
+      }
+    }
+    return its;
+  }
+
+  const getVisibleColumns = (): string[] => {
+    const t = Array.from(visibleColumns) as string[];
+    return t.filter((el) => el !== "actions");
+  };
+
+  const handleExportExcel = () => {
+    exitPlanDataToExcel(getSelectedExitPlans(), intl, getVisibleColumns());
+
+  }
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4 mb-2">
@@ -459,6 +553,50 @@ const ExitPlanTable = () => {
           onFinish={onFinishFilter}
           destionations={destinations}
         />
+        <div
+          className="flex gap-3"
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginRight: "20px",
+            marginBottom: "10px",
+            marginTop: "10px",
+          }}
+        >
+          <Button
+            color="primary"
+            isDisabled={selectedItems.length === 0}
+            endContent={
+              <FaFilePdf style={{ fontSize: "22px", color: "white" }} />
+            }
+          >
+            <PDFDownloadLink
+              document={
+                <ExportExitPlanTable
+                  intl={intl}
+                  data={getSelectedExitPlans()}
+                  columns={getVisibleColumns()}
+                />
+              }
+              fileName="operation_instructions_pdf.pdf"
+            >
+              {({ blob, url, loading, error }) =>
+                intl.formatMessage({ id: "export_pdf" })
+              }
+            </PDFDownloadLink>
+          </Button>
+          <Button
+            color="primary"
+            style={{ width: "121px", marginLeft: "10px" }}
+            endContent={
+              <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
+            }
+            onClick={() => handleExportExcel()}
+            isDisabled={selectedItems.length === 0}
+          >
+            {intl.formatMessage({ id: "export" })}
+          </Button>
+        </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
@@ -520,6 +658,7 @@ const ExitPlanTable = () => {
     statusSelected,
     intl,
     currentStatePosition,
+    selectedItems
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -570,6 +709,7 @@ const ExitPlanTable = () => {
   const loadExitPlans = async () => {
     setLoading(true);
     const pms = await getExitPlansByState("pending");
+    console.log(pms)
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
     const count = await countExitPlans();
@@ -737,42 +877,45 @@ const ExitPlanTable = () => {
       <Loading loading={loading}>
         {topContent}
         <div className="overflow-x-auto tab-system-table">
-        <Table
-          aria-label="USER-LEVEL"
-          isHeaderSticky
-          classNames={{
-            wrapper: "max-h-[auto]",
-          }}
-          selectedKeys={selectedKeys}
-          selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
-          onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
-        >
-          <TableHeader columns={headerColumns}>
-            {(column: any) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid == "actions" ? "center" : "start"}
-                allowsSorting={column.sortable}
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody
-            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+          <Table
+            aria-label="USER-LEVEL"
+            isHeaderSticky
+            classNames={{
+              wrapper: "max-h-[auto]",
+            }}
+            selectedKeys={selectedKeys}
+            selectionMode="multiple"
+            sortDescriptor={sortDescriptor}
+            // onSelectionChange={setSelectedKeys}
+            onSortChange={setSortDescriptor}
+            onSelectionChange={(keys: Selection) => {
+              selectedItemsFn(keys);
+            }}
           >
-            {(item: any) => (
-              <TableRow key={item.id}>
-                {(columnKey: any) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            <TableHeader columns={headerColumns}>
+              {(column: any) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid == "actions" ? "center" : "start"}
+                  allowsSorting={column.sortable}
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody
+              emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
+              items={sortedItems}
+            >
+              {(item: any) => (
+                <TableRow key={item.id}>
+                  {(columnKey: any) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
         {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
