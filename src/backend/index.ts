@@ -1,10 +1,7 @@
 import { BASE_URL } from "../config/index";
 
 const getBaseUrl = () => {
-  console.log(process.env.WAREHOUSE_ENV)
-  console.log(process.env.WAREHOUSE_API_HOST)
   if (process.env.WAREHOUSE_ENV && (process.env.WAREHOUSE_ENV === 'staging' || process.env.WAREHOUSE_ENV === 'prod')) {
-    console.log('entro')
     return process.env.WAREHOUSE_API_HOST;
   }
   return BASE_URL;
