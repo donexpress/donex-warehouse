@@ -353,10 +353,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                   <DropdownItem className={(!storageP["history"] || (storageP["history"].length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleHistory(storageP["id"])}>
                     {intl.formatMessage({ id: "history" })}
                   </DropdownItem>
-                  <DropdownItem className={statusSelected !== 'to be storage' ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
+                  <DropdownItem className={(!inWMS || statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
-                  <DropdownItem className={statusSelected !== 'into warehouse' ? 'do-not-show-dropdown-item' : ''} onClick={() => openForceEntryStoragePlanDialog(storageP)}>
+                  <DropdownItem className={(!inWMS || statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''} onClick={() => openForceEntryStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "force_entry" })}
                   </DropdownItem>
                   <DropdownItem className={(!inWMS || (statusSelected !== 'into warehouse' && statusSelected !== 'stocked')) ? 'do-not-show-dropdown-item' : ''} onClick={() => openUploadEvidenceStoragePlanDialog(storageP)}>
@@ -661,7 +661,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               {intl.formatMessage({ id: "export" })}
             </Button>
             {
-              statusSelected === 'to be storage' && (
+              (inWMS && statusSelected === 'to be storage') && (
                 <Button
                   color="primary"
                   style={{ width: '121px', marginLeft: '10px' }}

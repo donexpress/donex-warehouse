@@ -5,7 +5,7 @@ import PackingListForm from '../../../../../src/app/components/wms/storagePlan/P
 import { PackingListProps } from '../../../../../src/types/storage_plan';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const AddPackingList = ({ id, storagePlan, inWMS = false }: PackingListProps) => {console.log(storagePlan)
+const AddPackingList = ({ id, storagePlan, inWMS = false }: PackingListProps) => {
   
   return (
   <ProtectedRoute>

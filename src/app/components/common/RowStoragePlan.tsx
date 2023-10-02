@@ -44,7 +44,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
   const [isLoadImage, setIsLoadImage] = useState(false);
 
   useEffect(() => {
-    if (showImage && lightboxRef.current && !zoomed && isLoadImage) { console.log('entro')
+    if (showImage && lightboxRef.current && !zoomed && isLoadImage) {
       setTimeout(()=>{
         // @ts-ignore
         lightboxRef.current.setState({
@@ -86,7 +86,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
   };
 
   const uploadImageClient = (imagePath: string) => {
-    console.log(imagePath)
+    
     onUpdate({
       ...initialValues,
       ['custome_picture']: imagePath,
@@ -94,7 +94,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
   }
 
   const uploadImageStaff = (imagePath: string) => {
-    console.log(imagePath)
+    
     onUpdate({
       ...initialValues,
       ['operator_picture']: imagePath,

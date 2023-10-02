@@ -23,7 +23,7 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
 
   }, []);
 
-  const handleSubmit = async() => {console.log(batch);
+  const handleSubmit = async() => {
     setSendRequest(true);
     const response: Response = await createBatchStoragePlan(batch);
     setSendRequest(false);
@@ -59,7 +59,6 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
   }
 
   const uploadBatch = (b: BatchStoragePlans[]) => {
-    console.log(b)
     if (b.every(isBatchStoragePlans)) {
         setBatch(b.map((item: any) => {
             return {

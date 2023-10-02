@@ -6,7 +6,7 @@ import { ShelfConfigProps } from '../../../../../../../src/types/shelf';
 import { getShelfById } from '../../../../../../../src/services/api.shelf';
 import { getWhById } from '../../../../../../../src/services/api.wh';
 
-const ConfigWarehouse = ({ shelf, warehouse, id, warehouse_id }: ShelfConfigProps) => {console.log(shelf)
+const ConfigWarehouse = ({ shelf, warehouse, id, warehouse_id }: ShelfConfigProps) => {
     
     return (
     <ProtectedRoute>
