@@ -42,15 +42,35 @@ import "./../../../../styles/generic.input.scss";
 import { indexCountries } from "@/services/api.countrieserege1992";
 import { getRegionalDivision } from "@/services/api.regional_divisionerege1992";
 import { Loading } from "../../common/Loading";
+import { showMsg } from "../../../../helpers";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
   "principal",
   "receiving_area",
+  "state",
   "actions",
 ];
 
-const WarehouseTable = () => {
+const getLabelByLanguage = (state: StateWarehouse, locale: string): string => {
+  if (locale === 'es') {
+    return state.es_name;
+  } else if (locale === 'zh') {
+    return state.zh_name;
+  }
+  return state.name;
+};
+
+const getStateList = (states: StateWarehouse[], locale: string):{ name: string, uid: string}[] => {
+  return states.map((state: StateWarehouse) => {
+    return {
+      name: getLabelByLanguage(state, locale),
+      uid: state.value,
+    }
+  })
+}
+
+const WarehouseTable = ({ states }: WarehouseListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -70,36 +90,38 @@ const WarehouseTable = () => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "name",
     direction: "ascending",
   });
 
+  const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>(getStateList(states, String(locale)));
+
   const [page, setPage] = useState(1);
 
   const columns = React.useMemo(() => {
     return [
-      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
+      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: false },
       {
         name: intl.formatMessage({ id: "principal" }),
         uid: "principal",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "receiving_area" }),
         uid: "receiving_area",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "state" }),
         uid: "state",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "country" }),
         uid: "country",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -139,6 +161,15 @@ const WarehouseTable = () => {
             ?.includes(filterValue.toLowerCase())
       );
     }
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
+      filteredUsers = filteredUsers.filter((user) =>
+        // @ts-ignore
+        Array.from(statusFilter).includes(user.state ? String(user.state.value) : '')
+      );
+    }
 
     return filteredUsers;
   }, [warehouses, filterValue, statusFilter]);
@@ -151,22 +182,6 @@ const WarehouseTable = () => {
 
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
-
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort(
-      (a: CargoStationWarehouseForm, b: CargoStationWarehouseForm) => {
-        const first = a[
-          sortDescriptor.column as keyof CargoStationWarehouseForm
-        ] as number;
-        const second = b[
-          sortDescriptor.column as keyof CargoStationWarehouseForm
-        ] as number;
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-        return sortDescriptor.direction === "descending" ? -cmp : cmp;
-      }
-    );
-  }, [sortDescriptor, items]);
 
   const getLabelByLanguage = (state: any) => {
     if (locale === 'es') {
@@ -185,6 +200,8 @@ const WarehouseTable = () => {
           return getReceptionAreaLabel(cellValue);
         case "state":
           return user.state ? getLabelByLanguage(user.state) : '';
+        case "name":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.name}</span>;
         case "country":
           return getCountryLabel(cellValue);
         case "actions":
@@ -243,7 +260,7 @@ const WarehouseTable = () => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -255,6 +272,31 @@ const WarehouseTable = () => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  className="bnt-select"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  {intl.formatMessage({ id: "filters" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
+              >
+                {statusOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -302,9 +344,9 @@ const WarehouseTable = () => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -359,6 +401,10 @@ const WarehouseTable = () => {
   useEffect(() => {
     loadWarehouses();
   }, []);
+
+  useEffect(() => {
+    setStatusOptions(getStateList(states, String(locale)));
+  }, [locale, states]);
 
   useEffect(() => {
     setLoading(true);
@@ -429,7 +475,13 @@ const WarehouseTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeWarehouseById(deleteElement);
+    const response = await removeWarehouseById(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadWarehouses();
     setLoading(false);
@@ -438,21 +490,17 @@ const WarehouseTable = () => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="WARE-HOUSE"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
         >
           <TableHeader columns={headerColumns}>
             {(column) => (
@@ -467,7 +515,7 @@ const WarehouseTable = () => {
           </TableHeader>
           <TableBody
             emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
               <TableRow key={item.id}>
@@ -478,6 +526,8 @@ const WarehouseTable = () => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>

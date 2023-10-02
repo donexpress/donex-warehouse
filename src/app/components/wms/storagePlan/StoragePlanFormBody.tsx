@@ -16,8 +16,25 @@ import { Warehouse } from '../../../../types/warehouse';
 import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 import CheckboxesStoragePlan from './CheckboxesStoragePlan';
+import SelectUserStoragePlan from './SelectUserStoragePlan';
+import CustomerOrderNumberStoragePlan from './CustomerOrderNumberStoragePlan';
 
-const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails }: StoragePlanProps) => {
+const getWarehouseIdOfUser = (userId: number | null, users: User[], warehouses: Warehouse[]) => {
+  if (userId) {
+    const filterUser = users.filter((user: User) => user.id === Number(userId))
+    if (filterUser.length > 0) {
+        if (filterUser[0].warehouse) {
+            const filterWarehouse = warehouses.filter((warehouse: Warehouse) => warehouse.id === filterUser[0].warehouse?.id);
+            if (filterWarehouse.length > 0) {
+              return Number(filterWarehouse[0].id);
+            }
+        }
+    }
+  }
+  return -1;
+}
+
+const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails, inWMS }: StoragePlanProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
@@ -36,13 +53,14 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         label: "6"
       }
     ];
+    const [warehouseOfUser, setWarehouseOfUser] = useState<number>(!!id && storagePlan && storagePlan.user_id ? getWarehouseIdOfUser(storagePlan.user_id, users, warehouses) : -1);
     
     const initialValues: StoragePlan = {
         customer_order_number: (id && storagePlan) ? storagePlan.customer_order_number : '',
         user_id: (id && storagePlan) ? storagePlan.user_id : null,
         warehouse_id: (id && storagePlan) ? storagePlan.warehouse_id : null,
         box_amount: (id && storagePlan) ? storagePlan.box_amount : 0,
-        delivered_time: (id && storagePlan) ? (storagePlan.delivered_time ? storagePlan.delivered_time.substring(0,10) : null) : null,
+        delivered_time: (id && storagePlan) ? (storagePlan.delivered_time ? storagePlan.delivered_time.substring(0,16) : null) : null,
         observations: (id && storagePlan) ? storagePlan.observations : '',
         rejected_boxes: (id && storagePlan) ? storagePlan.rejected_boxes : false,
         return: (id && storagePlan) ? storagePlan.return : false,
@@ -50,13 +68,18 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         show_expansion_box_number: false,
         prefix_expansion_box_number: 'FBA',
         digits_box_number: 6,
+        reference_number: (id && storagePlan) ? storagePlan.reference_number : null,
+        pr_number: (id && storagePlan) ? storagePlan.pr_number : null,
         rows: [],
     };
   
       const cancelSend = () => {
-          if (isWMS()) {
-            router.push(`/${locale}/wms/storage_plan`);
-          }
+          const goBack = router.query.goBack;
+            if (goBack && goBack === 'config' && !!id) {
+              router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
+            } else {
+              router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
+            }
       };
 
       const getUsersFormatted = (usersAll: User[]): ValueSelect[] => {
@@ -70,8 +93,19 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         return response;
       };
 
-      const getWarehousesFormatted = (warehouseAll: Warehouse[]): ValueSelect[] => {
+      const getWarehousesFormatted = (warehouseAll: Warehouse[], warehouseOfU: number = -1): ValueSelect[] => {
         let response: ValueSelect[] = [];
+        if (warehouseOfU !== -1) {
+          const warehouseOfUserList = warehouseAll.filter((wh: Warehouse) => wh.id === warehouseOfU);
+          if (warehouseOfUserList.length > 0) {
+            return warehouseOfUserList.map((wh: Warehouse) => {
+              return {
+                value: Number(wh.id),
+                label: wh.name + ` (${wh.code})`
+              }
+            })
+          }
+        }
         warehouseAll.forEach((warehouse) => {
           response.push({
             value: Number(warehouse.id),
@@ -91,8 +125,17 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: values.state ? values.state : 1,
+                state: getState(values.state),
+                reference_number: values.reference_number,
+                pr_number: values.pr_number
               };
+      }
+
+      const getState = (state: string | undefined) => {
+        if (state) {
+          return state;
+        }
+        return 'to be storage';
       }
 
       const tableIsValid = () => {
@@ -108,13 +151,11 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
       }
   
       const handleSubmit = async (values: StoragePlan) => {
-          if (isWMS()) {
             if (id) {
               await modify(id, values);
             } else {
               await create(values);
             }
-          }
       };
 
       const formatBodyPackingList = (pl: PackingList, storagePlanId: number): PackingList => {
@@ -150,7 +191,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
             }
           }
           showMsg(intl.formatMessage({ id: 'successfullyMsg' }), { type: "success" });
-          router.push(`/${locale}/wms/storage_plan`);
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
           showMsg(message, { type: "error" });
@@ -161,7 +202,12 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         const response: Response = await updateStoragePlanById(storagePlanId, formatBody(values));
         if (response.status >= 200 && response.status <= 299) {
           showMsg(intl.formatMessage({ id: 'changedsuccessfullyMsg' }), { type: "success" });
-          router.push(`/${locale}/wms/storage_plan`);
+          const goBack = router.query.goBack;
+          if (goBack && goBack === 'config' && !!id) {
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
+          } else {
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
+          }
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
           showMsg(message, { type: "error" });
@@ -169,7 +215,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
       }
 
       const goToEdit = () => {
-        router.push(`/${locale}/wms/storage_plan/${id}/update`)
+        router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/update`)
       };
       
       const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -259,6 +305,17 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         setRows(updatedRows);
       };
 
+      const changeWarehouse = (id: number) => {
+        setWarehouseOfUser(id);
+      };
+
+      const changeCustomerOrderNumber = (value: string) => {
+        if (value && value !== ''){
+          setPrefixExpansionBoxNumber(value);
+          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: value, dBN: digitsBoxNumber });
+        }
+      };
+
     return (
         <div className='user-form-body shadow-small' style={{ paddingRight: '0px' }}>
             <h1 className="text-xl font-semibold">
@@ -280,34 +337,42 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                     <Form className='flex flex-col gap-3'>
                       <div className='flex gap-3 flex-wrap justify-between' style={{ paddingRight: '16px' }}>
                         <div className="w-full sm:w-[49%]">
-                          <GenericInput
-                            type="text"
-                            name="customer_order_number"
-                            placeholder={intl.formatMessage({ id: 'customer_order_number' })}
-                            customClass="custom-input"
-                            disabled={ isFromDetails }
-                            required
-                          />
+                          <CustomerOrderNumberStoragePlan isFromDetails={!!isFromDetails} changeCustomerOrderNumber={changeCustomerOrderNumber}></CustomerOrderNumberStoragePlan>
                         </div>
-                        <div className="w-full sm:w-[49%]">
-                          <GenericInput
-                            type="select"
-                            name="user_id"
-                            selectLabel={intl.formatMessage({ id: 'select_user' })}
-                            options={getUsersFormatted(users)}
-                            customClass="custom-input"
-                            disabled={ isFromDetails }
-                          />
-                        </div>
+                        {
+                          inWMS && (
+                            <div className="w-full sm:w-[49%]">
+                              <SelectUserStoragePlan options={getUsersFormatted(users)} users={users} warehouses={warehouses} changeWarehouse={changeWarehouse} isFromDetails={!!isFromDetails}></SelectUserStoragePlan>
+                            </div>
+                          )
+                        }
                         <div className="w-full sm:w-[49%]">
                           <GenericInput
                             type="select"
                             name="warehouse_id"
                             selectLabel={intl.formatMessage({ id: 'select_warehouse' })}
-                            options={getWarehousesFormatted(warehouses)}
+                            options={getWarehousesFormatted(warehouses, warehouseOfUser)}
+                            customClass="custom-input"
+                            disabled={ isFromDetails || (!!id && storagePlan && storagePlan.state !== 'to be storage') || (warehouseOfUser !== -1) }
+                            required
+                          />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
+                          <GenericInput
+                            type="text"
+                            name="reference_number"
+                            placeholder={intl.formatMessage({ id: 'reference_number' })}
                             customClass="custom-input"
                             disabled={ isFromDetails }
-                            required
+                          />
+                        </div>
+                        <div className="w-full sm:w-[49%]">
+                          <GenericInput
+                            type="text"
+                            name="pr_number"
+                            placeholder={intl.formatMessage({ id: 'pr_number' })}
+                            customClass="custom-input"
+                            disabled={ isFromDetails }
                           />
                         </div>
                         <div className="w-full sm:w-[49%]">
@@ -316,7 +381,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             name="box_amount"
                             placeholder={intl.formatMessage({ id: 'number_of_boxes' })}
                             customClass="custom-input"
-                            disabled={ isFromDetails }
+                            disabled={ !!id }
                             minValue={0}
                             onChangeFunction={handleInputChange}
                             required
@@ -324,7 +389,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                         </div>
                         <div className="w-full sm:w-[49%]">
                           <GenericInput
-                            type="date"
+                            type="datetime-local"
                             name="delivered_time"
                             placeholder={intl.formatMessage({ id: 'delivery_time' })}
                             customClass="custom-input"
@@ -388,11 +453,13 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             </div>
                             <div className='boxes-container'>
                               <div>
-                                <RowStoragePlanHeader />
-                                {rows.map((row, index) => (
-                                  <RowStoragePlan key={index} initialValues={{ ...row, id: index }}
-                                  onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
-                                ))}
+                                <RowStoragePlanHeader inWMS={inWMS} />
+                                <div className='boxes-container-values'>
+                                  {rows.map((row, index) => (
+                                    <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
+                                    onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>

@@ -31,6 +31,7 @@ import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { capitalize } from "../../../../helpers/utils";
+import { showMsg } from "../../../../helpers";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
@@ -54,7 +55,7 @@ const WhTable = () => {
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -69,52 +70,52 @@ const WhTable = () => {
       {
         name: intl.formatMessage({ id: "warehouse_name" }),
         uid: "name",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "warehouse_code" }),
         uid: "code",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "country" }),
         uid: "country",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "contact" }),
         uid: "contact",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "address" }),
         uid: "address_1",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "address" }) + ' 2',
         uid: "address_2",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "postal_code" }),
         uid: "cp",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "phone" }),
         uid: "phone",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "email" }),
         uid: "email",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -176,13 +177,22 @@ const WhTable = () => {
                 <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Edit" })}
                 </DropdownItem>
-                <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
-                  {intl.formatMessage({ id: "Delete" })}
+                <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
+                  {intl.formatMessage({ id: "config" })}
                 </DropdownItem>
+                {/* <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
+                  {intl.formatMessage({ id: "Delete" })}
+                </DropdownItem> */}
               </DropdownMenu>
             </Dropdown>
           </div>
         );
+      case "name": return (
+        <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.name}</span>
+      );
+      case "code": return (
+        <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.code}</span>
+      );
       default:
         return cellValue;
     }
@@ -212,7 +222,7 @@ const WhTable = () => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -271,9 +281,9 @@ const WhTable = () => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -364,6 +374,11 @@ const WhTable = () => {
     router.push(`/${locale}/wms/warehouses/insert`);
   };
 
+  const handleConfig = (id: number) => {
+    setLoading(true);
+    router.push(`/${locale}/wms/warehouses/${id}/config`);
+  };
+
   const close = () => {
     setShowConfirm(false);
     setDeleteElemtent(-1);
@@ -371,7 +386,13 @@ const WhTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeWhById(deleteElement);
+    const response = await removeWhById(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadWarehouses();
 
@@ -381,18 +402,16 @@ const WhTable = () => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="USER-LEVEL"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
         >
           <TableHeader columns={headerColumns}>
@@ -419,6 +438,8 @@ const WhTable = () => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>

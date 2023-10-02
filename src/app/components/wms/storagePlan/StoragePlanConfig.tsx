@@ -6,12 +6,12 @@ import { Button,
   DropdownItem, } from "@nextui-org/react";
 import '../../../../styles/wms/user.form.scss';
 import '../../../../styles/wms/storage.plan.config.scss';
-import { showMsg, isOMS, isWMS } from '../../../../helpers';
+import { showMsg, isOMS, isWMS, packingListDataToExcel } from '../../../../helpers';
 import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
 import { updatePackingListById, removePackingListById } from '../../../../services/api.packing_list';
 import { updateStoragePlanById, createStoragePlan} from '../../../../services/api.storage_plan';
-import { StoragePlanProps, PackingList, StoragePlan } from '../../../../types/storage_plan';
+import { StoragePlanConfigProps, PackingList, StoragePlan } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
 import { Response } from '../../../../types/index';
 import { Warehouse } from '../../../../types/warehouse';
@@ -20,6 +20,11 @@ import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 import { Formik, Form } from 'formik';
 import PackingListDialog from '../../common/PackingListDialog';
 import BatchOnShelvesDialog from '../../common/BatchOnShelvesDialog';
+import ReceiptPDF from '../../common/ReceiptPDF';
+import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
+import { getDateFormat, getHourFormat } from '../../../../helpers/utils';
 
 const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boolean = true): PackingList[] => {
   return packingLists.map((packingList: PackingList) => {
@@ -30,7 +35,7 @@ const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boole
   });
 };
 
-const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanProps) => {
+const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
@@ -46,31 +51,35 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
     const initialValues = {
         rows: [],
     };
+
+    const valuesToExportPDF = new Set([
+      "order_number",
+      "customer_order_number",
+      "user_id",
+      "warehouse_id",
+      "box_amount",
+    ]);
   
       const cancelSend = () => {
-          if (isWMS()) {
-            router.push(`/${locale}/wms/storage_plan`);
-          }
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
       };
 
-      const getUserLabel = (usersAll: User[], userId: number): string | number => {
-        const response: User[] = usersAll.filter((user) => user.id === userId);
-        if (response && response.length > 0) {
-          return response[0].customer_number + ' - ' +  response[0].username;
+      const getUserLabel = (): string | number => {
+        if (storagePlan && storagePlan.user) {
+          return storagePlan.user.customer_number + ' - ' +  storagePlan.user.username;
         }
-        return userId;
+        return '';
       };
 
-      const getWarehouseLabel = (warehouseAll: Warehouse[], warehouseId: number): string | number => {
-        const response: Warehouse[] = warehouseAll.filter((warehouse) => warehouse.id === warehouseId);
-        if (response && response.length > 0) {
-          return response[0].name + ` (${response[0].code})`;
+      const getWarehouseLabel = (): string | number => {
+        if (storagePlan?.warehouse) {
+          return storagePlan?.warehouse.name + ` (${storagePlan?.warehouse.code})`;
         }
-        return warehouseId;
+        return '';
       };
 
       const goToEdit = () => {
-        router.push(`/${locale}/wms/storage_plan/${id}/update`)
+        router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/update?goBack=config`)
       };
 
       const handleUpdateRow = (id: number, updatedValues: PackingList) => {
@@ -80,13 +89,13 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
       const handleAction = (action: number) => {
         switch(action) {
           case 1: {
-            router.push(`/${locale}/wms/storage_plan/${id}/add_packing_list`)
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/add_packing_list`)
           } break;
           case 2: {
             setShowRemoveBoxDialog(true);
           } break;
           case 3: {
-            router.push(`/${locale}/wms/storage_plan/${id}/modify_packing_list`)
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/modify_packing_list`)
           } break;
           case 4: {
             setShowSplitBillDialog(true);
@@ -95,15 +104,18 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
             setShowBatchOnShelvesDialog(true);
           } break;
           case 6: {
-            router.push(`/${locale}/wms/storage_plan/${id}/history`)
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/history?goBack=config`)
           } break;
           case 7: {
             //Fast delivery
           } break;
+          case 8: {
+            
+          } break;
         }
       }
   
-      const formatBody = (values: StoragePlan, isSplitBill=false, nextState=-1): StoragePlan => {
+      const formatBody = (values: StoragePlan, isSplitBill=false, nextState: string = ''): StoragePlan => {
         return {
                 user_id: values.user_id,
                 warehouse_id: values.warehouse_id,
@@ -113,7 +125,7 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: (nextState !== -1 && (!values.state || (values.state && values.state <= 3))) ? nextState : (values.state ? values.state : 1)
+                state: (nextState !== '' && (!values.state || (values.state && (values.state === 'to be storage' || values.state === 'into warehouse' || values.state === 'stocked')))) ? nextState : (values.state ? values.state : 'to be storage')
               };
       }
 
@@ -202,29 +214,29 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
         setShowSplitBillDialog(false);
       }
 
-      const batchOnShelvesAction = (packingListItems: PackingList[]) => {console.log(packingListItems)
+      const batchOnShelvesAction = (packingListItems: PackingList[]) => {
         setShowBatchOnShelvesDialog(false);
         const elements = changeRowsAfterBatchOnShelves(packingListItems);
         setRows(elements);
         setSelectedRows([]);
 
-        /* if (allHavePackageShelf(elements)) {
-          if (storagePlan && storagePlan.state && storagePlan.state !== 3) {
-            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 3));
+        if (allHavePackageShelf(elements)) {
+          if (storagePlan && storagePlan.state && storagePlan.state !== 'stocked') {
+            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'stocked'));
           }
         } else if (atLeastOneHasPackageShelf(elements)) {
-          if (storagePlan && storagePlan.state && storagePlan.state !== 2) {
-            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 2));
+          if (storagePlan && storagePlan.state && storagePlan.state !== 'into warehouse' && storagePlan.state !== 'stocked') {
+            updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'into warehouse'));
           }
-        } */
+        }
       }
 
       const allHavePackageShelf = (packingListItems: PackingList[]): boolean => {
-        return packingListItems.every((item) => !!item.package_shelf);
+        return packingListItems.every((item) => (item.package_shelf && (item.package_shelf.length > 0)));
       };
       
       const atLeastOneHasPackageShelf = (packingListItems: PackingList[]): boolean => {
-        return packingListItems.some((item) => !!item.package_shelf);
+        return packingListItems.some((item) => (item.package_shelf && (item.package_shelf.length > 0)));
       };
 
       const changeRowsAfterBatchOnShelves = (packingListItems: PackingList[]) => {
@@ -299,53 +311,132 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                 <div className='storage-plan-data'>
                   <div style={{ paddingTop: '10px' }}>
                     <div className='storage-plan-data__table bg-default-100' style={{ padding: '5px 0px 5px 5px', borderRadius: '5px 5px 0 0' }}>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'customer_order_number' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'customer_order_number' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'user' })}</span>
+                      {
+                        inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'user' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'storage' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'number_of_boxes' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        !inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'number_of_boxes_entered' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        !inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'number_of_boxes_stored' })}</span>
+                          </div>
+                        )
+                      }
+                      {
+                        !inWMS && (
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'evidence' })}</span>
+                          </div>
+                        )
+                      }
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'country' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'storage' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'reference_number' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'number_of_boxes' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'pr_number' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'country' })}</span>
+                      {/* <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'client_weight' })}</span>
                       </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'client_weight' })}</span>
-                      </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'client_volume' })}</span>
-                      </div>
-                      <div className='elements-center'>
-                        <span className='text-center'>{intl.formatMessage({ id: 'observations' })}</span>
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'client_volume' })}</span>
+                      </div> */}
+                      <div className='elements-center-start'>
+                        <span className=''>{intl.formatMessage({ id: 'observations' })}</span>
                       </div>
                     </div>
                     <div className='storage-plan-data__table storage-plan-header' style={{ padding: '5px 0px 5px 5px', borderRadius: '0 0 5px 5px' }}>
                       <div>
                         {storagePlan?.customer_order_number}
                       </div>
-                      <div>
-                        {getUserLabel(users, Number(storagePlan?.user_id))}
-                      </div>
-                      <div>
-                        {getWarehouseLabel(warehouses, Number(storagePlan?.warehouse_id))}
-                      </div>
+                      {
+                        inWMS && (
+                          <div>
+                            {getUserLabel()}
+                          </div>
+                        )
+                      }
+                      {
+                        inWMS && (
+                          <div>
+                            {getWarehouseLabel()}
+                          </div>
+                        )
+                      }
                       <div>
                         {boxNumber}
                       </div>
+                      {
+                        !inWMS && (
+                          <div>
+                            { rows.length > 0 ? (rows.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0' }
+                          </div>
+                        )
+                      }
+                      {
+                        !inWMS && (
+                          <div>
+                            { storagePlan.images ? storagePlan.images.length : '0' }
+                          </div>
+                        )
+                      }
                       <div>
                         {storagePlan?.country}
                       </div>
-                      <div>
+                      <div className='spc'>
+                        {storagePlan?.reference_number &&
+                          <CopyColumnToClipboard
+                            value={
+                              storagePlan?.reference_number
+                            }
+                          />
+                        } 
+                      </div>
+                      <div className='spc'>
+                        {storagePlan?.pr_number &&
+                          <CopyColumnToClipboard
+                            value={
+                              storagePlan?.pr_number
+                            }
+                          />
+                        }
+                      </div>
+                      {/* <div>
                         {storagePlan?.weight}
                       </div>
                       <div>
                         {storagePlan?.volume}
-                      </div>
+                      </div> */}
                       <div>
                         {storagePlan?.observations}
                       </div>
@@ -370,22 +461,39 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu>
-                          <DropdownItem className={(storagePlan && storagePlan.state !== 1) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(1)}>
+                          <DropdownItem className={(storagePlan && storagePlan.state !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(1)}>
                             {intl.formatMessage({ id: "add_box" })}
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && storagePlan.state !== 1)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && storagePlan.state !== 'to be storage')) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
                             {intl.formatMessage({ id: "remove_box" })}
                           </DropdownItem>
-                          <DropdownItem className={((storagePlan && (storagePlan.state === 1 || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
+                          {/* <DropdownItem className={((storagePlan && (storagePlan.state === 'to be storage' || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
                             {intl.formatMessage({ id: "fast_delivery" })}
+                          </DropdownItem> */}
+                          <DropdownItem onClick={() => packingListDataToExcel(storagePlan, rows, intl, tabToShow === 1 ? 'ic' : 'lg' )}>
+                            {intl.formatMessage({ id: "generate_xlsx_inventory" })}
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && (storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
+                          <DropdownItem>
+                            <PDFDownloadLink document={<ReceiptPDF storagePlan={storagePlan as StoragePlan} intl={intl} />} fileName="inventory_pdf.pdf">
+                              {({ blob, url, loading, error }) =>
+                                intl.formatMessage({ id: "generate_pdf_inventory" })
+                              }
+                            </PDFDownloadLink>
+                          </DropdownItem>
+                          <DropdownItem className={(storagePlan && (storagePlan.state !== 'stocked' && storagePlan.state !== 'into warehouse')) ? 'do-not-show-dropdown-item' : ''}>
+                            <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={rows} warehouseCode={String(storagePlan.warehouse?.code)} orderNumber={String(storagePlan.order_number)} intl={intl} />} fileName="entry_plan_labels.pdf">
+                              {({ blob, url, loading, error }) =>
+                                intl.formatMessage({ id: "generate_labels" })
+                              }
+                            </PDFDownloadLink>
+                          </DropdownItem>
+                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && (storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (storagePlan.state === 3 || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (storagePlan.state === 'stocked' || storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
                             {intl.formatMessage({ id: "split_bill" })}
                           </DropdownItem>
-                          <DropdownItem onClick={() => handleAction(6)}>
+                          <DropdownItem className={(!storagePlan?.history || (storagePlan?.history && storagePlan?.history.length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(6)}>
                             {intl.formatMessage({ id: "history" })}
                           </DropdownItem>
                           <DropdownItem onClick={() => handleAction(3)}>
@@ -412,54 +520,86 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                           <div className='elements-center'>
                             <input type="checkbox" name="selectAll" checked={selectAllPackingListItems} onChange={handleCheckboxChange} />
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'box_number' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'box_number' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'expansion_box_number' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'expansion_box_number' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'outgoing_order' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'outgoing_order' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'transfer_order_number' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'transfer_order_number' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'bill_lading_number' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'bill_lading_number' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'client_weight' })}(kg) / {intl.formatMessage({ id: 'dimensions' })}(cm)</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'client_weight' })}(kg) / {intl.formatMessage({ id: 'dimensions' })}(cm)</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'storage_weight' })}(kg) / {intl.formatMessage({ id: 'dimensions' })}(cm)</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'storage_weight' })}(kg) / {intl.formatMessage({ id: 'dimensions' })}(cm)</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'location' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'location' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'storage_time' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'storage_time' })}</span>
                           </div>
-                          <div className='elements-center'>
-                            <span className='text-center'>{intl.formatMessage({ id: 'delivery_time' })}</span>
+                          <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'delivery_time' })}</span>
                           </div>
                         </div>
+                        <div className='boxes-container-values'>
                         {rows.map((row, index) => (
                           <div key={index} className='info-packing-list__table storage-plan-header' style={{ padding: '8px 0px 8px 5px'}}>
-                            <div className='elements-center'>
-                              <input type="checkbox" name={`packing-list-${index}`} checked={row.checked} onChange={(event) => handleCheckboxChange(event, index)} />
+                            <div className='elements-start-center'>
+                              <input type="checkbox" style={{ marginTop: '3px' }} name={`packing-list-${index}`} checked={row.checked} onChange={(event) => handleCheckboxChange(event, index)} />
                             </div>
-                            <div>{row.box_number}</div>
-                            <div>{row.case_number}</div>
+                            <div>
+                              <CopyColumnToClipboard
+                                value={ row.box_number }
+                              />
+                            </div>
+                            <div>
+                              <CopyColumnToClipboard
+                                value={ row.case_number }
+                              />
+                            </div>
                             <div>{'--'}</div>
                             <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div>
+                            <div>{storagePlan.pr_number ? (
+                              <CopyColumnToClipboard value={ storagePlan.pr_number } />
+                            ) : '--'}</div>
+                            <div>{`${row.client_weight} / ${row.client_length}*${row.client_width}*${row.client_height}`}</div>
                             <div>{'--'}</div>
+                            <div>
+                            {
+                              (row.package_shelf && row.package_shelf.length > 0) ? (
+                                <>
+                                  {storagePlan.warehouse ? (
+                                    <>
+                                      {storagePlan.warehouse.code}-{String(row.package_shelf[0].shelf?.partition_table).padStart(2, '0')}-{String(row.package_shelf[0].shelf?.number_of_shelves).padStart(2, '0')}-{String(row.package_shelf[0].layer).padStart(2, '0')}-{String(row.package_shelf[0].column).padStart(2, '0')}
+                                      <br />
+                                    </>
+                                  ) : null}
+                                  {intl.formatMessage({ id: 'partition' })}: {(row.package_shelf && row.package_shelf.length > 0 && row.package_shelf[0].shelf) ? row.package_shelf[0].shelf.partition_table : ''}
+                                  &nbsp;
+                                  {intl.formatMessage({ id: 'shelf' })}: {(row.package_shelf && row.package_shelf.length > 0 && row.package_shelf[0].shelf) ? row.package_shelf[0].shelf.number_of_shelves : ''}
+                                  <br />
+                                  {intl.formatMessage({ id: 'layer' })}: {(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].layer : ''}
+                                  &nbsp;
+                                  {intl.formatMessage({ id: 'column' })}: {(row.package_shelf && row.package_shelf.length > 0) ? row.package_shelf[0].column : ''}
+                                </>
+                              ) : '--'
+                            }
+                            </div>
                             <div>{'--'}</div>
-                            <div>{'--'}</div>
-                            <div>{'--'}</div>
-                            <div>{'--'}</div>
-                            <div>{'--'}</div>
+                            <div>{storagePlan.delivered_time ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '--'}</div>
                           </div>
                         ))}
+                        </div>
                       </div>
                     </div>
                   )
@@ -471,11 +611,13 @@ const StoragePlanConfig = ({ users, warehouses, id, storagePlan }: StoragePlanPr
                         <Form>
                           <div className='boxes-container'>
                             <div>
-                              <RowStoragePlanHeader onlyReadly={true} />
-                              {rows.map((row, index) => (
-                                <RowStoragePlan key={index} initialValues={{ ...row, id: index }}
-                                onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} onlyReadly={true} />
-                              ))}
+                              <RowStoragePlanHeader onlyReadly={true} inWMS={inWMS} />
+                              <div className='boxes-container-values'>
+                                {rows.map((row, index) => (
+                                  <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
+                                  onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} onlyReadly={true} />
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </Form>

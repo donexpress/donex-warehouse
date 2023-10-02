@@ -1,4 +1,5 @@
 import { Country } from ".";
+import { OperationInstruction } from "./operation_instruction";
 import { PackingList, StoragePlan } from "./storage_plan";
 import { User } from "./user";
 import { Warehouse } from "./warehouse";
@@ -26,7 +27,17 @@ export type ExitPlan = {
   user_id?: number;
   warehouse_id?: number;
   state?: State
-  packing_lists?: PackingList[]
+  packing_lists?: PackingList[];
+  destination?: string;
+  operation_instructions?: OperationInstruction[]
+  destination_ref?: {
+    name: string;
+    es_name: string;
+    zh_name: string;
+    value: string;
+    position: number;
+  }
+  address_ref?: State
 };
 
 export type ExitPlanProps = {
@@ -36,6 +47,8 @@ export type ExitPlanProps = {
   users: User[];
   countries: Country[];
   warehouses: Warehouse[];
+  destinations?: {destinations: State[]}
+  addresses: {addresses: {amazon:State[], meli:State[]}}
 };
 
 export type ExitPlanState = {
@@ -49,3 +62,13 @@ export type State = {
   value: string;
   position: number;
 };
+
+export type StateCount = {
+  total: number;
+  pending: number;
+  to_be_processed: number;
+  processing: number;
+  dispatched: number;
+  cancelled: number;
+  collecting: number;
+}

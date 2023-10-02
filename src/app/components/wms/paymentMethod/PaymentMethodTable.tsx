@@ -32,6 +32,7 @@ import { SearchIcon } from "./../../common/SearchIcon";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
+import { showMsg } from "../../../../helpers";
 
 const PaymentMethodTable = () => {
   const intl = useIntl();
@@ -46,7 +47,7 @@ const PaymentMethodTable = () => {
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "name",
     direction: "ascending",
@@ -58,8 +59,8 @@ const PaymentMethodTable = () => {
 
   const headerColumns = useMemo(() => {
     return [
-      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: true },
-      { name: intl.formatMessage({ id: "code" }), uid: "code", sortable: true },
+      { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: false },
+      { name: intl.formatMessage({ id: "code" }), uid: "code", sortable: false },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
   }, [intl]);
@@ -125,8 +126,12 @@ const PaymentMethodTable = () => {
             </Dropdown>
           </div>
         );
-      default:
-        return cellValue;
+        case "name":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.name}</span>;
+        case "code":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.code}</span>;
+        default:
+          return cellValue;
     }
   }, []);
 
@@ -154,7 +159,7 @@ const PaymentMethodTable = () => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -188,9 +193,9 @@ const PaymentMethodTable = () => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -229,7 +234,7 @@ const PaymentMethodTable = () => {
   }, [
     selectedKeys,
     items.length,
-    sortedItems.length,
+    items.length,
     page,
     paymentMethods.length,
     rowsPerPage,
@@ -287,7 +292,13 @@ const PaymentMethodTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removePaymentMethodById(deleteElement);
+    const response = await removePaymentMethodById(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadWarehouses();
 
@@ -297,21 +308,17 @@ const PaymentMethodTable = () => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="USER-LEVEL"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
         >
           <TableHeader columns={headerColumns}>
             {(column) => (
@@ -326,7 +333,7 @@ const PaymentMethodTable = () => {
           </TableHeader>
           <TableBody
             emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
               <TableRow key={item.id}>
@@ -337,6 +344,8 @@ const PaymentMethodTable = () => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>

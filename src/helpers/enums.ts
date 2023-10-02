@@ -4,7 +4,7 @@ export enum RouteMenu {
     EXIT_PLAN = 'exit_plan',
     WAREHOUSE_MANAGEMENT = 'warehouses',
     INSERT_WAREHOUSE = 'warehouses/insert',
-    OPERATING_INSTRUCTIONS = 'operating_instructions',
+    OPERATING_INSTRUCTIONS = 'operation_instruction',
     OPERATIONS_RECORD = 'operations_record',
     INSERT_USER = 'users/insert_user',
     LIST_USERS = 'users',
@@ -16,4 +16,8 @@ export enum RouteMenu {
     LIST_PAYMENT_METHODS = 'payment_methods',
     INSERT_USER_LEVEL = 'user_levels/insert',
     LIST_USER_LEVELS = 'user_levels',
+    INSERT_LINE_CLASSIFICATION = 'line_classification/insert',
+    LIST_LINE_CLASSIFICATION = 'line_classification',
+    LIST_REGIONAL_DIVISION = 'regional_division',
+    LIST_ORGANIZATION = 'users',
 };

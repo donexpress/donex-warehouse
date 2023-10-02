@@ -17,7 +17,7 @@ export const createWh = async (values: Warehouse): Promise<Response> => {
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
+    return { status: error.response && error.response.status ? error.response.status : 0,  data: error.response.data };
   }
 };
 
@@ -41,17 +41,17 @@ export const updateWhById = async (warehouseId: number, warehouse: Warehouse):Pr
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
+    return { status: error.response && error.response.status ? error.response.status : 0, data: error.response.data };
   }
 }
 
-export const removeWhById = async (warehouseId: number):Promise<any | null> => {
+export const removeWhById = async (warehouseId: number):Promise<Response> => {
   const path = whPath() + `/${warehouseId}`;
   try {
     const response = await axios.delete(path, getHeaders());
-    return response.data;
-  } catch (error) {
-    return null;
+    return { status: response.status, data: response.data };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
   }
 }
 

@@ -33,7 +33,7 @@ const InsertUser = ({
           staffList={staffList}
           subsidiarieList={subsidiarieList}
           regionalDivisionList={regionalDivisionList}
-          warehouseList={warehouseList}
+          warehouseList={warehouseList ? warehouseList : []}
           userLevelList={userLevelList}
           paymentMethodList={paymentMethodList}
           userStateList={userStateList}
@@ -52,7 +52,8 @@ export async function getServerSideProps(context: any) {
   const paymentMethodList = await getPaymentMethods(context);
   const userStateListObj = await getUserStates(context);
 
-  const userStateList = (userStateListObj && (userStateListObj !== null)) ? Object.values(userStateListObj) : null;
+  // @ts-ignore
+  const userStateList = (userStateListObj && (userStateListObj !== null)) ? userStateListObj.states : [];
   return {
     props: {
       staffList,

@@ -23,7 +23,7 @@ export type PackingList = {
   operator_picture?: string,
   storage_plan_id?: number,
   order_transfer_number?: string;
-  package_shelf?: PackageShelf;
+  package_shelf?: PackageShelf[];
   meta?: any;
   checked?: boolean;
   created_at?: string;
@@ -40,6 +40,10 @@ export type StoragePlan = {
     observations: string;
     rejected_boxes: boolean;
     return: boolean;
+    reference_number?: string | null;
+    pr_number?: string | null;
+    images?: string[] | null;
+    is_images?: boolean;
     packing_list?: PackingList[];
     country?: string;
     weight?: string;
@@ -52,15 +56,15 @@ export type StoragePlan = {
     user?: User;
     warehouse?: Warehouse;
     order_number?: string;
-    state?: number;
+    state?: string;
     history?: History[];
     created_at?: string;
     updated_at?: string;
 };
 
 export type History = {
-  type: "packing_list" | "storage_plan";
-  data: PackingList | StoragePlan;
+  type: "packing_list" | "storage_plan" | "shelf_package";
+  data: PackingList | StoragePlan | PackageShelf;
 }
 
 export type StoragePlanProps = {
@@ -69,6 +73,13 @@ export type StoragePlanProps = {
   isFromDetails?: boolean;
   users: User[];
   warehouses: Warehouse[];
+  inWMS: boolean;
+};
+
+export type StoragePlanConfigProps = {
+  id: number;
+  storagePlan: StoragePlan;
+  inWMS: boolean;
 };
 
 export type PackingListProps = {
@@ -76,6 +87,7 @@ export type PackingListProps = {
   storagePlan: StoragePlan;
   isFromAddPackingList?: boolean;
   isFromModifyPackingList?: boolean;
+  inWMS: boolean;
 }
 
 export type HistoryStoragePlanProps = {
@@ -83,14 +95,36 @@ export type HistoryStoragePlanProps = {
   storagePlan: StoragePlan;
   users: User[];
   warehouses: Warehouse[];
+  inWMS: boolean;
 }
 
 export type StoragePlanListProps = {
-  storagePlanList: StoragePlan[];
+  storagePlanList?: StoragePlan[];
+  storagePlanStates: StoragePlanState[];
+  storagePCount?: StoragePlanCount;
+  inWMS: boolean;
 };
 
 export type BoxNumberLabelFn = { 
   showEBN: boolean; 
   prefixEBN: string; 
   dBN: number;
+};
+
+export type StoragePlanState = {
+  name: string;
+  es_name: string;
+  zh_name: string;
+  value: string;
+  position: number;
+};
+
+export type StoragePlanCount = {
+  total: number,
+  to_be_storage: number,
+  into_warehouse: number,
+  cancelled: number,
+  refused: number,
+  returns: number,
+  stocked: number
 };

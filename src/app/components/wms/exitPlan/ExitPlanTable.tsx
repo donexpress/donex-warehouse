@@ -26,32 +26,49 @@ import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import {
+  countExitPlans,
+  getExitPlanDestinations,
   getExitPlansByState,
   getExitPlansState,
   removeExitPlan,
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
-import { ExitPlan, ExitPlanState } from "../../../../types/exit_plan";
-import { capitalize } from "../../../../helpers/utils";
+import {
+  ExitPlan,
+  ExitPlanState,
+  State,
+  StateCount,
+} from "../../../../types/exit_plan";
+import {
+  capitalize,
+  getDateFormat,
+  getHourFormat,
+  getLanguage,
+} from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
-import { showMsg } from "@/helperserege1992";
+import { exitPlanDataToExcel, isOMS, showMsg } from "../../../../helpers";
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
+import FilterExitPlan from "./FilterExitPlan";
+import { FaFileExcel, FaFilePdf } from "react-icons/fa";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import ExportTable from "../operationInstruction/ExportTable";
+import ExportExitPlanTable from "./ExportExitPlanTable";
+import { PackageShelf } from "@/types/package_shelferege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
   "user",
   "warehouse",
   "box_amount",
-  "palets_amount",
-  "output_boxes",
-  "amount",
-  "delivered_quantity",
+  "destination",
   "actions",
 ];
 
 const ExitPlanTable = () => {
   const intl = useIntl();
   const router = useRouter();
+  const checkOMS = isOMS();
   const { locale } = router.query;
   const [exitPlans, setExitPlans] = useState<ExitPlan[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -66,8 +83,7 @@ const ExitPlanTable = () => {
 
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
-  const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [currentStatePosition, setCurrentStatePosition] = useState<number>(1);
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -85,8 +101,12 @@ const ExitPlanTable = () => {
   >([]);
 
   const [page, setPage] = useState(1);
+  const [count, setCount] = useState<StateCount | null>(null);
 
   const hasSearchFilter = Boolean(filterValue);
+
+  const [destinations, setDestinations] = useState<State[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -147,6 +167,26 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
+        name: intl.formatMessage({ id: "observations" }),
+        uid: "observations",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "destination" }),
+        uid: "destination",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "delivery_time" }),
+        uid: "delivered_time",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "location" }),
+        uid: "location",
+        sortable: true,
+      },
+      {
         name: intl.formatMessage({ id: "created_at" }),
         uid: "created_at",
         sortable: true,
@@ -155,11 +195,6 @@ const ExitPlanTable = () => {
       {
         name: intl.formatMessage({ id: "updated_at" }),
         uid: "updated_at",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "observations" }),
-        uid: "observations",
         sortable: true,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -180,22 +215,15 @@ const ExitPlanTable = () => {
 
   const filteredItems = useMemo(() => {
     let filteredUsers = [...exitPlans];
-
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.output_number
-          ? user.output_number
-          : "".toLowerCase().includes(filterValue.toLowerCase()) ||
-            user.case_numbers
-              ?.toString()
-              ?.toLowerCase()
-              ?.includes(filterValue.toLowerCase())
-      );
+      filteredUsers = filteredUsers.filter((user) => {
+        return user.output_number
+          ?.toLowerCase()
+          .includes(filterValue.toLowerCase());
+      });
     }
     return filteredUsers;
-  }, [exitPlans, filterValue, statusFilter]);
-
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+  }, [exitPlans, filterValue]);
 
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -213,6 +241,23 @@ const ExitPlanTable = () => {
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
+
+  const selectedItemsFn = (selection: Selection) => {
+    setSelectedKeys(selection);
+    if (selection === "all") {
+      setSelectedItems(
+        exitPlans.map((ep: ExitPlan) => Number(ep.id))
+      );
+    }
+    else {
+      setSelectedItems(
+        Array.from(selection.values()).map((cadena) =>
+          parseInt(cadena.toString())
+        )
+      );
+      // setSelectedItems(Array.from(selection.values()).map((cadena) =>parseInt(cadena.toString())))
+    }
+  };
 
   const renderCell = useCallback((user: any, columnKey: React.Key) => {
     const cellValue = user[columnKey];
@@ -238,7 +283,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "pending"
+                    user.state.value !== "pending" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -248,7 +293,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "to_be_chosen"
+                    user.state.value !== "to_be_processed" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -258,7 +303,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "chooze"
+                    user.state.value !== "processing" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -268,13 +313,18 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "exhausted" && user.state.value !== "to_be_chosen"
+                    (user.state.value !== "dispatched" &&
+                      user.state.value !== "to_be_processed") ||
+                    checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
                   onClick={() => handleReturn(user)}
                 >
                   {intl.formatMessage({ id: "return" })}
+                </DropdownItem>
+                <DropdownItem onClick={() => handleOperationInstruction(user)}>
+                  {intl.formatMessage({ id: "operation_instruction" })}
                 </DropdownItem>
                 <DropdownItem
                   className={
@@ -286,7 +336,10 @@ const ExitPlanTable = () => {
                 >
                   {intl.formatMessage({ id: "cancel" })}
                 </DropdownItem>
-                <DropdownItem onClick={() => handleDelete(Number(user["id"]))}>
+                <DropdownItem
+                  className={checkOMS ? "do-not-show-dropdown-item" : ""}
+                  onClick={() => handleDelete(Number(user["id"]))}
+                >
                   {intl.formatMessage({ id: "Delete" })}
                 </DropdownItem>
               </DropdownMenu>
@@ -297,10 +350,73 @@ const ExitPlanTable = () => {
         return <span>{user["user"]["username"]}</span>;
       case "warehouse":
         return <span>{user["warehouse"]["name"]}</span>;
+      case "destination":
+        if (user["destination_ref"]) {
+          return <span>{user["destination_ref"][getLanguage(intl)]}</span>;
+        } else {
+          return <span>-</span>;
+        }
+      case "delivered_time":
+        return (
+          <span>
+            {getDateFormat(cellValue)}, {getHourFormat(cellValue)}
+          </span>
+        );
+      case "output_number":
+        return (
+          <CopyColumnToClipboard
+            value={
+              <a
+                href={`/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${
+                  user["id"]
+                }/config`}
+              >
+                {cellValue}
+              </a>
+            }
+          />
+        );
+      case "address":
+        return user.address_ref ? (
+          <span>{user.address_ref[getLanguage(intl)]}</span>
+        ) : (
+          <span>{cellValue}</span>
+        );
+      case 'location':
+        return <span style={{maxWidth: "250px", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display:  'block'}}>{getLocation(user)}</span>
       default:
         return cellValue;
     }
   }, []);
+
+  const getLocation = (ep: ExitPlan): string => {
+    let locations = ""
+    if(ep.packing_lists && ep.packing_lists?.length == 0) {
+      return '--'
+    }
+    if(ep.packing_lists && ep.packing_lists?.length > 1) {
+      return 'Multiple'
+    }
+    ep.packing_lists?.forEach(pl => {
+      locations+=packageShelfFormat(pl.package_shelf)
+    })
+    return locations
+  }
+
+  const packageShelfFormat = (packageShelfs: PackageShelf[] | undefined): string => {
+    if (packageShelfs && packageShelfs.length > 0) {
+      const packageShelf: PackageShelf = packageShelfs[0];
+      return `${intl.formatMessage({ id: "partition" })}: ${
+        packageShelf.shelf?.partition_table
+      }
+        ${intl.formatMessage({ id: "shelf" })}: ${
+        packageShelf.shelf?.number_of_shelves
+      }
+        ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
+        ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
+    }
+    return "";
+  };
 
   const onRowsPerPageChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -339,22 +455,55 @@ const ExitPlanTable = () => {
     }
   };
 
-  const getLanguage = () => {
-    switch (intl.locale) {
-      case "es":
-        return "es_name";
-      case "en":
-        return "name";
-      case "zh":
-        return "zh_name";
-      default:
-        return "name";
+  const getCountByPosition = () => {
+    const value = exitPlanState?.states.find(
+      (el) => el.position === currentStatePosition
+    )?.value;
+    if (!value || !count) {
+      return 0;
     }
+    // @ts-ignore
+    return count[value];
   };
+
+  const onFinishFilter = (data: ExitPlan[]) => {
+    setExitPlans(data);
+  };
+
+  const getSelectedExitPlans = (): ExitPlan[] => {
+    let its: ExitPlan[] = [];
+    for (let i = 0; i < selectedItems.length; i++) {
+      const index = selectedItems[i];
+      const item = exitPlans.filter((ep: ExitPlan) => ep.id === index);
+      if (filterValue && (filterValue !== "")) {
+        const isSearchable = item[0].output_number
+        ?.toLowerCase()
+        ?.includes(filterValue.toLowerCase());
+        if (isSearchable) {
+          its.push(item[0]);
+        }
+      } else {
+        if(item[0]) {
+          its.push(item[0]);
+        }
+      }
+    }
+    return its;
+  }
+
+  const getVisibleColumns = (): string[] => {
+    const t = Array.from(visibleColumns) as string[];
+    return t.filter((el) => el !== "actions");
+  };
+
+  const handleExportExcel = () => {
+    exitPlanDataToExcel(getSelectedExitPlans(), intl, getVisibleColumns());
+
+  }
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -400,12 +549,57 @@ const ExitPlanTable = () => {
             </Button>
           </div>
         </div>
+        <FilterExitPlan
+          onFinish={onFinishFilter}
+          destionations={destinations}
+        />
+        <div
+          className="flex gap-3"
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginRight: "20px",
+            marginBottom: "10px",
+            marginTop: "10px",
+          }}
+        >
+          <Button
+            color="primary"
+            isDisabled={selectedItems.length === 0}
+            endContent={
+              <FaFilePdf style={{ fontSize: "22px", color: "white" }} />
+            }
+          >
+            <PDFDownloadLink
+              document={
+                <ExportExitPlanTable
+                  intl={intl}
+                  data={getSelectedExitPlans()}
+                  columns={getVisibleColumns()}
+                />
+              }
+              fileName="operation_instructions_pdf.pdf"
+            >
+              {({ blob, url, loading, error }) =>
+                intl.formatMessage({ id: "export_pdf" })
+              }
+            </PDFDownloadLink>
+          </Button>
+          <Button
+            color="primary"
+            style={{ width: "121px", marginLeft: "10px" }}
+            endContent={
+              <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
+            }
+            onClick={() => handleExportExcel()}
+            isDisabled={selectedItems.length === 0}
+          >
+            {intl.formatMessage({ id: "export" })}
+          </Button>
+        </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {intl.formatMessage(
-              { id: "total_results" },
-              { in: exitPlans.length }
-            )}
+            {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
           </span>
           <label className="flex items-center text-default-400 text-small">
             {intl.formatMessage({ id: "rows_page" })}
@@ -413,9 +607,9 @@ const ExitPlanTable = () => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -433,9 +627,18 @@ const ExitPlanTable = () => {
                       }
                       onClick={() => changeTab(state.position)}
                     >
-                      {state[getLanguage()]}
-                      {state.position === currentStatePosition &&
-                        ` (${exitPlans.length})`}
+                      {state[getLanguage(intl)]}
+                      {count && (
+                        <>
+                          {state.value === "all" && (
+                            <span> ({count.total})</span>
+                          )}
+                          {state.value !== "all" && (
+                            // @ts-ignore
+                            <span> ({count[state.value]})</span>
+                          )}
+                        </>
+                      )}
                     </button>
                   </li>
                 ))}
@@ -446,7 +649,6 @@ const ExitPlanTable = () => {
     );
   }, [
     filterValue,
-    statusFilter,
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
@@ -456,6 +658,7 @@ const ExitPlanTable = () => {
     statusSelected,
     intl,
     currentStatePosition,
+    selectedItems
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -506,8 +709,13 @@ const ExitPlanTable = () => {
   const loadExitPlans = async () => {
     setLoading(true);
     const pms = await getExitPlansByState("pending");
+    console.log(pms)
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
+    const count = await countExitPlans();
+    const destinations = await getExitPlanDestinations();
+    setDestinations(destinations.destinations);
+    setCount(count);
     setExitPlanState(states);
     setLoading(false);
   };
@@ -545,12 +753,29 @@ const ExitPlanTable = () => {
   };
 
   const handleReturn = (exitPlan: ExitPlan) => {
-    setExitPlanAction("return-"+exitPlan.state?.value);
+    setExitPlanAction("return-" + exitPlan.state?.value);
     setChangeStatePackages([
       { box_number: exitPlan.output_number ? exitPlan.output_number : "" },
     ]);
     setChangeExitPlanId(exitPlan.id ? exitPlan.id : -1);
     setShowListPackage(true);
+  };
+
+  const handleOperationInstruction = (exitPlan: ExitPlan) => {
+    if (
+      exitPlan.operation_instructions &&
+      exitPlan.operation_instructions.length > 0
+    ) {
+      router.push(
+        `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${exitPlan.id}/config`
+      );
+    } else {
+      router.push(
+        `/${locale}/${
+          checkOMS ? "oms" : "wms"
+        }/operation_instruction/insert?exit_plan_id=${exitPlan.id}`
+      );
+    }
   };
 
   const closeListPackage = () => {
@@ -565,19 +790,19 @@ const ExitPlanTable = () => {
     let state = "";
     switch (exitPlanAction) {
       case "already_sent":
-        state = "to_be_chosen";
+        state = "to_be_processed";
         break;
       case "manual_pickup":
-        state = "chooze";
+        state = "processing";
         break;
-      case 'out_warehouse':
-        state = 'exhausted'
+      case "out_warehouse":
+        state = "dispatched";
         break;
-      case 'return-exhausted':
-        state = 'chooze'
+      case "return-exhausted":
+        state = "processing";
         break;
-      case 'return-to_be_chosen':
-        state = 'pending'
+      case "return-to_be_chosen":
+        state = "pending";
         break;
     }
     const reponse = await updateExitPlan(changeExitPlanId, {
@@ -592,8 +817,8 @@ const ExitPlanTable = () => {
   };
 
   const getListPackageTitle = (intl: any) => {
-    if(exitPlanAction.startsWith("return")) {
-      return intl.formatMessage({ id: 'return' });
+    if (exitPlanAction.startsWith("return")) {
+      return intl.formatMessage({ id: "return" });
     }
     return intl.formatMessage({ id: exitPlanAction });
   };
@@ -605,22 +830,26 @@ const ExitPlanTable = () => {
 
   const handleEdit = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/${id}/update`);
+    router.push(
+      `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${id}/update`
+    );
   };
 
   const handleShow = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/${id}/show`);
+    router.push(`/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${id}/show`);
   };
 
   const handleAdd = () => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/insert`);
+    router.push(`/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/insert`);
   };
 
   const handleConfig = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/exit_plan/${id}/config`);
+    router.push(
+      `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${id}/config`
+    );
   };
 
   const close = () => {
@@ -646,46 +875,49 @@ const ExitPlanTable = () => {
   return (
     <>
       <Loading loading={loading}>
-        <Table
-          aria-label="USER-LEVEL"
-          isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
-          classNames={{
-            wrapper: "max-h-[382px]",
-          }}
-          selectedKeys={selectedKeys}
-          selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
-          onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
-        >
-          <TableHeader columns={headerColumns}>
-            {(column: any) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid == "actions" ? "center" : "start"}
-                allowsSorting={column.sortable}
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody
-            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
+          <Table
+            aria-label="USER-LEVEL"
+            isHeaderSticky
+            classNames={{
+              wrapper: "max-h-[auto]",
+            }}
+            selectedKeys={selectedKeys}
+            selectionMode="multiple"
+            sortDescriptor={sortDescriptor}
+            // onSelectionChange={setSelectedKeys}
+            onSortChange={setSortDescriptor}
+            onSelectionChange={(keys: Selection) => {
+              selectedItemsFn(keys);
+            }}
           >
-            {(item: any) => (
-              <TableRow key={item.id}>
-                {(columnKey: any) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            <TableHeader columns={headerColumns}>
+              {(column: any) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid == "actions" ? "center" : "start"}
+                  allowsSorting={column.sortable}
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody
+              emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
+              items={sortedItems}
+            >
+              {(item: any) => (
+                <TableRow key={item.id}>
+                  {(columnKey: any) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showListPakcage && (
           <PackingListDialog

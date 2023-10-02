@@ -63,6 +63,7 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
 
   const handleSubmit = async (values: BatchOnShelves) => {
     const shelfId = Number(values.shelf_id);
+    const shelf = allShelfs.filter((sh: Shelf) => sh.id === shelfId);
     const aux = values.location_id?.toString().split('-');
     if (aux && (aux.length === 2)) {
       const layer = Number(aux[0]);
@@ -79,12 +80,28 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
           package_id: Number(packingList.id)
         };
 
-        const response: Response = await createPackageShelf(bodyParams);
-        if (response.status >= 200 && response.status <= 299) {
-          c++;
-          const data: PackageShelf = response.data;
-          packingList.package_shelf = data;
-          packingListItems.push(packingList);
+        if (packingList.package_shelf && packingList.package_shelf.length > 0) {
+          const response: Response = await updatePackageShelfById(Number(packingList.package_shelf[0].id), bodyParams);
+          if (response.status >= 200 && response.status <= 299) {
+            c++;
+            const data: PackageShelf = {...packingList.package_shelf[0], ...bodyParams};
+            if (shelf.length > 0) {
+              data.shelf = shelf[0];
+            }
+            packingList.package_shelf = [data];
+            packingListItems.push(packingList);
+          }
+        } else {
+          const response: Response = await createPackageShelf(bodyParams);
+          if (response.status >= 200 && response.status <= 299) {
+            c++;
+            const data: PackageShelf = response.data;
+            if (shelf.length > 0) {
+              data.shelf = shelf[0];
+            }
+            packingList.package_shelf = [data];
+            packingListItems.push(packingList);
+          }
         }
       }
       if (c > 0) {
@@ -114,7 +131,7 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
         setShelfs(
           elements.map((sh: Shelf, ind: number) => ({
               value: Number(sh.id),
-              label: (warehouse as Warehouse).code + String(sh.partition_table).padStart(2, '0') + String(ind+1).padStart(2, '0'),
+              label: (warehouse as Warehouse).code + String(sh.partition_table).padStart(2, '0') + String(sh.number_of_shelves).padStart(2, '0'),
             }))
         )
       } else {
@@ -173,6 +190,7 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
           >
             {({ isSubmitting, isValid }) => (
               <Form className='flex flex-col gap-3'>
+                <div className="upload-evidence-body-dialog w-full">
                 <div className='flex gap-3 flex-wrap justify-between'>
                   <div className="w-full">
                     <GenericInput
@@ -214,6 +232,7 @@ const BatchOnShelvesDialog = ({ close, confirm, title, packingLists, warehouse }
                           { pl.box_number }
                       </div>
                     ))}
+                </div>
                 </div>
                 <div className="elements-row-end w-full">
                   <Button

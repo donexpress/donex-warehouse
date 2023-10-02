@@ -11,11 +11,17 @@ import { PackingList, StoragePlan } from "../../../../types/storage_plan";
 import { useRouter } from "next/router";
 import { ExitPlan } from "../../../../types/exit_plan";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
-import { getExitPlansById, updateExitPlan } from "../../../../services/api.exit_plan";
+import {
+  getExitPlansById,
+  updateExitPlan,
+} from "../../../../services/api.exit_plan";
 import AddExitPlanDialog from "./AddExitPlanDialog";
 import { getPackingListsByCaseNumber } from "../../../../services/api.packing_list";
 import { getStoragePlanByOrder_number } from "../../../../services/api.storage_plan";
 import { showMsg } from "../../../../helpers";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import InventoryList from "./InventoryList";
+import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
 
 interface Props {
   exitPlan: ExitPlan;
@@ -122,8 +128,10 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     setShowAddDialog(false);
   };
 
-  const addNewData = async (data: any) => {
-    console.log(data.case_number);
+  const addNewData = async (data: {
+    case_number: string;
+    warehouse_order_number: string;
+  }) => {
     if (exitPlan) {
       if (!exitPlan.case_numbers) {
         exitPlan.case_numbers = [];
@@ -131,42 +139,60 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       let exist: PackingList | StoragePlan | null = null;
       let added: string | undefined = undefined;
       if (data.case_number) {
-        exist = await getPackingListsByCaseNumber(data.case_number);
-        if (!exist) {
-          showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
-            type: "error",
-          });
-        }
-        added = exitPlan.case_numbers?.find(
-          (value) => value === data.case_number
-        );
-        if (added === undefined) {
-          exitPlan.case_numbers.push(data.case_number);
-        } else {
-          showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
-            type: "warning",
-          });
+        const arr = data.case_number.split(",");
+        for (let i = 0; i < arr.length; i++) {
+          const caseNumber = arr[i].trim();
+          exist = await getPackingListsByCaseNumber(caseNumber);
+          if (!exist) {
+            showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+              type: "error",
+            });
+          }
+          added = exitPlan.case_numbers?.find(
+            (value) => value === data.case_number
+          );
+          if (added === undefined) {
+            exitPlan.case_numbers.push(data.case_number);
+          } else {
+            showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+              type: "warning",
+            });
+          }
         }
       }
       if (data.warehouse_order_number) {
-        const tmp = await getStoragePlanByOrder_number(
-          data.warehouse_order_number
-        );
+        const arr = data.warehouse_order_number.split(",");
+        let tmp: StoragePlan[] = []
+        for (let i = 0; i < arr.length; i++) {
+          const t = await getStoragePlanByOrder_number(
+            arr[i]
+          );
+          if(t) {
+            tmp = tmp.concat(t)
+          }
+        }
         exist = tmp ? tmp[0] : null;
         if (tmp && exitPlan) {
-          const storage_plan = tmp[0];
-          storage_plan.packing_list?.forEach((pl) => {
-            // @ts-ignore
-            const tmp_added = exitPlan.case_numbers?.find(
-              (value) => value === pl.case_number
-            );
-            if (tmp_added === undefined) {
+          tmp.forEach((t) => {
+            const storage_plan = t;
+            storage_plan.packing_list?.forEach((pl) => {
               // @ts-ignore
-              exitPlan.case_numbers.push(pl.case_number);
-            }
+              const tmp_added = exitPlan.case_numbers?.find(
+                (value) => value === pl.case_number
+              );
+              if (tmp_added === undefined) {
+                // @ts-ignore
+                exitPlan.case_numbers.push(pl.case_number);
+              } else {
+                showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+                  type: "warning",
+                });
+              }
+            });
           });
         }
       }
+      // update portion
       if (exitPlan.id && exist) {
         await updateExitPlan(exitPlan.id, {
           case_numbers: exitPlan.case_numbers,
@@ -227,8 +253,21 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 <DropdownItem onClick={() => handleAction(1)}>
                   {intl.formatMessage({ id: "add" })}
                 </DropdownItem>
-                <DropdownItem onClick={() => handleAction(2)}>
-                  {intl.formatMessage({ id: "print_inventory_list" })}
+                <DropdownItem>
+                  <PDFDownloadLink
+                    document={
+                      <InventoryList
+                        intl={intl}
+                        exitPlan={exitPlan}
+                        boxes={rows}
+                      />
+                    }
+                    fileName={`${exitPlan.output_number}.pdf`}
+                  >
+                    {({ blob, url, loading, error }) =>
+                      intl.formatMessage({ id: "print_inventory_list" })
+                    }
+                  </PDFDownloadLink>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -323,11 +362,25 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               </div>
               <div className="elements-center">{"--"}</div>
               <div className="elements-center">{"--"}</div>
+              <div className="elements-center">{row.packing_lists?.amount}</div>
               <div className="elements-center">
-                {row.packing_lists?.box_number}
+                {getDateFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+                ,{" "}
+                {getHourFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
               </div>
-              <div className="elements-center">{"--"}</div>
-              <div className="elements-center">{"--"}</div>
+              <div className="elements-center">
+                {getDateFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+                ,{" "}
+                {getHourFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+              </div>
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <Dropdown>
                   <DropdownTrigger>

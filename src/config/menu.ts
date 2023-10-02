@@ -1,5 +1,5 @@
-import { RouteMenu } from "./../helpers/enums";
-import { IntlShape } from "react-intl";
+import {RouteMenu} from "./../helpers/enums";
+import {IntlShape} from "react-intl";
 
 export const menuWMS = (intl: IntlShape) => {
   return [
@@ -70,12 +70,12 @@ export const menuWMS = (intl: IntlShape) => {
         {
           id: 3.3,
           label: intl.formatMessage({ id: "lineClassification" }),
-          route: "#",
+          route: RouteMenu.LIST_LINE_CLASSIFICATION,
         },
         {
           id: 3.4,
           label: intl.formatMessage({ id: "regionalDivision" }),
-          route: "#",
+          route: RouteMenu.LIST_REGIONAL_DIVISION,
         },
         {
           id: 3.5,
@@ -97,7 +97,7 @@ export const menuWMS = (intl: IntlShape) => {
         {
           id: 4.2,
           label: intl.formatMessage({ id: "organization" }),
-          route: "#",
+          route: RouteMenu.LIST_ORGANIZATION,
         },
         {
           id: 4.3,
@@ -131,12 +131,12 @@ export const menuOMS = (intl: IntlShape) => {
         {
           id: 2.1,
           label: intl.formatMessage({ id: "storagePlan" }),
-          route: "#",
+          route: RouteMenu.STORAGE_PLAN,
         },
         {
           id: 2.2,
           label: intl.formatMessage({ id: "exitPlan" }),
-          route: "#",
+          route: RouteMenu.EXIT_PLAN,
         },
         {
           id: 2.3,
@@ -146,7 +146,7 @@ export const menuOMS = (intl: IntlShape) => {
         {
           id: 2.4,
           label: intl.formatMessage({ id: "operatingInstructions" }),
-          route: "#",
+          route: RouteMenu.OPERATING_INSTRUCTIONS,
         },
       ],
     },

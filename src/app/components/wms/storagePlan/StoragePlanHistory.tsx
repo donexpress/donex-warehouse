@@ -5,9 +5,11 @@ import '../../../../styles/wms/storage.plan.config.scss';
 import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
 import { HistoryStoragePlanProps, History as HistorySP, StoragePlan, PackingList } from '../../../../types/storage_plan';
+import { PackageShelf } from '../../../../types/package_shelf';
 import ElementHistoryDialog from '../../common/ElementHistoryDialog';
+import { getDateFormat, getHourFormat } from '../../../../helpers/utils';
 
-const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStoragePlanProps) => {
+const StoragePlanHistory = ({ id, storagePlan, warehouses, users, inWMS }: HistoryStoragePlanProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
@@ -15,7 +17,12 @@ const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStora
     const [showElementHistoryDialog, setShowElementHistoryDialog] = useState<boolean>(false);
   
     const cancelSend = () => {
-        router.push(`/${locale}/wms/storage_plan/${id}/config`);
+        const goBack = router.query.goBack;
+        if (goBack && goBack === 'config') {
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
+        } else {
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
+        }
     };
 
     const openElementHistoryDialog = async(element: HistorySP) => {
@@ -88,15 +95,18 @@ const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStora
                                                 {
                                                     historySP.type === 'storage_plan' && <span style={{fontSize: '11px'}}>{intl.formatMessage({ id: 'storagePlan' })}</span>
                                                 }
+                                                {
+                                                    historySP.type === 'shelf_package' && <span style={{fontSize: '11px'}}>{intl.formatMessage({ id: 'package_location_on_shelf' })}</span>
+                                                }
                                             </div>
                                             <div style={{ marginBottom: '5px' }}>
                                                 {
-                                                    getDateFromStr(historySP.data.updated_at)
+                                                    historySP.data.updated_at ? getDateFormat(historySP.data.updated_at) : ''
                                                 }
                                             </div>
                                             <div>
                                                 {
-                                                    getHourFromStr(historySP.data.updated_at)
+                                                    historySP.data.updated_at ? getHourFormat(historySP.data.updated_at) : ''
                                                 }
                                             </div>
                                         </div>
@@ -119,6 +129,22 @@ const StoragePlanHistory = ({ id, storagePlan, warehouses, users }: HistoryStora
                                                     <div style={{ paddingBottom: '10px' }}>{((historySP.data) as StoragePlan).customer_order_number}</div>
                                                     <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'warehouse_order_number' })}</span>
                                                     <div>{((historySP.data) as StoragePlan).order_number}</div>
+                                                </div>
+                                            }
+                                            {
+                                                historySP.type === 'shelf_package' && 
+                                                <div className='elements-center-start'>
+                                                    <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'box_number' })}</span>
+                                                    <div style={{ paddingBottom: '10px' }}>{(((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.box_number : '')}</div>
+                                                    <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'expansion_box_number' })}</span>
+                                                    <div style={{ paddingBottom: '10px' }}>{(((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.case_number : '')}</div>
+                                                    <span style={{ fontWeight: '600' }}>{intl.formatMessage({ id: 'location' })}</span>
+                                                    <div style={{ paddingBottom: '10px' }}>
+                                                        {`${intl.formatMessage({ id: 'partition' })}: ${((historySP.data) as PackageShelf).shelf ? ((historySP.data) as PackageShelf).shelf?.partition_table : ''}
+                                                        ${intl.formatMessage({ id: 'shelf' })}: ${((historySP.data) as PackageShelf).shelf ? ((historySP.data) as PackageShelf).shelf?.number_of_shelves : ''}
+                                                        ${intl.formatMessage({ id: 'layer' })}: ${((historySP.data) as PackageShelf).layer}
+                                                        ${intl.formatMessage({ id: 'column' })}: ${((historySP.data) as PackageShelf).column}`}
+                                                    </div>
                                                 </div>
                                             }
                                         </div>

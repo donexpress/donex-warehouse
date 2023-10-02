@@ -21,7 +21,7 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
       name: (id && warehouse) ? warehouse.name : '',
       contact: (id && warehouse) ? warehouse.contact : '',
       company: (id && warehouse) ? warehouse.company : '',
-      country: (id && warehouse) ? warehouse.country : '',
+      country: (id && warehouse) ? warehouse.country : 'Mexico',
       address_1: (id && warehouse) ? warehouse.address_1 : '',
       address_2: (id && warehouse) ? warehouse.address_2 : '',
       city: (id && warehouse) ? warehouse.city : '',
@@ -45,7 +45,12 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
   
       const cancelSend = () => {
           if (isWMS()) {
-            router.push(`/${locale}/wms/warehouses`);
+            const goBack = router.query.goBack;
+            if (goBack && goBack === 'config' && !!id) {
+              router.push(`/${locale}/wms/warehouses/${id}/config`);
+            } else {
+              router.push(`/${locale}/wms/warehouses`);
+            }
           }
       };
   
@@ -73,9 +78,23 @@ const WarehouseFormBody = ({ countries, id, warehouse, isFromDetails }: Warehous
     if (response.status >= 200 && response.status <= 299) {
       const message = id ? intl.formatMessage({ id: 'changedsuccessfullyMsg' }) : intl.formatMessage({ id: 'successfullyMsg' });
       showMsg(message, { type: "success" });
-      router.push(`/${locale}/wms/warehouses`);
+      
+      const goBack = router.query.goBack;
+      if (goBack && goBack === 'config' && !!id) {
+        router.push(`/${locale}/wms/warehouses/${id}/config`);
+      } else {
+        router.push(`/${locale}/wms/warehouses`);
+      }
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      if (response.status === 409) {
+        message = intl.formatMessage({ id: "warehouse_code_name_already_exists" });
+        if (response.data && response.data.message && (response.data.message === "name already exists")) {
+          message = intl.formatMessage({ id: "warehouse_name_already_exists" });
+        } else if (response.data && response.data.message && (response.data.message === "code already exists")) {
+          message = intl.formatMessage({ id: "warehouse_code_already_exists" });
+        }
+      }
       showMsg(message, { type: "error" });
     }
   }

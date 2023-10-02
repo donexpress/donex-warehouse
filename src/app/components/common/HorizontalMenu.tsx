@@ -116,11 +116,11 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                         },
                         {
                             label: intl.formatMessage({ id: 'lineClassification' }),
-                            route: '#'
+                            route: RouteMenu.LIST_LINE_CLASSIFICATION
                         },
                         {
                             label: intl.formatMessage({ id: 'regionalDivision' }),
-                            route: '#'
+                            route: RouteMenu.LIST_REGIONAL_DIVISION
                         },
                         {
                             label: intl.formatMessage({ id: 'warehouseStation' }),
@@ -155,7 +155,7 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
                         },
                         {
                             label: intl.formatMessage({ id: 'organization' }),
-                            route: '#'
+                            route: RouteMenu.LIST_ORGANIZATION
                         },
                         {
                             label: intl.formatMessage({ id: 'employeeRole' }),
@@ -214,7 +214,7 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
         <nav className="menu">
           <ul>
             {
-                options.map((option, index) => (       
+                options.map((option, index) => (
                     <li key={index}>
                         {
                             option.route && (
@@ -306,5 +306,5 @@ const HorizontalMenu = ({ inWMS, inOMS }: AppProps) => {
         </nav>
     );
 };
-  
+
 export default HorizontalMenu;

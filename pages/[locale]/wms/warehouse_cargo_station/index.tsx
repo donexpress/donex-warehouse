@@ -3,12 +3,11 @@ import Layout from "../../../../src/app/layout";
 import ProtectedRoute from "../../../../src/app/components/common/ProtectedRoute";
 import { WarehouseListProps } from "../../../../src/types";
 import TableWarehouse from "../../../../src/app/components/wms/warehouse/TableWarehouse";
+import { indexStateWarehouse } from "../../../../src/services/api.warehouse";
+import { GetServerSidePropsContext } from "next";
 
 const WarehouseCargoStation = ({
-  warehouseList,
   states,
-  countries,
-  receptionAreas,
 }: WarehouseListProps) => {
   return (
     <Layout>
@@ -17,10 +16,22 @@ const WarehouseCargoStation = ({
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
-        <TableWarehouse/>
+        <TableWarehouse states={states}/>
       </ProtectedRoute>
     </Layout>
   );
 };
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const statesObj = await indexStateWarehouse(context);
+  
+  // @ts-ignore
+  const states = statesObj.states ? statesObj.states : [];
+  return {
+    props: {
+      states
+    },
+  };
+}
 
 export default WarehouseCargoStation;

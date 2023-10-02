@@ -8,6 +8,8 @@ import { getDateFormat, getHourFormat } from "../../../../helpers/utils";
 import { ExitPlanProps } from "../../../../types/exit_plan";
 import ExitPlanBox from "./ExitPlanBox";
 import ExitPlanAppendix from "./ExitPlanAppendix";
+import OperationInstructionTable from "../operationInstruction/OperationInstructionTable";
+import { isOMS } from "@/helperserege1992";
 
 const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
   const router = useRouter();
@@ -18,7 +20,7 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
     switch (action) {
       case 3:
         {
-          router.push(`/${locale}/wms/exit_plan/${id}/update`);
+          router.push(`/${locale}/${isOMS() ? 'oms' : 'wms'}/exit_plan/${id}/update`);
         }
         break;
     }
@@ -96,10 +98,11 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
             </div>
           </div>
         </div>
-        {exitPlan && exitPlan.user && (
+        {exitPlan && exitPlan.user && exitPlan.id && (
           <>
             <ExitPlanBox exitPlan={exitPlan} />
             <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user}/>
+            <OperationInstructionTable exit_plan_id={exitPlan.id} />
           </>
         )}
       </div>

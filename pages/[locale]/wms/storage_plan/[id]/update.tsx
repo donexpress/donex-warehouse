@@ -7,7 +7,7 @@ import { getUsers } from '../../../../../src/services/api.users';
 import { getWhs } from '../../../../../src/services/api.wh';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const UpdateStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanProps) => {
+const UpdateStoragePlan = ({ warehouses, users, id, storagePlan, inWMS = true }: StoragePlanProps) => {
   
   return (
   <ProtectedRoute>
@@ -16,7 +16,7 @@ const UpdateStoragePlan = ({ warehouses, users, id, storagePlan }: StoragePlanPr
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StoragePlanFormBody warehouses={warehouses ? warehouses : []} users={users ? users : []} storagePlan={storagePlan} id={id} />
+        <StoragePlanFormBody inWMS={inWMS} warehouses={warehouses ? warehouses : []} users={users ? users : []} storagePlan={storagePlan} id={id} />
       </Layout>
     </ProtectedRoute>
     );

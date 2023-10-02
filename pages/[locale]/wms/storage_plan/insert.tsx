@@ -7,7 +7,7 @@ import { getUsers } from '../../../../src/services/api.users';
 import { getWhs } from '../../../../src/services/api.wh';
 import { GetServerSidePropsContext } from 'next';
 
-const InsertStoragePlan = ({ warehouses, users }: StoragePlanProps) => {
+const InsertStoragePlan = ({ warehouses, users, inWMS = true }: StoragePlanProps) => {
   
   return (
   <ProtectedRoute>
@@ -16,7 +16,7 @@ const InsertStoragePlan = ({ warehouses, users }: StoragePlanProps) => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StoragePlanFormBody warehouses={warehouses ? warehouses : []} users={users ? users : []} />
+        <StoragePlanFormBody inWMS={inWMS} warehouses={warehouses ? warehouses : []} users={users ? users : []} />
       </Layout>
     </ProtectedRoute>
     );

@@ -1,6 +1,7 @@
 import { StaticImageData } from "next/image";
 import { Service } from './service';
 import { User } from './user';
+import { Line } from './line';
 import { Staff, StaffState } from './staff';
 import { PaymentMethod } from './payment_methods';
 import { UserState } from './user_state';
@@ -14,15 +15,6 @@ export type LanguageObj = {
   name: string;
   flag: StaticImageData | string;
 }
-
-export type UserProfile = {
-  id?: number;
-  username: string;
-  fullname?: string;
-  profile_image?: string;
-  phone_number?: string;
-  email?: string;
-};
 
 export type MessageOpts = {
   type?: TypeOptions;
@@ -143,20 +135,18 @@ export type UserFormProps = {
 };
 
 export type WarehouseListProps = {
-  warehouseList: CargoStationWarehouseForm[];
   states: StateWarehouse[];
-  countries: Country[];
-  receptionAreas: any[];
 };
 
 export type ValueSelect = {
-  value: string | number; 
-  label: string 
+  value: string | number;
+  label: string
 };
 
 export type LoginResponse = {
   status: number;
   token?: string;
+  message?: string;
 };
 
 export type Country = {
@@ -208,6 +198,28 @@ export type StaffForm = {
     allow_search: boolean;
 };
 
+export type StaffFormProps = {
+  id?: number;
+  staff?: Staff;
+  isFromDetails?: boolean;
+  staffStates: StaffState[];
+  roles: Role[];
+  organizations: Organization[];
+  affiliations: CargoStationWarehouseForm[];
+};
+
+export type LineForm = {
+  name: string;
+  contain_channels?: string;
+  include_order_account?: string;
+};
+
+export type LineFormProps = {
+  id?: number;
+  line?: Line;
+  isFromDetails?: boolean;
+};
+
 export type Response = {
   status: number;
   data?: any;
@@ -227,7 +239,39 @@ export type File = {
   name: string;
 };
 
+export type Counts = {
+  user_count: number;
+  staff_count: number;
+  role_count: number;
+  level_count: number;
+  payment_level_count: number;
+  organization_count: number;
+  warehouse_count: number;
+  service_count: number;
+  supplier_count: number;
+  storage_plan_count: number;
+  output_plan_count: number;
+  cargo_station_count: number;
+  line_clasification_count: number;
+  regional_division_count: number;
+};
+
+export type BatchStoragePlans = {
+  customer_order_number: string;
+  user_id: number;
+  warehouse_id: number;
+  reference_number: string;
+  pr_number: string;
+  box_amount: number;
+  delivered_time: string;
+  observations: string;
+  return: boolean;
+  rejected_boxes: boolean;
+  expansion_box_number: string;
+  digits_box_number: number;
+};
+
 export type TypeOptions = "success" | "error" | "info" | "warning";
 export type TypePositions = "top-left" | "top-right" | "top-center" | "bottom-left" | "bottom-right" | "bottom-center";
 export type TypeThemes = "light" | "dark";
-export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search' | 'checkbox' | 'select-filter';
+export type TypeField = 'text' | 'number' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'daterange' | 'tel' | 'search' | 'checkbox' | 'select-filter' | 'datetime-local';

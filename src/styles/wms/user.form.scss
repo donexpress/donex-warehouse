@@ -17,11 +17,28 @@
         padding-right: 16px;
         grid-template-columns: 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 240px 240px;
     }
+
+    &__table-oms {
+        display: grid;
+        padding-right: 16px;
+        grid-template-columns: 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 240px;
+    }
+}
+
+.boxes-container-values {
+    max-height: 940px;
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .boxes-container-table-only-readly {
     display: grid;
-    grid-template-columns: 140px 190px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 240px 240px !important;
+    grid-template-columns: 140px 200px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 240px 240px !important;
+}
+
+.boxes-container-table-only-readly-oms {
+    display: grid;
+    grid-template-columns: 140px 200px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 140px 240px !important;
 }
 
 .text-center {

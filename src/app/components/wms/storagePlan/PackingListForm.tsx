@@ -14,8 +14,9 @@ import { PackingListProps, StoragePlan, PackingList, BoxNumberLabelFn } from '..
 import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 
-const getInitialLabel = (packingList: PackingList[] | undefined): string => {
-    let label = 'FBA';
+const getInitialLabel = (storagePlan: StoragePlan): string => {
+    const packingList: PackingList[] | undefined = storagePlan.packing_list;
+    let label = storagePlan.customer_order_number;
     if (packingList !== undefined && packingList.length !== 0) {
         const prefixes: string[] = [];
         
@@ -86,7 +87,7 @@ const getMajorNumber = (packingList: PackingList[] | undefined): number => {
   return result;
 }
 
-const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModifyPackingList }: PackingListProps) => {
+const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModifyPackingList, inWMS }: PackingListProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
@@ -116,7 +117,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
         ])
         :
         getPackingListFromSP(!!isFromModifyPackingList, storagePlan.packing_list));
-    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>(getInitialLabel(storagePlan.packing_list));
+    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>(getInitialLabel(storagePlan));
     const [digitsBoxNumber, setDigitsBoxNumber] = useState<number>(getInitialDigits(storagePlan.packing_list));
     const digitsBoxNumberOptions: ValueSelect[] = [
       {
@@ -138,9 +139,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
     };
   
       const cancelSend = () => {
-          if (isWMS()) {
-            router.push(`/${locale}/wms/storage_plan/${id}/config`);
-          }
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
       };
   
       const formatBody = (value: number): StoragePlan => {
@@ -218,7 +217,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
             }
           }
           showMsg(intl.formatMessage({ id: 'successfullyMsg' }), { type: "success" });
-          router.push(`/${locale}/wms/storage_plan/${id}/config`);
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
           showMsg(message, { type: "error" });
@@ -231,7 +230,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
           const response: Response = await updatePackingListById(Number(element.id), formatBodyPackingList(element, storagePlanId));
           if ((index === (rows.length-1)) && (response.status >= 200 && response.status <= 299)) {
             showMsg(intl.formatMessage({ id: 'changedsuccessfullyMsg' }), { type: "success" });
-            router.push(`/${locale}/wms/storage_plan/${id}/config`);
+            router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
           } else if (index === (rows.length-1)) {
             let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
             showMsg(message, { type: "error" });
@@ -385,11 +384,13 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
                         </div>
                         <div className='boxes-container'>
                           <div>
-                            <RowStoragePlanHeader />
-                            {rows.map((row, index) => (
-                              <RowStoragePlan key={index} initialValues={{ ...row }}
-                              onUpdate={(updatedValues) => handleUpdateRow(Number(row.id), updatedValues)} />
-                            ))}
+                            <RowStoragePlanHeader inWMS={inWMS} />
+                            <div className='boxes-container-values'>
+                              {rows.map((row, index) => (
+                                <RowStoragePlan key={index} initialValues={{ ...row }} inWMS={inWMS}
+                                onUpdate={(updatedValues) => handleUpdateRow(Number(row.id), updatedValues)} />
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>

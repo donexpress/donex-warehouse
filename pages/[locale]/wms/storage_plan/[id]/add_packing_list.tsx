@@ -5,7 +5,7 @@ import PackingListForm from '../../../../../src/app/components/wms/storagePlan/P
 import { PackingListProps } from '../../../../../src/types/storage_plan';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const AddPackingList = ({ id, storagePlan }: PackingListProps) => {console.log(storagePlan)
+const AddPackingList = ({ id, storagePlan, inWMS = true }: PackingListProps) => {console.log(storagePlan)
   
   return (
   <ProtectedRoute>
@@ -14,7 +14,7 @@ const AddPackingList = ({ id, storagePlan }: PackingListProps) => {console.log(s
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <PackingListForm storagePlan={storagePlan} id={id} isFromAddPackingList={true} />
+        <PackingListForm storagePlan={storagePlan} id={id} isFromAddPackingList={true} inWMS={inWMS} />
       </Layout>
     </ProtectedRoute>
     );

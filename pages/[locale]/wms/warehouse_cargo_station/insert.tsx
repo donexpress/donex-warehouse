@@ -35,7 +35,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const countries = await indexCountries(context);
   const receptionAreas = await getRegionalDivision(context);
 
-  const states = statesObj !== null ? Object.values(statesObj) : null;
+  // @ts-ignore
+  const states = statesObj.states;
   return {
     props: {
       states,

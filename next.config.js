@@ -5,6 +5,10 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
+  env: {
+    WAREHOUSE_ENV: process.env.WAREHOUSE_ENV,
+    WAREHOUSE_API_HOST: process.env.WAREHOUSE_API_HOST,
+  },
 }
 const withSass = require('@zeit/next-sass')
 module.exports = withSass({

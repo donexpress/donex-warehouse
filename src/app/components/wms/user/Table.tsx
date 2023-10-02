@@ -22,6 +22,7 @@ import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
+import { showMsg } from "../../../../helpers";
 
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
@@ -32,6 +33,7 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
+import { UserListProps } from '../../../../types/user';
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -44,10 +46,29 @@ const INITIAL_VISIBLE_COLUMNS = [
   "username",
   "contact",
   "payment_method",
+  "state",
   "actions",
 ];
 
-const UserTable = () => {
+const getLabelByLanguage = (state: any, locale: string): string => {
+  if (locale === 'es') {
+    return state.es_name;
+  } else if (locale === 'zh') {
+    return state.zh_name;
+  }
+  return state.name;
+};
+
+const getUserStateList = (states: any[], locale: string):{ name: string, uid: string}[] => {
+  return states.map((state: any) => {
+    return {
+      name: String(getLabelByLanguage(state, locale)),
+      uid: String(state.value),
+    }
+  })
+}
+
+const UserTable = ({ role, userStateList }: UserListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -65,7 +86,7 @@ const UserTable = () => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "customer_number",
     direction: "descending",
@@ -73,46 +94,42 @@ const UserTable = () => {
 
   const [page, setPage] = useState(1);
 
-  const statusOptions = [
-    { name: "Active", uid: "active" },
-    { name: "Paused", uid: "paused" },
-    { name: "Vacation", uid: "vacation" },
-  ];
+  const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>(getUserStateList(userStateList, String(locale)));
 
   const hasSearchFilter = Boolean(filterValue);
 
   const getColumns = React.useMemo(() => {
     const columns = [
-      { name: "ID", uid: "id", sortable: true },
+      { name: "ID", uid: "id", sortable: false },
       {
         name: intl.formatMessage({ id: "customer_number" }),
         uid: "customer_number",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "username" }),
         uid: "username",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "contact" }),
         uid: "contact",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "payment_method" }),
         uid: "payment_method_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "user_level" }),
         uid: "user_level_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "state" }),
         uid: "state",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -208,7 +225,7 @@ const UserTable = () => {
                   <DropdownItem onClick={() => handleEdit(user["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleDelete(user["id"])}>
+                  <DropdownItem className={ role !== "ADMIN" ? 'do-not-show-dropdown-item' : '' } onClick={() => handleDelete(user["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
                 </DropdownMenu>
@@ -221,6 +238,10 @@ const UserTable = () => {
             return user.user_level ? user.user_level.name : "";
         case "state": 
             return user.user_state ? getLabelByLanguage(user.user_state) : "";
+        case "customer_number":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.customer_number}</span>;
+        case "username":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.username}</span>;
         default:
           return cellValue;
       }
@@ -261,7 +282,7 @@ const UserTable = () => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -342,9 +363,9 @@ const UserTable = () => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -384,7 +405,7 @@ const UserTable = () => {
   }, [
     selectedKeys,
     items.length,
-    sortedItems.length,
+    items.length,
     page,
     users.length,
     rowsPerPage,
@@ -396,6 +417,10 @@ const UserTable = () => {
   useEffect(() => {
     loadUsers();
   }, []);
+
+  useEffect(() => {
+    setStatusOptions(getUserStateList(userStateList, String(locale)));
+  }, [locale, userStateList]);
 
   useEffect(() => {
     setLoading(true);
@@ -440,7 +465,13 @@ const UserTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeUser(deleteElement);
+    const response = await removeUser(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadUsers();
     setLoading(false);
@@ -449,19 +480,17 @@ const UserTable = () => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="USER"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
           sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
           onSortChange={setSortDescriptor}
         >
@@ -478,7 +507,7 @@ const UserTable = () => {
           </TableHeader>
           <TableBody
             emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
               <TableRow key={item.id}>
@@ -489,6 +518,8 @@ const UserTable = () => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>

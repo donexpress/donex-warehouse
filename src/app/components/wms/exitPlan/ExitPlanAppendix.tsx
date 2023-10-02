@@ -5,17 +5,19 @@ import { useIntl } from "react-intl";
 import AddAppendixDialog from "./AddAppendixDialog";
 import { ExitPlan } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
-import { deleteAppendix, getAppendagesByExitPlanId } from "../../../../services/api.appendix";
+import { deleteAppendix, getAppendagesByExitPlanId, getAppendagesByOperationInstructionId } from "../../../../services/api.appendix";
 import { Appendix } from "../../../../types/appendix";
 import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { showMsg } from "@/helperserege1992";
+import { OperationInstruction } from "@/types/operation_instructionerege1992";
 
 interface Props {
-  exitPlan: ExitPlan;
+  exitPlan?: ExitPlan;
+  operationInstruction?: OperationInstruction;
   owner: User;
 }
-const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
+const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
   const intl = useIntl();
   const [showAppendixDialog, setShowAppendixDialog] = useState<boolean>(false);
   const [appendages, setAppendages] = useState<Appendix[]>([]);
@@ -38,9 +40,16 @@ const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
   };
 
   const loadAppendages = async () => {
-    const result = await getAppendagesByExitPlanId(
-      exitPlan.id ? exitPlan.id : -1
-    );
+    let result = null
+    if(exitPlan) {
+      result = await getAppendagesByExitPlanId(
+        exitPlan.id ? exitPlan.id : -1
+      );
+    } else {
+      result = await getAppendagesByOperationInstructionId(operationInstruction?.id ? operationInstruction.id : -1)
+      console.log(owner)
+    }
+    
     if (result) {
       setAppendages(result);
     }
@@ -53,6 +62,13 @@ const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
       showMsg(intl.formatMessage({id: 'successfullyActionMsg'}), {type: 'success'})
     } else {
       showMsg(intl.formatMessage({id: 'unknownStatusErrorMsg'}), {type: 'error'})
+    }
+  }
+
+  const handleVisualice = (id: number) => {
+    const appendix = appendages.find(el => el.id === id)
+    if( appendix ) {
+      window.open(appendix.url, appendix.name )
     }
   }
 
@@ -117,7 +133,7 @@ const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
               borderRadius: "5px 5px 5px 5px",
             }}
           >
-            <div className="elements-center">
+            <div className="elements-center" style={{wordBreak: 'break-all'}}>
               <span className="text-center">{appendix.name}</span>
             </div>
             <div className="elements-center">
@@ -133,15 +149,22 @@ const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
               <span className="text-center">{appendix.function}</span>
             </div>
             <div className="elements-center">
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button isIconOnly size="sm" variant="light">
+              <Dropdown aria-labelledby="action-menu">
+                <DropdownTrigger aria-labelledby="action-menu">
+                  <Button isIconOnly size="sm" variant="light" aria-labelledby="action-menu">
                     <VerticalDotsIcon className="text-default-300" />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem
-                    onClick={() => handleDelete(appendix.id ? appendix.id : -1)}
+                  aria-labelledby="visualice-button"
+                    onClick={() => handleVisualice(appendix.id ? appendix.id : -1)}
+                  >
+                    {intl.formatMessage({ id: "vizualice" })}
+                  </DropdownItem>
+                  <DropdownItem
+                  aria-labelledby="delete-button"
+                  onClick={() => handleDelete(appendix.id ? appendix.id : -1)}
                   >
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
@@ -155,6 +178,7 @@ const ExitPlanAppendix = ({ exitPlan, owner }: Props) => {
         <AddAppendixDialog
           exitPlan={exitPlan}
           owner={owner}
+          operationInstruction={operationInstruction}
           close={closeAppendixDialog}
           confirm={confirmAppendixDialog}
           title={intl.formatMessage({ id: "create_appendix" })}

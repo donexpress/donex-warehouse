@@ -25,12 +25,13 @@ import { capitalize } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import { Staff } from "@/types/stafferege1992";
+import { Staff, StaffListProps, StaffState } from "@/types/stafferege1992";
 import PaginationTable from "../../common/Pagination";
 import { getStaff, removeStaff } from "@/services/api.stafferege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
+import { showMsg } from "../../../../helpers";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -46,7 +47,25 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const StaffTable = () => {
+const getLabelByLanguage = (state: StaffState, locale: string): string => {
+  if (locale === 'es') {
+    return state.es_name;
+  } else if (locale === 'zh') {
+    return state.zh_name;
+  }
+  return state.name;
+};
+
+const getStateList = (states: StaffState[], locale: string):{ name: string, uid: string}[] => {
+  return states.map((state: StaffState) => {
+    return {
+      name: getLabelByLanguage(state, locale),
+      uid: state.value,
+    }
+  })
+}
+
+const StaffTable = ({ role, staffStates }: StaffListProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -64,7 +83,7 @@ const StaffTable = () => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "username",
     direction: "ascending",
@@ -72,56 +91,52 @@ const StaffTable = () => {
 
   const [page, setPage] = useState(1);
 
-  const statusOptions = [
-    { name: "Active", uid: "active" },
-    { name: "Paused", uid: "paused" },
-    { name: "Vacation", uid: "vacation" },
-  ];
+  const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>(getStateList(staffStates, String(locale)));
 
   const hasSearchFilter = Boolean(filterValue);
 
   const getColumns = React.useMemo(() => {
     const columns = [
-      { name: "ID", uid: "id", sortable: true },
+      { name: "ID", uid: "id", sortable: false },
       {
         name: intl.formatMessage({ id: "username" }),
         uid: "username",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "chinese_name" }),
         uid: "chinesse_name",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "fullname" }),
         uid: "english_name",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "email" }),
         uid: "email",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "phone" }),
         uid: "phone",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "organization_id" }),
         uid: "organization_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "role_id" }),
         uid: "role_id",
-        sortable: true,
+        sortable: false,
       },
       {
         name: intl.formatMessage({ id: "state" }),
         uid: "state",
-        sortable: true,
+        sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -161,7 +176,8 @@ const StaffTable = () => {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(String(user.state))
+        // @ts-ignore
+        Array.from(statusFilter).includes(user.state ? String(user.state.value) : '')
       );
     }
 
@@ -218,7 +234,7 @@ const StaffTable = () => {
                   <DropdownItem onClick={() => handleEdit(user["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleDelete(user["id"])}>
+                  <DropdownItem className={ role !== "ADMIN" ? 'do-not-show-dropdown-item' : '' } onClick={() => handleDelete(user["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
                 </DropdownMenu>
@@ -229,6 +245,8 @@ const StaffTable = () => {
           return user.organization ? user.organization.name : "";
         case "role_id": 
           return user.role ? user.role.name : "";
+        case "username":
+          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.username}</span>;
         case "state": 
           return user.state ? getLabelByLanguage(user.state) : "";
         default:
@@ -271,7 +289,7 @@ const StaffTable = () => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -352,9 +370,9 @@ const StaffTable = () => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -396,7 +414,7 @@ const StaffTable = () => {
     items.length,
     page,
     hasSearchFilter,
-    sortedItems.length,
+    items.length,
     staffs.length,
     rowsPerPage,
     intl,
@@ -406,6 +424,10 @@ const StaffTable = () => {
   useEffect(() => {
     loadStaffs();
   }, []);
+
+  useEffect(() => {
+    setStatusOptions(getStateList(staffStates, String(locale)));
+  }, [locale, staffStates]);
 
   useEffect(() => {
     setLoading(true);
@@ -450,7 +472,13 @@ const StaffTable = () => {
 
   const confirm = async () => {
     setLoading(true);
-    const reponse = await removeStaff(deleteElement);
+    const response = await removeStaff(deleteElement);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
     close();
     await loadStaffs();
     setLoading(false);
@@ -458,21 +486,17 @@ const StaffTable = () => {
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="STAFF"
           isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
           onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
         >
           <TableHeader columns={headerColumns}>
             {(column) => (
@@ -487,7 +511,7 @@ const StaffTable = () => {
           </TableHeader>
           <TableBody
             emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
               <TableRow key={item.id}>
@@ -498,6 +522,8 @@ const StaffTable = () => {
             )}
           </TableBody>
         </Table>
+        </div>
+        {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
       </Loading>
     </>

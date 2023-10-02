@@ -1,17 +1,32 @@
 import axios from 'axios';
-import { countStoragePlanPath, storagePlanByOrderNumberPath, storagePlanPath } from '../backend';
+import { countStoragePlanPath, storagePlanByOrderNumberPath, storagePlanPath, storagePlanStatePath, storagePlanCountPath } from '../backend';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
-import { Response } from '../types/index';
-import { StoragePlan } from '../types/storage_plan';
+import { Response, BatchStoragePlans } from '../types/index';
+import { StoragePlan, StoragePlanState, StoragePlanCount } from '../types/storage_plan';
+import { StateCount } from '@/types/exit_planerege1992';
 
-export const countStoragePlan = async ():Promise<{count: number}> => {
+export const countStoragePlan = async ():Promise<StateCount> => {
     const response = await axios.get(countStoragePlanPath())
     return response.data
 }
 
 export const createStoragePlan = async (values: StoragePlan): Promise<Response> => {
   const path = storagePlanPath();
+  try {
+    const response = await axios.post(path, values, getHeaders());
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {data: response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const createBatchStoragePlan = async (values: BatchStoragePlans[]): Promise<Response> => {
+  const path = storagePlanPath() + '/multi';
   try {
     const response = await axios.post(path, values, getHeaders());
     
@@ -48,17 +63,27 @@ export const getStoragePlanById = async (storagePlanId: number, context?: GetSer
   }
 }
 
-export const removeStoragePlanById = async (storagePlanId: number):Promise<any | null> => {
-  const path = storagePlanPath() + `/${storagePlanId}`;
+export const storagePlanCount = async (context?: GetServerSidePropsContext):Promise<StoragePlanCount | null> => {
+  const path = storagePlanCountPath();
   try {
-    const response = await axios.delete(path, getHeaders());
+    const response = await axios.get(path, getHeaders(context));
     return response.data;
   } catch (error) {
     return null;
   }
 }
 
-export const getStoragePlans = async (status: number = 0, context?: GetServerSidePropsContext):Promise<StoragePlan[] | null> => {
+export const removeStoragePlanById = async (storagePlanId: number):Promise<Response> => {
+  const path = storagePlanPath() + `/${storagePlanId}`;
+  try {
+    const response = await axios.delete(path, getHeaders());
+    return { status: response.status, data: response.data };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+}
+
+export const getStoragePlans = async (status: string = '', context?: GetServerSidePropsContext):Promise<StoragePlan[] | null> => {
   const path = storagePlanPath(status);
   try {
     const response = await axios.get(path, getHeaders(context));
@@ -76,5 +101,14 @@ export const getStoragePlanByOrder_number = async(order_number: string, context?
   } catch (error) {
     return null;
   }
+}
 
+export const getStoragePlansState = async (context?: GetServerSidePropsContext):Promise<{ states: StoragePlanState[] } | null> => {
+  const path = storagePlanStatePath();
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
 }

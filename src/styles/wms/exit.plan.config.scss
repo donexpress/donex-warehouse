@@ -41,6 +41,12 @@
         grid-template-columns: 0.5fr 2fr 2fr 2fr 2fr 2fr 2fr 2fr 2fr 1fr;
         column-gap: 5px;
     }
+    &__table_display {
+        display: grid;
+        margin-right: 16px;
+        grid-template-columns: 2fr 2fr 2fr 2fr 2fr 2fr 2fr 2fr;
+        column-gap: 5px;
+    }
 }
 
 .infoExitPlanAppendixList {
@@ -117,4 +123,8 @@
     .show-sp-mobile {
         display: none;
     }
+}
+
+.custom-select {
+    padding: 10px !important;
 }
