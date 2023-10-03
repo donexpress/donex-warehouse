@@ -180,6 +180,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         uid: "observations",
         sortable: false,
       },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
+        sortable: false,
+      },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ] :  [
       { name: "ID", uid: "id", sortable: false },
@@ -236,6 +246,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
         sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -330,6 +350,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             </Chip>
           );
         case "delivered_time":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+        case "created_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+        case "updated_at":
           return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         case "actions":
           return (

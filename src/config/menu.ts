@@ -57,7 +57,7 @@ export const menuWMS = (intl: IntlShape) => {
       icon: "BiLogoNetlify",
       label: intl.formatMessage({ id: "logisticsNetwork" }),
       items: [
-        {
+        /* {
           id: 3.1,
           label: intl.formatMessage({ id: "service" }),
           route: "#",
@@ -66,7 +66,7 @@ export const menuWMS = (intl: IntlShape) => {
           id: 3.2,
           label: intl.formatMessage({ id: "supplier" }),
           route: "#",
-        },
+        }, */
         {
           id: 3.3,
           label: intl.formatMessage({ id: "lineClassification" }),
@@ -99,11 +99,11 @@ export const menuWMS = (intl: IntlShape) => {
           label: intl.formatMessage({ id: "organization" }),
           route: RouteMenu.LIST_ORGANIZATION,
         },
-        {
+        /* {
           id: 4.3,
           label: intl.formatMessage({ id: "employeeRole" }),
           route: "#",
-        },
+        }, */
       ],
     },
   ];

@@ -21,7 +21,7 @@ import { PlusIcon } from "./../../common/PlusIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
-import { capitalize } from "../../../../helpers/utils";
+import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
 import { showMsg } from "../../../../helpers";
 
 import { useIntl } from "react-intl";
@@ -129,6 +129,16 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
       {
         name: intl.formatMessage({ id: "state" }),
         uid: "state",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
         sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -242,6 +252,10 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
           return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.customer_number}</span>;
         case "username":
           return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.username}</span>;
+        case "created_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+        case "updated_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         default:
           return cellValue;
       }
