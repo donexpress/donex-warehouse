@@ -353,6 +353,8 @@ const ExitPlanTable = () => {
         } else {
           return <span>-</span>;
         }
+      case "updated_at":
+      case "created_at":
       case "delivered_time": {
         if (cellValue && cellValue !== "") {
           return (
@@ -409,7 +411,7 @@ const ExitPlanTable = () => {
       return "--";
     }
     if (ep.packing_lists && ep.packing_lists?.length > 1) {
-      return "Multiple";
+      return  intl.formatMessage({ id: "multiple" });
     }
     ep.packing_lists?.forEach((pl) => {
       locations += packageShelfFormat(pl.package_shelf);
@@ -599,7 +601,7 @@ const ExitPlanTable = () => {
                       columns={getVisibleColumns()}
                     />
                   }
-                  fileName="operation_instructions_pdf.pdf"
+                  fileName="exit_plan_pdf.pdf"
                 >
                   {({ blob, url, loading, error }) =>
                     intl.formatMessage({ id: "export_pdf" })

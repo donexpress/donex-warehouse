@@ -363,5 +363,12 @@
 	"output_number": "Número de entrega",
 	"delivered_time": "Tiempo de entrega",
 	"palets_amount": "Número de palets",
-	"delivered_quantity": "Cantidad de cajas entregadas"
+	"delivered_quantity": "Cantidad de cajas entregadas",
+	"exit_plan_information": "Información de planes de salida",
+	"multiple": "Múltiple",
+	"amazon": "Amazon",
+	"meli": "Mercado Libre",
+	"private_address": "Dirección privada"
+
+
 }

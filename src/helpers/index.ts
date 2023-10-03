@@ -402,9 +402,11 @@ export const operationInstructionDataToExcel = (
   };
   const getLocation = (ep: OperationInstruction): string => {
     let locations = "";
-    ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists.forEach(pl => {
-      locations+=packageShelfFormat(pl.package_shelf)
-    })
+    ep.output_plan &&
+      ep.output_plan.packing_lists &&
+      ep.output_plan.packing_lists.forEach((pl) => {
+        locations += packageShelfFormat(pl.package_shelf);
+      });
     return locations;
   };
 
@@ -441,6 +443,20 @@ export const operationInstructionDataToExcel = (
         case "location":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getLocation(oi);
+          break;
+        case "updated_at":
+        case "created_at":
+          {
+            // @ts-ignore
+            if (oi[column] && oi[column] !== "") {
+              return (oInst[
+                intl.formatMessage({ id: column })
+                // @ts-ignore
+              ] = `${getDateFormat(oi[column])}, ${getHourFormat(oi[column])}`);
+            } else {
+              return "";
+            }
+          }
           break;
         default: {
           // @ts-ignore
@@ -537,6 +553,20 @@ export const exitPlanDataToExcel = (
         case "location":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getLocation(oi);
+        case "updated_at":
+        case "created_at":
+        case "delivered_time":
+          {
+            // @ts-ignore
+            if (oi[column] && oi[column] !== "") {
+              return (oInst[
+                intl.formatMessage({ id: column })
+                // @ts-ignore
+              ] = `${getDateFormat(oi[column])}, ${getHourFormat(oi[column])}`);
+            } else {
+              return "";
+            }
+          }
           break;
         default: {
           // @ts-ignore
