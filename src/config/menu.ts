@@ -138,11 +138,11 @@ export const menuOMS = (intl: IntlShape) => {
           label: intl.formatMessage({ id: "exitPlan" }),
           route: RouteMenu.EXIT_PLAN,
         },
-        {
+        /* {
           id: 2.3,
           label: intl.formatMessage({ id: "productsInventory" }),
           route: "#",
-        },
+        }, */
         {
           id: 2.4,
           label: intl.formatMessage({ id: "operatingInstructions" }),
@@ -150,7 +150,7 @@ export const menuOMS = (intl: IntlShape) => {
         },
       ],
     },
-    {
+    /* {
       id: 3,
       icon: "BiPlusCircle",
       label: intl.formatMessage({ id: "more" }),
@@ -161,7 +161,7 @@ export const menuOMS = (intl: IntlShape) => {
           route: "#",
         },
       ],
-    },
+    }, */
   ];
 };
 
