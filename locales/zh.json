@@ -363,6 +363,11 @@
   "output_number": "发货数量",
   "delivered_time": "送貨時間",
   "palets_amount": "托盘数量",
-	"delivered_quantity": "交付箱数"
+	"delivered_quantity": "交付箱数",
+	"exit_plan_information": "退出计划信息",
+	"multiple": "多种的",
+  "amazon": "Amazon",
+	"meli": "Mercado Libre",
+	"private_address": "私人地址"
 
 }

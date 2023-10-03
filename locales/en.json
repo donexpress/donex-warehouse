@@ -363,7 +363,10 @@
 	"output_number": "Delivery number",
 	"delivered_time":  "Delivery time",
 	"palets_amount": "Palets numbers",
-	"delivered_quantity": "Delivered amount boxes"
-
-
+	"delivered_quantity": "Delivered amount boxes",
+	"exit_plan_information": "Exit plan information",
+	"multiple": "Multiple",
+	"amazon": "Amazon",
+	"meli": "Mercado Libre",
+	"private_address": "Private address"
 }
