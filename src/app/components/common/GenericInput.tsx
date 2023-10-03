@@ -97,6 +97,10 @@ const GenericInput: React.FC<GenericInputProps> = ({
       ...provided,
       color: '#aeb9e1',
     }),
+    input: (provided: any) => ({
+      ...provided,
+      color: 'white',
+    }),
   };
 
   useEffect(() => {
