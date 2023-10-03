@@ -44,7 +44,7 @@ const FilterExitPlan = ({ onFinish, destionations }: Props) => {
   }
 
   return (
-    <div className="flex justify-between items-center" style={{ width: "40%" }}>
+    <div className="flex justify-between items-center" style={{marginTop: 10}}>
       <div className="w-full sm:w-[39%]">
         <select className="search-input custom-select" value={location} onChange={changeSelect} style={{width: '100%', padding: '10px'}}>
           {getDestinationsFormatted(destionations).map((dest, key) => (
