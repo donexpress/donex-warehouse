@@ -784,44 +784,10 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            marginRight: "20px",
             marginBottom: "10px",
             marginTop: "10px",
           }}
         >
-          <Button
-            color="primary"
-            isDisabled={selectedItems.length === 0}
-            endContent={
-              <FaFilePdf style={{ fontSize: "22px", color: "white" }} />
-            }
-          >
-            <PDFDownloadLink
-              document={
-                <ExportTable
-                  intl={intl}
-                  data={getSelectedOperationInstructions()}
-                  columns={getVisibleColumns()}
-                />
-              }
-              fileName="operation_instructions_pdf.pdf"
-            >
-              {({ blob, url, loading, error }) =>
-                intl.formatMessage({ id: "export_pdf" })
-              }
-            </PDFDownloadLink>
-          </Button>
-          <Button
-            color="primary"
-            style={{ width: "121px", marginLeft: "10px" }}
-            endContent={
-              <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
-            }
-            onClick={() => handleExportExcel()}
-            isDisabled={selectedItems.length === 0}
-          >
-            {intl.formatMessage({ id: "export" })}
-          </Button>
           {statusSelected === 1 && isWMS() && (
             <Button
               color="primary"
@@ -860,6 +826,39 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
               {intl.formatMessage({ id: "return" })}
             </Button>
           )}
+          <Button
+            color="primary"
+            isDisabled={selectedItems.length === 0}
+            endContent={
+              <FaFilePdf style={{ fontSize: "22px", color: "white" }} />
+            }
+          >
+            <PDFDownloadLink
+              document={
+                <ExportTable
+                  intl={intl}
+                  data={getSelectedOperationInstructions()}
+                  columns={getVisibleColumns()}
+                />
+              }
+              fileName="operation_instructions_pdf.pdf"
+            >
+              {({ blob, url, loading, error }) =>
+                intl.formatMessage({ id: "export_pdf" })
+              }
+            </PDFDownloadLink>
+          </Button>
+          <Button
+            color="primary"
+            style={{ width: "121px" }}
+            endContent={
+              <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
+            }
+            onClick={() => handleExportExcel()}
+            isDisabled={selectedItems.length === 0}
+          >
+            {intl.formatMessage({ id: "export" })}
+          </Button>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
