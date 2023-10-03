@@ -245,11 +245,8 @@ const ExitPlanTable = () => {
   const selectedItemsFn = (selection: Selection) => {
     setSelectedKeys(selection);
     if (selection === "all") {
-      setSelectedItems(
-        exitPlans.map((ep: ExitPlan) => Number(ep.id))
-      );
-    }
-    else {
+      setSelectedItems(exitPlans.map((ep: ExitPlan) => Number(ep.id)));
+    } else {
       setSelectedItems(
         Array.from(selection.values()).map((cadena) =>
           parseInt(cadena.toString())
@@ -356,12 +353,17 @@ const ExitPlanTable = () => {
         } else {
           return <span>-</span>;
         }
-      case "delivered_time":
-        return (
-          <span>
-            {getDateFormat(cellValue)}, {getHourFormat(cellValue)}
-          </span>
-        );
+      case "delivered_time": {
+        if (cellValue && cellValue !== "") {
+          return (
+            <span>
+              {getDateFormat(cellValue)}, {getHourFormat(cellValue)}
+            </span>
+          );
+        } else {
+          return "";
+        }
+      }
       case "output_number":
         return (
           <CopyColumnToClipboard
@@ -382,28 +384,42 @@ const ExitPlanTable = () => {
         ) : (
           <span>{cellValue}</span>
         );
-      case 'location':
-        return <span style={{maxWidth: "250px", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display:  'block'}}>{getLocation(user)}</span>
+      case "location":
+        return (
+          <span
+            style={{
+              maxWidth: "250px",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              display: "block",
+            }}
+          >
+            {getLocation(user)}
+          </span>
+        );
       default:
         return cellValue;
     }
   }, []);
 
   const getLocation = (ep: ExitPlan): string => {
-    let locations = ""
-    if(ep.packing_lists && ep.packing_lists?.length == 0) {
-      return '--'
+    let locations = "";
+    if (ep.packing_lists && ep.packing_lists?.length == 0) {
+      return "--";
     }
-    if(ep.packing_lists && ep.packing_lists?.length > 1) {
-      return 'Multiple'
+    if (ep.packing_lists && ep.packing_lists?.length > 1) {
+      return "Multiple";
     }
-    ep.packing_lists?.forEach(pl => {
-      locations+=packageShelfFormat(pl.package_shelf)
-    })
-    return locations
-  }
+    ep.packing_lists?.forEach((pl) => {
+      locations += packageShelfFormat(pl.package_shelf);
+    });
+    return locations;
+  };
 
-  const packageShelfFormat = (packageShelfs: PackageShelf[] | undefined): string => {
+  const packageShelfFormat = (
+    packageShelfs: PackageShelf[] | undefined
+  ): string => {
     if (packageShelfs && packageShelfs.length > 0) {
       const packageShelf: PackageShelf = packageShelfs[0];
       return `${intl.formatMessage({ id: "partition" })}: ${
@@ -475,21 +491,21 @@ const ExitPlanTable = () => {
     for (let i = 0; i < selectedItems.length; i++) {
       const index = selectedItems[i];
       const item = exitPlans.filter((ep: ExitPlan) => ep.id === index);
-      if (filterValue && (filterValue !== "")) {
+      if (filterValue && filterValue !== "") {
         const isSearchable = item[0].output_number
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase());
+          ?.toLowerCase()
+          ?.includes(filterValue.toLowerCase());
         if (isSearchable) {
           its.push(item[0]);
         }
       } else {
-        if(item[0]) {
+        if (item[0]) {
           its.push(item[0]);
         }
       }
     }
     return its;
-  }
+  };
 
   const getVisibleColumns = (): string[] => {
     const t = Array.from(visibleColumns) as string[];
@@ -498,104 +514,111 @@ const ExitPlanTable = () => {
 
   const handleExportExcel = () => {
     exitPlanDataToExcel(getSelectedExitPlans(), intl, getVisibleColumns());
-
-  }
+  };
 
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4 mb-2">
-        <div className="flex justify-between gap-3 items-end">
-          <Input
-            isClearable
-            className="w-full sm:max-w-[33%] search-input"
-            placeholder=""
-            startContent={<SearchIcon />}
-            value={filterValue}
-            onClear={() => onClear()}
-            onValueChange={onSearchChange}
-          />
-          <div className="flex gap-3">
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  className="bnt-select"
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
-                >
-                  {intl.formatMessage({ id: "columns" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
-              >
-                {getColumns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-            <Button
-              color="primary"
-              endContent={<PlusIcon />}
-              onClick={() => handleAdd()}
-            >
-              {intl.formatMessage({ id: "create" })}
-            </Button>
+        <div className="flex justify-between gap-3">
+          <div>
+            <Input
+              isClearable
+              className="w-full search-input"
+              placeholder=""
+              startContent={<SearchIcon />}
+              value={filterValue}
+              onClear={() => onClear()}
+              onValueChange={onSearchChange}
+            />
+            <FilterExitPlan
+              onFinish={onFinishFilter}
+              destionations={destinations}
+            />
           </div>
-        </div>
-        <FilterExitPlan
-          onFinish={onFinishFilter}
-          destionations={destinations}
-        />
-        <div
-          className="flex gap-3"
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginRight: "20px",
-            marginBottom: "10px",
-            marginTop: "10px",
-          }}
-        >
-          <Button
-            color="primary"
-            isDisabled={selectedItems.length === 0}
-            endContent={
-              <FaFilePdf style={{ fontSize: "22px", color: "white" }} />
-            }
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "end",
+            }}
           >
-            <PDFDownloadLink
-              document={
-                <ExportExitPlanTable
-                  intl={intl}
-                  data={getSelectedExitPlans()}
-                  columns={getVisibleColumns()}
-                />
-              }
-              fileName="operation_instructions_pdf.pdf"
+            <div className="flex gap-3">
+              <Dropdown>
+                <DropdownTrigger className="hidden sm:flex">
+                  <Button
+                    className="bnt-select"
+                    endContent={<ChevronDownIcon className="text-small" />}
+                    variant="flat"
+                  >
+                    {intl.formatMessage({ id: "columns" })}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  disallowEmptySelection
+                  aria-label="Table Columns"
+                  closeOnSelect={false}
+                  selectedKeys={visibleColumns}
+                  selectionMode="multiple"
+                  onSelectionChange={setVisibleColumns}
+                >
+                  {getColumns.map((column) => (
+                    <DropdownItem key={column.uid} className="capitalize">
+                      {capitalize(column.name)}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+              <Button
+                color="primary"
+                endContent={<PlusIcon />}
+                onClick={() => handleAdd()}
+              >
+                {intl.formatMessage({ id: "create" })}
+              </Button>
+            </div>
+            <div
+              className="flex gap-3"
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                marginTop: "10px",
+              }}
             >
-              {({ blob, url, loading, error }) =>
-                intl.formatMessage({ id: "export_pdf" })
-              }
-            </PDFDownloadLink>
-          </Button>
-          <Button
-            color="primary"
-            style={{ width: "121px", marginLeft: "10px" }}
-            endContent={
-              <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
-            }
-            onClick={() => handleExportExcel()}
-            isDisabled={selectedItems.length === 0}
-          >
-            {intl.formatMessage({ id: "export" })}
-          </Button>
+              <Button
+                color="primary"
+                isDisabled={selectedItems.length === 0}
+                endContent={
+                  <FaFilePdf style={{ fontSize: "22px", color: "white" }} />
+                }
+              >
+                <PDFDownloadLink
+                  document={
+                    <ExportExitPlanTable
+                      intl={intl}
+                      data={getSelectedExitPlans()}
+                      columns={getVisibleColumns()}
+                    />
+                  }
+                  fileName="operation_instructions_pdf.pdf"
+                >
+                  {({ blob, url, loading, error }) =>
+                    intl.formatMessage({ id: "export_pdf" })
+                  }
+                </PDFDownloadLink>
+              </Button>
+              <Button
+                color="primary"
+                style={{ width: "121px" }}
+                endContent={
+                  <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
+                }
+                onClick={() => handleExportExcel()}
+                isDisabled={selectedItems.length === 0}
+              >
+                {intl.formatMessage({ id: "export" })}
+              </Button>
+            </div>
+          </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
@@ -658,7 +681,7 @@ const ExitPlanTable = () => {
     statusSelected,
     intl,
     currentStatePosition,
-    selectedItems
+    selectedItems,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -709,7 +732,7 @@ const ExitPlanTable = () => {
   const loadExitPlans = async () => {
     setLoading(true);
     const pms = await getExitPlansByState("pending");
-    console.log(pms)
+    console.log(pms);
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
     const count = await countExitPlans();

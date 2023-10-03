@@ -360,6 +360,9 @@
 	"user_id": "用戶",
 	"output_plan_id": "退出計劃",
 	"box_amount": "箱号",
-  "output_number": "发货数量"
+  "output_number": "发货数量",
+  "delivered_time": "送貨時間",
+  "palets_amount": "托盘数量",
+	"delivered_quantity": "交付箱数"
 
 }

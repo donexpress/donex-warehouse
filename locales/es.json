@@ -360,6 +360,8 @@
 	"user_id": "Usuario",
 	"output_plan_id": "Plan de salida",
 	"box_amount": "Número de caja",
-	"output_number": "Número de entrega"
-
+	"output_number": "Número de entrega",
+	"delivered_time": "Tiempo de entrega",
+	"palets_amount": "Número de palets",
+	"delivered_quantity": "Cantidad de cajas entregadas"
 }
