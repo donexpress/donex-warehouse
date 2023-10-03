@@ -78,7 +78,7 @@ const Index = () => {
       menu.route
     }`;
     return classNames("flex items-center cursor-pointer nav-item-hover", {
-      ["bg-nav-item-hover"]: router.pathname && router.pathname === e,
+      ["bg-nav-item-hover"]: router.pathname && (router.pathname === e || router.pathname.startsWith(e)),
     });
   };
 

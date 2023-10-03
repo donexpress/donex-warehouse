@@ -360,6 +360,10 @@
 	"user_id": "User",
 	"output_plan_id": "Exit plan",
 	"box_amount": "Box number",
-	"output_number": "Delivery number"
+	"output_number": "Delivery number",
+	"delivered_time":  "Delivery time",
+	"palets_amount": "Palets numbers",
+	"delivered_quantity": "Delivered amount boxes"
+
 
 }

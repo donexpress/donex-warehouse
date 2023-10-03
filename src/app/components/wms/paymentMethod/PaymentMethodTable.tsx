@@ -33,6 +33,7 @@ import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { showMsg } from "../../../../helpers";
+import { getDateFormat, getHourFormat } from "../../../../helpers/utils";
 
 const PaymentMethodTable = () => {
   const intl = useIntl();
@@ -61,6 +62,16 @@ const PaymentMethodTable = () => {
     return [
       { name: intl.formatMessage({ id: "name" }), uid: "name", sortable: false },
       { name: intl.formatMessage({ id: "code" }), uid: "code", sortable: false },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
+        sortable: false,
+      },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
   }, [intl]);
@@ -130,6 +141,10 @@ const PaymentMethodTable = () => {
           return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.name}</span>;
         case "code":
           return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.code}</span>;
+        case "created_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+        case "updated_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         default:
           return cellValue;
     }

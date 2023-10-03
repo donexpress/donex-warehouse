@@ -17,7 +17,7 @@ const UpdateWarehouseCargoStation = ({
   receptionAreas,
   warehouse,
   id,
-}: CargoStationWarehouseProps) => {console.log(warehouse)
+}: CargoStationWarehouseProps) => {
   return (
     <Layout>
       <Head>

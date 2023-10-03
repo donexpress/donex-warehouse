@@ -7,7 +7,7 @@ import { getUsers } from '../../../../../src/services/api.users';
 import { getWhs } from '../../../../../src/services/api.wh';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const HistoryStoragePlan = ({ id, storagePlan, warehouses, users, inWMS = false }: HistoryStoragePlanProps) => {console.log(storagePlan)
+const HistoryStoragePlan = ({ id, storagePlan, warehouses, users, inWMS = false }: HistoryStoragePlanProps) => {
   
   return (
   <ProtectedRoute>

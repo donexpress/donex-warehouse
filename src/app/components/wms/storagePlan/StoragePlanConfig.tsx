@@ -487,7 +487,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                               }
                             </PDFDownloadLink>
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && (storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
+                          <DropdownItem className={(selectedRows.length === 0 || !inWMS || (storagePlan && (storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
                           </DropdownItem>
                           <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (storagePlan.state === 'stocked' || storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>

@@ -180,6 +180,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         uid: "observations",
         sortable: false,
       },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
+        sortable: false,
+      },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ] :  [
       { name: "ID", uid: "id", sortable: false },
@@ -236,6 +246,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
         sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -331,6 +351,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
           );
         case "delivered_time":
           return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+        case "created_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+        case "updated_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         case "actions":
           return (
             <div className="relative flex justify-end items-center gap-2">
@@ -353,10 +377,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                   <DropdownItem className={(!storageP["history"] || (storageP["history"].length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleHistory(storageP["id"])}>
                     {intl.formatMessage({ id: "history" })}
                   </DropdownItem>
-                  <DropdownItem className={statusSelected !== 'to be storage' ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
+                  <DropdownItem className={(!inWMS || statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
-                  <DropdownItem className={statusSelected !== 'into warehouse' ? 'do-not-show-dropdown-item' : ''} onClick={() => openForceEntryStoragePlanDialog(storageP)}>
+                  <DropdownItem className={(!inWMS || statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''} onClick={() => openForceEntryStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "force_entry" })}
                   </DropdownItem>
                   <DropdownItem className={(!inWMS || (statusSelected !== 'into warehouse' && statusSelected !== 'stocked')) ? 'do-not-show-dropdown-item' : ''} onClick={() => openUploadEvidenceStoragePlanDialog(storageP)}>
@@ -597,6 +621,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                 selectedKeys={visibleColumns}
                 selectionMode="multiple"
                 onSelectionChange={setVisibleColumns}
+                className="custom-dropdown-menu"
               >
                 {getColumns.map((column) => (
                   <DropdownItem key={column.uid} className="capitalize">
@@ -661,7 +686,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               {intl.formatMessage({ id: "export" })}
             </Button>
             {
-              statusSelected === 'to be storage' && (
+              (inWMS && statusSelected === 'to be storage') && (
                 <Button
                   color="primary"
                   style={{ width: '121px', marginLeft: '10px' }}

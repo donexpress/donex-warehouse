@@ -167,7 +167,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
         return true;
       }
   
-      const handleSubmit = async (values: StoragePlan) => { console.log(values);console.log(rows)
+      const handleSubmit = async (values: StoragePlan) => {
         if (isFromAddPackingList) {
             await create(Number(id), values.box_amount);
         } else if (isFromModifyPackingList) {

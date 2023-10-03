@@ -30,7 +30,7 @@ import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
-import { capitalize } from "../../../../helpers/utils";
+import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
 import { showMsg } from "../../../../helpers";
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -117,6 +117,16 @@ const WhTable = () => {
         uid: "observations",
         sortable: false,
       },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
+        sortable: false,
+      },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
 
@@ -193,6 +203,10 @@ const WhTable = () => {
       case "code": return (
         <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.code}</span>
       );
+      case "created_at":
+        return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+      case "updated_at":
+        return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
       default:
         return cellValue;
     }

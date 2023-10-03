@@ -56,7 +56,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                         showMsg(message, { type: "error" });
                         setLoading(false);
                       }
-                    } catch (err) {console.log(err)
+                    } catch (err) {
                         let message = intl.formatMessage({ id: "error_processing_excel_file" });
                         showMsg(message, { type: "error" });
                         setLoading(false);

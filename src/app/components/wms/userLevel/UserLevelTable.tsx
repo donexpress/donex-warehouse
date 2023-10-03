@@ -33,6 +33,7 @@ import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { Service } from "@/types/serviceerege1992";
 import { showMsg } from "../../../../helpers";
+import { getDateFormat, getHourFormat } from "../../../../helpers/utils";
 
 const UserLevelTable = () => {
   const intl = useIntl();
@@ -64,6 +65,16 @@ const UserLevelTable = () => {
       {
         name: intl.formatMessage({ id: "designated_service" }),
         uid: "service_id",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "updated_at" }),
+        uid: "updated_at",
         sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -136,6 +147,10 @@ const UserLevelTable = () => {
           return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.name}</span>;
         case "service_id":
           return user.service ? user.service.name : "";
+        case "created_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+        case "updated_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         default:
           return cellValue;
       }
