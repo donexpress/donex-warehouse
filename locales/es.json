@@ -14,6 +14,7 @@
 	"wmsLoginNoteSecondary": "Iniciarás sesión con una cuenta de empleado.",
 	"selectOption": "Selecciona una opción",
 	"successLoginMsg": "¡Bienvenido! Has iniciado sesión correctamente",
+	"hello": "Hola",
 	"unknownStatusErrorMsg": "Ha ocurrido un error al intentar ejecutar la acción, por favor, intente de nuevo",
 	"successfullyMsg": "Elemento creado de manera satisfactoria",
 	"changedsuccessfullyMsg": "Elemento modificado de manera satisfactoria",

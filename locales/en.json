@@ -14,6 +14,7 @@
 	"wmsLoginNoteSecondary": "You will log in with an employee account.",
 	"selectOption": "Select an option",
 	"successLoginMsg": "Welcome! You have successfully logged in",
+	"hello": "Hello",
 	"unknownStatusErrorMsg":"An error occurred while trying to execute the action, please try again",
 	"successfullyMsg": "Item created successfully",
 	"changedsuccessfullyMsg": "Item changed successfully",

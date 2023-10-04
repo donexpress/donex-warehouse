@@ -91,7 +91,14 @@ const Header = () => {
                   className="container-header__icon"
                 />
               </div>
-              {/* <span className='container-header__username'>{profile.username}</span> */}
+              {
+                profile !== null && (
+                  <div className="elements-center-start">
+                    <span style={{ fontSize: '10px', minHeight: '18px' }}>{intl.formatMessage({ id: "hello" })},</span>
+                    <span className='container-header__username'>{profile.username}</span>
+                  </div>
+                )
+              }
             </div>
 
             <Popover

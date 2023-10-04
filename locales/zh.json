@@ -14,6 +14,7 @@
   "wmsLoginNoteSecondary": "您將使用員工帳戶登錄。",
   "selectOption": "選擇一個選項",
   "successLoginMsg": "歡迎您！您已成功登錄",
+  "hello": "你好",
   "unknownStatusErrorMsg": "嘗試執行操作時發生錯誤，請重試",
   "successivelyMsg": "項目創建成功",
   "changedsuccessivelyMsg": "項目更改成功",
