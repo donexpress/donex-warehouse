@@ -234,6 +234,12 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     }
   };
 
+  const getBoxes = (items: { packing_lists: PackingList; checked: boolean }[]): PackingList[] => {
+    return items.map((item) => {
+      return item.packing_lists
+    });
+  }
+
   return (
     <>
       <div style={{ paddingTop: "20px" }}>
@@ -259,13 +265,13 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                       <InventoryList
                         intl={intl}
                         exitPlan={exitPlan}
-                        boxes={rows}
+                        boxes={getBoxes(rows)}
                       />
                     }
                     fileName={`${exitPlan.output_number}.pdf`}
                   >
                     {({ blob, url, loading, error }) =>
-                      intl.formatMessage({ id: "print_inventory_list" })
+                      intl.formatMessage({ id: "generate_pdf_inventory" })
                     }
                   </PDFDownloadLink>
                 </DropdownItem>

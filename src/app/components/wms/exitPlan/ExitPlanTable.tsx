@@ -55,6 +55,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "../operationInstruction/ExportTable";
 import ExportExitPlanTable from "./ExportExitPlanTable";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import InventoryList from "./InventoryList";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -277,6 +278,22 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
+                </DropdownItem>
+                <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""}>
+                  <PDFDownloadLink
+                    document={
+                      <InventoryList
+                        intl={intl}
+                        exitPlan={user}
+                        boxes={user.packing_lists}
+                      />
+                    }
+                    fileName={`${user.output_number}.pdf`}
+                  >
+                    {({ blob, url, loading, error }) =>
+                      intl.formatMessage({ id: "generate_pdf_inventory" })
+                    }
+                  </PDFDownloadLink>
                 </DropdownItem>
                 <DropdownItem
                   className={

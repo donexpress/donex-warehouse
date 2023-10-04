@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
 interface Props {
   intl: IntlShape;
   exitPlan: ExitPlan;
-  boxes: { packing_lists: PackingList; checked: boolean }[];
+  boxes: PackingList[];
 }
 
 const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
@@ -170,17 +170,17 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
           {boxes.map((box, index) => (
             <View style={styles.tableRow} key={index}>
               <Text style={styles.tableCell}>
-                {box.packing_lists.case_number}
+                {box.case_number}
               </Text>
               <Text style={styles.tableCell}>
-                {box.packing_lists.client_weight}
+                {box.client_weight}
               </Text>
               <Text style={styles.tableCell}>
-                {box.packing_lists?.client_height}
+                {box.client_height}
               </Text>
               <Text style={styles.tableCell}>--</Text>
               <Text style={styles.tableCell}>--</Text>
-              <Text style={styles.tableCell}>{box.packing_lists.amount}</Text>
+              <Text style={styles.tableCell}>{box.amount}</Text>
               <Text style={styles.tableCell}>--</Text>
               <Text style={styles.tableCell}>--</Text>
             </View>
