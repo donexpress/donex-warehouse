@@ -18,7 +18,7 @@ import {
 import AddExitPlanDialog from "./AddExitPlanDialog";
 import { getPackingListsByCaseNumber } from "../../../../services/api.packing_list";
 import { getStoragePlanByOrder_number } from "../../../../services/api.storage_plan";
-import { showMsg } from "../../../../helpers";
+import { showMsg, packingListDataToExcel } from "../../../../helpers";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InventoryList from "./InventoryList";
 import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
@@ -258,6 +258,9 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               <DropdownMenu aria-label="Actions menu">
                 <DropdownItem onClick={() => handleAction(1)}>
                   {intl.formatMessage({ id: "add" })}
+                </DropdownItem>
+                <DropdownItem className={(rows.length === 0) ? "do-not-show-dropdown-item" : ""} onClick={() => packingListDataToExcel(null, getBoxes(rows), intl, 'lg' )}>
+                  {intl.formatMessage({ id: "generate_xlsx_inventory" })}
                 </DropdownItem>
                 <DropdownItem>
                   <PDFDownloadLink

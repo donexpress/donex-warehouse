@@ -47,7 +47,7 @@ import {
 } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
-import { exitPlanDataToExcel, isOMS, showMsg } from "../../../../helpers";
+import { exitPlanDataToExcel, isOMS, showMsg, packingListDataToExcel } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import FilterExitPlan from "./FilterExitPlan";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
@@ -278,6 +278,9 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
+                </DropdownItem>
+                <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""} onClick={() => packingListDataToExcel(null, user.packing_lists, intl, 'lg' )}>
+                  {intl.formatMessage({ id: "generate_xlsx_inventory" })}
                 </DropdownItem>
                 <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""}>
                   <PDFDownloadLink

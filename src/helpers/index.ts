@@ -236,14 +236,14 @@ export const storagePlanDataToExcel = (
 };
 
 export const packingListDataToExcel = (
-  storagePlan: StoragePlan,
+  storagePlan: StoragePlan | null,
   packingLists: PackingList[],
   intl: IntlShape,
   type: "ic" | "lg"
 ) => {
   let dataToExport: object[] = [];
 
-  if (type === "ic") {
+  if (type === "ic" && storagePlan) {
     const key1: string = intl.formatMessage({ id: "box_number" });
     const key2: string = intl.formatMessage({ id: "expansion_box_number" });
     const key3: string = intl.formatMessage({ id: "outgoing_order" });
@@ -337,20 +337,20 @@ export const packingListDataToExcel = (
     packingLists.forEach((pl: PackingList) => {
       const pList: { [key: string]: string } = {};
 
-      pList[key1] = pl.box_number;
-      pList[key2] = pl.case_number;
+      pList[key1] = pl.box_number ? pl.box_number : "--";
+      pList[key2] = pl.case_number ? pl.case_number : "--";
       pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
-      pList[key4] = pl.amount.toString();
-      pList[key5] = pl.client_weight.toString();
-      pList[key6] = pl.client_length.toString();
-      pList[key7] = pl.client_width.toString();
-      pList[key8] = pl.client_height.toString();
-      pList[key9] = pl.product_name;
-      pList[key10] = pl.english_product_name;
-      pList[key11] = pl.price.toString();
-      pList[key12] = pl.material;
-      pList[key13] = pl.customs_code;
-      pList[key14] = pl.fnscu;
+      pList[key4] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
+      pList[key5] = (pl.client_weight || pl.client_weight === 0) ? pl.client_weight.toString() : "--";
+      pList[key6] = (pl.client_length || pl.client_length === 0) ? pl.client_length.toString() : "--";
+      pList[key7] = (pl.client_width || pl.client_width === 0) ? pl.client_width.toString() : "--";
+      pList[key8] = (pl.client_height || pl.client_height === 0) ? pl.client_height.toString() : "--";
+      pList[key9] = pl.product_name ? pl.product_name : "--";
+      pList[key10] = pl.english_product_name ? pl.english_product_name : "--";
+      pList[key11] = (pl.price || pl.price === 0) ? pl.price.toString() : "--";
+      pList[key12] = pl.material ? pl.material : "--";
+      pList[key13] = pl.customs_code ? pl.customs_code : "--";
+      pList[key14] = pl.fnscu ? pl.fnscu : "--";
 
       dataToExport.push(pList);
     });
@@ -367,7 +367,7 @@ export const packingListDataToExcel = (
   const data = new Blob([excelBuffer], { type: fileType });
   FileSaver.saveAs(
     data,
-    `${intl.formatMessage({ id: "storage_plan_inventory" })}(` +
+    `${storagePlan !== null ? "storage_plan_inventory " : "exit_plan_inventory "}(` +
       date.getDate() +
       "-" +
       (date.getMonth() + 1) +
@@ -400,6 +400,7 @@ export const operationInstructionDataToExcel = (
     }
     return "";
   };
+
   const getLocation = (ep: OperationInstruction): string => {
     let locations = "";
     ep.output_plan &&
@@ -417,6 +418,7 @@ export const operationInstructionDataToExcel = (
     });
     return result;
   };
+  
   operationInstructions.forEach((oi: OperationInstruction) => {
     const oInst: { [key: string]: string } = {};
     visibleColumn.forEach((column) => {
