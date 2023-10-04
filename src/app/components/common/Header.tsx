@@ -54,9 +54,9 @@ const Header = () => {
         setProfile(data);
       }
     }
-    if (isOMS() !== undefined) {
+    if (isOMS()) {
       const data = getCookie("profileOMS");
-      if (data) {
+      if (data !== undefined) {
         setProfile(data);
       }
     }
