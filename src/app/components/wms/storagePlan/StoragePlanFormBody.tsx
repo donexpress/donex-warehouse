@@ -53,6 +53,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         label: "6"
       }
     ];
+    const [rejectedBoxesCheckValue, setRejectedBoxesCheckValue] = useState<boolean>((!!id && storagePlan) ? storagePlan.rejected_boxes : false);
     const [warehouseOfUser, setWarehouseOfUser] = useState<number>(!!id && storagePlan && storagePlan.user_id ? getWarehouseIdOfUser(storagePlan.user_id, users, warehouses) : -1);
     
     const initialValues: StoragePlan = {
@@ -227,15 +228,15 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
           setShowPackingList(fieldValue);
         } else if (name === 'show_expansion_box_number') {
           setShowExpansionBoxNumber(fieldValue);
-          setBoxNumberLabel({ showEBN: fieldValue, prefixEBN: prefixExpansionBoxNumber, dBN: digitsBoxNumber });
+          setBoxNumberLabel({ showEBN: fieldValue, prefixEBN: prefixExpansionBoxNumber, dBN: digitsBoxNumber }, rejectedBoxesCheckValue);
         } else if (name === 'prefix_expansion_box_number') {
           const valueElement: string = fieldValue ? fieldValue : '';
           setPrefixExpansionBoxNumber(valueElement);
-          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: valueElement, dBN: digitsBoxNumber });
+          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: valueElement, dBN: digitsBoxNumber }, rejectedBoxesCheckValue);
         } else if (name === 'digits_box_number') {
           const valueElement: number = fieldValue ? Number (fieldValue) : 6;
           setDigitsBoxNumber(valueElement);
-          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: prefixExpansionBoxNumber, dBN: valueElement });
+          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: prefixExpansionBoxNumber, dBN: valueElement }, rejectedBoxesCheckValue);
         } else if (name === 'box_amount') {
           const valueElement = fieldValue < 0 ? 0 : fieldValue;
           setBoxesCount(valueElement);
@@ -260,7 +261,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
           for (let index = 0; index < count; index++) {
             items.push({
               id: rows.length + index, 
-              box_number: getInitialBoxNumberLabel(rows.length + index + 1), 
+              box_number: getInitialBoxNumberLabel(rows.length + index + 1, null, rejectedBoxesCheckValue), 
               case_number: '',
               amount: 0,
               client_weight: 0,
@@ -283,17 +284,17 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         }
       }
 
-      const setBoxNumberLabel = (params: BoxNumberLabelFn) => {
-        const allRows = rows.map((row: PackingList) => ({...row, box_number: getInitialBoxNumberLabel(Number(row.id) + 1, params)}));
+      const setBoxNumberLabel = (params: BoxNumberLabelFn, rBoxes = false) => {
+        const allRows = rows.map((row: PackingList) => ({...row, box_number: getInitialBoxNumberLabel(Number(row.id) + 1, params, rBoxes)}));
         setRows(allRows);
       }
 
-      const getInitialBoxNumberLabel = (value: number, params: BoxNumberLabelFn | null = null) => {
+      const getInitialBoxNumberLabel = (value: number, params: BoxNumberLabelFn | null = null, rBoxes = false) => {
         let showEBN: boolean = params !== null ? params.showEBN : showExpansionBoxNumber;
         let prefixEBN: string = params !== null ? params.prefixEBN : prefixExpansionBoxNumber;
         let dBN: number = params !== null ? params.dBN : digitsBoxNumber;
         if (showEBN){
-          let numberPart = 'U' + ((value.toString.length >= dBN) ? value : (String(value).padStart(dBN, '0')));
+          let numberPart = (rBoxes ? 'UR' : 'U') + ((value.toString.length >= dBN) ? value : (String(value).padStart(dBN, '0')));
           
           return prefixEBN + numberPart;
         }
@@ -312,8 +313,14 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
       const changeCustomerOrderNumber = (value: string) => {
         if (value && value !== ''){
           setPrefixExpansionBoxNumber(value);
-          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: value, dBN: digitsBoxNumber });
+          setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: value, dBN: digitsBoxNumber }, rejectedBoxesCheckValue);
         }
+      };
+
+      const changeRejectedValue = (value: boolean) => {
+        setRejectedBoxesCheckValue(value);
+        
+        setBoxNumberLabel({ showEBN: showExpansionBoxNumber, prefixEBN: prefixExpansionBoxNumber, dBN: digitsBoxNumber }, value);
       };
 
     return (
@@ -398,7 +405,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           />
                         </div>
                       </div>
-                      <CheckboxesStoragePlan  isFromDetails={!!isFromDetails}/>
+                      <CheckboxesStoragePlan  isFromDetails={!!isFromDetails} changeRejectedValue={changeRejectedValue}/>
                       <div className="flex gap-3 flex-wrap" style={{ paddingRight: '16px' }}>
                         <div className="w-full">
                           <GenericInput
@@ -435,7 +442,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                                       placeholder={intl.formatMessage({ id: 'expansion_box_number' })}
                                       customClass="custom-input"
                                       onChangeFunction={handleInputChange}
-                                      disabled={ isFromDetails }
+                                      disabled={ true }
                                     />
                                   </div>
                                   <div className="w-full sm:w-[49%]">
@@ -458,7 +465,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                                 <div className='boxes-container-values'>
                                   {rows.map((row, index) => (
                                     <RowStoragePlan key={index} initialValues={{ ...row, id: index }} inWMS={inWMS}
-                                    onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} />
+                                    onUpdate={(updatedValues) => handleUpdateRow(index, updatedValues)} prefixBoxNumber={prefixExpansionBoxNumber} rejectedBoxes={rejectedBoxesCheckValue} />
                                   ))}
                                 </div>
                               </div>

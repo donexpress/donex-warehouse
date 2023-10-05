@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { MessageOpts, TypeOptions } from "../types";
+import { MessageOpts, TypeOptions, BatchStoragePlans } from "../types";
 import { getCookie } from "./cookieUtils";
 import { AxiosRequestConfig } from "axios";
 import { parse } from "cookie";
@@ -135,6 +135,37 @@ export const getHourFromStr = (date: string | undefined): string => {
   }
   return "";
 };
+
+export const downloadTemplateSP = () => {
+  const dataToExport: object[] = [
+    {
+      customer_order_number: '',
+      username: '',
+      warehouse_code: '',
+      reference_number: '',
+      pr_number: '',
+      box_amount: '',
+      delivered_time: '',
+      observations: '',
+      return: '',
+      rejected_boxes: '',
+      expansion_box_number: '',
+      digits_box_number: ''
+    }
+  ];
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `template_to_import_entry_plans` + fileExtension
+  );
+}
 
 export const storagePlanDataToExcel = (
   storagePlans: StoragePlan[],

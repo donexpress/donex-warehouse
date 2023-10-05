@@ -141,6 +141,7 @@
 	"number_of_boxes_entered": "Number of boxes entered",
 	"number_of_boxes_stored": "Number of boxes stored",
 	"force_entry": "Force entry",
+	"template": "Template",
 	"upload_evidence": "Upload evidence",
 	"generate_evidence": "Generate evidence",
 	"evidence_generated": "Evidence generated",

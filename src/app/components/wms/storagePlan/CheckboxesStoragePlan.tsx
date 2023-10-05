@@ -6,9 +6,10 @@ import { useFormikContext } from 'formik';
 
 interface RowStoragePlanProps {
   isFromDetails: boolean;
+  changeRejectedValue: (value: boolean) => any;
 }
 
-const CheckboxesStoragePlan: React.FC<RowStoragePlanProps> = ({ isFromDetails = false }) => {
+const CheckboxesStoragePlan: React.FC<RowStoragePlanProps> = ({ isFromDetails = false, changeRejectedValue }) => {
     const intl = useIntl();
     const formik = useFormikContext();
 
@@ -20,11 +21,13 @@ const CheckboxesStoragePlan: React.FC<RowStoragePlanProps> = ({ isFromDetails = 
       if (name === 'return') {
         if (fieldValue) {
           formik.setFieldValue('rejected_boxes', false);
+          changeRejectedValue(false);
         }
       } else if (name === 'rejected_boxes') {
         if (fieldValue) {
           formik.setFieldValue('return', false);
         }
+        changeRejectedValue(fieldValue);
       }
     }
 

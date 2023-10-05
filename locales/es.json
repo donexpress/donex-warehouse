@@ -141,6 +141,7 @@
 	"number_of_boxes_entered": "Número de cajas entradas",
 	"number_of_boxes_stored": "Número de cajas almacenadas",
 	"force_entry": "Forzar entrada",
+	"template": "Plantilla",
 	"upload_evidence": "Subir evidencias",
 	"generate_evidence": "Generar evidencias",
 	"evidence_generated": "Evidencias generadas",

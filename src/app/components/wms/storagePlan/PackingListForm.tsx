@@ -22,7 +22,7 @@ const getInitialLabel = (storagePlan: StoragePlan): string => {
         
         packingList.forEach(item => {
           if (typeof item.box_number === 'string') {
-            const match = item.box_number.match(/^(.*)(?=U\d+$)/)
+            const match = item.box_number.match(/^(.*)(U[R]?)(\d+)$/)
             if (match) {
               prefixes.push(match[1]);
             }
@@ -43,7 +43,7 @@ const getInitialDigits = (packingList: PackingList[] | undefined): number => {
         
         packingList.forEach(item => {
           if (typeof item.box_number === 'string') {
-            const match = item.box_number.match(/U(\d+)$/);
+            const match = item.box_number.match(/U[R]?(\d+)$/);
             if (match) {
               digitCounts.push(match[1].length);
             }
@@ -87,12 +87,12 @@ const getMajorNumber = (packingList: PackingList[] | undefined): number => {
   return result;
 }
 
-const getInitialBNL = (value: number, params: BoxNumberLabelFn) => {
+const getInitialBNL = (value: number, params: BoxNumberLabelFn, isRejectedBoxes = false) => {
   let showEBN: boolean = params.showEBN;
   let prefixEBN: string = params.prefixEBN;
   let dBN: number = params.dBN;
   if (showEBN){
-    let numberPart = 'U' + ((value.toString.length >= dBN) ? value : (String(value).padStart(dBN, '0')));
+    let numberPart = (isRejectedBoxes ? 'UR' : 'U') + ((value.toString.length >= dBN) ? value : (String(value).padStart(dBN, '0')));
     
     return prefixEBN + numberPart;
   }
@@ -111,7 +111,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
         ([
             {
                 id: (storagePlan.packing_list && (storagePlan.packing_list.length > 0)) ? (Number(storagePlan.packing_list[storagePlan.packing_list.length - 1].id) + 1) : storagePlan.box_amount, 
-                box_number: getInitialBNL(getMajorNumber(storagePlan.packing_list) + 1, {showEBN: true, prefixEBN: prefixExpansionBoxNumber, dBN: digitsBoxNumber}),
+                box_number: getInitialBNL(getMajorNumber(storagePlan.packing_list) + 1, {showEBN: true, prefixEBN: prefixExpansionBoxNumber, dBN: digitsBoxNumber}, (storagePlan && storagePlan.rejected_boxes) ? true : false),
                 box_number_aux: getMajorNumber(storagePlan.packing_list) + 1,  
                 case_number: '',
                 amount: 0,
@@ -283,7 +283,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
           for (let index = 0; index < count; index++) {
             items.push({
               id: ((storagePlan.packing_list && (storagePlan.packing_list.length > 0)) ? (Number(storagePlan.packing_list[storagePlan.packing_list.length - 1].id) + 1) : storagePlan.box_amount) + rows.length + index, 
-              box_number: getInitialBoxNumberLabel(getMajorNumber(storagePlan.packing_list) + rows.length + index + 1), 
+              box_number: getInitialBoxNumberLabel(getMajorNumber(storagePlan.packing_list) + rows.length + index + 1, null, (storagePlan && storagePlan.rejected_boxes) ? true : false), 
               box_number_aux: getMajorNumber(storagePlan.packing_list) + rows.length + index + 1, 
               case_number: '',
               amount: 0,
@@ -307,16 +307,16 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
       }
 
       const setBoxNumberLabel = (params: BoxNumberLabelFn) => {
-        const allRows = rows.map((row: PackingList) => ({...row, box_number: getInitialBoxNumberLabel(Number(row.box_number_aux), params)}));
+        const allRows = rows.map((row: PackingList) => ({...row, box_number: getInitialBoxNumberLabel(Number(row.box_number_aux), params, (storagePlan && storagePlan.rejected_boxes) ? true : false)}));
         setRows(allRows);
       }
 
-      const getInitialBoxNumberLabel = (value: number, params: BoxNumberLabelFn | null = null) => {
+      const getInitialBoxNumberLabel = (value: number, params: BoxNumberLabelFn | null = null, isRBoxes = false) => {
         let showEBN: boolean = params !== null ? params.showEBN : showExpansionBoxNumber;
         let prefixEBN: string = params !== null ? params.prefixEBN : prefixExpansionBoxNumber;
         let dBN: number = params !== null ? params.dBN : digitsBoxNumber;
         if (showEBN){
-          let numberPart = 'U' + ((value.toString.length >= dBN) ? value : (String(value).padStart(dBN, '0')));
+          let numberPart = (isRBoxes ? 'UR' : 'U') + ((value.toString.length >= dBN) ? value : (String(value).padStart(dBN, '0')));
           
           return prefixEBN + numberPart;
         }
@@ -381,6 +381,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
                                   placeholder={intl.formatMessage({ id: 'expansion_box_number' })}
                                   customClass="custom-input"
                                   onChangeFunction={handleInputChange}
+                                  disabled={true}
                                 />
                               </div>
                               <div className="w-full sm:w-[49%]">
@@ -402,7 +403,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
                             <div className='boxes-container-values'>
                               {rows.map((row, index) => (
                                 <RowStoragePlan key={index} initialValues={{ ...row }} inWMS={inWMS}
-                                onUpdate={(updatedValues) => handleUpdateRow(Number(row.id), updatedValues)} />
+                                onUpdate={(updatedValues) => handleUpdateRow(Number(row.id), updatedValues)} rejectedBoxes={(storagePlan && storagePlan.rejected_boxes) ? true : false} prefixBoxNumber={prefixExpansionBoxNumber} />
                               ))}
                             </div>
                           </div>

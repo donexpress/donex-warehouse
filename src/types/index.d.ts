@@ -258,8 +258,8 @@ export type Counts = {
 
 export type BatchStoragePlans = {
   customer_order_number: string;
-  user_id: number;
-  warehouse_id: number;
+  username: string | null;
+  warehouse_code: string;
   reference_number: string;
   pr_number: string;
   box_amount: number;
