@@ -39,7 +39,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     const { locale } = router.query;
     const intl = useIntl();
     const [showPackingList, setShowPackingList] = useState<boolean>(false);
-    const [showExpansionBoxNumber, setShowExpansionBoxNumber] = useState<boolean>(false);
+    const [showExpansionBoxNumber, setShowExpansionBoxNumber] = useState<boolean>(true);
     const [rows, setRows] = useState<PackingList[]>([]);
     const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>('FBA');
     const [digitsBoxNumber, setDigitsBoxNumber] = useState<number>(6);
@@ -65,7 +65,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
         rejected_boxes: (id && storagePlan) ? storagePlan.rejected_boxes : false,
         return: (id && storagePlan) ? storagePlan.return : false,
         show_packing_list: false,
-        show_expansion_box_number: false,
+        show_expansion_box_number: true,
         prefix_expansion_box_number: 'FBA',
         digits_box_number: 6,
         reference_number: (id && storagePlan) ? storagePlan.reference_number : null,
@@ -422,7 +422,8 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                           <div>
                             <div style={{ paddingLeft: '10px' }}>
                               <div className="flex gap-2 flex-wrap" style={{ paddingBottom: '10px' }}>
-                                <GenericInput onChangeFunction={handleInputChange} hideErrorContent={true} type='checkbox' name="show_expansion_box_number" placeholder={intl.formatMessage({ id: 'expansion_box_number' })} customClass='custom-input' />
+                                <span>{intl.formatMessage({ id: 'expansion_box_number' })}</span>
+                                {/* <GenericInput onChangeFunction={handleInputChange} hideErrorContent={true} type='checkbox' name="show_expansion_box_number" placeholder={intl.formatMessage({ id: 'expansion_box_number' })} customClass='custom-input' /> */}
                               </div>
                               {
                                 showExpansionBoxNumber && 

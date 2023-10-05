@@ -87,16 +87,31 @@ const getMajorNumber = (packingList: PackingList[] | undefined): number => {
   return result;
 }
 
+const getInitialBNL = (value: number, params: BoxNumberLabelFn) => {
+  let showEBN: boolean = params.showEBN;
+  let prefixEBN: string = params.prefixEBN;
+  let dBN: number = params.dBN;
+  if (showEBN){
+    let numberPart = 'U' + ((value.toString.length >= dBN) ? value : (String(value).padStart(dBN, '0')));
+    
+    return prefixEBN + numberPart;
+  }
+  return value.toString();
+}
+
 const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModifyPackingList, inWMS }: PackingListProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
-    const [showExpansionBoxNumber, setShowExpansionBoxNumber] = useState<boolean>(isFromModifyPackingList ? true : false);
+    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>(getInitialLabel(storagePlan));
+    const [digitsBoxNumber, setDigitsBoxNumber] = useState<number>(getInitialDigits(storagePlan.packing_list));
+    const [showExpansionBoxNumber, setShowExpansionBoxNumber] = useState<boolean>(true);
+    //const [showExpansionBoxNumber, setShowExpansionBoxNumber] = useState<boolean>(isFromModifyPackingList ? true : false);
     const [rows, setRows] = useState<PackingList[]>(isFromAddPackingList ? 
         ([
             {
                 id: (storagePlan.packing_list && (storagePlan.packing_list.length > 0)) ? (Number(storagePlan.packing_list[storagePlan.packing_list.length - 1].id) + 1) : storagePlan.box_amount, 
-                box_number: String(getMajorNumber(storagePlan.packing_list) + 1),
+                box_number: getInitialBNL(getMajorNumber(storagePlan.packing_list) + 1, {showEBN: true, prefixEBN: prefixExpansionBoxNumber, dBN: digitsBoxNumber}),
                 box_number_aux: getMajorNumber(storagePlan.packing_list) + 1,  
                 case_number: '',
                 amount: 0,
@@ -117,8 +132,6 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
         ])
         :
         getPackingListFromSP(!!isFromModifyPackingList, storagePlan.packing_list));
-    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>(getInitialLabel(storagePlan));
-    const [digitsBoxNumber, setDigitsBoxNumber] = useState<number>(getInitialDigits(storagePlan.packing_list));
     const digitsBoxNumberOptions: ValueSelect[] = [
       {
         value: 3,
@@ -132,7 +145,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
     
     const initialValues: any = {
         box_amount: 1,
-        show_expansion_box_number: false,
+        show_expansion_box_number: true,
         prefix_expansion_box_number: prefixExpansionBoxNumber,
         digits_box_number: digitsBoxNumber,
         rows: [],
@@ -354,7 +367,8 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
                           {
                               isFromAddPackingList &&
                               <div className="flex gap-2 flex-wrap" style={{ paddingBottom: '10px' }}>
-                                <GenericInput onChangeFunction={handleInputChange} hideErrorContent={true} type='checkbox' name="show_expansion_box_number" placeholder={intl.formatMessage({ id: 'expansion_box_number' })} customClass='custom-input' />
+                                <span>{intl.formatMessage({ id: 'expansion_box_number' })}</span>
+                                {/* <GenericInput onChangeFunction={handleInputChange} hideErrorContent={true} type='checkbox' name="show_expansion_box_number" placeholder={intl.formatMessage({ id: 'expansion_box_number' })} customClass='custom-input' /> */}
                               </div>
                           }
                           {
