@@ -370,6 +370,9 @@
 	"multiple": "多种的",
   "amazon": "Amazon",
 	"meli": "Mercado Libre",
-	"private_address": "私人地址"
+	"private_address": "私人地址",
+	"not_own_box_msg": "您正在尝试添加或删除不属于该用户的邮箱，请联系管理员。",
+	"not_correct_state_msg": "并非所有引入的盒子都被添加，因为它们没有被存储。",
+	"missing_apendix_msg": "要更改状态，您需要上传至少 1 个证据。"
 
 }

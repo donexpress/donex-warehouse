@@ -37,7 +37,8 @@ export type ExitPlan = {
     value: string;
     position: number;
   }
-  address_ref?: State
+  address_ref?: State;
+  reference_number: string | null
 };
 
 export type ExitPlanProps = {
