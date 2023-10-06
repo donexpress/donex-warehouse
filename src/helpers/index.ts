@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { MessageOpts, TypeOptions } from "../types";
+import { MessageOpts, TypeOptions, BatchStoragePlans } from "../types";
 import { getCookie } from "./cookieUtils";
 import { AxiosRequestConfig } from "axios";
 import { parse } from "cookie";
@@ -136,6 +136,37 @@ export const getHourFromStr = (date: string | undefined): string => {
   return "";
 };
 
+export const downloadTemplateSP = () => {
+  const dataToExport: object[] = [
+    {
+      customer_order_number: '',
+      username: '',
+      warehouse_code: '',
+      reference_number: '',
+      pr_number: '',
+      box_amount: '',
+      delivered_time: '',
+      observations: '',
+      return: '',
+      rejected_boxes: '',
+      expansion_box_number: '',
+      digits_box_number: ''
+    }
+  ];
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `template_to_import_entry_plans` + fileExtension
+  );
+}
+
 export const storagePlanDataToExcel = (
   storagePlans: StoragePlan[],
   intl: IntlShape,
@@ -234,6 +265,101 @@ export const storagePlanDataToExcel = (
       fileExtension
   );
 };
+
+export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingList[], intl: IntlShape) => {
+  let dataToExport: object[] = [];
+
+  const key1: string = intl.formatMessage({ id: "box_number" });
+  const key2: string = intl.formatMessage({ id: "case_number" });
+  const key3: string = `${intl.formatMessage({ id: "client_weight" })} (kg)`;
+  const key4: string = `${intl.formatMessage({ id: "client_height" })} (cm)`;
+  const key5: string = `${intl.formatMessage({ id: "storage_weight" })} (kg)`;
+  const key6: string = `${intl.formatMessage({ id: "storage_height" })} (cm)`;
+  const key7: string = intl.formatMessage({ id: "products_per_box" });
+  const key8: string = intl.formatMessage({ id: "location" });
+  const key9: string = intl.formatMessage({ id: "storage_time" });
+  const key10: string = intl.formatMessage({ id: "delivery_time" });
+
+  
+  packingLists.forEach((pl: PackingList) => {
+    const pList: { [key: string]: string } = {};
+
+    pList[key1] = pl.box_number;
+    pList[key2] = pl.case_number;
+    pList[key3] = (pl.client_weight || pl.client_weight === 0) ? pl.client_weight.toString() : "--";
+    pList[key4] = (pl.client_height || pl.client_height === 0) ? pl.client_height.toString() : "--";
+    pList[key5] = "--";
+    pList[key6] = "--";
+    pList[key7] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
+    pList[key8] =
+      pl.package_shelf && pl.package_shelf.length > 0
+        ? (exitPlan.warehouse
+            ? `${exitPlan.warehouse.code}-${String(
+                pl.package_shelf[0].shelf?.partition_table
+              ).padStart(2, "0")}-${String(
+                pl.package_shelf[0].shelf?.number_of_shelves
+              ).padStart(2, "0")}-${String(
+                pl.package_shelf[0].layer
+              ).padStart(2, "0")}-${String(
+                pl.package_shelf[0].column
+              ).padStart(2, "0")} `
+            : "") +
+          `${intl.formatMessage({ id: "partition" })}: ${
+            pl.package_shelf &&
+            pl.package_shelf.length > 0 &&
+            pl.package_shelf[0].shelf
+              ? pl.package_shelf[0].shelf.partition_table
+              : ""
+          } ` +
+          `${intl.formatMessage({ id: "shelf" })}: ${
+            pl.package_shelf &&
+            pl.package_shelf.length > 0 &&
+            pl.package_shelf[0].shelf
+              ? pl.package_shelf[0].shelf.number_of_shelves
+              : ""
+          } ` +
+          `${intl.formatMessage({ id: "layer" })}: ${
+            pl.package_shelf && pl.package_shelf.length > 0
+              ? pl.package_shelf[0].layer
+              : ""
+          }  ` +
+          `${intl.formatMessage({ id: "column" })}: ${
+            pl.package_shelf && pl.package_shelf.length > 0
+              ? pl.package_shelf[0].column
+              : ""
+          } `
+        : "--";
+    pList[key9] = "--";
+    pList[key10] = exitPlan.delivered_time
+      ? `${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(
+        exitPlan.delivered_time
+        )}`
+      : "--";
+
+    dataToExport.push(pList);
+  });
+
+  const date = new Date();
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `exit_plan_inventory_${exitPlan.output_number} (` +
+      date.getDate() +
+      "-" +
+      (date.getMonth() + 1) +
+      "-" +
+      date.getFullYear() +
+      ")" +
+      fileExtension
+  );
+}
 
 export const packingListDataToExcel = (
   storagePlan: StoragePlan,
@@ -337,20 +463,20 @@ export const packingListDataToExcel = (
     packingLists.forEach((pl: PackingList) => {
       const pList: { [key: string]: string } = {};
 
-      pList[key1] = pl.box_number;
-      pList[key2] = pl.case_number;
+      pList[key1] = pl.box_number ? pl.box_number : "--";
+      pList[key2] = pl.case_number ? pl.case_number : "--";
       pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
-      pList[key4] = pl.amount.toString();
-      pList[key5] = pl.client_weight.toString();
-      pList[key6] = pl.client_length.toString();
-      pList[key7] = pl.client_width.toString();
-      pList[key8] = pl.client_height.toString();
-      pList[key9] = pl.product_name;
-      pList[key10] = pl.english_product_name;
-      pList[key11] = pl.price.toString();
-      pList[key12] = pl.material;
-      pList[key13] = pl.customs_code;
-      pList[key14] = pl.fnscu;
+      pList[key4] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
+      pList[key5] = (pl.client_weight || pl.client_weight === 0) ? pl.client_weight.toString() : "--";
+      pList[key6] = (pl.client_length || pl.client_length === 0) ? pl.client_length.toString() : "--";
+      pList[key7] = (pl.client_width || pl.client_width === 0) ? pl.client_width.toString() : "--";
+      pList[key8] = (pl.client_height || pl.client_height === 0) ? pl.client_height.toString() : "--";
+      pList[key9] = pl.product_name ? pl.product_name : "--";
+      pList[key10] = pl.english_product_name ? pl.english_product_name : "--";
+      pList[key11] = (pl.price || pl.price === 0) ? pl.price.toString() : "--";
+      pList[key12] = pl.material ? pl.material : "--";
+      pList[key13] = pl.customs_code ? pl.customs_code : "--";
+      pList[key14] = pl.fnscu ? pl.fnscu : "--";
 
       dataToExport.push(pList);
     });
@@ -367,7 +493,7 @@ export const packingListDataToExcel = (
   const data = new Blob([excelBuffer], { type: fileType });
   FileSaver.saveAs(
     data,
-    `${intl.formatMessage({ id: "storage_plan_inventory" })}(` +
+    `storage_plan_inventory (` +
       date.getDate() +
       "-" +
       (date.getMonth() + 1) +
@@ -400,6 +526,7 @@ export const operationInstructionDataToExcel = (
     }
     return "";
   };
+
   const getLocation = (ep: OperationInstruction): string => {
     let locations = "";
     ep.output_plan &&
@@ -417,6 +544,7 @@ export const operationInstructionDataToExcel = (
     });
     return result;
   };
+  
   operationInstructions.forEach((oi: OperationInstruction) => {
     const oInst: { [key: string]: string } = {};
     visibleColumn.forEach((column) => {

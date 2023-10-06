@@ -72,6 +72,10 @@
             grid-template-columns: 140px 140px 140px 140px 140px 140px 140px 140px;
         }
     }
+
+    .info-packing-list {
+        width: calc(100vw - 64px);
+    }
 }
 
 @media only screen and (max-width: 500px) {

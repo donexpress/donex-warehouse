@@ -18,6 +18,12 @@
     column-gap: 5px;
 }
 
+.upload-batch-sp-header-dialog {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px;
+    column-gap: 8px;
+}
+
 .upload-evidence-body-dialog {
     display: grid;
     grid-template-columns: 1fr;

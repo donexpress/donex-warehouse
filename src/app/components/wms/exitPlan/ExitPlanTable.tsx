@@ -47,7 +47,7 @@ import {
 } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
-import { exitPlanDataToExcel, isOMS, showMsg } from "../../../../helpers";
+import { exitPlanDataToExcel, isOMS, showMsg, inventoryOfExitPlan } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import FilterExitPlan from "./FilterExitPlan";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
@@ -55,13 +55,15 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "../operationInstruction/ExportTable";
 import ExportExitPlanTable from "./ExportExitPlanTable";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import InventoryList from "./InventoryList";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
-  "user",
-  "warehouse",
-  "box_amount",
+  "output_boxes",
+  "location",
+  "delivered_time",
   "destination",
+  "address",
   "actions",
 ];
 
@@ -152,6 +154,21 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
+        name: intl.formatMessage({ id: "location" }),
+        uid: "location",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "delivery_time" }),
+        uid: "delivered_time",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "destination" }),
+        uid: "destination",
+        sortable: true,
+      },
+      {
         name: intl.formatMessage({ id: "country" }),
         uid: "country",
         sortable: true,
@@ -167,23 +184,13 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
+        name: intl.formatMessage({ id: "operation_instructions" }),
+        uid: "operation_instructions",
+        sortable: false,
+      },
+      {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "destination" }),
-        uid: "destination",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "delivery_time" }),
-        uid: "delivered_time",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "location" }),
-        uid: "location",
         sortable: true,
       },
       {
@@ -219,7 +226,19 @@ const ExitPlanTable = () => {
       filteredUsers = filteredUsers.filter((user) => {
         return user.output_number
           ?.toLowerCase()
-          .includes(filterValue.toLowerCase());
+          .includes(filterValue.toLowerCase()) ||
+          (user.user ? user.user.username : '')
+            ?.toString()
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase()) ||
+          (user.warehouse ? `${user.warehouse.name} (${user.warehouse.code})` : '')
+            ?.toString()
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase()) || 
+          (user.destination_ref ? user.destination_ref.name : '')
+            ?.toString()
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase());
       });
     }
     return filteredUsers;
@@ -277,6 +296,25 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
+                </DropdownItem>
+                <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""} onClick={() => inventoryOfExitPlan(user, user.packing_lists, intl )}>
+                  {intl.formatMessage({ id: "generate_xlsx_inventory" })}
+                </DropdownItem>
+                <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""}>
+                  <PDFDownloadLink
+                    document={
+                      <InventoryList
+                        intl={intl}
+                        exitPlan={user}
+                        boxes={user.packing_lists}
+                      />
+                    }
+                    fileName={`${user.output_number}.pdf`}
+                  >
+                    {({ blob, url, loading, error }) =>
+                      intl.formatMessage({ id: "generate_pdf_inventory" })
+                    }
+                  </PDFDownloadLink>
                 </DropdownItem>
                 <DropdownItem
                   className={
@@ -400,6 +438,8 @@ const ExitPlanTable = () => {
             {getLocation(user)}
           </span>
         );
+      case "operation_instructions":
+        return <span>{(user.operation_instructions && user.operation_instructions.length > 0) ? user.operation_instructions.length : 0}</span>
       default:
         return cellValue;
     }

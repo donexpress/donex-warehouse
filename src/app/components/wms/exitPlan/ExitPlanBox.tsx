@@ -18,7 +18,7 @@ import {
 import AddExitPlanDialog from "./AddExitPlanDialog";
 import { getPackingListsByCaseNumber } from "../../../../services/api.packing_list";
 import { getStoragePlanByOrder_number } from "../../../../services/api.storage_plan";
-import { showMsg } from "../../../../helpers";
+import { showMsg, inventoryOfExitPlan } from "../../../../helpers";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InventoryList from "./InventoryList";
 import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
@@ -249,6 +249,12 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     }
   };
 
+  const getBoxes = (items: { packing_lists: PackingList; checked: boolean }[]): PackingList[] => {
+    return items.map((item) => {
+      return item.packing_lists
+    });
+  }
+
   return (
     <>
       <div style={{ paddingTop: "20px" }}>
@@ -268,19 +274,22 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 <DropdownItem onClick={() => handleAction(1)}>
                   {intl.formatMessage({ id: "add" })}
                 </DropdownItem>
+                <DropdownItem className={(rows.length === 0) ? "do-not-show-dropdown-item" : ""} onClick={() => inventoryOfExitPlan(exitPlan, getBoxes(rows), intl )}>
+                  {intl.formatMessage({ id: "generate_xlsx_inventory" })}
+                </DropdownItem>
                 <DropdownItem>
                   <PDFDownloadLink
                     document={
                       <InventoryList
                         intl={intl}
                         exitPlan={exitPlan}
-                        boxes={rows}
+                        boxes={getBoxes(rows)}
                       />
                     }
                     fileName={`${exitPlan.output_number}.pdf`}
                   >
                     {({ blob, url, loading, error }) =>
-                      intl.formatMessage({ id: "print_inventory_list" })
+                      intl.formatMessage({ id: "generate_pdf_inventory" })
                     }
                   </PDFDownloadLink>
                 </DropdownItem>
@@ -289,10 +298,10 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           </div>
         </div>
       </div>
-      <div style={{ paddingTop: "10px" }} className="info-packing-list">
+      <div style={{ paddingTop: "10px" }} className="info-epb">
         <div>
           <div
-            className="info-packing-list__table bg-default-100"
+            className="info-epb__table bg-default-100"
             style={{
               padding: "5px 0px 5px 5px",
               borderRadius: "5px 5px 5px 5px",
@@ -306,43 +315,53 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 onChange={handleCheckboxChange}
               />
             </div>
-            <div className="elements-center">
-              <span className="text-center">
+            <div className='elements-center-start'>
+              <span>
+                {intl.formatMessage({ id: 'box_number' })}
+              </span>
+            </div>
+            <div className="elements-center-start">
+              <span className="">
                 {intl.formatMessage({ id: "case_number" })}
               </span>
             </div>
-            <div className="elements-center">
-              <span className="text-center">
+            <div className="elements-center-start">
+              <span className="">
                 {intl.formatMessage({ id: "client_weight" })} (kg)
               </span>
             </div>
-            <div className="elements-center">
-              <span className="text-center">
+            <div className="elements-center-start">
+              <span className="">
                 {intl.formatMessage({ id: "client_height" })} (cm)
               </span>
             </div>
-            <div className="elements-center">
-              <span className="text-center">
+            <div className="elements-center-start">
+              <span className="">
                 {intl.formatMessage({ id: "storage_weight" })} (kg)
               </span>
             </div>
-            <div className="elements-center">
-              <span className="text-center">
+            <div className="elements-center-start">
+              <span className="">
                 {intl.formatMessage({ id: "storage_height" })} (cm)
               </span>
             </div>
-            <div className="elements-center">
-              <span className="text-center">
+            <div className="elements-center-start">
+              <span className="">
                 {intl.formatMessage({ id: "products_per_box" })}
               </span>
             </div>
-            <div className="elements-center">
-              <span className="text-center">
+            <div className="elements-center-start">
+              <span>
+                {intl.formatMessage({ id: "location" })}
+              </span>
+            </div>
+            <div className="elements-center-start">
+              <span className="">
                 {intl.formatMessage({ id: "storage_time" })}
               </span>
             </div>
-            <div className="elements-center">
-              <span className="text-center">
+            <div className="elements-center-start">
+              <span className="">
                 {intl.formatMessage({ id: "delivery_time" })}
               </span>
             </div>
@@ -355,30 +374,54 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           {rows.map((row, index) => (
             <div
               key={index}
-              className="info-packing-list__table storage-plan-header"
+              className="info-epb__table storage-plan-header"
               style={{ padding: "8px 0px 8px 5px" }}
             >
-              <div className="elements-center">
-                <input
+              <div className="elements-start-center">
+                <input style={{ marginTop: '3px' }}
                   type="checkbox"
                   name={`packing-list-${index}`}
                   checked={row.checked}
                   onChange={(event) => handleCheckboxChange(event, index)}
                 />
               </div>
-              <div className="elements-center">
+              <div className="">
+                {row.packing_lists?.box_number}
+              </div>
+              <div className="">
                 {row.packing_lists?.case_number}
               </div>
-              <div className="elements-center">
+              <div className="">
                 {row.packing_lists?.client_weight}
               </div>
-              <div className="elements-center">
+              <div className="">
                 {row.packing_lists?.client_height}
               </div>
-              <div className="elements-center">{"--"}</div>
-              <div className="elements-center">{"--"}</div>
-              <div className="elements-center">{row.packing_lists?.amount}</div>
-              <div className="elements-center">
+              <div className="">{"--"}</div>
+              <div className="">{"--"}</div>
+              <div className="">{row.packing_lists?.amount}</div>
+              <div>
+              {
+                (row.packing_lists && row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0) ? (
+                  <>
+                    {exitPlan.warehouse ? (
+                      <>
+                        {exitPlan.warehouse.code}-{String(row.packing_lists.package_shelf[0].shelf?.partition_table).padStart(2, '0')}-{String(row.packing_lists.package_shelf[0].shelf?.number_of_shelves).padStart(2, '0')}-{String(row.packing_lists.package_shelf[0].layer).padStart(2, '0')}-{String(row.packing_lists.package_shelf[0].column).padStart(2, '0')}
+                        <br />
+                      </>
+                    ) : null}
+                    {intl.formatMessage({ id: 'partition' })}: {(row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0 && row.packing_lists.package_shelf[0].shelf) ? row.packing_lists.package_shelf[0].shelf.partition_table : ''}
+                    &nbsp;
+                    {intl.formatMessage({ id: 'shelf' })}: {(row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0 && row.packing_lists.package_shelf[0].shelf) ? row.packing_lists.package_shelf[0].shelf.number_of_shelves : ''}
+                    <br />
+                    {intl.formatMessage({ id: 'layer' })}: {(row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0) ? row.packing_lists.package_shelf[0].layer : ''}
+                    &nbsp;
+                    {intl.formatMessage({ id: 'column' })}: {(row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0) ? row.packing_lists.package_shelf[0].column : ''}
+                  </>
+                ) : '--'
+              }
+              </div>
+              <div className="">
                 {getDateFormat(
                   exitPlan.delivered_time ? exitPlan.delivered_time : ""
                 )}
@@ -387,7 +430,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                   exitPlan.delivered_time ? exitPlan.delivered_time : ""
                 )}
               </div>
-              <div className="elements-center">
+              <div className="">
                 {getDateFormat(
                   exitPlan.delivered_time ? exitPlan.delivered_time : ""
                 )}
