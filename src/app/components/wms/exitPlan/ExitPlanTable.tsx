@@ -411,7 +411,13 @@ const ExitPlanTable = () => {
       return "--";
     }
     if (ep.packing_lists && ep.packing_lists?.length > 1) {
-      return  intl.formatMessage({ id: "multiple" });
+      const pl = ep.packing_lists.filter(el => el.package_shelf && el.package_shelf?.length > 0)
+      if(pl.length > 1)
+        return  intl.formatMessage({ id: "multiple" });
+      else if (pl.length == 1)
+        locations += packageShelfFormat(pl[0].package_shelf);
+      else
+        return "--"
     }
     ep.packing_lists?.forEach((pl) => {
       locations += packageShelfFormat(pl.package_shelf);

@@ -368,5 +368,9 @@
 	"multiple": "Multiple",
 	"amazon": "Amazon",
 	"meli": "Mercado Libre",
-	"private_address": "Private address"
+	"private_address": "Private address",
+	"not_own_box_msg": "You are trying to add or remove a box that does not belong to the user, please contact an administrator.",
+	"not_correct_state_msg": "Not all boxes introduced were added because they were not stored.",
+	"missing_apendix_msg": "To change status you need to upload at least 1 evidence."
+
 }

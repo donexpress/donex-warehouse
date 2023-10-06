@@ -99,12 +99,12 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
           >
             <div className="elements-center">
               <span className="text-center">
-                {intl.formatMessage({ id: "case_number" })}
+                {intl.formatMessage({ id: "expansion_box_number" })}
               </span>
             </div>
             <div className="elements-center">
               <span className="text-center">
-                {intl.formatMessage({ id: "client_weight" })} (kg)
+                {intl.formatMessage({ id: "case_number" })}
               </span>
             </div>
             <div className="elements-center">
@@ -145,10 +145,10 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
               style={{ padding: "8px 0px 8px 5px" }}
             >
               <div className="elements-center">
-                {row.packing_lists?.case_number}
+                {row.packing_lists?.box_number}
               </div>
               <div className="elements-center">
-                {row.packing_lists?.client_weight}
+                {row.packing_lists?.case_number}
               </div>
               <div className="elements-center">
                 {row.packing_lists?.client_height}

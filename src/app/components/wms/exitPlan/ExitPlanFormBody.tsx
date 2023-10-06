@@ -61,6 +61,7 @@ const ExitPlanFormBody = ({
       ? exitPlan.user.id
       : undefined,
     destination: id && exitPlan ? exitPlan.destination : "",
+    reference_number: id && exitPlan ? exitPlan.reference_number: ''
   };
 
   const cancelSend = () => {
@@ -313,6 +314,17 @@ const ExitPlanFormBody = ({
                     name="delivered_time"
                     placeholder={intl.formatMessage({
                       id: "delivery_time",
+                    })}
+                    customClass="custom-input"
+                    disabled={isFromDetails}
+                  />
+                </div>
+                <div className="w-full sm:w-[49%]">
+                  <GenericInput
+                    type="text"
+                    name="reference_number"
+                    placeholder={intl.formatMessage({
+                      id: "reference_number",
                     })}
                     customClass="custom-input"
                     disabled={isFromDetails}
