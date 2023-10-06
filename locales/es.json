@@ -14,6 +14,7 @@
 	"wmsLoginNoteSecondary": "Iniciarás sesión con una cuenta de empleado.",
 	"selectOption": "Selecciona una opción",
 	"successLoginMsg": "¡Bienvenido! Has iniciado sesión correctamente",
+	"hello": "Hola",
 	"unknownStatusErrorMsg": "Ha ocurrido un error al intentar ejecutar la acción, por favor, intente de nuevo",
 	"successfullyMsg": "Elemento creado de manera satisfactoria",
 	"changedsuccessfullyMsg": "Elemento modificado de manera satisfactoria",
@@ -140,6 +141,7 @@
 	"number_of_boxes_entered": "Número de cajas entradas",
 	"number_of_boxes_stored": "Número de cajas almacenadas",
 	"force_entry": "Forzar entrada",
+	"template": "Plantilla",
 	"upload_evidence": "Subir evidencias",
 	"generate_evidence": "Generar evidencias",
 	"evidence_generated": "Evidencias generadas",
@@ -363,5 +365,12 @@
 	"output_number": "Número de entrega",
 	"delivered_time": "Tiempo de entrega",
 	"palets_amount": "Número de palets",
-	"delivered_quantity": "Cantidad de cajas entregadas"
+	"delivered_quantity": "Cantidad de cajas entregadas",
+	"exit_plan_information": "Información de planes de salida",
+	"multiple": "Múltiple",
+	"amazon": "Amazon",
+	"meli": "Mercado Libre",
+	"private_address": "Dirección privada"
+
+
 }

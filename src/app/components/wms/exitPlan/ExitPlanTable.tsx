@@ -47,7 +47,7 @@ import {
 } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
-import { exitPlanDataToExcel, isOMS, showMsg } from "../../../../helpers";
+import { exitPlanDataToExcel, isOMS, showMsg, inventoryOfExitPlan } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import FilterExitPlan from "./FilterExitPlan";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
@@ -55,6 +55,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "../operationInstruction/ExportTable";
 import ExportExitPlanTable from "./ExportExitPlanTable";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import InventoryList from "./InventoryList";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -278,6 +279,25 @@ const ExitPlanTable = () => {
                 <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
                 </DropdownItem>
+                <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""} onClick={() => inventoryOfExitPlan(user, user.packing_lists, intl )}>
+                  {intl.formatMessage({ id: "generate_xlsx_inventory" })}
+                </DropdownItem>
+                <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""}>
+                  <PDFDownloadLink
+                    document={
+                      <InventoryList
+                        intl={intl}
+                        exitPlan={user}
+                        boxes={user.packing_lists}
+                      />
+                    }
+                    fileName={`${user.output_number}.pdf`}
+                  >
+                    {({ blob, url, loading, error }) =>
+                      intl.formatMessage({ id: "generate_pdf_inventory" })
+                    }
+                  </PDFDownloadLink>
+                </DropdownItem>
                 <DropdownItem
                   className={
                     user.state.value !== "pending" || checkOMS
@@ -353,6 +373,8 @@ const ExitPlanTable = () => {
         } else {
           return <span>-</span>;
         }
+      case "updated_at":
+      case "created_at":
       case "delivered_time": {
         if (cellValue && cellValue !== "") {
           return (
@@ -409,7 +431,7 @@ const ExitPlanTable = () => {
       return "--";
     }
     if (ep.packing_lists && ep.packing_lists?.length > 1) {
-      return "Multiple";
+      return  intl.formatMessage({ id: "multiple" });
     }
     ep.packing_lists?.forEach((pl) => {
       locations += packageShelfFormat(pl.package_shelf);
@@ -599,7 +621,7 @@ const ExitPlanTable = () => {
                       columns={getVisibleColumns()}
                     />
                   }
-                  fileName="operation_instructions_pdf.pdf"
+                  fileName="exit_plan_pdf.pdf"
                 >
                   {({ blob, url, loading, error }) =>
                     intl.formatMessage({ id: "export_pdf" })

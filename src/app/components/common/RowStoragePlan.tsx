@@ -33,9 +33,11 @@ interface RowStoragePlanProps {
   onUpdate: (updatedValues: RowData) => void;
   onlyReadly?: boolean;
   inWMS: boolean;
+  prefixBoxNumber?: string;
+  rejectedBoxes?: boolean;
 }
 
-const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate, onlyReadly = false, inWMS }) => {
+const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate, onlyReadly = false, inWMS, prefixBoxNumber = '', rejectedBoxes = false }) => {
   const intl = useIntl();
   const [showImage, setShowImage] = useState<boolean>(false);
   const [imageToShow, setImageToShow] = useState<string>('');
@@ -57,6 +59,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
 
   const handleRowChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
+    if ((name !== 'box_number') || (name === 'box_number' && value.startsWith(prefixBoxNumber + (rejectedBoxes ? 'UR' : 'U'))))
     onUpdate({
       ...initialValues,
       [name]: changeNumberValue(name, value),

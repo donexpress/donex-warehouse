@@ -8,7 +8,11 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import { IntlShape } from "react-intl";
-import { getLanguage } from "@/helpers/utilserege1992";
+import {
+  getDateFormat,
+  getHourFormat,
+  getLanguage,
+} from "@/helpers/utilserege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
 const styles = StyleSheet.create({
@@ -115,7 +119,7 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
           style={styles.logo}
         />
         <Text style={styles.title}>
-          {intl.formatMessage({ id: "operation_instructions" })}
+          {intl.formatMessage({ id: "exit_plan_information" })}
         </Text>
 
         <View style={styles.table}>
@@ -170,12 +174,29 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                       </Text>
                     );
 
-                    case "location":
-                        return (
-                          <Text key={index} style={styles.tableCell}>
-                            {getLocation(oi)}
-                          </Text>
-                        );
+                  case "location":
+                    return (
+                      <Text key={index} style={styles.tableCell}>
+                        {getLocation(oi)}
+                      </Text>
+                    );
+                  case "delivered_time":
+                  case "updated_at":
+                  case "created_at":
+                    // @ts-ignore
+                    if (oi[column] && oi[column] !== "") {
+                      return (
+                        <Text key={index} style={styles.tableCell}>
+                          {/* @ts-ignore */}
+                          {getDateFormat(oi[column])},{/* @ts-ignore */}
+                          {getHourFormat(oi[column])}
+                        </Text>
+                      );
+                    } else {
+                      <Text key={index} style={styles.tableCell}>
+                        --
+                      </Text>;
+                    }
                   default:
                     return (
                       <Text key={index} style={styles.tableCell}>

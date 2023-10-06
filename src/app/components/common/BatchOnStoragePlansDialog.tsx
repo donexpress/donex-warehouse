@@ -4,8 +4,8 @@ import { useIntl } from "react-intl";
 import { BatchStoragePlans, Response } from '../../../types';
 import '../../../styles/generic.dialog.scss';
 import FileUploader from './FileUploader';
-import { FaFileExcel } from 'react-icons/fa';
-import { showMsg } from "../../../helpers";
+import { FaFileExcel, FaFileDownload } from 'react-icons/fa';
+import { showMsg, downloadTemplateSP } from "../../../helpers";
 import { createBatchStoragePlan } from "../../../services/api.storage_plan";
 
 interface Params {
@@ -42,8 +42,8 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
     const keys = Object.keys(obj);
     const requiredKeys = [ 
         "customer_order_number", 
-        //"user_id", 
-        "warehouse_id", 
+        //"username", 
+        "warehouse_code", 
         //"reference_number", 
         //"pr_number", 
         "box_amount", 
@@ -65,7 +65,7 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
                 ...item, 
                 return: (item.return && item.return.toString().toLowerCase() === 'true'), 
                 rejected_boxes: (item.rejected_boxes && item.rejected_boxes.toString().toLowerCase() === 'true'),
-                user_id: item.user_id ? Number(item.user_id) : null,
+                username: item.username ? item.username : null,
                 reference_number: item.reference_number ? item.reference_number : '',
                 pr_number: item.pr_number ? item.pr_number : '',
                 delivered_time: item.delivered_time ? item.delivered_time : null,
@@ -91,9 +91,17 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
       <div className="confirmation_backdrop" onClick={close}></div>
       <div className="confirmation_card dialog-background">
         <div className="confirmation_card_header" style={{ color: 'white' }}>
-            <div className="upload-evidence-header-dialog">
+            <div className="upload-batch-sp-header-dialog">
                 <strong>{ title }</strong>
-                
+                <div
+                  className="upload_button_evidence"
+                  onClick={() => { downloadTemplateSP() }}
+                >
+                    <span>
+                      {intl.formatMessage({ id: "template" })}
+                    </span>
+                    <FaFileDownload style={{fontSize: '16px', color: 'white' }} />
+                </div>
                 <FileUploader onDataUpload={uploadBatch} isXLSX={true}>
                   <div
                     className="upload_button_evidence"

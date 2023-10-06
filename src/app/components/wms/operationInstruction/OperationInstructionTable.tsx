@@ -47,7 +47,12 @@ import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import { SearchIcon } from "../../common/SearchIcon";
 import "./../../../../styles/generic.input.scss";
 import "../../../../styles/wms/user.table.scss";
-import { isOMS, isWMS, operationInstructionDataToExcel, showMsg } from "@/helperserege1992";
+import {
+  isOMS,
+  isWMS,
+  operationInstructionDataToExcel,
+  showMsg,
+} from "@/helperserege1992";
 import PaginationTable from "../../common/Pagination";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "./ExportTable";
@@ -451,8 +456,32 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
         case "number_delivery": {
           return <CopyColumnToClipboard value={cellValue} />;
         }
-        case 'location':
-        return <span style={{maxWidth: "250px", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display:  'block'}}>{getLocation(user)}</span>
+        case "location":
+          return (
+            <span
+              style={{
+                maxWidth: "250px",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                display: "block",
+              }}
+            >
+              {getLocation(user)}
+            </span>
+          );
+        case "updated_at":
+        case "created_at": {
+          if (cellValue && cellValue !== "") {
+            return (
+              <span>
+                {getDateFormat(cellValue)}, {getHourFormat(cellValue)}
+              </span>
+            );
+          } else {
+            return "";
+          }
+        }
         default:
           console.log(cellValue);
           return cellValue;
@@ -655,8 +684,8 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
 
   const getVisibleColumns = (): string[] => {
     const t = Array.from(visibleColumns) as string[];
-    console.log(t)
-    console.log(visibleColumns)
+    console.log(t);
+    console.log(visibleColumns);
     return t.filter((el) => el !== "actions");
   };
 
@@ -664,14 +693,17 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     let its: OperationInstruction[] = [];
     for (let i = 0; i < selectedItems.length; i++) {
       const index = selectedItems[i];
-      const item = operationInstructions.filter((sp: OperationInstruction) => sp.id === index);
-      if (filterValue && (filterValue !== "")) {
-        const isSearchable = item[0].number_delivery
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase()) ||
-        item[0].output_plan?.output_number
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase());
+      const item = operationInstructions.filter(
+        (sp: OperationInstruction) => sp.id === index
+      );
+      if (filterValue && filterValue !== "") {
+        const isSearchable =
+          item[0].number_delivery
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase()) ||
+          item[0].output_plan?.output_number
+            ?.toLowerCase()
+            ?.includes(filterValue.toLowerCase());
         if (isSearchable) {
           its.push(item[0]);
         }
@@ -680,27 +712,43 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
       }
     }
     return its;
-  }
+  };
 
   const handleExportExcel = () => {
-    operationInstructionDataToExcel(getSelectedOperationInstructions(), intl, getVisibleColumns());
-  }
+    operationInstructionDataToExcel(
+      getSelectedOperationInstructions(),
+      intl,
+      getVisibleColumns()
+    );
+  };
 
   const getLocation = (ep: OperationInstruction): string => {
-    let locations = ""
-    if(ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists?.length == 0) {
-      return '--'
+    let locations = "";
+    if (
+      ep.output_plan &&
+      ep.output_plan.packing_lists &&
+      ep.output_plan.packing_lists?.length == 0
+    ) {
+      return "--";
     }
-    if(ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists?.length > 1) {
-      return 'Multiple'
+    if (
+      ep.output_plan &&
+      ep.output_plan.packing_lists &&
+      ep.output_plan.packing_lists?.length > 1
+    ) {
+      return "Multiple";
     }
-    ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists.forEach(pl => {
-      locations+=packageShelfFormat(pl.package_shelf)
-    })
-    return locations
-  }
+    ep.output_plan &&
+      ep.output_plan.packing_lists &&
+      ep.output_plan.packing_lists.forEach((pl) => {
+        locations += packageShelfFormat(pl.package_shelf);
+      });
+    return locations;
+  };
 
-  const packageShelfFormat = (packageShelfs: PackageShelf[] | undefined): string => {
+  const packageShelfFormat = (
+    packageShelfs: PackageShelf[] | undefined
+  ): string => {
     if (packageShelfs && packageShelfs.length > 0) {
       const packageShelf: PackageShelf = packageShelfs[0];
       return `${intl.formatMessage({ id: "partition" })}: ${

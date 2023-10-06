@@ -286,11 +286,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
           storageP.customer_order_number
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||
-          storageP.user_id
+          (storageP.user ? storageP.user.username : '')
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||
-          storageP.warehouse_id
+          (storageP.warehouse ? `${storageP.warehouse.name} (${storageP.warehouse.code})` : '')
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||

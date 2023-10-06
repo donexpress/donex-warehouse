@@ -9,7 +9,7 @@ import {
 } from "@react-pdf/renderer";
 import { IntlShape } from "react-intl";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
-import { getLanguage } from "@/helpers/utilserege1992";
+import { getDateFormat, getHourFormat, getLanguage } from "@/helpers/utilserege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
 const styles = StyleSheet.create({
   page: {
@@ -167,6 +167,22 @@ const ExportTable = ({ intl, columns, data }: Props) => {
                         {getLocation(oi)}
                       </Text>
                     );
+                  case "updated_at":
+                  case "created_at":
+                    // @ts-ignore
+                    if (oi[column] && oi[column] !== "") {
+                      return (
+                        <Text key={index} style={styles.tableCell}>
+                          {/* @ts-ignore */}
+                          {getDateFormat(oi[column])},{/* @ts-ignore */}
+                          {getHourFormat(oi[column])}
+                        </Text>
+                      );
+                    } else {
+                      <Text key={index} style={styles.tableCell}>
+                        --
+                      </Text>;
+                    }
                   default:
                     return (
                       <Text key={index} style={styles.tableCell}>
