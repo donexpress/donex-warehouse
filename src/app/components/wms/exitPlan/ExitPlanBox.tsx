@@ -16,7 +16,7 @@ import {
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
 import AddExitPlanDialog from "./AddExitPlanDialog";
-import { getPackingListsByCaseNumber } from "../../../../services/api.packing_list";
+import { getPackingListsByBoxNumber, getPackingListsByCaseNumber } from "../../../../services/api.packing_list";
 import { getStoragePlanByOrder_number } from "../../../../services/api.storage_plan";
 import { showMsg, inventoryOfExitPlan } from "../../../../helpers";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -142,17 +142,17 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         const arr = data.case_number.split(",");
         for (let i = 0; i < arr.length; i++) {
           const caseNumber = arr[i].trim();
-          exist = await getPackingListsByCaseNumber(caseNumber);
+          exist = caseNumber.indexOf('DEW') >-1 ? await getPackingListsByCaseNumber(caseNumber) : await getPackingListsByBoxNumber(caseNumber);
           if (!exist) {
             showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
               type: "error",
             });
           }
           added = exitPlan.case_numbers?.find(
-            (value) => value === data.case_number
+            (value) => value === (exist as PackingList).case_number
           );
           if (added === undefined) {
-            exitPlan.case_numbers.push(data.case_number);
+            exitPlan.case_numbers.push((exist as PackingList).case_number);
           } else {
             showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
               type: "warning",
@@ -192,6 +192,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       }
       // update portion
       if (exitPlan.id && exist) {
+        console.log(exitPlan.case_numbers)
         const result = await updateExitPlan(exitPlan.id, {
           case_numbers: exitPlan.case_numbers,
         });
@@ -203,6 +204,10 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           if (result.status === 422) {
             showMsg(intl.formatMessage({ id: "not_correct_state_msg" }), {
               type: "warning",
+            });
+          } else {
+            showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+              type: "success",
             });
           }
           if (exitPlan.id) {
@@ -244,6 +249,10 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       } else if (result.status === 401) {
         showMsg(intl.formatMessage({ id: "not_own_box_msg" }), {
           type: "error",
+        });
+      } else {
+        showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+          type: "success",
         });
       }
     }

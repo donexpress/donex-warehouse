@@ -19,6 +19,7 @@ import ExitPlanAppendix from "../exitPlan/ExitPlanAppendix";
 import { isOMS } from "@/helperserege1992";
 import LocationTable from "../../common/LocationTable";
 import "../../../../styles/wms/user.form.scss";
+import OperationInstructionAppendix from "./OperationInstructionAppendix";
 
 interface Props {
   types: State[];
@@ -44,6 +45,8 @@ const OperationInstructionFormBody = ({
   const intl = useIntl();
   const router = useRouter();
   const { locale, exit_plan_id } = router.query;
+  const [user, setUser] = useState<User| undefined>(users.find(el => el.id === operationInstruction?.user_id))
+  const [oI, setOI] = useState<OperationInstruction| undefined>(operationInstruction)
   const [filterType, setFilterType] = useState<{
     filter: ExitPlan | Warehouse | User | undefined;
     type: string;
@@ -109,7 +112,9 @@ const OperationInstructionFormBody = ({
       console.log(values);
       await updateOperationInstruction(id ? id : -1, values);
     } else {
-      await createOperationInstruction(values);
+      const r = await createOperationInstruction(values);
+      setOI(r)
+      setUser(users.find(el => el.id === values.user_id))
     }
     if (exit_plan_id) {
       router.push(
@@ -159,12 +164,6 @@ const OperationInstructionFormBody = ({
         warehouses_ids.push(tmp.warehouse_id);
       }
     }
-    // if (filterType.type === "user") {
-    //   const tmp = filterType.filter as User;
-    //   if (tmp.warehouse_id) {
-    //     warehouses_ids.push(tmp.warehouse_id);
-    //   }
-    // }
     let response: ValueSelect[] = [];
     warehouses.forEach((warehouse) => {
       if (warehouses_ids.length > 0) {
@@ -386,6 +385,7 @@ const OperationInstructionFormBody = ({
           )}
         </Formik>
       </div>
+      <OperationInstructionAppendix owner={user} operationInstruction={oI} />
       {isFromDetails && (
         <LocationTable
         // @ts-ignore

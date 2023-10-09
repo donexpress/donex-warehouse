@@ -32,21 +32,33 @@ const AddExitPlanDialog = ({ close, confirm, title }: Params) => {
                       <GenericInput
                         type="text"
                         name="case_number"
-                        placeholder={intl.formatMessage({
+                        hideErrorContent={true}
+                        placeholder={`${intl.formatMessage({
                           id: "expansion_box_number",
-                        })}
+                        })} / ${intl.formatMessage({
+                          id: "box_number",
+                        })}`}
                         customClass="custom-input"
                       />
+                      <span className="text_example">{intl.formatMessage({
+                          id: "input_example_1",
+                        })}</span>
                     </div>
                     <div className="w-full sm:w-[99%]">
                       <GenericInput
                         type="text"
+                        hideErrorContent={true}
                         name="warehouse_order_number"
-                        placeholder={intl.formatMessage({
+                        placeholder={`${intl.formatMessage({
                           id: "warehouse_order_number",
-                        })}
+                        })} / ${intl.formatMessage({
+                          id: "customer_order_number",
+                        })}`}
                         customClass="custom-input"
                       />
+                      <span className="text_example">{intl.formatMessage({
+                          id: "input_example_2",
+                        })}</span>
                     </div>
                   </div>
                   <div className="elements-row-end">

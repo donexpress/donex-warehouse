@@ -65,6 +65,8 @@ const INITIAL_VISIBLE_COLUMNS = [
   "destination",
   "address",
   "actions",
+  "observations",
+  "customer_order_number"
 ];
 
 const ExitPlanTable = () => {
@@ -191,6 +193,11 @@ const ExitPlanTable = () => {
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "customer_order_number" }),
+        uid: "customer_order_number",
         sortable: true,
       },
       {
@@ -424,6 +431,8 @@ const ExitPlanTable = () => {
         ) : (
           <span>{cellValue}</span>
         );
+        case "customer_order_number":
+        return <span>{getCustomerOrderNumber(user)}</span>
       case "location":
         return (
           <span
@@ -446,23 +455,20 @@ const ExitPlanTable = () => {
   }, []);
 
   const getLocation = (ep: ExitPlan): string => {
-    let locations = "";
+    const locations:string[] = [];
     if (ep.packing_lists && ep.packing_lists?.length == 0) {
       return "--";
     }
-    if (ep.packing_lists && ep.packing_lists?.length > 1) {
-      const pl = ep.packing_lists.filter(el => el.package_shelf && el.package_shelf?.length > 0)
-      if(pl.length > 1)
-        return  intl.formatMessage({ id: "multiple" });
-      else if (pl.length == 1)
-        locations += packageShelfFormat(pl[0].package_shelf);
-      else
-        return "--"
-    }
     ep.packing_lists?.forEach((pl) => {
-      locations += packageShelfFormat(pl.package_shelf);
+      console.log(pl)
+      if(pl.package_shelf) {
+        const tmpl = `${ep.warehouse?.code}-${String(pl.package_shelf[0].shelf?.partition_table).padStart(2, '0')}-${String(pl.package_shelf[0].shelf?.number_of_shelves).padStart(2, '0')}-${String(pl.package_shelf[0].layer).padStart(2, '0')}-${String(pl.package_shelf[0].column).padStart(2, '0')}`
+        if(!locations.find(el => el === tmpl)) {
+          locations.push(tmpl);
+        }
+      }
     });
-    return locations;
+    return locations.join(', ');
   };
 
   const packageShelfFormat = (
@@ -563,6 +569,18 @@ const ExitPlanTable = () => {
   const handleExportExcel = () => {
     exitPlanDataToExcel(getSelectedExitPlans(), intl, getVisibleColumns());
   };
+
+  const getCustomerOrderNumber = (exitPlan: ExitPlan): string => {
+    const numbers: string[] = [];
+
+    exitPlan.packing_lists?.forEach((pl, index) => {
+      const tmpn = pl.box_number.split('U')[0]
+      if(!numbers.find(el => el === tmpn)) {
+        numbers.push(tmpn)
+      }
+    })
+    return numbers.join(', ')
+  }
 
   const topContent = React.useMemo(() => {
     return (
