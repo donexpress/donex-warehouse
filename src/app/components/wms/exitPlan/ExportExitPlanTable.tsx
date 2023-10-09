@@ -79,6 +79,9 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     marginBottom: 10,
   },
+  locationCell: {
+    marginBottom: 5,
+  }
 });
 
 interface Props {
@@ -176,9 +179,15 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
 
                   case "location":
                     return (
-                      <Text key={index} style={styles.tableCell}>
-                        {getLocation(oi)}
-                      </Text>
+                      <View key={index} style={styles.tableCell}>
+                        {oi.packing_lists?.map((pl, plIndex) => (
+                          pl.package_shelf ?
+                          <Text key={plIndex} style={styles.locationCell}>
+                            {packageShelfFormat(pl.package_shelf)}
+                          </Text>
+                          : ''
+                        ))}
+                      </View>
                     );
                   case "delivered_time":
                   case "updated_at":

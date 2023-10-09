@@ -32,6 +32,7 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { showMsg } from "../../../../helpers";
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -256,7 +257,15 @@ const StaffTable = ({ role, staffStates }: StaffListProps) => {
         case "role_id": 
           return user.role ? user.role.name : "";
         case "username":
-          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.username}</span>;
+          return (
+            <CopyColumnToClipboard
+              value={
+                <a href={`/${locale}/wms/staff/${user["id"]}/show_staff`}>
+                  {cellValue}
+                </a>
+              }
+            />
+          );
         case "state": 
           return user.state ? getLabelByLanguage(user.state) : "";
         case "created_at":
