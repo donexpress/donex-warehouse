@@ -58,15 +58,13 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "./ExportTable";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import { getAppendagesByOperationInstructionId } from "@/services/api.appendixerege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
-  "warehouse_id",
   "output_plan_id",
-  "user_id",
   "number_delivery",
   "remark",
-  "internal_remark",
   "actions",
 ];
 
@@ -192,6 +190,11 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
       {
         name: intl.formatMessage({ id: "location" }),
         uid: "location",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "expansion_box_number" }),
+        uid: "box_number",
         sortable: true,
       },
       {
@@ -456,6 +459,9 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
         case "number_delivery": {
           return <CopyColumnToClipboard value={cellValue} />;
         }
+        case "box_number": {
+          return <CopyColumnToClipboard value={user.output_plan.packing_lists.map((el: any) => {return el.box_number}).join(', ')} />
+        }
         case "location":
           return (
             <span
@@ -503,14 +509,19 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     setStatusSelected(tab);
   };
 
-  const handleProcessing = (id: number) => {
+  const handleProcessing = async (id: number) => {
     const op = operationInstructions.find((el) => el.id === id);
-    if (op) {
-      setDialogIds([id]);
-      // @ts-ignore
-      setDialogTexts(op.operation_instruction_type.instruction_type);
-      setDialogType("processing");
-      setDisplayOperationInstructionConfirmation(true);
+    if (op && op.id) {
+      const appendages = await getAppendagesByOperationInstructionId(op.id)
+      if(appendages && appendages.length > 0) {
+        setDialogIds([id]);
+        // @ts-ignore
+        setDialogTexts(op.operation_instruction_type.instruction_type);
+        setDialogType("processing");
+        setDisplayOperationInstructionConfirmation(true);
+      } else {
+        showMsg(intl.formatMessage({id: 'missing_apendix_msg'}), {type: 'warning'})
+      }
     }
   };
 

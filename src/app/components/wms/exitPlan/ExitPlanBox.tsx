@@ -162,13 +162,11 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       }
       if (data.warehouse_order_number) {
         const arr = data.warehouse_order_number.split(",");
-        let tmp: StoragePlan[] = []
+        let tmp: StoragePlan[] = [];
         for (let i = 0; i < arr.length; i++) {
-          const t = await getStoragePlanByOrder_number(
-            arr[i]
-          );
-          if(t) {
-            tmp = tmp.concat(t)
+          const t = await getStoragePlanByOrder_number(arr[i]);
+          if (t) {
+            tmp = tmp.concat(t);
           }
         }
         exist = tmp ? tmp[0] : null;
@@ -194,26 +192,37 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       }
       // update portion
       if (exitPlan.id && exist) {
-        await updateExitPlan(exitPlan.id, {
+        const result = await updateExitPlan(exitPlan.id, {
           case_numbers: exitPlan.case_numbers,
         });
-        if (exitPlan.id) {
-          const ep = await getExitPlansById(exitPlan.id);
-          if (ep) {
-            ep.packing_lists?.forEach((pl) => {
-              if (
-                !rows.find(
-                  (r) => r.packing_lists.case_number === pl.case_number
-                )
-              ) {
-                rows.push({ checked: false, packing_lists: pl });
-              }
+        if (result.status === 401) {
+          showMsg(intl.formatMessage({ id: "not_own_box_msg" }), {
+            type: "error",
+          });
+        } else {
+          if (result.status === 422) {
+            showMsg(intl.formatMessage({ id: "not_correct_state_msg" }), {
+              type: "warning",
             });
-            const tmprows = rows;
-            setRows([]);
-            setRows(tmprows);
           }
-          closeAddDialog();
+          if (exitPlan.id) {
+            const ep = await getExitPlansById(exitPlan.id);
+            if (ep) {
+              ep.packing_lists?.forEach((pl) => {
+                if (
+                  !rows.find(
+                    (r) => r.packing_lists.case_number === pl.case_number
+                  )
+                ) {
+                  rows.push({ checked: false, packing_lists: pl });
+                }
+              });
+              const tmprows = rows;
+              setRows([]);
+              setRows(tmprows);
+            }
+            closeAddDialog();
+          }
         }
       }
     }
@@ -223,14 +232,20 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     const new_case_numbers: string[] | undefined =
       exitPlan?.case_numbers?.filter((el) => el !== case_number);
     if (exitPlan && exitPlan.id) {
-      await updateExitPlan(exitPlan.id, {
+      const result = await updateExitPlan(exitPlan.id, {
         case_numbers: new_case_numbers,
       });
-      exitPlan.case_numbers = new_case_numbers;
-      const new_rows = rows.filter(
-        (row) => row.packing_lists.case_number !== case_number
-      );
-      setRows(new_rows);
+      if (result.status < 300) {
+        exitPlan.case_numbers = new_case_numbers;
+        const new_rows = rows.filter(
+          (row) => row.packing_lists.case_number !== case_number
+        );
+        setRows(new_rows);
+      } else if (result.status === 401) {
+        showMsg(intl.formatMessage({ id: "not_own_box_msg" }), {
+          type: "error",
+        });
+      }
     }
   };
 
