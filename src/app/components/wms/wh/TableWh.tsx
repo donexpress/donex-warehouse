@@ -32,6 +32,7 @@ import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
 import { showMsg } from "../../../../helpers";
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
@@ -200,9 +201,16 @@ const WhTable = () => {
       case "name": return (
         <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.name}</span>
       );
-      case "code": return (
-        <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(Number(user["id"]))}}>{user.code}</span>
-      );
+      case "code":
+        return (
+          <CopyColumnToClipboard
+            value={
+              <a href={`/${locale}/wms/warehouses/${user["id"]}/config`}>
+                {cellValue}
+              </a>
+            }
+          />
+        );
       case "created_at":
         return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
       case "updated_at":

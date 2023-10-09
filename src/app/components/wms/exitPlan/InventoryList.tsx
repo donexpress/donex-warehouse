@@ -10,6 +10,9 @@ import {
 import { IntlShape } from "react-intl";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackingList } from "@/types/storage_planerege1992";
+import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
+import { PackageShelf } from "../../../../types/package_shelf";
+
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
@@ -83,6 +86,23 @@ interface Props {
 }
 
 const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
+  const packageShelfFormat = (
+    packageShelfs: PackageShelf[] | undefined
+  ): string => {
+    if (packageShelfs && packageShelfs.length > 0) {
+      const packageShelf: PackageShelf = packageShelfs[0];
+      return `${intl.formatMessage({ id: "partition" })}: ${
+        packageShelf.shelf?.partition_table
+      }
+        ${intl.formatMessage({ id: "shelf" })}: ${
+        packageShelf.shelf?.number_of_shelves
+      }
+        ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
+        ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
+    }
+    return "--";
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page} orientation="landscape">
@@ -143,22 +163,13 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
         <View style={styles.table}>
           <View style={styles.tableRow}>
             <Text style={[styles.headerCell]}>
+              {intl.formatMessage({ id: "box_number" })}
+            </Text>
+            <Text style={[styles.headerCell]}>
               {intl.formatMessage({ id: "case_number" })}
             </Text>
             <Text style={[styles.headerCell]}>
-              {intl.formatMessage({ id: "client_weight" })} (kg)
-            </Text>
-            <Text style={[styles.headerCell]}>
-              {intl.formatMessage({ id: "client_height" })} (cm)
-            </Text>
-            <Text style={[styles.headerCell]}>
-              {intl.formatMessage({ id: "storage_weight" })} (kg)
-            </Text>
-            <Text style={[styles.headerCell]}>
-              {intl.formatMessage({ id: "storage_height" })} (cm)
-            </Text>
-            <Text style={[styles.headerCell]}>
-              {intl.formatMessage({ id: "products_per_box" })}
+              {intl.formatMessage({ id: "location" })}
             </Text>
             <Text style={[styles.headerCell]}>
               {intl.formatMessage({ id: "storage_time" })}
@@ -170,19 +181,16 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
           {boxes.map((box, index) => (
             <View style={styles.tableRow} key={index}>
               <Text style={styles.tableCell}>
+                {box.box_number}
+              </Text>
+              <Text style={styles.tableCell}>
                 {box.case_number}
               </Text>
               <Text style={styles.tableCell}>
-                {box.client_weight}
-              </Text>
-              <Text style={styles.tableCell}>
-                {box.client_height}
+                {packageShelfFormat(box.package_shelf)}
               </Text>
               <Text style={styles.tableCell}>--</Text>
-              <Text style={styles.tableCell}>--</Text>
-              <Text style={styles.tableCell}>{box.amount}</Text>
-              <Text style={styles.tableCell}>--</Text>
-              <Text style={styles.tableCell}>--</Text>
+              <Text style={styles.tableCell}>{exitPlan.delivered_time ? (`${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(exitPlan.delivered_time)}`) : '--'}</Text>
             </View>
           ))}
         </View>

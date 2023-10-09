@@ -34,6 +34,7 @@ import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { UserListProps } from '../../../../types/user';
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -251,7 +252,15 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
         case "customer_number":
           return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.customer_number}</span>;
         case "username":
-          return <span style={{ cursor: 'pointer' }} onClick={()=>{handleShow(user["id"])}}>{user.username}</span>;
+          return (
+            <CopyColumnToClipboard
+              value={
+                <a href={`/${locale}/wms/users/${user["id"]}/show_user`}>
+                  {cellValue}
+                </a>
+              }
+            />
+          );
         case "created_at":
           return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         case "updated_at":
