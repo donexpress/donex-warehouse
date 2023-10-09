@@ -72,3 +72,24 @@ export const deleteAppendix = async (
     };
   }
 };
+
+export const updateAppendix = async (
+  appendixId: number,
+  values: Appendix,
+  context?: GetServerSidePropsContext
+): Promise<Response> => {
+  const path = appendixPath();
+  try {
+    const response = await axios.put(
+      `${path}/${appendixId}`,
+      values,
+      getHeaders(context)
+    );
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return {
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    };
+  }
+};
