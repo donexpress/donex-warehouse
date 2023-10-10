@@ -47,7 +47,12 @@ import {
 } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
-import { exitPlanDataToExcel, isOMS, showMsg, inventoryOfExitPlan } from "../../../../helpers";
+import {
+  exitPlanDataToExcel,
+  isOMS,
+  showMsg,
+  inventoryOfExitPlan,
+} from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import FilterExitPlan from "./FilterExitPlan";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
@@ -66,7 +71,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "address",
   "actions",
   "observations",
-  "customer_order_number"
+  "customer_order_number",
 ];
 
 const ExitPlanTable = () => {
@@ -231,21 +236,26 @@ const ExitPlanTable = () => {
     let filteredUsers = [...exitPlans];
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) => {
-        return user.output_number
-          ?.toLowerCase()
-          .includes(filterValue.toLowerCase()) ||
-          (user.user ? user.user.username : '')
+        return (
+          user.output_number
+            ?.toLowerCase()
+            .includes(filterValue.toLowerCase()) ||
+          (user.user ? user.user.username : "")
             ?.toString()
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase()) ||
-          (user.warehouse ? `${user.warehouse.name} (${user.warehouse.code})` : '')
+          (user.warehouse
+            ? `${user.warehouse.name} (${user.warehouse.code})`
+            : ""
+          )
             ?.toString()
             ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) || 
-          (user.destination_ref ? user.destination_ref.name : '')
+            ?.includes(filterValue.toLowerCase()) ||
+          (user.destination_ref ? user.destination_ref.name : "")
             ?.toString()
             ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase());
+            ?.includes(filterValue.toLowerCase())
+        );
       });
     }
     return filteredUsers;
@@ -304,10 +314,27 @@ const ExitPlanTable = () => {
                 <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
                 </DropdownItem>
-                <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""} onClick={() => inventoryOfExitPlan(user, user.packing_lists, intl )}>
+                <DropdownItem
+                  className={
+                    !user.packing_lists ||
+                    (user.packing_lists && user.packing_lists.length === 0)
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                  onClick={() =>
+                    inventoryOfExitPlan(user, user.packing_lists, intl)
+                  }
+                >
                   {intl.formatMessage({ id: "generate_xlsx_inventory" })}
                 </DropdownItem>
-                <DropdownItem className={(!user.packing_lists || (user.packing_lists && user.packing_lists.length === 0)) ? "do-not-show-dropdown-item" : ""}>
+                <DropdownItem
+                  className={
+                    !user.packing_lists ||
+                    (user.packing_lists && user.packing_lists.length === 0)
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                >
                   <PDFDownloadLink
                     document={
                       <InventoryList
@@ -431,8 +458,8 @@ const ExitPlanTable = () => {
         ) : (
           <span>{cellValue}</span>
         );
-        case "customer_order_number":
-        return <span>{getCustomerOrderNumber(user)}</span>
+      case "customer_order_number":
+        return <span>{getCustomerOrderNumber(user)}</span>;
       case "location":
         return (
           <span
@@ -448,27 +475,45 @@ const ExitPlanTable = () => {
           </span>
         );
       case "operation_instructions":
-        return <span>{(user.operation_instructions && user.operation_instructions.length > 0) ? user.operation_instructions.length : 0}</span>
+        return (
+          <span>
+            {user.operation_instructions &&
+            user.operation_instructions.length > 0
+              ? user.operation_instructions.length
+              : 0}
+          </span>
+        );
       default:
         return cellValue;
     }
   }, []);
 
   const getLocation = (ep: ExitPlan): string => {
-    const locations:string[] = [];
+    const locations: string[] = [];
     if (ep.packing_lists && ep.packing_lists?.length == 0) {
       return "--";
     }
     ep.packing_lists?.forEach((pl) => {
-      console.log(pl)
-      if(pl.package_shelf && pl.package_shelf[0] && pl.package_shelf[0].shelf) {
-        const tmpl = `${ep.warehouse?.code}-${String(pl.package_shelf[0].shelf.partition_table).padStart(2, '0')}-${String(pl.package_shelf[0].shelf.number_of_shelves).padStart(2, '0')}-${String(pl.package_shelf[0].layer).padStart(2, '0')}-${String(pl.package_shelf[0].column).padStart(2, '0')}`
-        if(!locations.find(el => el === tmpl)) {
+      console.log(pl);
+      if (
+        pl.package_shelf &&
+        pl.package_shelf[0] &&
+        pl.package_shelf[0].shelf
+      ) {
+        const tmpl = `${ep.warehouse?.code}-${String(
+          pl.package_shelf[0].shelf.partition_table
+        ).padStart(2, "0")}-${String(
+          pl.package_shelf[0].shelf.number_of_shelves
+        ).padStart(2, "0")}-${String(pl.package_shelf[0].layer).padStart(
+          2,
+          "0"
+        )}-${String(pl.package_shelf[0].column).padStart(2, "0")}`;
+        if (!locations.find((el) => el === tmpl)) {
           locations.push(tmpl);
         }
       }
     });
-    return locations.join(', ');
+    return locations.join(", ");
   };
 
   const packageShelfFormat = (
@@ -574,13 +619,15 @@ const ExitPlanTable = () => {
     const numbers: string[] = [];
 
     exitPlan.packing_lists?.forEach((pl, index) => {
-      const tmpn = pl.box_number.split('U')[0]
-      if(!numbers.find(el => el === tmpn)) {
-        numbers.push(tmpn)
+      if (pl.box_number) {
+        const tmpn = pl.box_number.split("U")[0];
+        if (!numbers.find((el) => el === tmpn)) {
+          numbers.push(tmpn);
+        }
       }
-    })
-    return numbers.join(', ')
-  }
+    });
+    return numbers.join(", ");
+  };
 
   const topContent = React.useMemo(() => {
     return (
