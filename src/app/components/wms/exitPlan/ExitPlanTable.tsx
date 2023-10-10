@@ -461,8 +461,8 @@ const ExitPlanTable = () => {
     }
     ep.packing_lists?.forEach((pl) => {
       console.log(pl)
-      if(pl.package_shelf) {
-        const tmpl = `${ep.warehouse?.code}-${String(pl.package_shelf[0].shelf?.partition_table).padStart(2, '0')}-${String(pl.package_shelf[0].shelf?.number_of_shelves).padStart(2, '0')}-${String(pl.package_shelf[0].layer).padStart(2, '0')}-${String(pl.package_shelf[0].column).padStart(2, '0')}`
+      if(pl.package_shelf && pl.package_shelf[0] && pl.package_shelf[0].shelf) {
+        const tmpl = `${ep.warehouse?.code}-${String(pl.package_shelf[0].shelf.partition_table).padStart(2, '0')}-${String(pl.package_shelf[0].shelf.number_of_shelves).padStart(2, '0')}-${String(pl.package_shelf[0].layer).padStart(2, '0')}-${String(pl.package_shelf[0].column).padStart(2, '0')}`
         if(!locations.find(el => el === tmpl)) {
           locations.push(tmpl);
         }
