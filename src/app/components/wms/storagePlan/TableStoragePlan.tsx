@@ -56,8 +56,8 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 const INITIAL_VISIBLE_COLUMNS = [
   "order_number",
   "customer_order_number",
-  "user_id",
-  "warehouse_id",
+  "number_of_boxes_stored",
+  "reference_number",
   "box_amount",
   "actions",
 ];
@@ -394,7 +394,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                     </PDFDownloadLink>
                   </DropdownItem>
                   <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl, visibleColumns)}>
-                    {intl.formatMessage({ id: "export" })}
+                    {intl.formatMessage({ id: "export_xlsx" })}
                   </DropdownItem>
                   <DropdownItem>
                     <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={[storageP]} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
@@ -678,12 +678,12 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
             <Button
               color="primary"
-              style={{ width: '121px', marginLeft: '10px' }}
+              style={{ width: '140px', marginLeft: '10px' }}
               endContent={<FaFileExcel style={{ fontSize: '22px', color: 'white' }} />}
               onClick={() => handleExportStoragePlanData()}
               isDisabled={selectedItems.length === 0}
             >
-              {intl.formatMessage({ id: "export" })}
+              {intl.formatMessage({ id: "export_xlsx" })}
             </Button>
             {
               (inWMS && statusSelected === 'to be storage') && (
@@ -701,7 +701,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {intl.formatMessage({ id: "total_results" }, { in: storagePlans.length })}
+            {intl.formatMessage({ id: "total_results" }, { in: filteredItems.length })}
           </span>
           <label className="flex items-center text-default-400 text-small">
             {intl.formatMessage({ id: "rows_page" })}
