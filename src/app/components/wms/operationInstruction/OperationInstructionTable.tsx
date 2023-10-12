@@ -445,7 +445,11 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
               return getInstructionLabelByLanguage(instruction);
             }
           );
-          return values.join(", ");
+          return <a
+          href={`/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${user.id}/show`}
+        >
+          {values.join(", ")}
+        </a>;
         }
         case "warehouse_id": {
           return user.warehouse.name;
