@@ -260,6 +260,7 @@
   "column": "Nivel",
   "export": "Exportar",
   "export_pdf": "Exportar PDF",
+  "export_xlsx": "Exportar XLSX",
   "number_of_partitions": "Número de particiones",
   "number_of_shelves": "Número de estantes",
   "total_volume": "Volumen total",
@@ -272,6 +273,9 @@
   "add_partition": "Adicionar partición",
   "add_shelves": "Agregar estantes",
   "remove_shelves": "Eliminar estantes",
+  "modify_dimensions": "Modificar dimensiones",
+  "modify_shelf_number": "Modificar número de estante",
+  "shelf_number_already_exists": "El número de estante ya existe",
   "shelf_number": "Número de estante",
   "layers": "Filas",
   "length": "Longitud",
@@ -372,7 +376,9 @@
   "meli": "Mercado Libre",
   "private_address": "Dirección privada",
   "not_own_box_msg": "Esta intentando adicionar o eliminar una caja que no le pertenece al usuario, por favor pongase en contacto con un administrador.",
-	"not_correct_state_msg": "No todas las cajas introducidas fueron agregadas porque no estaban almacenadas.",
-  "missing_apendix_msg": "Para cambiar de estado necesitas al menos subir 1 evidencia."
+  "not_correct_state_msg": "No todas las cajas introducidas fueron agregadas porque no estaban almacenadas.",
+  "missing_apendix_msg": "Para cambiar de estado necesitas al menos subir 1 evidencia.",
+  "input_example_1": "Ej: DEWMXI2023096000011U047, DEWMXI2023096000011U049...",
+  "input_example_2": "Ej: DEWMXI2023096000010, DEWMXI2023096000008..."
 
 }

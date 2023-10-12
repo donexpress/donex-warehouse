@@ -113,7 +113,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
 
   return (
     <Document>
-        <Page size="A4" style={styles.page}>
+        <Page size="A4" orientation='landscape' style={styles.page}>
           <Image src="https://dc0-bucket.oss-us-west-1.aliyuncs.com/8Y2QlTD9eyFgyWt773lwMUJXGN0xDNHT.png" style={styles.logo} />
   
           <Text style={styles.title}>{intl.formatMessage({ id: 'entry_plan_inventory' })}</Text>
@@ -125,12 +125,14 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
               <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'customer_order_number' })}</Text>
               <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'storage' })}</Text>
               <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'number_of_boxes' })}</Text>
+              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'pr_number' })}</Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>{storagePlan.order_number ? storagePlan.order_number : ''}</Text>
               <Text style={styles.tableCell}>{ storagePlan.customer_order_number }</Text>
               <Text style={styles.tableCell}>{ storagePlan.warehouse ? (`${storagePlan.warehouse.name} (${storagePlan.warehouse.code})`) : '' }</Text>
               <Text style={styles.tableCell}>{ storagePlan.box_amount }</Text>
+              <Text style={styles.tableCell}>{ storagePlan.pr_number ? storagePlan.pr_number : '--' }</Text>
             </View>
           </View>
 
@@ -159,7 +161,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
         </Page>
 
         {atLeastOneHasOperatorPicture(storagePlan.packing_list) &&
-          <Page size="A4" style={styles.page}>
+          <Page size="A4" orientation='landscape' style={styles.page}>
             <Text style={styles.subtitle}>{intl.formatMessage({ id: 'entry_plan_proof' })}</Text>
             {getPackingListWithOperatorPicture(storagePlan.packing_list).map((pl: PackingList, index) => (
               <Image

@@ -260,6 +260,7 @@
 	"column": "Level",
 	"export": "Export",
 	"export_pdf": "Export PDF",
+	"export_xlsx": "Export XLSX",
 	"number_of_partitions": "Number of partitions",
 	"number_of_shelves": "Number of shelves",
 	"total_volume": "Total volume",
@@ -272,6 +273,9 @@
 	"add_partition": "Add partition",
 	"add_shelves": "Add shelves",
 	"remove_shelves": "Remove shelves",
+	"modify_dimensions": "Modify dimensions",
+	"modify_shelf_number": "Modify shelf number",
+	"shelf_number_already_exists": "Shelf number already exists",
 	"shelf_number": "Shelf number",
 	"layers": "Rows",
 	"length": "Length",
@@ -373,6 +377,7 @@
 	"private_address": "Private address",
 	"not_own_box_msg": "You are trying to add or remove a box that does not belong to the user, please contact an administrator.",
 	"not_correct_state_msg": "Not all boxes introduced were added because they were not stored.",
-	"missing_apendix_msg": "To change status you need to upload at least 1 evidence."
-
+	"missing_apendix_msg": "To change status you need to upload at least 1 evidence.",
+	"input_example_1": "Ex: DEWMXI2023096000011U047, DEWMXI2023096000011U049...",
+	"input_example_2": "Ex: DEWMXI2023096000010, DEWMXI2023096000008..."
 }

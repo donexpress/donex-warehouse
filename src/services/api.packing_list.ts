@@ -77,3 +77,13 @@ export const getPackingListsByCaseNumber = async (case_nummber :string, context?
     return null;
   }
 }
+
+export const getPackingListsByBoxNumber = async (box_nummber :string, context?: GetServerSidePropsContext):Promise<PackingList | null> => {
+  const path = packingListPath();
+  try {
+    const response = await axios.get(`${path}/by_box_number?box_number=${box_nummber}`, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}
