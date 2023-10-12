@@ -94,6 +94,8 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     const key10: string = intl.formatMessage({ id: 'state' });
     const key11: string = intl.formatMessage({ id: 'delivery_time' });
     const key12: string = intl.formatMessage({ id: 'observations' });
+    const key13: string = intl.formatMessage({ id: "created_at" });
+    const key14: string = intl.formatMessage({ id: "updated_at" });
     
     if (selection === "all" || selection.has("order_number")) {
         titles.push(key1);
@@ -130,6 +132,12 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     }
     if (selection === "all" || selection.has("observations")) {
         titles.push(key12);
+    }
+    if (selection === "all" || selection.has("created_at")) {
+        titles.push(key13);
+    }
+    if (selection === "all" || selection.has("updated_at")) {
+        titles.push(key14);
     }
     return titles;
   }
@@ -187,6 +195,14 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
         }
         if (selection === "all" || selection.has("observations")) {
           values[index][i] = sp.observations;
+          i++;
+        }
+        if (selection === "all" || selection.has("created_at")) {
+          values[index][i] = `${sp.created_at ? getDateFormat(sp.created_at) : ''} ${sp.created_at ? getHourFormat(sp.created_at) : ''}`;
+          i++;
+        }
+        if (selection === "all" || selection.has("updated_at")) {
+          values[index][i] = `${sp.updated_at ? getDateFormat(sp.updated_at) : ''} ${sp.updated_at ? getHourFormat(sp.updated_at) : ''}`;
           i++;
         }
     });

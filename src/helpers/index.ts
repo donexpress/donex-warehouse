@@ -185,6 +185,8 @@ export const storagePlanDataToExcel = (
   const key10: string = intl.formatMessage({ id: "state" });
   const key11: string = intl.formatMessage({ id: "delivery_time" });
   const key12: string = intl.formatMessage({ id: "observations" });
+  const key13: string = intl.formatMessage({ id: "created_at" });
+  const key14: string = intl.formatMessage({ id: "updated_at" });
 
   storagePlans.forEach((sp: StoragePlan) => {
     const sPlan: { [key: string]: string } = {};
@@ -239,6 +241,16 @@ export const storagePlanDataToExcel = (
     }
     if (selection === "all" || selection.has("observations")) {
       sPlan[key12] = sp.observations;
+    }
+    if (selection === "all" || selection.has("created_at")) {
+      sPlan[key13] = `${
+        sp.created_at ? getDateFormat(sp.created_at) : ""
+      } ${sp.created_at ? getHourFormat(sp.created_at) : ""}`;
+    }
+    if (selection === "all" || selection.has("updated_at")) {
+      sPlan[key14] = `${
+        sp.updated_at ? getDateFormat(sp.updated_at) : ""
+      } ${sp.updated_at ? getHourFormat(sp.updated_at) : ""}`;
     }
 
     dataToExport.push(sPlan);

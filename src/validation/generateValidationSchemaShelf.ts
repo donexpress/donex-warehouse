@@ -26,3 +26,25 @@ export const generateValidationSchemaShelf = (intl: IntlShape) => {
         .integer(intl.formatMessage({ id: 'must_be_an_integer' })),
     });
   };
+
+export const generateValidationSchemaNumberShelf = (intl: IntlShape) => {
+    return Yup.object({
+      number_of_shelves: Yup.number()
+        .required(intl.formatMessage({ id: 'required' }))
+        .integer(intl.formatMessage({ id: 'must_be_an_integer' })),
+    });
+  };
+
+export const generateValidationSchemaDimensionsShelf = (intl: IntlShape) => {
+    return Yup.object({
+      high_inventory: Yup.number()
+        .required(intl.formatMessage({ id: 'required' }))
+        .integer(intl.formatMessage({ id: 'must_be_an_integer' })),
+      location_length: Yup.number()
+        .required(intl.formatMessage({ id: 'required' }))
+        .integer(intl.formatMessage({ id: 'must_be_an_integer' })),
+      location_width: Yup.number()
+        .required(intl.formatMessage({ id: 'required' }))
+        .integer(intl.formatMessage({ id: 'must_be_an_integer' })),
+    });
+  };

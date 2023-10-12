@@ -15,8 +15,12 @@ import { Shelf } from '../../../../types/shelf';
 import { removeShelfById } from '../../../../services/api.shelf';
 import AddShelfDialog from '../../common/AddShelfDialog';
 import ConfirmationDialog from "../../common/ConfirmationDialog";
+import ModifyShelfNumberDialog from "./ModifyShelfNumberDialog";
+import ModifyShelfDimensionsDialog from "./ModifyShelfDimensions";
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import LocationLabelsPDF from '../../common/LocationLabelsPDF';
+import { FaPencilAlt } from 'react-icons/fa';
+import { updateShelfById } from '../../../../services/api.shelf';
 
 type PartitionsItem = {
   partition_number: number;
@@ -55,7 +59,11 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
     const [shelfNumberDialog, setShelfNumberDialog] = useState<number>(0);
     
     const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+    const [showShelfNumberDialog, setShowShelfNumberDialog] = useState<boolean>(false);
+    const [shelfNumberElement, setShelfNumberElement] = useState<Shelf | null>(null);
 
+    const [showDimensionsDialog, setShowDimensionsDialog] = useState<boolean>(false);
+    const [shelfDimensionsElement, setShelfDimensionsElement] = useState<Shelf | null>(null);
 
     useEffect(() => {
       let items: PartitionsItem[] = [];
@@ -221,6 +229,96 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
 
     const closeDeleteDialog = () => {
       setShowDeleteDialog(false);
+    }
+
+    const handleModifyShelfNumber = async(shelfNumber: number) => {
+      if (shelfNumberElement !== null) {
+        const findElement = shelvesToShow.filter((shelf: Shelf) => ((shelfNumberElement.id !== shelf.id) && (shelf.number_of_shelves === Number(shelfNumber))));
+        if (findElement.length === 0) {
+          const body: Shelf = {
+            column_ammount: shelfNumberElement.column_ammount,
+            layers: shelfNumberElement.layers,
+            number_of_shelves: shelfNumber,
+            high_inventory: shelfNumberElement.high_inventory,
+            location_width: shelfNumberElement.location_width,
+            location_length: shelfNumberElement.location_length,
+            warehouse_id: shelfNumberElement.warehouse_id,
+            partition_table: shelfNumberElement.partition_table
+          };
+          const response: Response = await updateShelfById(Number(shelfNumberElement.id), body);
+          if (response.status >= 200 && response.status <= 299) {
+            const element: Shelf = {
+              ...shelfNumberElement, number_of_shelves: shelfNumber
+            };
+            setShelves(shelves.map((shelf: Shelf) => {
+              return shelf.id !== element.id ? shelf : element;
+            }));
+            setShelvesToShow(shelvesToShow.map((shelf: Shelf) => {
+              return shelf.id !== element.id ? shelf : element;
+            }));
+            showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+            closeModifyShelfNumberDialog();
+          } else {
+            showMsg(intl.formatMessage({ id: 'unknownStatusErrorMsg' }), { type: "error" })
+          }
+        } else {
+          showMsg(intl.formatMessage({ id: 'shelf_number_already_exists' }), { type: "error" });
+        }
+      }
+    }
+
+    const openModifyShelfNumberDialog = async(shelf: Shelf) => {
+      await setShelfNumberElement(shelf);
+      setShowShelfNumberDialog(true);
+    }
+
+    const closeModifyShelfNumberDialog = () => {
+      setShelfNumberElement(null);
+      setShowShelfNumberDialog(false);
+    }
+
+    const handleModifyDimensions = async(shelfLength: number, shelfWidth: number, shelfHigh: number) => {
+      if (shelfDimensionsElement !== null) {
+          const body: Shelf = {
+            column_ammount: shelfDimensionsElement.column_ammount,
+            layers: shelfDimensionsElement.layers,
+            number_of_shelves: shelfDimensionsElement.number_of_shelves,
+            high_inventory: shelfHigh,
+            location_width: shelfWidth,
+            location_length: shelfLength,
+            warehouse_id: shelfDimensionsElement.warehouse_id,
+            partition_table: shelfDimensionsElement.partition_table
+          };
+          const response: Response = await updateShelfById(Number(shelfDimensionsElement.id), body);
+          if (response.status >= 200 && response.status <= 299) {
+            const element: Shelf = {
+              ...shelfDimensionsElement, 
+              high_inventory: shelfHigh,
+              location_width: shelfWidth,
+              location_length: shelfLength,
+            };
+            setShelves(shelves.map((shelf: Shelf) => {
+              return shelf.id !== element.id ? shelf : element;
+            }));
+            setShelvesToShow(shelvesToShow.map((shelf: Shelf) => {
+              return shelf.id !== element.id ? shelf : element;
+            }));
+            showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+            closeDimensionsDialog();
+          } else {
+            showMsg(intl.formatMessage({ id: 'unknownStatusErrorMsg' }), { type: "error" })
+          }
+      }
+    }
+
+    const openDimensionsDialog = async(shelf: Shelf) => {
+      await setShelfDimensionsElement(shelf);
+      setShowDimensionsDialog(true);
+    }
+
+    const closeDimensionsDialog = () => {
+      setShelfDimensionsElement(null);
+      setShowDimensionsDialog(false);
     }
 
     return (
@@ -467,8 +565,18 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                             <div className='elements-center'>
                               <input type="checkbox" name={`shelf-${index}`} checked={row.checked} onChange={(event) => handleCheckboxChange(event, index)} />
                             </div>
-                            <div onClick={() => {goToShelf(Number(row.id))}} style={{cursor: 'pointer'}}>{`${warehouse.code}${String(row.partition_table).padStart(2, '0')}${String(row.number_of_shelves).padStart(2, '0')}`}</div>
-                            <div>{row.location_length}*{row.location_width}*{row.high_inventory}</div>
+                            <div className='elements-row-start container-shelf-number'>
+                              <a
+                                href={`/${locale}/wms/warehouses/${id}/config/${row.id}/shelf`}
+                              >
+                                {`${warehouse.code}${String(row.partition_table).padStart(2, '0')}${String(row.number_of_shelves).padStart(2, '0')}`}
+                              </a>
+                              <FaPencilAlt className='modify-shelf-number' onClick={()=>{ openModifyShelfNumberDialog(row) }} style={{ fontSize: '15px', color: 'white', marginLeft: '10px', cursor: 'pointer' }} />
+                            </div>
+                            <div className='elements-row-start container-shelf-number'>
+                              <span>{row.location_length}*{row.location_width}*{row.high_inventory}</span>
+                              <FaPencilAlt className='modify-shelf-number' onClick={()=>{ openDimensionsDialog(row) }} style={{ fontSize: '15px', color: 'white', marginLeft: '10px', cursor: 'pointer' }} />
+                            </div>
                             <div>{row.layers}</div>
                             <div>{row.column_ammount}</div>
                             <div>{row.layers*row.column_ammount}</div>
@@ -481,6 +589,8 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
             </div>
             { showDialog && (<AddShelfDialog close={closeDialog} confirm={confirmAddShelves} title={titleDialog} partition_table={partitionTableDialog} warehouse={warehouse} shelf_number={shelfNumberDialog} isCreatePartition={isCreatePartition}></AddShelfDialog>) }
             { showDeleteDialog && <ConfirmationDialog close={closeDeleteDialog} confirm={handleRemoveShelves} />}
+            { showShelfNumberDialog && <ModifyShelfNumberDialog close={closeModifyShelfNumberDialog} confirm={handleModifyShelfNumber} title={intl.formatMessage({ id: 'modify_shelf_number' })} warehouseCode={warehouse.code} shelf={shelfNumberElement as Shelf} />}
+            { showDimensionsDialog && <ModifyShelfDimensionsDialog close={closeDimensionsDialog} confirm={handleModifyDimensions} title={intl.formatMessage({ id: 'modify_dimensions' })} shelf={shelfDimensionsElement as Shelf} />}
         </div>
     );
 };

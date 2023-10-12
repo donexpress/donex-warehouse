@@ -349,7 +349,7 @@ const WarehouseTable = ({ states }: WarehouseListProps) => {
           <span className="text-default-400 text-small">
             {intl.formatMessage(
               { id: "total_results" },
-              { in: warehouses.length }
+              { in: filteredItems.length }
             )}
           </span>
           <label className="flex items-center text-default-400 text-small">

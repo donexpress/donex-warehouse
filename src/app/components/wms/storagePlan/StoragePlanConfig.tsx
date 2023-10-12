@@ -25,6 +25,7 @@ import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import { getDateFormat, getHourFormat } from '../../../../helpers/utils';
+import ConfirmationDialog from "../../common/ConfirmationDialog";
 
 const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boolean = true): PackingList[] => {
   return packingLists.map((packingList: PackingList) => {
@@ -46,7 +47,9 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
     const [showRemoveBoxDialog, setShowRemoveBoxDialog] = useState<boolean>(false);
     const [showSplitBillDialog, setShowSplitBillDialog] = useState<boolean>(false);
     const [showBatchOnShelvesDialog, setShowBatchOnShelvesDialog] = useState<boolean>(false);
+    const [showForceEntryDialog, setShowForceEntryDialog] = useState<boolean>(false);
     const [boxNumber, setBoxNumber] = useState<number | null>(storagePlan?.box_amount ? storagePlan?.box_amount : null);
+    const [stateStoragePlan, setStateStoragePlan] = useState<string>(storagePlan.state ? storagePlan.state : 'to be storage')
     
     const initialValues = {
         rows: [],
@@ -125,7 +128,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: (nextState !== '' && (!values.state || (values.state && (values.state === 'to be storage' || values.state === 'into warehouse' || values.state === 'stocked')))) ? nextState : (values.state ? values.state : 'to be storage')
+                state: (nextState !== '' && (!stateStoragePlan || (stateStoragePlan && (stateStoragePlan === 'to be storage' || stateStoragePlan === 'into warehouse' || stateStoragePlan === 'stocked')))) ? nextState : (stateStoragePlan ? stateStoragePlan : 'to be storage')
               };
       }
 
@@ -221,12 +224,14 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
         setSelectedRows([]);
 
         if (allHavePackageShelf(elements)) {
-          if (storagePlan && storagePlan.state && storagePlan.state !== 'stocked') {
+          if (storagePlan && stateStoragePlan && stateStoragePlan !== 'stocked') {
             updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'stocked'));
+            setStateStoragePlan('stocked');
           }
         } else if (atLeastOneHasPackageShelf(elements)) {
-          if (storagePlan && storagePlan.state && storagePlan.state !== 'into warehouse' && storagePlan.state !== 'stocked') {
+          if (storagePlan && stateStoragePlan && stateStoragePlan !== 'into warehouse' && stateStoragePlan !== 'stocked') {
             updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'into warehouse'));
+            setStateStoragePlan('into warehouse');
           }
         }
       }
@@ -286,6 +291,27 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
             }
           }
         }
+      }
+
+      const openForceEntryStoragePlanDialog = () => {
+        setShowForceEntryDialog(true);
+      }
+
+      const closeForceEntryStoragePlanDialog = () => {
+        setShowForceEntryDialog(false);
+      }
+
+      const handleForceEntry = async() => {
+          const response: Response = await updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'stocked'));
+          if (response.status >= 200 && response.status <= 299) {
+            const message = intl.formatMessage({ id: 'successfullyActionMsg' });
+            setStateStoragePlan('stocked');
+            showMsg(message, { type: "success" });
+            closeForceEntryStoragePlanDialog();
+          } else {
+            let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+            showMsg(message, { type: "error" });
+          }
       }
 
     return (
@@ -461,13 +487,13 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu>
-                          <DropdownItem className={(storagePlan && storagePlan.state !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(1)}>
+                          <DropdownItem className={(storagePlan && stateStoragePlan !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(1)}>
                             {intl.formatMessage({ id: "add_box" })}
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && storagePlan.state !== 'to be storage')) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (storagePlan && stateStoragePlan !== 'to be storage')) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(2)}>
                             {intl.formatMessage({ id: "remove_box" })}
                           </DropdownItem>
-                          {/* <DropdownItem className={((storagePlan && (storagePlan.state === 'to be storage' || storagePlan.state === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
+                          {/* <DropdownItem className={((storagePlan && (stateStoragePlan === 'to be storage' || stateStoragePlan === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
                             {intl.formatMessage({ id: "fast_delivery" })}
                           </DropdownItem> */}
                           <DropdownItem onClick={() => packingListDataToExcel(storagePlan, rows, intl, tabToShow === 1 ? 'ic' : 'lg' )}>
@@ -480,18 +506,21 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                               }
                             </PDFDownloadLink>
                           </DropdownItem>
-                          <DropdownItem className={(storagePlan && (storagePlan.state !== 'stocked' && storagePlan.state !== 'into warehouse')) ? 'do-not-show-dropdown-item' : ''}>
+                          <DropdownItem className={(storagePlan && (stateStoragePlan !== 'stocked' && stateStoragePlan !== 'into warehouse')) ? 'do-not-show-dropdown-item' : ''}>
                             <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={rows} warehouseCode={String(storagePlan.warehouse?.code)} orderNumber={String(storagePlan.order_number)} intl={intl} />} fileName="entry_plan_labels.pdf">
                               {({ blob, url, loading, error }) =>
                                 intl.formatMessage({ id: "generate_labels" })
                               }
                             </PDFDownloadLink>
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || !inWMS || (storagePlan && (storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
+                          <DropdownItem className={(selectedRows.length === 0 || !inWMS || (storagePlan && (stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (storagePlan.state === 'stocked' || storagePlan.state === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (stateStoragePlan === 'stocked' || stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
                             {intl.formatMessage({ id: "split_bill" })}
+                          </DropdownItem>
+                          <DropdownItem className={(storagePlan && stateStoragePlan === 'into warehouse') ? '' : 'do-not-show-dropdown-item'} onClick={() => openForceEntryStoragePlanDialog()}>
+                            {intl.formatMessage({ id: "force_entry" })}
                           </DropdownItem>
                           <DropdownItem className={(!storagePlan?.history || (storagePlan?.history && storagePlan?.history.length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(6)}>
                             {intl.formatMessage({ id: "history" })}
@@ -629,6 +658,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
             { showRemoveBoxDialog && <PackingListDialog close={closeRemoveBoxesDialog} confirm={removeBoxes} title={intl.formatMessage({ id: 'remove_box' })} packingLists={selectedRows} /> }
             { showSplitBillDialog && <PackingListDialog close={closeSplitBillDialog} confirm={splitBill} title={intl.formatMessage({ id: 'split_bill' })} packingLists={selectedRows} /> }
             { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows} warehouse={storagePlan?.warehouse} /> }
+            {showForceEntryDialog && <ConfirmationDialog close={closeForceEntryStoragePlanDialog} confirm={handleForceEntry} />}
         </div>
     );
 };

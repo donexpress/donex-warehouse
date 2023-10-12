@@ -103,6 +103,18 @@
     }
 }
 
+.container-shelf-number {
+    .modify-shelf-number {
+        display: none;
+    }
+}
+
+.container-shelf-number:hover {
+    .modify-shelf-number {
+        display: inline-block;
+    }
+}
+
 @media only screen and (max-width: 1250px) {
     .warehouse-data {
         width: calc(100vw - 64px);
@@ -123,6 +135,12 @@
         
         &__sub-container {
             min-width: auto;
+        }
+    }
+
+    .container-shelf-number {
+        .modify-shelf-number {
+            display: inline-block;
         }
     }
 }
