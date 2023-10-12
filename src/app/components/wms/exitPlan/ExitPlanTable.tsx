@@ -72,6 +72,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
   "observations",
   "customer_order_number",
+  "reference_number"
 ];
 
 const ExitPlanTable = () => {
@@ -126,18 +127,8 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "warehouse" }),
-        uid: "warehouse",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "user" }),
-        uid: "user",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "box_numbers" }),
-        uid: "box_amount",
+        name: intl.formatMessage({ id: "customer_order_number" }),
+        uid: "customer_order_number",
         sortable: true,
       },
       {
@@ -146,18 +137,8 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "palets_numbers" }),
-        uid: "palets_amount",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "amount" }),
-        uid: "amount",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "delivered_amount_boxes" }),
-        uid: "delivered_quantity",
+        name: intl.formatMessage({ id: "reference_number" }),
+        uid: "reference_number",
         sortable: true,
       },
       {
@@ -176,6 +157,41 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
+        name: intl.formatMessage({ id: "address" }),
+        uid: "address",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "delivered_amount_boxes" }),
+        uid: "delivered_quantity",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "box_numbers" }),
+        uid: "box_amount",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "warehouse" }),
+        uid: "warehouse",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "user" }),
+        uid: "user",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "palets_numbers" }),
+        uid: "palets_amount",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "amount" }),
+        uid: "amount",
+        sortable: true,
+      },
+      {
         name: intl.formatMessage({ id: "country" }),
         uid: "country",
         sortable: true,
@@ -186,11 +202,6 @@ const ExitPlanTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "address" }),
-        uid: "address",
-        sortable: true,
-      },
-      {
         name: intl.formatMessage({ id: "operation_instructions" }),
         uid: "operation_instructions",
         sortable: false,
@@ -198,11 +209,6 @@ const ExitPlanTable = () => {
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "customer_order_number" }),
-        uid: "customer_order_number",
         sortable: true,
       },
       {

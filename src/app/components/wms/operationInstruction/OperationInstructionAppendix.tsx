@@ -170,7 +170,7 @@ const OperationInstructionAppendix = ({
             }}
           >
             <div className="elements-center" style={{ wordBreak: "break-all" }}>
-              <span className="text-center">{appendix.name}</span>
+              <span style={{cursor: 'pointer'}} className="text-center" onClick={() => handleVisualice(appendix.id ? appendix.id : 1)}>{appendix.name}</span>
             </div>
             <div className="elements-center">
               <span className="text-center">{appendix.user?.nickname}</span>
