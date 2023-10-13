@@ -126,13 +126,14 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                 observations: values.observations,
                 rejected_boxes: values.rejected_boxes,
                 return: values.return,
-                state: getState(values.state),
+                state: getState(storagePlan ? storagePlan.state : values.state),
                 reference_number: values.reference_number,
                 pr_number: values.pr_number
               };
       }
 
       const getState = (state: string | undefined) => {
+        console.log(state)
         if (state) {
           return state;
         }
