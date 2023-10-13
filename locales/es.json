@@ -379,6 +379,6 @@
   "not_correct_state_msg": "No todas las cajas introducidas fueron agregadas porque no estaban almacenadas.",
   "missing_apendix_msg": "Para cambiar de estado necesitas al menos subir 1 evidencia.",
   "input_example_1": "Ej: DEWMXI2023096000011U047, DEWMXI2023096000011U049...",
-  "input_example_2": "Ej: DEWMXI2023096000010, DEWMXI2023096000008..."
-
+  "input_example_2": "Ej: DEWMXI2023096000010, DEWMXI2023096000008...",
+  "wrongStateMsg": "Las cajas seleccionadas necesitan estar almacenadas para ser adicionadas a un plan de salida."
 }
