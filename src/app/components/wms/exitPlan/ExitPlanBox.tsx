@@ -138,15 +138,15 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       }
       let exist: PackingList | StoragePlan | null = null;
       let added: string | undefined = undefined;
+      let show_error: boolean = false
+      let show_duplicated_warning: boolean = false
       if (data.case_number) {
         const arr = data.case_number.split(",");
         for (let i = 0; i < arr.length; i++) {
           const caseNumber = arr[i].trim();
           exist = caseNumber.indexOf('DEW') >-1 ? await getPackingListsByCaseNumber(caseNumber) : await getPackingListsByBoxNumber(caseNumber);
           if (!exist) {
-            showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
-              type: "error",
-            });
+            show_error = true;
           }
           added = exitPlan.case_numbers?.find(
             (value) => value === (exist as PackingList).case_number
@@ -154,9 +154,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           if (added === undefined) {
             exitPlan.case_numbers.push((exist as PackingList).case_number);
           } else {
-            showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
-              type: "warning",
-            });
+            show_duplicated_warning = true
           }
         }
       }
@@ -182,13 +180,20 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 // @ts-ignore
                 exitPlan.case_numbers.push(pl.case_number);
               } else {
-                showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
-                  type: "warning",
-                });
+                show_duplicated_warning = true
               }
             });
           });
         }
+      }
+      if(show_error) {
+        showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+          type: "error",
+        });
+      } else if(show_duplicated_warning) {
+        showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+          type: "warning",
+        });
       }
       // update portion
       if (exitPlan.id && exist) {
@@ -196,16 +201,16 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         const result = await updateExitPlan(exitPlan.id, {
           case_numbers: exitPlan.case_numbers,
         });
-        if (result.status === 401) {
+        if (result.status === 401 && !show_error && !show_duplicated_warning) {
           showMsg(intl.formatMessage({ id: "not_own_box_msg" }), {
             type: "error",
           });
         } else {
-          if (result.status === 422) {
+          if (result.status === 422 && !show_error && !show_duplicated_warning) {
             showMsg(intl.formatMessage({ id: "not_correct_state_msg" }), {
               type: "warning",
             });
-          } else {
+          } else if(result.status < 300 && !show_error && !show_duplicated_warning){
             showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
               type: "success",
             });
