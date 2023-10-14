@@ -178,6 +178,9 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           }
         }
         exist = tmp ? tmp[0] : null;
+        if(tmp.filter(el => el.state !== "stocked").length > 0) {
+          show_miss_state_warning = true
+        }
         if (tmp && exitPlan) {
           tmp.forEach((t) => {
             const storage_plan = t;
