@@ -490,7 +490,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                             )
                           }
                           {
-                            isFromDetails && id && (
+                            isFromDetails && id && (inWMS || (!inWMS && storagePlan && storagePlan.state === 'to be storage')) && (
                               <Button
                                 color="primary"
                                 type="button"
