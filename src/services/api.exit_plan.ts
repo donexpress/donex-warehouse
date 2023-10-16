@@ -74,6 +74,30 @@ export const updateExitPlan = async (
   }
 };
 
+export const removeBoxesExitPlan = async (
+  exitPlanId: number,
+  exitPlan: any
+): Promise<Response> => {
+  const path = exitPlanPath() + `/${exitPlanId}/remove_boxes`;
+  try {
+    const response = await axios.patch(path, exitPlan, getHeaders());
+
+    if (response.status && response.status >= 200 && response.status <= 299) {
+      return { ...response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    console.log({
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    })
+    return {
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    };
+  }
+};
+
 export const removeExitPlan = async (exitPlanId: number): Promise<Response> => {
   const path = exitPlanPath() + `/${exitPlanId}`;
   try {

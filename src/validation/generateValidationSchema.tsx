@@ -77,12 +77,28 @@ export const generateValidationSchemaUserLevel = (intl: IntlShape) => {
   });
 };
 
-export const generateValidationSchemaExitPlan = (intl: IntlShape) => {
+export const generateValidationSchemaExitPlan = (intl: IntlShape, destinationSelected: string) => {
+  return destinationSelected !== "private_address" ? Yup.object({
+    warehouse_id: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+    user_id: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+    delivered_time: Yup.string()
+      .required(intl.formatMessage({ id: 'required' }))
+  }) :  Yup.object({
+    warehouse_id: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+    user_id: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+  });
+};
+
+export const generateValidationSchemaOperationinstruction = (intl: IntlShape) => {
   return Yup.object({
     warehouse_id: Yup.string()
       .required(intl.formatMessage({ id: 'required' })),
     user_id: Yup.string()
-      .required(intl.formatMessage({ id: 'required' }))
+      .required(intl.formatMessage({ id: 'required' })),
   });
 };
 
