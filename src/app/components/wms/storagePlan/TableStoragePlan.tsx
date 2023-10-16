@@ -502,12 +502,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const getCountByState = (state: any) => {
     if (stgPCount) {
       switch(state.value) {
-        case 'to be storage': return ` (${stgPCount.to_be_storage})`;
-        case 'into warehouse': return ` (${stgPCount.into_warehouse})`;
-        case 'stocked': return ` (${stgPCount.stocked})`;
-        case 'cancelled': return ` (${stgPCount.cancelled})`;
-        case 'returns': return ` (${stgPCount.returns})`;
-        case 'refused': return ` (${stgPCount.refused})`;
+        case 'to be storage': return ` (${(statusSelected === 'to be storage' && !loadingItems) ? filteredItems.length : stgPCount.to_be_storage})`;
+        case 'into warehouse': return ` (${(statusSelected === 'into warehouse' && !loadingItems) ? filteredItems.length : stgPCount.into_warehouse})`;
+        case 'stocked': return ` (${(statusSelected === 'stocked' && !loadingItems) ? filteredItems.length : stgPCount.stocked})`;
+        case 'cancelled': return ` (${(statusSelected === 'cancelled' && !loadingItems) ? filteredItems.length : stgPCount.cancelled})`;
       }
     }
     return '';
