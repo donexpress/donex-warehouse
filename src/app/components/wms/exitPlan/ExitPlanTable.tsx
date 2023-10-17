@@ -72,7 +72,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
   "observations",
   "customer_order_number",
-  "reference_number"
+  "reference_number",
 ];
 
 const ExitPlanTable = () => {
@@ -922,19 +922,25 @@ const ExitPlanTable = () => {
   };
 
   const handleOperationInstruction = (exitPlan: ExitPlan) => {
-    if (
-      exitPlan.operation_instructions &&
-      exitPlan.operation_instructions.length > 0
-    ) {
-      router.push(
-        `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${exitPlan.id}/config`
-      );
+    if (exitPlan.packing_lists && exitPlan.packing_lists.length > 0) {
+      if (
+        exitPlan.operation_instructions &&
+        exitPlan.operation_instructions.length > 0
+      ) {
+        router.push(
+          `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${
+            exitPlan.id
+          }/config`
+        );
+      } else {
+        router.push(
+          `/${locale}/${
+            checkOMS ? "oms" : "wms"
+          }/operation_instruction/insert?exit_plan_id=${exitPlan.id}`
+        );
+      }
     } else {
-      router.push(
-        `/${locale}/${
-          checkOMS ? "oms" : "wms"
-        }/operation_instruction/insert?exit_plan_id=${exitPlan.id}`
-      );
+      showMsg(intl.formatMessage({ id: "operation_instruction_box_requirement_amount" }), {type: 'warning'})
     }
   };
 
@@ -963,6 +969,9 @@ const ExitPlanTable = () => {
         break;
       case "return-to_be_chosen":
         state = "pending";
+        break;
+      case "return-dispatched":
+        state = "processing";
         break;
     }
     const reponse = await updateExitPlan(changeExitPlanId, {

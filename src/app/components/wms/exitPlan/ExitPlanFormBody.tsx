@@ -207,7 +207,7 @@ const ExitPlanFormBody = ({
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
-          validationSchema={generateValidationSchemaExitPlan(intl)}
+          validationSchema={generateValidationSchemaExitPlan(intl, destinationSelected)}
           onSubmit={handleSubmit}
           enableReinitialize
         >
@@ -323,6 +323,7 @@ const ExitPlanFormBody = ({
                     })}
                     customClass="custom-input"
                     disabled={isFromDetails}
+                    required={destinationSelected !== "private_address"}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">

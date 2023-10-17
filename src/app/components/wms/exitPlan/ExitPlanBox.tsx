@@ -13,6 +13,7 @@ import { ExitPlan } from "../../../../types/exit_plan";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import {
   getExitPlansById,
+  removeBoxesExitPlan,
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
 import AddExitPlanDialog from "./AddExitPlanDialog";
@@ -282,8 +283,8 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     const new_case_numbers: string[] | undefined =
       exitPlan?.case_numbers?.filter((el) => el !== case_number);
     if (exitPlan && exitPlan.id) {
-      const result = await updateExitPlan(exitPlan.id, {
-        case_numbers: new_case_numbers,
+      const result = await removeBoxesExitPlan(exitPlan.id, {
+        case_numbers: [case_number],
       });
       if (result.status < 300) {
         exitPlan.case_numbers = new_case_numbers;

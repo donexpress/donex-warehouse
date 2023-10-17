@@ -59,6 +59,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "number_of_boxes_stored",
   "reference_number",
   "box_amount",
+  "dispatched_boxes",
   "actions",
 ];
 
@@ -151,6 +152,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         sortable: false,
       },
       {
+        name: intl.formatMessage({ id: "dispatched_boxes" }),
+        uid: "dispatched_boxes",
+        sortable: false,
+      },
+      {
         name: intl.formatMessage({ id: "evidence" }),
         uid: "evidence",
         sortable: false,
@@ -211,6 +217,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "number_of_boxes_stored" }),
         uid: "number_of_boxes_stored",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "dispatched_boxes" }),
+        uid: "dispatched_boxes",
         sortable: false,
       },
       {
@@ -468,7 +479,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         );
         case "number_of_boxes_stored": return (
           storageP.packing_list && storageP.packing_list.length > 0 ? (storageP.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0'
-        );
+        ) - storageP.packing_list.filter((el: any) => el.dispatched).length;
+        case "dispatched_boxes":
+          return storageP.packing_list.filter((el: any) => el.dispatched).length
         default:
           return cellValue;
       }

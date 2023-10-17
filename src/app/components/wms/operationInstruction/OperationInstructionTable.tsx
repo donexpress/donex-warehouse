@@ -59,6 +59,7 @@ import ExportTable from "./ExportTable";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { getAppendagesByOperationInstructionId } from "@/services/api.appendixerege1992";
+import { getExitPlansById } from "@/services/api.exit_planerege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
@@ -215,14 +216,23 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     return columns;
   }, [intl]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (exit_plan_id) {
-      router.push({
-        pathname: `/${locale}/${
-          isOMS() ? "oms" : "wms"
-        }/operation_instruction/insert`,
-        search: `?exit_plan_id=${exit_plan_id}`,
-      });
+      const exit_plan = await getExitPlansById(exit_plan_id);
+      if (
+        exit_plan &&
+        exit_plan.case_numbers &&
+        exit_plan.case_numbers.length > 0
+      ) {
+        router.push({
+          pathname: `/${locale}/${
+            isOMS() ? "oms" : "wms"
+          }/operation_instruction/insert`,
+          search: `?exit_plan_id=${exit_plan_id}`,
+        });
+      } else {
+        showMsg(intl.formatMessage({ id: "operation_instruction_box_requirement_amount" }), {type: 'warning'})
+      }
     } else {
       router.push({
         pathname: `/${locale}/${
@@ -446,11 +456,15 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
               return getInstructionLabelByLanguage(instruction);
             }
           );
-          return <a
-          href={`/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${user.id}/show`}
-        >
-          {values.join(", ")}
-        </a>;
+          return (
+            <a
+              href={`/${locale}/${
+                isOMS() ? "oms" : "wms"
+              }/operation_instruction/${user.id}/show`}
+            >
+              {values.join(", ")}
+            </a>
+          );
         }
         case "warehouse_id": {
           return user.warehouse.name;
@@ -465,7 +479,15 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
           return <CopyColumnToClipboard value={cellValue} />;
         }
         case "box_number": {
-          return <CopyColumnToClipboard value={user.output_plan.packing_lists.map((el: any) => {return el.box_number}).join(', ')} />
+          return (
+            <CopyColumnToClipboard
+              value={user.output_plan.packing_lists
+                .map((el: any) => {
+                  return el.box_number;
+                })
+                .join(", ")}
+            />
+          );
         }
         case "location":
           return (
@@ -517,15 +539,24 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
   const handleProcessing = async (id: number) => {
     const op = operationInstructions.find((el) => el.id === id);
     if (op && op.id) {
-      const appendages = await getAppendagesByOperationInstructionId(op.id)
-      if(appendages && appendages.length > 0) {
+      const appendages = await getAppendagesByOperationInstructionId(op.id);
+      console.log(op.operation_instruction_type);
+      if (
+        // @ts-ignore
+        op.operation_instruction_type.instruction_type.find((el) => {
+          return el.value === "change label" || el.value === "photograph";
+        }) &&
+        (!appendages || appendages.length === 0)
+      ) {
+        showMsg(intl.formatMessage({ id: "missing_apendix_msg" }), {
+          type: "warning",
+        });
+      } else {
         setDialogIds([id]);
         // @ts-ignore
         setDialogTexts(op.operation_instruction_type.instruction_type);
         setDialogType("processing");
         setDisplayOperationInstructionConfirmation(true);
-      } else {
-        showMsg(intl.formatMessage({id: 'missing_apendix_msg'}), {type: 'warning'})
       }
     }
   };
