@@ -379,6 +379,10 @@
 	"not_correct_state_msg": "并非所有引入的盒子都被添加，因为它们没有被存储。",
 	"missing_apendix_msg": "要更改状态，您需要上传至少 1 个证据。",
   "input_example_1": "例子: DEWMXI2023096000011U047, DEWMXI2023096000011U049...",
-	"input_example_2": "例子: DEWMXI2023096000010, DEWMXI2023096000008..."
+	"input_example_2": "例子: DEWMXI2023096000010, DEWMXI2023096000008...",
+	"wrongStateMsg": "需要存储选定的框才能将其添加到输出计划中。",
+	"dispatched_boxes": "已发货的箱子",
+	"operation_instruction_box_requirement_amount": "您至少需要1个盒子来添加操作说明"
+
 
 }

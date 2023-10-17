@@ -13,15 +13,20 @@ import { ExitPlan } from "../../../../types/exit_plan";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import {
   getExitPlansById,
+  removeBoxesExitPlan,
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
 import AddExitPlanDialog from "./AddExitPlanDialog";
-import { getPackingListsByBoxNumber, getPackingListsByCaseNumber } from "../../../../services/api.packing_list";
+import {
+  getPackingListsByBoxNumber,
+  getPackingListsByCaseNumber,
+} from "../../../../services/api.packing_list";
 import { getStoragePlanByOrder_number } from "../../../../services/api.storage_plan";
 import { showMsg, inventoryOfExitPlan } from "../../../../helpers";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InventoryList from "./InventoryList";
 import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
+import ConfirmationDialog from "../../common/ConfirmationDialog";
 
 interface Props {
   exitPlan: ExitPlan;
@@ -46,6 +51,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
   const { locale } = router.query;
   const intl = useIntl();
   const [showAddDialog, setShowAddDialog] = useState<boolean>(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
   const [selectAllPackingListItems, setSelectAllPackingListItems] =
     useState<boolean>(false);
   const [rows, setRows] = useState<
@@ -70,6 +76,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         }
         break;
       case 2: {
+        setShowConfirmDialog(true);
         break;
       }
       case 3:
@@ -138,15 +145,19 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       }
       let exist: PackingList | StoragePlan | null = null;
       let added: string | undefined = undefined;
+      let show_error: boolean = false;
+      let show_duplicated_warning: boolean = false;
+      let show_miss_state_warning: boolean = false;
       if (data.case_number) {
         const arr = data.case_number.split(",");
         for (let i = 0; i < arr.length; i++) {
           const caseNumber = arr[i].trim();
-          exist = caseNumber.indexOf('DEW') >-1 ? await getPackingListsByCaseNumber(caseNumber) : await getPackingListsByBoxNumber(caseNumber);
+          exist =
+            caseNumber.indexOf("DEW") > -1
+              ? await getPackingListsByCaseNumber(caseNumber)
+              : await getPackingListsByBoxNumber(caseNumber);
           if (!exist) {
-            showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
-              type: "error",
-            });
+            show_error = true;
           }
           added = exitPlan.case_numbers?.find(
             (value) => value === (exist as PackingList).case_number
@@ -154,9 +165,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           if (added === undefined) {
             exitPlan.case_numbers.push((exist as PackingList).case_number);
           } else {
-            showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
-              type: "warning",
-            });
+            show_duplicated_warning = true;
           }
         }
       }
@@ -170,42 +179,79 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           }
         }
         exist = tmp ? tmp[0] : null;
+        if(tmp.filter(el => el.state !== "stocked").length > 0) {
+          show_miss_state_warning = true
+        }
         if (tmp && exitPlan) {
           tmp.forEach((t) => {
             const storage_plan = t;
-            storage_plan.packing_list?.forEach((pl) => {
-              // @ts-ignore
-              const tmp_added = exitPlan.case_numbers?.find(
-                (value) => value === pl.case_number
-              );
-              if (tmp_added === undefined) {
+            if (
+              storage_plan.packing_list &&
+              storage_plan.packing_list.length > 0
+            ) {
+              storage_plan.packing_list?.forEach((pl) => {
                 // @ts-ignore
-                exitPlan.case_numbers.push(pl.case_number);
-              } else {
-                showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
-                  type: "warning",
-                });
-              }
-            });
+                const tmp_added = exitPlan.case_numbers?.find(
+                  (value) => value === pl.case_number
+                );
+                if (tmp_added === undefined) {
+                  // @ts-ignore
+                  exitPlan.case_numbers.push(pl.case_number);
+                } else {
+                  show_duplicated_warning = true;
+                }
+              });
+            } else {
+              show_miss_state_warning = true;
+            }
           });
         }
+        console.log(tmp);
+      }
+      if (show_error) {
+        showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+          type: "error",
+        });
+      } else if (show_duplicated_warning) {
+        showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+          type: "warning",
+        });
+      } else if (show_miss_state_warning) {
+        showMsg(intl.formatMessage({ id: "not_correct_state_msg" }), {
+          type: "warning",
+        });
       }
       // update portion
       if (exitPlan.id && exist) {
-        console.log(exitPlan.case_numbers)
+        console.log(exitPlan.case_numbers);
         const result = await updateExitPlan(exitPlan.id, {
           case_numbers: exitPlan.case_numbers,
         });
-        if (result.status === 401) {
+        if (
+          result.status === 401 &&
+          !show_error &&
+          !show_duplicated_warning &&
+          !show_miss_state_warning
+        ) {
           showMsg(intl.formatMessage({ id: "not_own_box_msg" }), {
             type: "error",
           });
         } else {
-          if (result.status === 422) {
+          if (
+            result.status === 422 &&
+            !show_error &&
+            !show_duplicated_warning &&
+            !show_miss_state_warning
+          ) {
             showMsg(intl.formatMessage({ id: "not_correct_state_msg" }), {
               type: "warning",
             });
-          } else {
+          } else if (
+            result.status < 300 &&
+            !show_error &&
+            !show_duplicated_warning &&
+            !show_miss_state_warning
+          ) {
             showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
               type: "success",
             });
@@ -237,8 +283,8 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     const new_case_numbers: string[] | undefined =
       exitPlan?.case_numbers?.filter((el) => el !== case_number);
     if (exitPlan && exitPlan.id) {
-      const result = await updateExitPlan(exitPlan.id, {
-        case_numbers: new_case_numbers,
+      const result = await removeBoxesExitPlan(exitPlan.id, {
+        case_numbers: [case_number],
       });
       if (result.status < 300) {
         exitPlan.case_numbers = new_case_numbers;
@@ -258,11 +304,56 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     }
   };
 
-  const getBoxes = (items: { packing_lists: PackingList; checked: boolean }[]): PackingList[] => {
+  const getBoxes = (
+    items: { packing_lists: PackingList; checked: boolean }[]
+  ): PackingList[] => {
     return items.map((item) => {
-      return item.packing_lists
+      return item.packing_lists;
     });
-  }
+  };
+
+  const closeConfirmDialog = () => {
+    setShowConfirmDialog(false);
+  };
+
+  const deleteElements = async () => {
+    const new_case_numbers: string[] = []
+    if(exitPlan.case_numbers) {
+      exitPlan.case_numbers.forEach(el => {
+        if(selectedRows.find(sr => sr.packing_lists.case_number === el) === undefined) {
+          new_case_numbers.push(el)
+        }
+      })
+      if (exitPlan && exitPlan.id) {
+        const result = await updateExitPlan(exitPlan.id, {
+          case_numbers: new_case_numbers,
+        });
+        if (result.status < 300) {
+          exitPlan.case_numbers = new_case_numbers;
+          const new_rows:{ packing_lists: PackingList; checked: boolean; }[] = []
+          new_case_numbers.forEach(cn => {
+            const tmp = rows.find(el => el.packing_lists.case_number === cn)
+            if(tmp) {
+              new_rows.push(tmp)
+            }
+          })
+          setRows(new_rows);
+          showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+            type: "success",
+          });
+        } else if (result.status === 401) {
+          showMsg(intl.formatMessage({ id: "not_own_box_msg" }), {
+            type: "error",
+          });
+        } else {
+          showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+            type: "success",
+          });
+        }
+      }
+    }
+    closeConfirmDialog()
+  };
 
   return (
     <>
@@ -283,7 +374,22 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 <DropdownItem onClick={() => handleAction(1)}>
                   {intl.formatMessage({ id: "add" })}
                 </DropdownItem>
-                <DropdownItem className={(rows.length === 0) ? "do-not-show-dropdown-item" : ""} onClick={() => inventoryOfExitPlan(exitPlan, getBoxes(rows), intl )}>
+                <DropdownItem
+                  className={
+                    selectedRows.length === 0 ? "do-not-show-dropdown-item" : ""
+                  }
+                  onClick={() => handleAction(2)}
+                >
+                  {intl.formatMessage({ id: "Delete" })}
+                </DropdownItem>
+                <DropdownItem
+                  className={
+                    rows.length === 0 ? "do-not-show-dropdown-item" : ""
+                  }
+                  onClick={() =>
+                    inventoryOfExitPlan(exitPlan, getBoxes(rows), intl)
+                  }
+                >
                   {intl.formatMessage({ id: "generate_xlsx_inventory" })}
                 </DropdownItem>
                 <DropdownItem>
@@ -324,10 +430,8 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 onChange={handleCheckboxChange}
               />
             </div>
-            <div className='elements-center-start'>
-              <span>
-                {intl.formatMessage({ id: 'box_number' })}
-              </span>
+            <div className="elements-center-start">
+              <span>{intl.formatMessage({ id: "box_number" })}</span>
             </div>
             <div className="elements-center-start">
               <span className="">
@@ -360,9 +464,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               </span>
             </div>
             <div className="elements-center-start">
-              <span>
-                {intl.formatMessage({ id: "location" })}
-              </span>
+              <span>{intl.formatMessage({ id: "location" })}</span>
             </div>
             <div className="elements-center-start">
               <span className="">
@@ -380,6 +482,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               </span>
             </div>
           </div>
+          <div className='boxes-container-values'>
           {rows.map((row, index) => (
             <div
               key={index}
@@ -387,48 +490,79 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               style={{ padding: "8px 0px 8px 5px" }}
             >
               <div className="elements-start-center">
-                <input style={{ marginTop: '3px' }}
+                <input
+                  style={{ marginTop: "3px" }}
                   type="checkbox"
                   name={`packing-list-${index}`}
                   checked={row.checked}
                   onChange={(event) => handleCheckboxChange(event, index)}
                 />
               </div>
-              <div className="">
-                {row.packing_lists?.box_number}
-              </div>
-              <div className="">
-                {row.packing_lists?.case_number}
-              </div>
-              <div className="">
-                {row.packing_lists?.client_weight}
-              </div>
-              <div className="">
-                {row.packing_lists?.client_height}
-              </div>
+              <div className="">{row.packing_lists?.box_number}</div>
+              <div className="">{row.packing_lists?.case_number}</div>
+              <div className="">{row.packing_lists?.client_weight}</div>
+              <div className="">{row.packing_lists?.client_height}</div>
               <div className="">{"--"}</div>
               <div className="">{"--"}</div>
               <div className="">{row.packing_lists?.amount}</div>
               <div>
-              {
-                (row.packing_lists && row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0) ? (
+                {row.packing_lists &&
+                row.packing_lists.package_shelf &&
+                row.packing_lists.package_shelf.length > 0 ? (
                   <>
                     {exitPlan.warehouse ? (
                       <>
-                        {exitPlan.warehouse.code}-{String(row.packing_lists.package_shelf[0].shelf?.partition_table).padStart(2, '0')}-{String(row.packing_lists.package_shelf[0].shelf?.number_of_shelves).padStart(2, '0')}-{String(row.packing_lists.package_shelf[0].layer).padStart(2, '0')}-{String(row.packing_lists.package_shelf[0].column).padStart(2, '0')}
+                        {exitPlan.warehouse.code}-
+                        {String(
+                          row.packing_lists.package_shelf[0].shelf
+                            ?.partition_table
+                        ).padStart(2, "0")}
+                        -
+                        {String(
+                          row.packing_lists.package_shelf[0].shelf
+                            ?.number_of_shelves
+                        ).padStart(2, "0")}
+                        -
+                        {String(
+                          row.packing_lists.package_shelf[0].layer
+                        ).padStart(2, "0")}
+                        -
+                        {String(
+                          row.packing_lists.package_shelf[0].column
+                        ).padStart(2, "0")}
                         <br />
                       </>
                     ) : null}
-                    {intl.formatMessage({ id: 'partition' })}: {(row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0 && row.packing_lists.package_shelf[0].shelf) ? row.packing_lists.package_shelf[0].shelf.partition_table : ''}
+                    {intl.formatMessage({ id: "partition" })}:{" "}
+                    {row.packing_lists.package_shelf &&
+                    row.packing_lists.package_shelf.length > 0 &&
+                    row.packing_lists.package_shelf[0].shelf
+                      ? row.packing_lists.package_shelf[0].shelf.partition_table
+                      : ""}
                     &nbsp;
-                    {intl.formatMessage({ id: 'shelf' })}: {(row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0 && row.packing_lists.package_shelf[0].shelf) ? row.packing_lists.package_shelf[0].shelf.number_of_shelves : ''}
+                    {intl.formatMessage({ id: "shelf" })}:{" "}
+                    {row.packing_lists.package_shelf &&
+                    row.packing_lists.package_shelf.length > 0 &&
+                    row.packing_lists.package_shelf[0].shelf
+                      ? row.packing_lists.package_shelf[0].shelf
+                          .number_of_shelves
+                      : ""}
                     <br />
-                    {intl.formatMessage({ id: 'layer' })}: {(row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0) ? row.packing_lists.package_shelf[0].layer : ''}
+                    {intl.formatMessage({ id: "layer" })}:{" "}
+                    {row.packing_lists.package_shelf &&
+                    row.packing_lists.package_shelf.length > 0
+                      ? row.packing_lists.package_shelf[0].layer
+                      : ""}
                     &nbsp;
-                    {intl.formatMessage({ id: 'column' })}: {(row.packing_lists.package_shelf && row.packing_lists.package_shelf.length > 0) ? row.packing_lists.package_shelf[0].column : ''}
+                    {intl.formatMessage({ id: "column" })}:{" "}
+                    {row.packing_lists.package_shelf &&
+                    row.packing_lists.package_shelf.length > 0
+                      ? row.packing_lists.package_shelf[0].column
+                      : ""}
                   </>
-                ) : '--'
-              }
+                ) : (
+                  "--"
+                )}
               </div>
               <div className="">
                 {getDateFormat(
@@ -468,6 +602,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               </div>
             </div>
           ))}
+          </div>
         </div>
       </div>
       {showAddDialog && (
@@ -475,6 +610,12 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           close={closeAddDialog}
           confirm={addNewData}
           title={intl.formatMessage({ id: "add_exit_plan_boxes" })}
+        />
+      )}
+      {showConfirmDialog && (
+        <ConfirmationDialog
+          close={closeConfirmDialog}
+          confirm={deleteElements}
         />
       )}
     </>

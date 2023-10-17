@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ExitPlan, State } from "@/types/exit_planerege1992";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
-import { generateValidationSchemaExitPlan } from "@/validation/generateValidationSchemaerege1992";
+import { generateValidationSchemaExitPlan, generateValidationSchemaOperationinstruction } from "@/validation/generateValidationSchemaerege1992";
 import { Form, Formik } from "formik";
 import { useIntl } from "react-intl";
 import GenericInput from "../../common/GenericInput";
@@ -255,7 +255,7 @@ const OperationInstructionFormBody = ({
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
-          validationSchema={generateValidationSchemaExitPlan(intl)}
+          validationSchema={generateValidationSchemaOperationinstruction(intl)}
           onSubmit={handleSubmit}
         >
           {({ isSubmitting, isValid }) => (

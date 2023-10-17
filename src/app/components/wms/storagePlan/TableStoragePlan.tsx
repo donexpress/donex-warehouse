@@ -59,6 +59,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "number_of_boxes_stored",
   "reference_number",
   "box_amount",
+  "dispatched_boxes",
   "actions",
 ];
 
@@ -151,6 +152,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         sortable: false,
       },
       {
+        name: intl.formatMessage({ id: "dispatched_boxes" }),
+        uid: "dispatched_boxes",
+        sortable: false,
+      },
+      {
         name: intl.formatMessage({ id: "evidence" }),
         uid: "evidence",
         sortable: false,
@@ -211,6 +217,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "number_of_boxes_stored" }),
         uid: "number_of_boxes_stored",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "dispatched_boxes" }),
+        uid: "dispatched_boxes",
         sortable: false,
       },
       {
@@ -368,16 +379,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                   <DropdownItem onClick={() => handleShow(storageP["id"])}>
                     {intl.formatMessage({ id: "View" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleEdit(storageP["id"])}>
+                  <DropdownItem className={(!inWMS && statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleEdit(storageP["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleConfig(storageP["id"])}>
+                  <DropdownItem className={(!inWMS && statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleConfig(storageP["id"])}>
                     {intl.formatMessage({ id: "config" })}
                   </DropdownItem>
                   <DropdownItem className={(!storageP["history"] || (storageP["history"].length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleHistory(storageP["id"])}>
                     {intl.formatMessage({ id: "history" })}
                   </DropdownItem>
-                  <DropdownItem className={(!inWMS || statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
+                  <DropdownItem className={(statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
                   <DropdownItem className={(!inWMS || statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''} onClick={() => openForceEntryStoragePlanDialog(storageP)}>
@@ -432,11 +443,18 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         case "state": return storageP.rejected_boxes ? intl.formatMessage({ id: "rejected_boxes" }) : (storageP.return ? intl.formatMessage({ id: "return" }) : intl.formatMessage({ id: "normal" }));
         case "warehouse_id": return storageP.warehouse ? (`${storageP.warehouse.name} (${storageP.warehouse.code})`) : '';
         case "order_number": return (
-          <CopyColumnToClipboard
+          (inWMS || (!inWMS && storageP.state === 'to be storage')) ?
+          (<CopyColumnToClipboard
             value={
               <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(storageP["id"])}}>{storageP.order_number}</span>
             }
-          />
+          />)
+          :
+          (<CopyColumnToClipboard
+            value={
+              <span>{storageP.order_number}</span>
+            }
+          />)
         );
         case "reference_number": return (
           <CopyColumnToClipboard
@@ -461,7 +479,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         );
         case "number_of_boxes_stored": return (
           storageP.packing_list && storageP.packing_list.length > 0 ? (storageP.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0'
-        );
+        ) - storageP.packing_list.filter((el: any) => el.dispatched).length;
+        case "dispatched_boxes":
+          return storageP.packing_list.filter((el: any) => el.dispatched).length
         default:
           return cellValue;
       }
@@ -489,12 +509,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const getCountByState = (state: any) => {
     if (stgPCount) {
       switch(state.value) {
-        case 'to be storage': return ` (${stgPCount.to_be_storage})`;
-        case 'into warehouse': return ` (${stgPCount.into_warehouse})`;
-        case 'stocked': return ` (${stgPCount.stocked})`;
-        case 'cancelled': return ` (${stgPCount.cancelled})`;
-        case 'returns': return ` (${stgPCount.returns})`;
-        case 'refused': return ` (${stgPCount.refused})`;
+        case 'to be storage': return ` (${(statusSelected === 'to be storage' && !loadingItems) ? filteredItems.length : stgPCount.to_be_storage})`;
+        case 'into warehouse': return ` (${(statusSelected === 'into warehouse' && !loadingItems) ? filteredItems.length : stgPCount.into_warehouse})`;
+        case 'stocked': return ` (${(statusSelected === 'stocked' && !loadingItems) ? filteredItems.length : stgPCount.stocked})`;
+        case 'cancelled': return ` (${(statusSelected === 'cancelled' && !loadingItems) ? filteredItems.length : stgPCount.cancelled})`;
       }
     }
     return '';
@@ -686,7 +704,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               {intl.formatMessage({ id: "export_xlsx" })}
             </Button>
             {
-              (inWMS && statusSelected === 'to be storage') && (
+              (statusSelected === 'to be storage') && (
                 <Button
                   color="primary"
                   style={{ width: '121px', marginLeft: '10px' }}

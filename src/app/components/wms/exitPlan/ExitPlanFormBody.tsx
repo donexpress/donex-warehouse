@@ -67,6 +67,8 @@ const ExitPlanFormBody = ({
   const cancelSend = () => {
     if (isWMS()) {
       router.push(`/${locale}/wms/exit_plan`);
+    } else {
+      router.push(`/${locale}/oms/exit_plan`);
     }
   };
 
@@ -188,6 +190,10 @@ const ExitPlanFormBody = ({
     return response;
   };
 
+  const checkPendingState = (state: any) => {
+    return state === "pending";
+  }
+
   return (
     <div className="user-form-body">
       <h1 className="text-xl font-semibold">
@@ -201,7 +207,7 @@ const ExitPlanFormBody = ({
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
-          validationSchema={generateValidationSchemaExitPlan(intl)}
+          validationSchema={generateValidationSchemaExitPlan(intl, destinationSelected)}
           onSubmit={handleSubmit}
           enableReinitialize
         >
@@ -317,6 +323,7 @@ const ExitPlanFormBody = ({
                     })}
                     customClass="custom-input"
                     disabled={isFromDetails}
+                    required={destinationSelected !== "private_address"}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
@@ -348,7 +355,7 @@ const ExitPlanFormBody = ({
                           : intl.formatMessage({ id: "add" })}
                       </Button>
                     )}
-                    {isFromDetails && id && (
+                    {isFromDetails && id && (!isOMS() || (isOMS() && exitPlan && checkPendingState(exitPlan.state))) && (
                       <Button
                         color="primary"
                         onClick={() => goToEdit()}

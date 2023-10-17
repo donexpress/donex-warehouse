@@ -21,6 +21,11 @@
     }
 }
 
+.boxes-container-values {
+    max-height: 940px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
 
 .do-not-show-dropdown-item {
     display: none !important;

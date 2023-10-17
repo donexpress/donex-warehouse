@@ -72,7 +72,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
   "observations",
   "customer_order_number",
-  "reference_number"
+  "reference_number",
 ];
 
 const ExitPlanTable = () => {
@@ -314,10 +314,20 @@ const ExitPlanTable = () => {
                 <DropdownItem onClick={() => handleShow(Number(user["id"]))}>
                   {intl.formatMessage({ id: "View" })}
                 </DropdownItem>
-                <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
+                <DropdownItem
+                  className={
+                    (user.state.value !== "pending" && checkOMS)
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  } onClick={() => handleEdit(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Edit" })}
                 </DropdownItem>
-                <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
+                <DropdownItem
+                  className={
+                    (user.state.value !== "pending" && checkOMS)
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  } onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
                 </DropdownItem>
                 <DropdownItem
@@ -446,7 +456,14 @@ const ExitPlanTable = () => {
       }
       case "output_number":
         return (
-          <CopyColumnToClipboard
+          (user.state.value !== "pending" && checkOMS) ?
+          (<CopyColumnToClipboard
+            value={
+              <span>{cellValue}</span>
+            }
+          />)
+          :
+          (<CopyColumnToClipboard
             value={
               <a
                 href={`/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${
@@ -456,7 +473,7 @@ const ExitPlanTable = () => {
                 {cellValue}
               </a>
             }
-          />
+          />)
         );
       case "address":
         return user.address_ref ? (
@@ -679,6 +696,7 @@ const ExitPlanTable = () => {
                   selectedKeys={visibleColumns}
                   selectionMode="multiple"
                   onSelectionChange={setVisibleColumns}
+                  className="custom-dropdown-menu"
                 >
                   {getColumns.map((column) => (
                     <DropdownItem key={column.uid} className="capitalize">
@@ -727,14 +745,14 @@ const ExitPlanTable = () => {
               </Button>
               <Button
                 color="primary"
-                style={{ width: "121px" }}
+                style={{ width: "140px" }}
                 endContent={
                   <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
                 }
                 onClick={() => handleExportExcel()}
                 isDisabled={selectedItems.length === 0}
               >
-                {intl.formatMessage({ id: "export" })}
+                {intl.formatMessage({ id: "export_xlsx" })}
               </Button>
             </div>
           </div>
@@ -904,19 +922,25 @@ const ExitPlanTable = () => {
   };
 
   const handleOperationInstruction = (exitPlan: ExitPlan) => {
-    if (
-      exitPlan.operation_instructions &&
-      exitPlan.operation_instructions.length > 0
-    ) {
-      router.push(
-        `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${exitPlan.id}/config`
-      );
+    if (exitPlan.packing_lists && exitPlan.packing_lists.length > 0) {
+      if (
+        exitPlan.operation_instructions &&
+        exitPlan.operation_instructions.length > 0
+      ) {
+        router.push(
+          `/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${
+            exitPlan.id
+          }/config`
+        );
+      } else {
+        router.push(
+          `/${locale}/${
+            checkOMS ? "oms" : "wms"
+          }/operation_instruction/insert?exit_plan_id=${exitPlan.id}`
+        );
+      }
     } else {
-      router.push(
-        `/${locale}/${
-          checkOMS ? "oms" : "wms"
-        }/operation_instruction/insert?exit_plan_id=${exitPlan.id}`
-      );
+      showMsg(intl.formatMessage({ id: "operation_instruction_box_requirement_amount" }), {type: 'warning'})
     }
   };
 
@@ -945,6 +969,9 @@ const ExitPlanTable = () => {
         break;
       case "return-to_be_chosen":
         state = "pending";
+        break;
+      case "return-dispatched":
+        state = "processing";
         break;
     }
     const reponse = await updateExitPlan(changeExitPlanId, {
