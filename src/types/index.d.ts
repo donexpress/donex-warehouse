@@ -258,7 +258,7 @@ export type Counts = {
 
 export type BatchStoragePlans = {
   customer_order_number: string;
-  username: string | null;
+  username?: string | null;
   warehouse_code: string;
   reference_number: string;
   pr_number: string;
@@ -282,7 +282,6 @@ export type BatchStoragePlansInput = {
   observations: string;
   return: boolean;
   rejected_boxes: boolean;
-  expansion_box_number: string;
   digits_box_number: number;
 };
 
