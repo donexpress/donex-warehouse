@@ -5,7 +5,7 @@ import { BatchStoragePlans, BatchStoragePlansInput, Response } from '../../../ty
 import '../../../styles/generic.dialog.scss';
 import FileUploader from './FileUploader';
 import { FaFileExcel, FaFileDownload } from 'react-icons/fa';
-import { showMsg, downloadTemplateSP } from "../../../helpers";
+import { showMsg, downloadTemplateSP, isOMS } from "../../../helpers";
 import { createBatchStoragePlan } from "../../../services/api.storage_plan";
 
 interface Params {
@@ -51,7 +51,6 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
         //"observations", 
         //"return", 
         //"rejected_boxes", 
-        //"expansion_box_number", 
         //"digits_box_number" 
     ];
     
@@ -62,19 +61,19 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
     if (b.every(isBatchStoragePlans)) {
         setBatch(b.map((item: any) => {
             return {
-                return: Boolean(item.return && item.return.toString().toLowerCase() === 'true'), 
-                rejected_boxes: Boolean(item.rejected_boxes && item.rejected_boxes.toString().toLowerCase() === 'true'),
-                username: item.username ? item.username : null,
-                reference_number: item.reference_number ? item.reference_number : '',
-                pr_number: item.bl_number ? item.bl_number : '',
-                delivered_time: item.delivered_time ? item.delivered_time : null,
-                observations: item.observations ? item.observations : '',
-                expansion_box_number: item.expansion_box_number ? item.expansion_box_number : '',
-                digits_box_number: item.digits_box_number ? Number(item.digits_box_number) : null,
-                customer_order_number: item.customer_order_number,
-                warehouse_code: item.warehouse_code,
-                box_amount: Number(item.box_amount)
-            }
+              return: Boolean(item.return && item.return.toString().toLowerCase() === 'true'), 
+              rejected_boxes: Boolean(item.rejected_boxes && item.rejected_boxes.toString().toLowerCase() === 'true'),
+              reference_number: item.reference_number ? item.reference_number : '',
+              pr_number: item.bl_number ? item.bl_number : '',
+              delivered_time: item.delivered_time ? item.delivered_time : null,
+              observations: item.observations ? item.observations : '',
+              expansion_box_number: item.customer_order_number,
+              digits_box_number: item.digits_box_number ? Number(item.digits_box_number) : null,
+              customer_order_number: item.customer_order_number,
+              warehouse_code: item.warehouse_code,
+              box_amount: Number(item.box_amount),
+              username: (item.username && !isOMS()) ? item.username : null,
+            };
         }));
     } else {
         if (b.length === 0) {

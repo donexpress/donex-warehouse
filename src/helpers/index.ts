@@ -137,7 +137,19 @@ export const getHourFromStr = (date: string | undefined): string => {
 };
 
 export const downloadTemplateSP = () => {
-  const dataToExport: object[] = [
+  const dataToExport: object[] = [isOMS() ?
+    {
+      customer_order_number: '',
+      warehouse_code: '',
+      reference_number: '',
+      bl_number: '',
+      box_amount: '',
+      delivered_time: '',
+      observations: '',
+      return: '',
+      rejected_boxes: '',
+      digits_box_number: ''
+    } : 
     {
       customer_order_number: '',
       username: '',
@@ -149,7 +161,6 @@ export const downloadTemplateSP = () => {
       observations: '',
       return: '',
       rejected_boxes: '',
-      expansion_box_number: '',
       digits_box_number: ''
     }
   ];
