@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/react";
 import { useIntl } from "react-intl";
-import { BatchStoragePlans, Response } from '../../../types';
+import { BatchStoragePlans, BatchStoragePlansInput, Response } from '../../../types';
 import '../../../styles/generic.dialog.scss';
 import FileUploader from './FileUploader';
 import { FaFileExcel, FaFileDownload } from 'react-icons/fa';
@@ -45,7 +45,7 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
         //"username", 
         "warehouse_code", 
         //"reference_number", 
-        //"pr_number", 
+        //"bl_number", 
         "box_amount", 
         //"delivered_time", 
         //"observations", 
@@ -58,20 +58,22 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
     return requiredKeys.every(key => keys.includes(key));
   }
 
-  const uploadBatch = (b: BatchStoragePlans[]) => {
+  const uploadBatch = (b: BatchStoragePlansInput[]) => {
     if (b.every(isBatchStoragePlans)) {
         setBatch(b.map((item: any) => {
             return {
-                ...item, 
-                return: (item.return && item.return.toString().toLowerCase() === 'true'), 
-                rejected_boxes: (item.rejected_boxes && item.rejected_boxes.toString().toLowerCase() === 'true'),
+                return: Boolean(item.return && item.return.toString().toLowerCase() === 'true'), 
+                rejected_boxes: Boolean(item.rejected_boxes && item.rejected_boxes.toString().toLowerCase() === 'true'),
                 username: item.username ? item.username : null,
                 reference_number: item.reference_number ? item.reference_number : '',
-                pr_number: item.pr_number ? item.pr_number : '',
+                pr_number: item.bl_number ? item.bl_number : '',
                 delivered_time: item.delivered_time ? item.delivered_time : null,
                 observations: item.observations ? item.observations : '',
                 expansion_box_number: item.expansion_box_number ? item.expansion_box_number : '',
                 digits_box_number: item.digits_box_number ? Number(item.digits_box_number) : null,
+                customer_order_number: item.customer_order_number,
+                warehouse_code: item.warehouse_code,
+                box_amount: Number(item.box_amount)
             }
         }));
     } else {

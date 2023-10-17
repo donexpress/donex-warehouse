@@ -263,6 +263,21 @@ export type BatchStoragePlans = {
   reference_number: string;
   pr_number: string;
   box_amount: number;
+  delivered_time: string | null;
+  observations: string;
+  return: boolean;
+  rejected_boxes: boolean;
+  expansion_box_number: string;
+  digits_box_number: number | null;
+};
+
+export type BatchStoragePlansInput = {
+  customer_order_number: string;
+  username: string | null;
+  warehouse_code: string;
+  reference_number: string;
+  bl_number: string;
+  box_amount: number;
   delivered_time: string;
   observations: string;
   return: boolean;

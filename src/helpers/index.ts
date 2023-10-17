@@ -143,7 +143,7 @@ export const downloadTemplateSP = () => {
       username: '',
       warehouse_code: '',
       reference_number: '',
-      pr_number: '',
+      bl_number: '',
       box_amount: '',
       delivered_time: '',
       observations: '',
