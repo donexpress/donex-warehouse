@@ -67,6 +67,8 @@ const ExitPlanFormBody = ({
   const cancelSend = () => {
     if (isWMS()) {
       router.push(`/${locale}/wms/exit_plan`);
+    } else {
+      router.push(`/${locale}/oms/exit_plan`);
     }
   };
 
@@ -187,6 +189,10 @@ const ExitPlanFormBody = ({
     }
     return response;
   };
+
+  const checkPendingState = (state: any) => {
+    return state === "pending";
+  }
 
   return (
     <div className="user-form-body">
@@ -348,7 +354,7 @@ const ExitPlanFormBody = ({
                           : intl.formatMessage({ id: "add" })}
                       </Button>
                     )}
-                    {isFromDetails && id && (
+                    {isFromDetails && id && (!isOMS() || (isOMS() && exitPlan && checkPendingState(exitPlan.state))) && (
                       <Button
                         color="primary"
                         onClick={() => goToEdit()}

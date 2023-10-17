@@ -94,7 +94,7 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
             className="info-packing-list__table_display bg-default-100"
             style={{
               padding: "5px 0px 5px 5px",
-              borderRadius: "5px 5px 5px 5px",
+              borderRadius: "5px 5px 5px 5px", marginRight: '0px'
             }}
           >
             <div className="elements-center">
@@ -138,11 +138,12 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
               </span>
             </div>
           </div>
+          <div className="boxes-container-values">
           {rows.map((row, index) => (
             <div
               key={index}
               className="info-packing-list__table_display storage-plan-header"
-              style={{ padding: "8px 0px 8px 5px" }}
+              style={{ padding: "8px 0px 8px 5px", marginRight: '0px' }}
             >
               <div className="elements-center">
                 {row.packing_lists?.box_number}
@@ -178,6 +179,7 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
               </div>
             </div>
           ))}
+          </div>
         </div>
       </div>
     </>

@@ -143,7 +143,7 @@ export const downloadTemplateSP = () => {
       username: '',
       warehouse_code: '',
       reference_number: '',
-      pr_number: '',
+      bl_number: '',
       box_amount: '',
       delivered_time: '',
       observations: '',
@@ -628,6 +628,25 @@ export const operationInstructionDataToExcel = (
   );
 };
 
+export const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
+  const pls = packingLists.filter((pl) => (pl.package_shelf && (pl.package_shelf.length > 0)));
+  
+  const uniqueCombinationSet = new Set<string>();
+  const uniqueArray: PackingList[] = [];
+
+  for (const pl of pls) {
+      const combinationKey = `${Number((pl.package_shelf as PackageShelf[])[0].shelf?.partition_table)}_${Number((pl.package_shelf as PackageShelf[])[0].shelf?.number_of_shelves)}_${(pl.package_shelf as PackageShelf[])[0].layer}_${(pl.package_shelf as PackageShelf[])[0].column}`;
+
+      if (!uniqueCombinationSet.has(combinationKey)) {
+          uniqueCombinationSet.add(combinationKey);
+
+          uniqueArray.push(pl);
+      }
+  }
+  
+  return uniqueArray;
+};
+
 export const exitPlanDataToExcel = (
   exiPlan: ExitPlan[],
   intl: IntlShape,
@@ -653,7 +672,7 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
   };
   const getLocation = (ep: ExitPlan): string => {
     let locations = "";
-    ep.packing_lists?.forEach((pl) => {
+    getPLUnique(ep.packing_lists ? ep.packing_lists : []).forEach((pl) => {
       locations += packageShelfFormat(pl.package_shelf);
     });
     return locations;
