@@ -309,6 +309,8 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   const key8: string = intl.formatMessage({ id: "location" });
   const key9: string = intl.formatMessage({ id: "storage_time" });
   const key10: string = intl.formatMessage({ id: "delivery_time" });
+  const key11: string = intl.formatMessage({ id: "reference_number" });
+  const key12: string = intl.formatMessage({ id: "dispatch_date" });
 
   
   packingLists.forEach((pl: PackingList) => {
@@ -316,6 +318,7 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
 
     pList[key1] = pl.box_number;
     pList[key2] = pl.case_number;
+    pList[key11] = exitPlan.reference_number ? exitPlan.reference_number : "--";
     pList[key3] = (pl.client_weight || pl.client_weight === 0) ? pl.client_weight.toString() : "--";
     pList[key4] = (pl.client_height || pl.client_height === 0) ? pl.client_height.toString() : "--";
     pList[key5] = "--";
@@ -363,6 +366,11 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
     pList[key10] = exitPlan.delivered_time
       ? `${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(
         exitPlan.delivered_time
+        )}`
+      : "--";
+    pList[key12] = pl.dispatched_time
+      ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
+        pl.dispatched_time
         )}`
       : "--";
 
