@@ -23,7 +23,7 @@ import {
   getPackingListsByCaseNumber,
 } from "../../../../services/api.packing_list";
 import { getStoragePlanByOrder_number } from "../../../../services/api.storage_plan";
-import { showMsg, inventoryOfExitPlan } from "../../../../helpers";
+import { showMsg, inventoryOfExitPlan, isOMS } from "../../../../helpers";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InventoryList from "./InventoryList";
 import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
@@ -236,7 +236,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           exitPlan.case_numbers
         );
         if (case_numbers.data.length !== exitPlan.case_numbers.length) {
-          // show_duplicated_warning = true;
+          show_duplicated_warning = true;
         }
         exitPlan.case_numbers = case_numbers.data;
         const result = await updateExitPlan(exitPlan.id, {
@@ -388,6 +388,11 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     closeConfirmDialog();
   };
 
+  const getState = (): string => {
+    // @ts-ignore
+    return exitPlan?.state;
+  };
+
   return (
     <>
       <div style={{ paddingTop: "20px" }}>
@@ -404,12 +409,12 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="Actions menu">
-                <DropdownItem onClick={() => handleAction(1)}>
+                <DropdownItem className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""} onClick={() => handleAction(1)}>
                   {intl.formatMessage({ id: "add" })}
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    selectedRows.length === 0 ? "do-not-show-dropdown-item" : ""
+                    (selectedRows.length === 0 || (isOMS() && exitPlan && getState() !== "pending")) ? "do-not-show-dropdown-item" : ""
                   }
                   onClick={() => handleAction(2)}
                 >
@@ -509,133 +514,132 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 {intl.formatMessage({ id: "delivery_time" })}
               </span>
             </div>
-            <div className="elements-center">
+            <div className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : "elements-center"}>
               <span className="text-center">
                 {intl.formatMessage({ id: "actions" })}
               </span>
             </div>
           </div>
-          <div className="boxes-container-values">
-            {rows.map((row, index) => (
-              <div
-                key={index}
-                className="info-epb__table storage-plan-header"
-                style={{ padding: "8px 0px 8px 5px" }}
-              >
-                <div className="elements-start-center">
-                  <input
-                    style={{ marginTop: "3px" }}
-                    type="checkbox"
-                    name={`packing-list-${index}`}
-                    checked={row.checked}
-                    onChange={(event) => handleCheckboxChange(event, index)}
-                  />
-                </div>
-                <div className="">{row.packing_lists?.box_number}</div>
-                <div className="">{row.packing_lists?.case_number}</div>
-                <div className="">{row.packing_lists?.client_weight}</div>
-                <div className="">{row.packing_lists?.client_height}</div>
-                <div className="">{"--"}</div>
-                <div className="">{"--"}</div>
-                <div className="">{row.packing_lists?.amount}</div>
-                <div>
-                  {row.packing_lists &&
-                  row.packing_lists.package_shelf &&
-                  row.packing_lists.package_shelf.length > 0 ? (
-                    <>
-                      {exitPlan.warehouse ? (
-                        <>
-                          {exitPlan.warehouse.code}-
-                          {String(
-                            row.packing_lists.package_shelf[0].shelf
-                              ?.partition_table
-                          ).padStart(2, "0")}
-                          -
-                          {String(
-                            row.packing_lists.package_shelf[0].shelf
-                              ?.number_of_shelves
-                          ).padStart(2, "0")}
-                          -
-                          {String(
-                            row.packing_lists.package_shelf[0].layer
-                          ).padStart(2, "0")}
-                          -
-                          {String(
-                            row.packing_lists.package_shelf[0].column
-                          ).padStart(2, "0")}
-                          <br />
-                        </>
-                      ) : null}
-                      {intl.formatMessage({ id: "partition" })}:{" "}
-                      {row.packing_lists.package_shelf &&
-                      row.packing_lists.package_shelf.length > 0 &&
-                      row.packing_lists.package_shelf[0].shelf
-                        ? row.packing_lists.package_shelf[0].shelf
-                            .partition_table
-                        : ""}
-                      &nbsp;
-                      {intl.formatMessage({ id: "shelf" })}:{" "}
-                      {row.packing_lists.package_shelf &&
-                      row.packing_lists.package_shelf.length > 0 &&
-                      row.packing_lists.package_shelf[0].shelf
-                        ? row.packing_lists.package_shelf[0].shelf
-                            .number_of_shelves
-                        : ""}
-                      <br />
-                      {intl.formatMessage({ id: "layer" })}:{" "}
-                      {row.packing_lists.package_shelf &&
-                      row.packing_lists.package_shelf.length > 0
-                        ? row.packing_lists.package_shelf[0].layer
-                        : ""}
-                      &nbsp;
-                      {intl.formatMessage({ id: "column" })}:{" "}
-                      {row.packing_lists.package_shelf &&
-                      row.packing_lists.package_shelf.length > 0
-                        ? row.packing_lists.package_shelf[0].column
-                        : ""}
-                    </>
-                  ) : (
-                    "--"
-                  )}
-                </div>
-                <div className="">
-                  {getDateFormat(
-                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                  )}
-                  ,{" "}
-                  {getHourFormat(
-                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                  )}
-                </div>
-                <div className="">
-                  {getDateFormat(
-                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                  )}
-                  ,{" "}
-                  {getHourFormat(
-                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                  )}
-                </div>
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button isIconOnly size="sm" variant="light">
-                        <VerticalDotsIcon className="text-default-300" />
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu>
-                      <DropdownItem
-                        onClick={() =>
-                          handleDelete(row.packing_lists.case_number)
-                        }
-                      >
-                        {intl.formatMessage({ id: "Delete" })}
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                </div>
+          <div className='boxes-container-values'>
+          {rows.map((row, index) => (
+            <div
+              key={index}
+              className="info-epb__table storage-plan-header"
+              style={{ padding: "8px 0px 8px 5px" }}
+            >
+              <div className="elements-start-center">
+                <input
+                  style={{ marginTop: "3px" }}
+                  type="checkbox"
+                  name={`packing-list-${index}`}
+                  checked={row.checked}
+                  onChange={(event) => handleCheckboxChange(event, index)}
+                />
               </div>
-            ))}
+              <div className="">{row.packing_lists?.box_number}</div>
+              <div className="">{row.packing_lists?.case_number}</div>
+              <div className="">{row.packing_lists?.client_weight}</div>
+              <div className="">{row.packing_lists?.client_height}</div>
+              <div className="">{"--"}</div>
+              <div className="">{"--"}</div>
+              <div className="">{row.packing_lists?.amount}</div>
+              <div>
+                {row.packing_lists &&
+                row.packing_lists.package_shelf &&
+                row.packing_lists.package_shelf.length > 0 ? (
+                  <>
+                    {exitPlan.warehouse ? (
+                      <>
+                        {exitPlan.warehouse.code}-
+                        {String(
+                          row.packing_lists.package_shelf[0].shelf
+                            ?.partition_table
+                        ).padStart(2, "0")}
+                        -
+                        {String(
+                          row.packing_lists.package_shelf[0].shelf
+                            ?.number_of_shelves
+                        ).padStart(2, "0")}
+                        -
+                        {String(
+                          row.packing_lists.package_shelf[0].layer
+                        ).padStart(2, "0")}
+                        -
+                        {String(
+                          row.packing_lists.package_shelf[0].column
+                        ).padStart(2, "0")}
+                        <br />
+                      </>
+                    ) : null}
+                    {intl.formatMessage({ id: "partition" })}:{" "}
+                    {row.packing_lists.package_shelf &&
+                    row.packing_lists.package_shelf.length > 0 &&
+                    row.packing_lists.package_shelf[0].shelf
+                      ? row.packing_lists.package_shelf[0].shelf.partition_table
+                      : ""}
+                    &nbsp;
+                    {intl.formatMessage({ id: "shelf" })}:{" "}
+                    {row.packing_lists.package_shelf &&
+                    row.packing_lists.package_shelf.length > 0 &&
+                    row.packing_lists.package_shelf[0].shelf
+                      ? row.packing_lists.package_shelf[0].shelf
+                          .number_of_shelves
+                      : ""}
+                    <br />
+                    {intl.formatMessage({ id: "layer" })}:{" "}
+                    {row.packing_lists.package_shelf &&
+                    row.packing_lists.package_shelf.length > 0
+                      ? row.packing_lists.package_shelf[0].layer
+                      : ""}
+                    &nbsp;
+                    {intl.formatMessage({ id: "column" })}:{" "}
+                    {row.packing_lists.package_shelf &&
+                    row.packing_lists.package_shelf.length > 0
+                      ? row.packing_lists.package_shelf[0].column
+                      : ""}
+                  </>
+                ) : (
+                  "--"
+                )}
+              </div>
+              <div className="">
+                {getDateFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+                ,{" "}
+                {getHourFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+              </div>
+              <div className="">
+                {getDateFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+                ,{" "}
+                {getHourFormat(
+                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                )}
+              </div>
+              <div className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""} style={{ display: "flex", justifyContent: "center" }}>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button isIconOnly size="sm" variant="light">
+                      <VerticalDotsIcon className="text-default-300" />
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu>
+                    <DropdownItem
+                      onClick={() =>
+                        handleDelete(row.packing_lists.case_number)
+                      }
+                    >
+                      {intl.formatMessage({ id: "Delete" })}
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+            </div>
+          ))}
           </div>
         </div>
       </div>

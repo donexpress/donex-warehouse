@@ -26,6 +26,11 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
     }
   };
 
+  const getState = (): string => {
+    // @ts-ignore
+    return exitPlan?.state;
+  };
+
   return (
     <div
       className="user-form-body shadow-small"
@@ -40,7 +45,7 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
           <Button
             color="primary"
             type="button"
-            className="px-4"
+            className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : "px-4"}
             onClick={() => handleAction(3)}
           >
             {intl.formatMessage({ id: "go_to_edit" })}
@@ -102,7 +107,7 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
           <>
             <ExitPlanBox exitPlan={exitPlan} />
             <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user}/>
-            <OperationInstructionTable exit_plan_id={exitPlan.id} />
+            <OperationInstructionTable exit_plan_id={exitPlan.id} exit_plan={exitPlan} />
           </>
         )}
       </div>

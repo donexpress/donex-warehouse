@@ -8,6 +8,7 @@ import { User } from "../../../../types/user";
 import { deleteAppendix, getAppendagesByExitPlanId, getAppendagesByOperationInstructionId } from "../../../../services/api.appendix";
 import { Appendix } from "../../../../types/appendix";
 import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
+import { isOMS } from "@/helperserege1992";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { showMsg } from "@/helperserege1992";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
@@ -72,6 +73,11 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
     }
   }
 
+  const getState = (): string => {
+    // @ts-ignore
+    return exitPlan?.state;
+  };
+
   return (
     <>
       <div style={{ paddingTop: "20px" }}>
@@ -84,7 +90,7 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
             <Button
               color="primary"
               type="button"
-              className="px-4"
+              className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : "px-4"}
               onClick={addAppendix}
             >
               {intl.formatMessage({ id: "upload_file" })}
@@ -163,8 +169,9 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
                     {intl.formatMessage({ id: "vizualice" })}
                   </DropdownItem>
                   <DropdownItem
-                  aria-labelledby="delete-button"
-                  onClick={() => handleDelete(appendix.id ? appendix.id : -1)}
+                    className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""}
+                    aria-labelledby="delete-button"
+                    onClick={() => handleDelete(appendix.id ? appendix.id : -1)}
                   >
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
