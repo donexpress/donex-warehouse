@@ -59,7 +59,6 @@ const INITIAL_VISIBLE_COLUMNS = [
   "number_of_boxes_stored",
   "reference_number",
   "box_amount",
-  "dispatched_boxes",
   "actions",
 ];
 
@@ -527,6 +526,20 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   
   const changeTab = async(tab: string) => {
     if (tab !== statusSelected && !loadingItems) {
+      if (visibleColumns !== "all") {
+        let items: Set<React.Key> = new Set(visibleColumns);
+        if (tab === 'stocked') {
+          if (!visibleColumns.has("dispatched_boxes")) {
+            items.add("dispatched_boxes");
+            setVisibleColumns(items);
+          }
+        } else {
+          if (visibleColumns.has("dispatched_boxes")) {
+            items.delete("dispatched_boxes");
+            setVisibleColumns(items);
+          }
+        }
+      }
       await setLoadingItems(true);
       await setStatusSelected(tab);
       const storagePlanss = await getStoragePlans(tab);
