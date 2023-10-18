@@ -13,6 +13,7 @@ import { ExitPlan } from "../../../../types/exit_plan";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import {
   getExitPlansById,
+  getNonBoxesOnExitPlans,
   removeBoxesExitPlan,
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
@@ -173,14 +174,14 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         const arr = data.warehouse_order_number.split(",");
         let tmp: StoragePlan[] = [];
         for (let i = 0; i < arr.length; i++) {
-          const t = await getStoragePlanByOrder_number(arr[i]);
+          const t = await getStoragePlanByOrder_number(arr[i].trim());
           if (t) {
             tmp = tmp.concat(t);
           }
         }
         exist = tmp ? tmp[0] : null;
-        if(tmp.filter(el => el.state !== "stocked").length > 0) {
-          show_miss_state_warning = true
+        if (tmp.filter((el) => el.state !== "stocked").length > 0) {
+          show_miss_state_warning = true;
         }
         if (tmp && exitPlan) {
           tmp.forEach((t) => {
@@ -223,11 +224,23 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
       }
       // update portion
       if (exitPlan.id && exist) {
-        console.log(exitPlan.case_numbers);
+        const case_numbers = await getNonBoxesOnExitPlans(
+          exitPlan.id,
+          exitPlan.case_numbers
+        );
+        console.log(case_numbers.data.length, exitPlan.case_numbers.length);
+        if (case_numbers.data.length !== exitPlan.case_numbers.length) {
+          show_duplicated_warning = true;
+        }
+        exitPlan.case_numbers = case_numbers.data;
         const result = await updateExitPlan(exitPlan.id, {
           case_numbers: exitPlan.case_numbers,
         });
-        if (
+        if (show_duplicated_warning) {
+          showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+            type: "warning",
+          });
+        } else if (
           result.status === 401 &&
           !show_error &&
           !show_duplicated_warning &&
@@ -256,24 +269,24 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               type: "success",
             });
           }
-          if (exitPlan.id) {
-            const ep = await getExitPlansById(exitPlan.id);
-            if (ep) {
-              ep.packing_lists?.forEach((pl) => {
-                if (
-                  !rows.find(
-                    (r) => r.packing_lists.case_number === pl.case_number
-                  )
-                ) {
-                  rows.push({ checked: false, packing_lists: pl });
-                }
-              });
-              const tmprows = rows;
-              setRows([]);
-              setRows(tmprows);
-            }
-            closeAddDialog();
+        }
+        if (exitPlan.id) {
+          const ep = await getExitPlansById(exitPlan.id);
+          if (ep) {
+            ep.packing_lists?.forEach((pl) => {
+              if (
+                !rows.find(
+                  (r) => r.packing_lists.case_number === pl.case_number
+                )
+              ) {
+                rows.push({ checked: false, packing_lists: pl });
+              }
+            });
+            const tmprows = rows;
+            setRows([]);
+            setRows(tmprows);
           }
+          closeAddDialog();
         }
       }
     }
@@ -317,26 +330,37 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
   };
 
   const deleteElements = async () => {
-    const new_case_numbers: string[] = []
-    if(exitPlan.case_numbers) {
-      exitPlan.case_numbers.forEach(el => {
-        if(selectedRows.find(sr => sr.packing_lists.case_number === el) === undefined) {
-          new_case_numbers.push(el)
+    const new_case_numbers: string[] = [];
+    if (exitPlan.case_numbers) {
+      exitPlan.case_numbers.forEach((el) => {
+        if (
+          selectedRows.find((sr) => sr.packing_lists.case_number === el) ===
+          undefined
+        ) {
+          new_case_numbers.push(el);
         }
-      })
+      });
       if (exitPlan && exitPlan.id) {
         const result = await updateExitPlan(exitPlan.id, {
           case_numbers: new_case_numbers,
         });
         if (result.status < 300) {
-          exitPlan.case_numbers = new_case_numbers;
-          const new_rows:{ packing_lists: PackingList; checked: boolean; }[] = []
-          new_case_numbers.forEach(cn => {
-            const tmp = rows.find(el => el.packing_lists.case_number === cn)
-            if(tmp) {
-              new_rows.push(tmp)
-            }
-          })
+          const ep = await getExitPlansById(exitPlan.id);
+          exitPlan.case_numbers = ep?.case_numbers;
+          const new_rows: { packing_lists: PackingList; checked: boolean }[] =
+            [];
+          if (ep && ep.case_numbers !== undefined) {
+            console.log(ep)
+            ep.case_numbers.forEach((cn) => {
+              const tmp = rows.find(
+                (el) => el.packing_lists.case_number === cn
+              );
+              if (tmp) {
+                new_rows.push(tmp);
+              }
+            });
+          }
+
           setRows(new_rows);
           showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
             type: "success",
@@ -352,7 +376,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         }
       }
     }
-    closeConfirmDialog()
+    closeConfirmDialog();
   };
 
   return (
