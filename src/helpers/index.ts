@@ -195,6 +195,7 @@ export const storagePlanDataToExcel = (
   const key9: string = intl.formatMessage({ id: "pr_number" });
   const key10: string = intl.formatMessage({ id: "state" });
   const key11: string = intl.formatMessage({ id: "delivery_time" });
+  const key11_1: string = intl.formatMessage({ id: "dispatched_boxes" });
   const key12: string = intl.formatMessage({ id: "observations" });
   const key13: string = intl.formatMessage({ id: "created_at" });
   const key14: string = intl.formatMessage({ id: "updated_at" });
@@ -227,6 +228,12 @@ export const storagePlanDataToExcel = (
                   pl.package_shelf && pl.package_shelf.length > 0
               )
               .length.toString()
+          : "0";
+    }
+    if (selection === "all" || selection.has("dispatched_boxes")) {
+      sPlan[key11_1] =
+        sp.packing_list && sp.packing_list.length > 0
+          ? sp.packing_list.filter((pl: PackingList) => pl.dispatched).length.toString()
           : "0";
     }
     if (selection === "all" || selection.has("evidence")) {
@@ -388,7 +395,7 @@ export const packingListDataToExcel = (
   storagePlan: StoragePlan,
   packingLists: PackingList[],
   intl: IntlShape,
-  type: "ic" | "lg"
+  type: "ic" | "lg" | "fl"
 ) => {
   let dataToExport: object[] = [];
 
@@ -407,6 +414,7 @@ export const packingListDataToExcel = (
     const key8: string = intl.formatMessage({ id: "location" });
     const key9: string = intl.formatMessage({ id: "storage_time" });
     const key10: string = intl.formatMessage({ id: "delivery_time" });
+    const key11: string = intl.formatMessage({ id: "dispatch_date" });
 
     packingLists.forEach((pl: PackingList) => {
       const pList: { [key: string]: string } = {};
@@ -464,6 +472,11 @@ export const packingListDataToExcel = (
             storagePlan.delivered_time
           )}`
         : "--";
+      pList[key11] = pl.dispatched_time
+        ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
+          pl.dispatched_time
+          )}`
+        : "--";
 
       dataToExport.push(pList);
     });
@@ -471,6 +484,14 @@ export const packingListDataToExcel = (
     const key1: string = intl.formatMessage({ id: "box_number" });
     const key2: string = intl.formatMessage({ id: "expansion_box_number" });
     const key3: string = intl.formatMessage({ id: "transfer_order_number" });
+    
+    const key3_1: string = intl.formatMessage({ id: "location" });
+    const key3_2: string = intl.formatMessage({ id: "storage_time" });
+    const key3_3: string = intl.formatMessage({ id: "delivery_time" });
+    const key3_4: string = intl.formatMessage({ id: "bill_lading_number" });
+    const key3_5: string = intl.formatMessage({ id: "reference_number" });
+    const key3_6: string = intl.formatMessage({ id: "dispatch_date" });
+
     const key4: string = intl.formatMessage({ id: "amount" });
     const key5: string = intl.formatMessage({ id: "client_weight" });
     const key6: string = intl.formatMessage({ id: "client_length" });
@@ -488,6 +509,66 @@ export const packingListDataToExcel = (
 
       pList[key1] = pl.box_number ? pl.box_number : "--";
       pList[key2] = pl.case_number ? pl.case_number : "--";
+      if (type === "fl") {
+        pList[key3_1] = 
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? (storagePlan.warehouse
+              ? `${storagePlan.warehouse.code}-${String(
+                  pl.package_shelf[0].shelf?.partition_table
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].shelf?.number_of_shelves
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].layer
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].column
+                ).padStart(2, "0")} `
+              : "") +
+            `${intl.formatMessage({ id: "partition" })}: ${
+              pl.package_shelf &&
+              pl.package_shelf.length > 0 &&
+              pl.package_shelf[0].shelf
+                ? pl.package_shelf[0].shelf.partition_table
+                : ""
+            } ` +
+            `${intl.formatMessage({ id: "shelf" })}: ${
+              pl.package_shelf &&
+              pl.package_shelf.length > 0 &&
+              pl.package_shelf[0].shelf
+                ? pl.package_shelf[0].shelf.number_of_shelves
+                : ""
+            } ` +
+            `${intl.formatMessage({ id: "layer" })}: ${
+              pl.package_shelf && pl.package_shelf.length > 0
+                ? pl.package_shelf[0].layer
+                : ""
+            }  ` +
+            `${intl.formatMessage({ id: "column" })}: ${
+              pl.package_shelf && pl.package_shelf.length > 0
+                ? pl.package_shelf[0].column
+                : ""
+            } `
+          : "--";
+        pList[key3_2] = "--";
+        pList[key3_3] = storagePlan.delivered_time
+          ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(
+              storagePlan.delivered_time
+            )}`
+          : "--";
+        pList[key3_6] = pl.dispatched_time
+          ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
+            pl.dispatched_time
+            )}`
+          : "--";
+        pList[key3_4] = storagePlan.pr_number ? storagePlan.pr_number : "--";
+        pList[key3_5] = storagePlan.reference_number ? storagePlan.reference_number : "--";
+      }
+      if (type !== "fl") {
+        pList[key3_6] = pl.dispatched_time
+          ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
+            pl.dispatched_time
+            )}`
+          : "--";
+      }
       pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
       pList[key4] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
       pList[key5] = (pl.client_weight || pl.client_weight === 0) ? pl.client_weight.toString() : "--";

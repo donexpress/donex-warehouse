@@ -125,6 +125,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
               <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'customer_order_number' })}</Text>
               <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'storage' })}</Text>
               <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'number_of_boxes' })}</Text>
+              <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'dispatched_boxes' })}</Text>
               <Text style={[styles.headerCell]}>{intl.formatMessage({ id: 'pr_number' })}</Text>
             </View>
             <View style={styles.tableRow}>
@@ -132,6 +133,12 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
               <Text style={styles.tableCell}>{ storagePlan.customer_order_number }</Text>
               <Text style={styles.tableCell}>{ storagePlan.warehouse ? (`${storagePlan.warehouse.name} (${storagePlan.warehouse.code})`) : '' }</Text>
               <Text style={styles.tableCell}>{ storagePlan.box_amount }</Text>
+              <Text style={styles.tableCell}>{ 
+                storagePlan.packing_list && storagePlan.packing_list.length > 0
+                  ? (storagePlan.packing_list.filter((pl: PackingList) => pl.dispatched).length.toString())
+                  : "0" 
+                  }
+              </Text>
               <Text style={styles.tableCell}>{ storagePlan.pr_number ? storagePlan.pr_number : '--' }</Text>
             </View>
           </View>
@@ -145,6 +152,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
               <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'location' })}</Text>
               <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'storage_time' })}</Text>
               <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'delivery_time' })}</Text>
+              <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'dispatch_date' })}</Text>
             </View>
             {
               storagePlan.packing_list?.map((pl: PackingList, index: number) => (
@@ -154,6 +162,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
                   <Text style={[styles.tableCell, styles.minorCell]}>{ packageShelfFormat(pl.package_shelf) }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ '--' }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ storagePlan.delivered_time ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '' }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ pl.dispatched_time ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(pl.dispatched_time)}` : '' }</Text>
                 </View>
               ))
             }

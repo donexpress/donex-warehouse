@@ -382,7 +382,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                   <DropdownItem className={(!inWMS && statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleEdit(storageP["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
-                  <DropdownItem className={(!inWMS && statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleConfig(storageP["id"])}>
+                  <DropdownItem onClick={() => handleConfig(storageP["id"])}>
                     {intl.formatMessage({ id: "config" })}
                   </DropdownItem>
                   <DropdownItem className={(!storageP["history"] || (storageP["history"].length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleHistory(storageP["id"])}>
@@ -414,7 +414,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  <DropdownItem onClick={() => packingListDataToExcel(storageP, storageP.packing_list ? storageP.packing_list : [], intl, 'lg' )}>
+                  <DropdownItem onClick={() => packingListDataToExcel(storageP, storageP.packing_list ? storageP.packing_list : [], intl, 'fl' )}>
                     {intl.formatMessage({ id: "generate_xlsx_inventory" })}
                   </DropdownItem>
                   <DropdownItem>
@@ -443,18 +443,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         case "state": return storageP.rejected_boxes ? intl.formatMessage({ id: "rejected_boxes" }) : (storageP.return ? intl.formatMessage({ id: "return" }) : intl.formatMessage({ id: "normal" }));
         case "warehouse_id": return storageP.warehouse ? (`${storageP.warehouse.name} (${storageP.warehouse.code})`) : '';
         case "order_number": return (
-          (inWMS || (!inWMS && storageP.state === 'to be storage')) ?
-          (<CopyColumnToClipboard
+          <CopyColumnToClipboard
             value={
               <span style={{ cursor: 'pointer' }} onClick={()=>{handleConfig(storageP["id"])}}>{storageP.order_number}</span>
             }
-          />)
-          :
-          (<CopyColumnToClipboard
-            value={
-              <span>{storageP.order_number}</span>
-            }
-          />)
+          />
         );
         case "reference_number": return (
           <CopyColumnToClipboard
