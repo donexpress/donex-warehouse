@@ -66,6 +66,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "output_plan_id",
   "number_delivery",
   "remark",
+  "location",
   "actions",
 ];
 

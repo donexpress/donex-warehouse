@@ -326,7 +326,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                 <Button
                   color="primary"
                   type="button"
-                  className='px-4'
+                  className={(!inWMS && (stateStoragePlan !== 'to be storage')) ? 'do-not-show-dropdown-item' : 'px-4'}
                   onClick={()=>goToEdit()}
                 >
                   {intl.formatMessage({ id: 'go_to_edit' })}
@@ -506,7 +506,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                               }
                             </PDFDownloadLink>
                           </DropdownItem>
-                          <DropdownItem className={(storagePlan && (stateStoragePlan !== 'stocked' && stateStoragePlan !== 'into warehouse')) ? 'do-not-show-dropdown-item' : ''}>
+                          <DropdownItem className={(!inWMS || (storagePlan && (stateStoragePlan !== 'stocked' && stateStoragePlan !== 'into warehouse'))) ? 'do-not-show-dropdown-item' : ''}>
                             <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={rows} warehouseCode={String(storagePlan.warehouse?.code)} orderNumber={String(storagePlan.order_number)} intl={intl} />} fileName="entry_plan_labels.pdf">
                               {({ blob, url, loading, error }) =>
                                 intl.formatMessage({ id: "generate_labels" })
@@ -516,16 +516,16 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                           <DropdownItem className={(selectedRows.length === 0 || !inWMS || (storagePlan && (stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
                           </DropdownItem>
-                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && (stateStoragePlan === 'stocked' || stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
+                          <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && ((inWMS && (stateStoragePlan === 'stocked' || stateStoragePlan === 'cancelled')) || (!inWMS && stateStoragePlan !== 'to be storage')))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
                             {intl.formatMessage({ id: "split_bill" })}
                           </DropdownItem>
-                          <DropdownItem className={(storagePlan && stateStoragePlan === 'into warehouse') ? '' : 'do-not-show-dropdown-item'} onClick={() => openForceEntryStoragePlanDialog()}>
+                          <DropdownItem className={(inWMS && storagePlan && stateStoragePlan === 'into warehouse') ? '' : 'do-not-show-dropdown-item'} onClick={() => openForceEntryStoragePlanDialog()}>
                             {intl.formatMessage({ id: "force_entry" })}
                           </DropdownItem>
                           <DropdownItem className={(!storagePlan?.history || (storagePlan?.history && storagePlan?.history.length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(6)}>
                             {intl.formatMessage({ id: "history" })}
                           </DropdownItem>
-                          <DropdownItem onClick={() => handleAction(3)}>
+                          <DropdownItem className={(!inWMS && storagePlan && stateStoragePlan !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(3)}>
                             {intl.formatMessage({ id: "modify_packing_list" })}
                           </DropdownItem>
                         </DropdownMenu>

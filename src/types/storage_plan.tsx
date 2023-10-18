@@ -26,6 +26,8 @@ export type PackingList = {
   package_shelf?: PackageShelf[];
   meta?: any;
   checked?: boolean;
+  dispatched?: boolean;
+  dispatched_time?: string;
   created_at?: string;
   updated_at?: string;
 };

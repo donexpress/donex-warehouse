@@ -381,6 +381,7 @@
   "input_example_1": "例子: DEWMXI2023096000011U047, DEWMXI2023096000011U049...",
 	"input_example_2": "例子: DEWMXI2023096000010, DEWMXI2023096000008...",
 	"wrongStateMsg": "需要存储选定的框才能将其添加到输出计划中。",
+  "dispatch_date": "出貨日期",
 	"dispatched_boxes": "已发货的箱子",
 	"operation_instruction_box_requirement_amount": "您至少需要1个盒子来添加操作说明"
 

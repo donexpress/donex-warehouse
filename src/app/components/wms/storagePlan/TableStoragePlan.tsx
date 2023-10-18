@@ -379,7 +379,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                   <DropdownItem onClick={() => handleShow(storageP["id"])}>
                     {intl.formatMessage({ id: "View" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleEdit(storageP["id"])}>
+                  <DropdownItem className={(!inWMS && statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleEdit(storageP["id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
                   <DropdownItem onClick={() => handleConfig(storageP["id"])}>
@@ -388,7 +388,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                   <DropdownItem className={(!storageP["history"] || (storageP["history"].length === 0)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleHistory(storageP["id"])}>
                     {intl.formatMessage({ id: "history" })}
                   </DropdownItem>
-                  <DropdownItem className={(!inWMS || statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
+                  <DropdownItem className={(statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => openCancelStoragePlanDialog(storageP)}>
                     {intl.formatMessage({ id: "cancel" })}
                   </DropdownItem>
                   <DropdownItem className={(!inWMS || statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''} onClick={() => openForceEntryStoragePlanDialog(storageP)}>
@@ -414,7 +414,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  <DropdownItem onClick={() => packingListDataToExcel(storageP, storageP.packing_list ? storageP.packing_list : [], intl, 'lg' )}>
+                  <DropdownItem onClick={() => packingListDataToExcel(storageP, storageP.packing_list ? storageP.packing_list : [], intl, 'fl' )}>
                     {intl.formatMessage({ id: "generate_xlsx_inventory" })}
                   </DropdownItem>
                   <DropdownItem>
@@ -697,7 +697,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               {intl.formatMessage({ id: "export_xlsx" })}
             </Button>
             {
-              (inWMS && statusSelected === 'to be storage') && (
+              (statusSelected === 'to be storage') && (
                 <Button
                   color="primary"
                   style={{ width: '121px', marginLeft: '10px' }}

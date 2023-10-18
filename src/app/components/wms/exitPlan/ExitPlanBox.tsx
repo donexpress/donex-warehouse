@@ -506,6 +506,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               </span>
             </div>
           </div>
+          <div className='boxes-container-values'>
           {rows.map((row, index) => (
             <div
               key={index}
@@ -625,6 +626,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
               </div>
             </div>
           ))}
+          </div>
         </div>
       </div>
       {showAddDialog && (

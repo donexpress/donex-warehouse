@@ -15,6 +15,7 @@ import {
 } from "@/helpers/utilserege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import { PackingList } from "@/types/storage_planerege1992";
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
@@ -114,6 +115,26 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
     });
     return locations;
   };
+
+  const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
+    const pls = packingLists.filter((pl) => (pl.package_shelf && (pl.package_shelf.length > 0)));
+    
+    const uniqueCombinationSet = new Set<string>();
+    const uniqueArray: PackingList[] = [];
+
+    for (const pl of pls) {
+        const combinationKey = `${Number((pl.package_shelf as PackageShelf[])[0].shelf?.partition_table)}_${Number((pl.package_shelf as PackageShelf[])[0].shelf?.number_of_shelves)}_${(pl.package_shelf as PackageShelf[])[0].layer}_${(pl.package_shelf as PackageShelf[])[0].column}`;
+
+        if (!uniqueCombinationSet.has(combinationKey)) {
+            uniqueCombinationSet.add(combinationKey);
+
+            uniqueArray.push(pl);
+        }
+    }
+    
+    return uniqueArray;
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page} orientation="landscape">
@@ -128,7 +149,7 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
         <View style={styles.table}>
           <View style={styles.tableRow}>
             {columns.map((column, index) => (
-              <Text style={[styles.headerCell]} key={index}>
+              <Text style={ column === "output_number" ? [styles.headerCell, styles.minorCell] : [styles.headerCell]} key={index}>
                 {intl.formatMessage({ id: column })}
               </Text>
             ))}
@@ -149,7 +170,7 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                         {oi.user?.username}
                       </Text>
                     );
-                  case "destination":
+                  case "destination": {
                     if (oi.destination_ref) {
                       return (
                         <Text key={index} style={styles.tableCell}>
@@ -162,8 +183,8 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                         {oi.destination}
                       </Text>
                     );
-
-                  case "address":
+                  }
+                  case "address": {
                     if (oi.address_ref) {
                       return (
                         <Text key={index} style={styles.tableCell}>
@@ -176,11 +197,11 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                         {oi.address_ref}
                       </Text>
                     );
-
+                  }
                   case "location":
                     return (
                       <View key={index} style={styles.tableCell}>
-                        {oi.packing_lists?.map((pl, plIndex) => (
+                        {getPLUnique(oi.packing_lists ? oi.packing_lists : []).map((pl, plIndex) => (
                           pl.package_shelf ?
                           <Text key={plIndex} style={styles.locationCell}>
                             {packageShelfFormat(pl.package_shelf)}
@@ -191,7 +212,7 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                     );
                   case "delivered_time":
                   case "updated_at":
-                  case "created_at":
+                  case "created_at":{
                     // @ts-ignore
                     if (oi[column] && oi[column] !== "") {
                       return (
@@ -202,10 +223,20 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                         </Text>
                       );
                     } else {
+                      return (
                       <Text key={index} style={styles.tableCell}>
                         --
-                      </Text>;
+                      </Text>
+                      );
                     }
+                  }
+                  case "output_number":
+                    return (
+                      <Text key={index} style={[styles.tableCell, styles.minorCell]}>
+                        {/* @ts-ignore */}
+                        {oi[column]}
+                      </Text>
+                    );
                   default:
                     return (
                       <Text key={index} style={styles.tableCell}>
