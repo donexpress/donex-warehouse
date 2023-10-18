@@ -172,3 +172,28 @@ export const getExitPlanByFilter = async (filter:any, context?: GetServerSidePro
   const response = await axios.post<ExitPlan[]>(`${exitPlanPath()}/filter`,filter, getHeaders(context))
   return response.data
 }
+
+export const getNonBoxesOnExitPlans = async (
+  excluded_output_plan: number,
+  case_numbers: string[]
+): Promise<Response> => {
+  const path = exitPlanPath() + `/get_non_boxes_on_output_plans`;
+  try {
+    const response = await axios.post(path, {case_numbers, excluded_output_plan}, getHeaders());
+
+    if (response.status && response.status >= 200 && response.status <= 299) {
+      return { data: response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    console.log({
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    })
+    return {
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    };
+  }
+};
+
