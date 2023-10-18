@@ -732,8 +732,6 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
 
   const getVisibleColumns = (): string[] => {
     const t = Array.from(visibleColumns) as string[];
-    console.log(t);
-    console.log(visibleColumns);
     return t.filter((el) => el !== "actions");
   };
 

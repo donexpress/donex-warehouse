@@ -160,11 +160,15 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           if (!exist) {
             show_error = true;
           }
+          if(exist && (exist as PackingList) && (!exist.package_shelf || exist.package_shelf.length === 0)) {
+            show_miss_state_warning = true
+          }
           added = exitPlan.case_numbers?.find(
             (value) => value === (exist as PackingList).case_number
           );
           if (added === undefined) {
             exitPlan.case_numbers.push((exist as PackingList).case_number);
+            exitPlan.packing_lists?.push(exist as PackingList);
           } else {
             show_duplicated_warning = true;
           }
@@ -198,6 +202,10 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 if (tmp_added === undefined) {
                   // @ts-ignore
                   exitPlan.case_numbers.push(pl.case_number);
+                  if (!exitPlan.packing_lists) {
+                    exitPlan.packing_lists = [];
+                  }
+                  exitPlan.packing_lists.push(pl);
                 } else {
                   show_duplicated_warning = true;
                 }
@@ -207,7 +215,6 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
             }
           });
         }
-        console.log(tmp);
       }
       if (show_error) {
         showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
@@ -228,7 +235,6 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           exitPlan.id,
           exitPlan.case_numbers
         );
-        console.log(case_numbers.data.length, exitPlan.case_numbers.length);
         if (case_numbers.data.length !== exitPlan.case_numbers.length) {
           show_duplicated_warning = true;
         }
@@ -273,6 +279,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         if (exitPlan.id) {
           const ep = await getExitPlansById(exitPlan.id);
           if (ep) {
+            exitPlan = ep;
             ep.packing_lists?.forEach((pl) => {
               if (
                 !rows.find(
@@ -346,11 +353,12 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         });
         if (result.status < 300) {
           const ep = await getExitPlansById(exitPlan.id);
-          exitPlan.case_numbers = ep?.case_numbers;
+          if(ep) {
+            exitPlan = ep
+          }
           const new_rows: { packing_lists: PackingList; checked: boolean }[] =
             [];
           if (ep && ep.case_numbers !== undefined) {
-            console.log(ep)
             ep.case_numbers.forEach((cn) => {
               const tmp = rows.find(
                 (el) => el.packing_lists.case_number === cn
@@ -362,6 +370,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           }
 
           setRows(new_rows);
+          setSelectedRows(new_rows)
           showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
             type: "success",
           });
