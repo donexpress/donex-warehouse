@@ -72,9 +72,10 @@ const INITIAL_VISIBLE_COLUMNS = [
 
 interface Props {
   exit_plan_id?: number;
+  exit_plan?: ExitPlan;
 }
 
-const OperationInstructionTable = ({ exit_plan_id }: Props) => {
+const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -793,6 +794,11 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
     return locations;
   };
 
+  const getState = (): string => {
+    // @ts-ignore
+    return exit_plan ? exit_plan?.state : "";
+  };
+
   const packageShelfFormat = (
     packageShelfs: PackageShelf[] | undefined
   ): string => {
@@ -869,6 +875,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
               color="primary"
               endContent={<PlusIcon />}
               onClick={() => handleAdd()}
+              className={(isOMS() && exit_plan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""}
             >
               {intl.formatMessage({ id: "create" })}
             </Button>
@@ -881,6 +888,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             justifyContent: "flex-end",
             marginBottom: "10px",
             marginTop: "10px",
+            marginRight: "20px",
           }}
         >
           {statusSelected === 1 && isWMS() && (
@@ -955,7 +963,7 @@ const OperationInstructionTable = ({ exit_plan_id }: Props) => {
             {intl.formatMessage({ id: "export" })}
           </Button>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center" style={{ marginRight: "15px" }}>
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
           </span>

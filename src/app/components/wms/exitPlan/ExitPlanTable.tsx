@@ -322,12 +322,7 @@ const ExitPlanTable = () => {
                   } onClick={() => handleEdit(Number(user["id"]))}>
                   {intl.formatMessage({ id: "Edit" })}
                 </DropdownItem>
-                <DropdownItem
-                  className={
-                    (user.state.value !== "pending" && checkOMS)
-                      ? "do-not-show-dropdown-item"
-                      : ""
-                  } onClick={() => handleConfig(Number(user["id"]))}>
+                <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
                   {intl.formatMessage({ id: "config" })}
                 </DropdownItem>
                 <DropdownItem
@@ -456,14 +451,7 @@ const ExitPlanTable = () => {
       }
       case "output_number":
         return (
-          (user.state.value !== "pending" && checkOMS) ?
-          (<CopyColumnToClipboard
-            value={
-              <span>{cellValue}</span>
-            }
-          />)
-          :
-          (<CopyColumnToClipboard
+          <CopyColumnToClipboard
             value={
               <a
                 href={`/${locale}/${checkOMS ? "oms" : "wms"}/exit_plan/${
@@ -473,7 +461,7 @@ const ExitPlanTable = () => {
                 {cellValue}
               </a>
             }
-          />)
+          />
         );
       case "address":
         return user.address_ref ? (

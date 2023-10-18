@@ -23,7 +23,7 @@ import {
   getPackingListsByCaseNumber,
 } from "../../../../services/api.packing_list";
 import { getStoragePlanByOrder_number } from "../../../../services/api.storage_plan";
-import { showMsg, inventoryOfExitPlan } from "../../../../helpers";
+import { showMsg, inventoryOfExitPlan, isOMS } from "../../../../helpers";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InventoryList from "./InventoryList";
 import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
@@ -379,6 +379,11 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     closeConfirmDialog();
   };
 
+  const getState = (): string => {
+    // @ts-ignore
+    return exitPlan?.state;
+  };
+
   return (
     <>
       <div style={{ paddingTop: "20px" }}>
@@ -395,12 +400,12 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="Actions menu">
-                <DropdownItem onClick={() => handleAction(1)}>
+                <DropdownItem className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""} onClick={() => handleAction(1)}>
                   {intl.formatMessage({ id: "add" })}
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    selectedRows.length === 0 ? "do-not-show-dropdown-item" : ""
+                    (selectedRows.length === 0 || (isOMS() && exitPlan && getState() !== "pending")) ? "do-not-show-dropdown-item" : ""
                   }
                   onClick={() => handleAction(2)}
                 >
@@ -500,7 +505,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 {intl.formatMessage({ id: "delivery_time" })}
               </span>
             </div>
-            <div className="elements-center">
+            <div className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : "elements-center"}>
               <span className="text-center">
                 {intl.formatMessage({ id: "actions" })}
               </span>
@@ -606,7 +611,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                   exitPlan.delivered_time ? exitPlan.delivered_time : ""
                 )}
               </div>
-              <div style={{ display: "flex", justifyContent: "center" }}>
+              <div className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""} style={{ display: "flex", justifyContent: "center" }}>
                 <Dropdown>
                   <DropdownTrigger>
                     <Button isIconOnly size="sm" variant="light">
