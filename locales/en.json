@@ -381,6 +381,7 @@
 	"input_example_1": "Ex: DEWMXI2023096000011U047, DEWMXI2023096000011U049...",
 	"input_example_2": "Ex: DEWMXI2023096000010, DEWMXI2023096000008...",
 	"wrongStateMsg": "The selected boxes need to be stored to be added to an output plan.",
+	"dispatch_date": "Dispatch date",
 	"dispatched_boxes": "Dispatched boxes",
 	"operation_instruction_box_requirement_amount": "You need at least 1 box to add an operating instruction"
 }

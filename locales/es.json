@@ -381,6 +381,7 @@
   "input_example_1": "Ej: DEWMXI2023096000011U047, DEWMXI2023096000011U049...",
   "input_example_2": "Ej: DEWMXI2023096000010, DEWMXI2023096000008...",
   "wrongStateMsg": "Las cajas seleccionadas necesitan estar almacenadas para ser adicionadas a un plan de salida.",
+  "dispatch_date": "Fecha de despacho",
   "dispatched_boxes": "Cajas despachadas",
   "operation_instruction_box_requirement_amount": "Necesitas al menos 1 caja para adicionar una instruccion de operación"
 

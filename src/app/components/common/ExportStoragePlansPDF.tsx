@@ -93,6 +93,7 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     const key9: string = intl.formatMessage({ id: 'pr_number' });
     const key10: string = intl.formatMessage({ id: 'state' });
     const key11: string = intl.formatMessage({ id: 'delivery_time' });
+    const key11_1: string = intl.formatMessage({ id: "dispatched_boxes" });
     const key12: string = intl.formatMessage({ id: 'observations' });
     const key13: string = intl.formatMessage({ id: "created_at" });
     const key14: string = intl.formatMessage({ id: "updated_at" });
@@ -114,6 +115,9 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     }
     if (selection === "all" || selection.has("number_of_boxes_stored")) {
         titles.push(key6);
+    }
+    if (selection === "all" || selection.has("dispatched_boxes")) {
+        titles.push(key11_1);
     }
     if (selection === "all" || selection.has("evidence")) {
         titles.push(key7);
@@ -171,6 +175,13 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
         }
         if (selection === "all" || selection.has("number_of_boxes_stored")) {
           values[index][i] = sp.packing_list && sp.packing_list.length > 0 ? (sp.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length.toString()) : '0';
+          i++;
+        }
+        if (selection === "all" || selection.has("dispatched_boxes")) {
+          values[index][i] =
+            sp.packing_list && sp.packing_list.length > 0
+              ? sp.packing_list.filter((pl: PackingList) => pl.dispatched).length.toString()
+              : "0";
           i++;
         }
         if (selection === "all" || selection.has("evidence")) {
