@@ -422,14 +422,18 @@ export const packingListDataToExcel = (
     const key8: string = intl.formatMessage({ id: "location" });
     const key9: string = intl.formatMessage({ id: "storage_time" });
     const key10: string = intl.formatMessage({ id: "delivery_time" });
-    const key11: string = intl.formatMessage({ id: "dispatch_date" });
+    //const key11: string = intl.formatMessage({ id: "dispatch_date" });
 
     packingLists.forEach((pl: PackingList) => {
       const pList: { [key: string]: string } = {};
 
       pList[key1] = pl.box_number;
       pList[key2] = pl.case_number;
-      pList[key3] = "--";
+      pList[key3] =  pl.dispatched_time
+      ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
+        pl.dispatched_time
+        )}`
+      : "--";
       pList[key4] = pl.order_transfer_number ? pl.order_transfer_number : "--";
       pList[key5] = storagePlan.pr_number ? storagePlan.pr_number : "--";
       pList[
@@ -480,11 +484,11 @@ export const packingListDataToExcel = (
             storagePlan.delivered_time
           )}`
         : "--";
-      pList[key11] = pl.dispatched_time
+      /* pList[key11] = pl.dispatched_time
         ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
           pl.dispatched_time
           )}`
-        : "--";
+        : "--"; */
 
       dataToExport.push(pList);
     });

@@ -596,7 +596,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                                 value={ row.case_number }
                               />
                             </div>
-                            <div>{'--'}</div>
+                            <div>{row.dispatched_time ? `${getDateFormat(row.dispatched_time)}, ${getHourFormat(row.dispatched_time)}` : '--'}</div>
                             <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div>
                             <div>{storagePlan.pr_number ? (
                               <CopyColumnToClipboard value={ storagePlan.pr_number } />
