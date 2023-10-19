@@ -559,6 +559,9 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             <span className=''>{intl.formatMessage({ id: 'outgoing_order' })}</span>
                           </div>
                           <div className='elements-center-start'>
+                            <span className=''>{intl.formatMessage({ id: 'dispatch_date' })}</span>
+                          </div>
+                          <div className='elements-center-start'>
                             <span className=''>{intl.formatMessage({ id: 'transfer_order_number' })}</span>
                           </div>
                           <div className='elements-center-start'>
@@ -596,6 +599,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                                 value={ row.case_number }
                               />
                             </div>
+                            <div>--</div>
                             <div>{row.dispatched_time ? `${getDateFormat(row.dispatched_time)}, ${getHourFormat(row.dispatched_time)}` : '--'}</div>
                             <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div>
                             <div>{storagePlan.pr_number ? (
