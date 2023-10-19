@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ExitPlan, State } from "@/types/exit_planerege1992";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { generateValidationSchemaExitPlan, generateValidationSchemaOperationinstruction } from "@/validation/generateValidationSchemaerege1992";
@@ -51,6 +51,19 @@ const OperationInstructionFormBody = ({
     filter: ExitPlan | Warehouse | User | undefined;
     type: string;
   }>({ filter: undefined, type: "none" });
+  const [isFromEPConfig, setIsFromEPConfig] = useState<boolean>(false);
+  const [stateEP, setStateEP] = useState<string>('');
+  const [ePId, setEPId] = useState<string>('');
+
+  useEffect(() => {
+    const exitPId = router.query.exit_plan_id;
+    const exitPState = router.query.exit_plan_state;
+    if (exitPId && exitPState && (exitPId !== '') && (exitPState !== '')) {
+      setStateEP(exitPState.toString());
+      setIsFromEPConfig(true);
+      setEPId(exitPId.toString());
+    }
+  }, []);
 
   const getPositions = (operationInstruction: any): string[] => {
     const pos: string[] = [];
@@ -134,9 +147,10 @@ const OperationInstructionFormBody = ({
     );
   };
   const cancelSend = () => {
-    if (exit_plan_id) {
+    const exitPId = router.query.exit_plan_id;
+    if (exitPId) {
       router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exit_plan_id}/config`
+        `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exitPId}/config`
       );
     } else {
       router.push(
@@ -359,7 +373,7 @@ const OperationInstructionFormBody = ({
                           : intl.formatMessage({ id: "add" })}
                       </Button>
                     )}
-                    {isFromDetails && id && (
+                    {isFromDetails && id && !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
                       <Button
                         color="primary"
                         onClick={() => goToEdit()}
@@ -385,8 +399,12 @@ const OperationInstructionFormBody = ({
           )}
         </Formik>
       </div>
-      <OperationInstructionAppendix owner={user} operationInstruction={oI} />
-      {isFromDetails && (
+      {
+        !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
+          <OperationInstructionAppendix owner={user} operationInstruction={oI} />
+        )
+      }
+      {isFromDetails && !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
         <LocationTable
         // @ts-ignore
           exitPlan={exitPlans.find((el) => el.id === operationInstruction?.output_plan_id)}
