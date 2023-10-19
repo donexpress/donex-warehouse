@@ -505,6 +505,7 @@ const ExitPlanTable = () => {
       return "--";
     }
     ep.packing_lists?.forEach((pl) => {
+      console.log(pl);
       if (
         pl.package_shelf &&
         pl.package_shelf[0] &&
@@ -856,6 +857,7 @@ const ExitPlanTable = () => {
   const loadExitPlans = async () => {
     setLoading(true);
     const pms = await getExitPlansByState("pending");
+    console.log(pms);
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
     const count = await countExitPlans();
