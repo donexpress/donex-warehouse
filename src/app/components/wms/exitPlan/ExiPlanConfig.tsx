@@ -5,7 +5,7 @@ import "../../../../styles/wms/exit.plan.config.scss";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { getDateFormat, getHourFormat } from "../../../../helpers/utils";
-import { ExitPlan, ExitPlanProps } from "../../../../types/exit_plan";
+import { ExitPlanProps } from "../../../../types/exit_plan";
 import ExitPlanBox from "./ExitPlanBox";
 import ExitPlanAppendix from "./ExitPlanAppendix";
 import OperationInstructionTable from "../operationInstruction/OperationInstructionTable";
@@ -30,22 +30,6 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
     // @ts-ignore
     return exitPlan?.state;
   };
-
-  const buildAddress = (exitPlan: ExitPlan): string => {
-    let address = ""
-    if(exitPlan.address) {
-      address+=exitPlan.address
-      if(exitPlan.city && exitPlan.city.trim() !== '') {
-        address+=`, ${exitPlan.city}`
-      }
-      if(exitPlan.country) {
-        address+=`, ${exitPlan.country}`
-      }
-    } else {
-      address = '-'
-    }
-    return address
-  }
 
   return (
     <div
@@ -109,7 +93,9 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
                   : "-"}
               </div>
               <div className="elements-center">
-                {exitPlan && buildAddress(exitPlan)}
+                {exitPlan?.address
+                  ? `${exitPlan?.address}, ${exitPlan.city}, ${exitPlan.country}`
+                  : "-"}
               </div>
               <div className="elements-center">
                 {exitPlan?.observations ? exitPlan?.observations : "-"}
