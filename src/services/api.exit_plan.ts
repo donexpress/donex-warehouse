@@ -197,3 +197,10 @@ export const getNonBoxesOnExitPlans = async (
   }
 };
 
+export const pullBoxes = async(data: {
+  case_number: string;
+  warehouse_order_number: string;
+}, context?: GetServerSidePropsContext): Promise<ExitPlan> => {
+  const response = await axios.post<ExitPlan>(`${exitPlanPath()}/pull_boxes`, data, getHeaders(context))
+  return response.data
+}
