@@ -60,6 +60,7 @@ import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { getAppendagesByOperationInstructionId } from "@/services/api.appendixerege1992";
 import { getExitPlansById } from "@/services/api.exit_planerege1992";
+import { ParsedUrlQueryInput } from 'querystring';
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
@@ -244,10 +245,18 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   };
 
   const handleShow = (id: number) => {
+    let params: ParsedUrlQueryInput = {};
+    if (exit_plan_id && exit_plan) {
+      params = {
+        exit_plan_id: exit_plan_id,
+        exit_plan_state: getState(),
+      };
+    }
     router.push({
       pathname: `/${locale}/${
         isOMS() ? "oms" : "wms"
       }/operation_instruction/${id}/show`,
+      query: params,
     });
   };
 
@@ -391,7 +400,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                   <DropdownItem onClick={() => handleShow(Number(user["id"]))}>
                     {intl.formatMessage({ id: "View" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleEdit(Number(user["id"]))}>
+                  <DropdownItem className={(isOMS() && exit_plan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""} onClick={() => handleEdit(Number(user["id"]))}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
                   <DropdownItem
@@ -424,14 +433,14 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                   >
                     {intl.formatMessage({ id: "return" })}
                   </DropdownItem>
-                  <DropdownItem
+                  <DropdownItem className={(isOMS() && exit_plan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""}
                     onClick={() => handleConfig(Number(user["id"]))}
                   >
                     {intl.formatMessage({ id: "config" })}
                   </DropdownItem>
                   <DropdownItem
                     className={
-                      user.state !== "pending"
+                      (user.state !== "pending" || (isOMS() && exit_plan && getState() !== "pending"))
                         ? "do-not-show-dropdown-item"
                         : ""
                     }
@@ -461,7 +470,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             <a
               href={`/${locale}/${
                 isOMS() ? "oms" : "wms"
-              }/operation_instruction/${user.id}/show`}
+              }/operation_instruction/${user.id}/show` + ((exit_plan_id && exit_plan) ? `?exit_plan_id=${exit_plan_id}&exit_plan_state=${getState()}` : '')}
             >
               {values.join(", ")}
             </a>
@@ -886,7 +895,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             justifyContent: "flex-end",
             marginBottom: "10px",
             marginTop: "10px",
-            marginRight: "20px",
+            marginRight: exit_plan ? "20px" : "0px",
           }}
         >
           {statusSelected === 1 && isWMS() && (
@@ -961,7 +970,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             {intl.formatMessage({ id: "export" })}
           </Button>
         </div>
-        <div className="flex justify-between items-center" style={{ marginRight: "15px" }}>
+        <div className="flex justify-between items-center" style={{ marginRight: exit_plan ? "15px" : "0px" }}>
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
           </span>
