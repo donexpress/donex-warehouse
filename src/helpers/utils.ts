@@ -48,7 +48,9 @@ export const getHourFormat = (date: string): string => {
   } else {
     validTimestamp = date + "+00:00";
   }
-  let time: any = new Date(validTimestamp).toString().split(" ")[4];
+  const offset = new Date(validTimestamp).getTimezoneOffset()
+  const no_offset_date = new Date(validTimestamp);
+  let time: any = new Date(no_offset_date.getTime() + offset *60 * 1000).toString().split(" ")[4];
   if (time) {
     time = time.split(":");
     if (Number(time[0]) > 12) {
