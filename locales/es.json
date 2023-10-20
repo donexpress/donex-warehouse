@@ -214,7 +214,7 @@
   "add_box": "Agregar caja",
   "remove_box": "Quitar caja",
   "modify_packing_list": "Modificar lista de embalaje",
-  "outgoing_order": "Orden saliente (Fecha de despacho)",
+  "outgoing_order": "Orden saliente",
   "transfer_order_number": "Número de orden de transferencia",
   "bill_lading_number": "Número de conocimiento de embarque (BL)",
   "dimensions": "Dimensiones",
