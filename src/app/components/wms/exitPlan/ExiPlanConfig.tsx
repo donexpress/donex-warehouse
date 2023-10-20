@@ -5,7 +5,7 @@ import "../../../../styles/wms/exit.plan.config.scss";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { getDateFormat, getHourFormat } from "../../../../helpers/utils";
-import { ExitPlanProps } from "../../../../types/exit_plan";
+import { ExitPlan, ExitPlanProps } from "../../../../types/exit_plan";
 import ExitPlanBox from "./ExitPlanBox";
 import ExitPlanAppendix from "./ExitPlanAppendix";
 import OperationInstructionTable from "../operationInstruction/OperationInstructionTable";
@@ -35,6 +35,22 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
     return exitPlan?.state;
   };
 
+  const buildAddress = (exitPlan: ExitPlan): string => {
+    let address = "";
+    if (exitPlan.address) {
+      address += exitPlan.address;
+      if (exitPlan.city && exitPlan.city.trim() !== "") {
+        address += `, ${exitPlan.city}`;
+      }
+      if (exitPlan.country) {
+        address += `, ${exitPlan.country}`;
+      }
+    } else {
+      address = "-";
+    }
+    return address;
+  };
+
   return (
     <div
       className="user-form-body shadow-small"
@@ -49,7 +65,11 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
           <Button
             color="primary"
             type="button"
-            className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : "px-4"}
+            className={
+              isOMS() && exitPlan && getState() !== "pending"
+                ? "do-not-show-dropdown-item"
+                : "px-4"
+            }
             onClick={() => handleAction(3)}
           >
             {intl.formatMessage({ id: "go_to_edit" })}
@@ -107,9 +127,7 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
                   : "-"}
               </div>
               <div className="elements-center">
-                {exitPlan?.address
-                  ? `${exitPlan?.address}, ${exitPlan.city}, ${exitPlan.country}`
-                  : "-"}
+                {exitPlan && buildAddress(exitPlan)}
               </div>
               <div className="elements-center">
                 {exitPlan?.observations ? exitPlan?.observations : "-"}
@@ -120,8 +138,11 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
         {exitPlan && exitPlan.user && exitPlan.id && (
           <>
             <ExitPlanBox exitPlan={exitPlan} />
-            <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user}/>
-            <OperationInstructionTable exit_plan_id={exitPlan.id} exit_plan={exitPlan} />
+            <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user} />
+            <OperationInstructionTable
+              exit_plan_id={exitPlan.id}
+              exit_plan={exitPlan}
+            />
           </>
         )}
       </div>
