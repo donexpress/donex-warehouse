@@ -75,12 +75,12 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     };
   
       const cancelSend = () => {
-          const goBack = router.query.goBack;
-            if (goBack && goBack === 'config' && !!id) {
-              router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
-            } else {
-              router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
-            }
+        const goBack = router.query.goBack;
+        if (goBack && goBack === 'config' && !!id) {
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
+        } else {
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
+        }
       };
 
       const getUsersFormatted = (usersAll: User[]): ValueSelect[] => {

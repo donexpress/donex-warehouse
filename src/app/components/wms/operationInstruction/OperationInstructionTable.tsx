@@ -61,6 +61,7 @@ import { PackageShelf } from "@/types/package_shelferege1992";
 import { getAppendagesByOperationInstructionId } from "@/services/api.appendixerege1992";
 import { getExitPlansById } from "@/services/api.exit_planerege1992";
 import { ParsedUrlQueryInput } from 'querystring';
+import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
@@ -82,7 +83,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   const { locale } = router.query;
   const [operationInstructionState, setOperationInstructionState] =
     useState<ExitPlanState | null>(null);
-  const [statusSelected, setStatusSelected] = useState<number>(1);
+  const [statusSelected, setStatusSelected] = useState<string>("pending");
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
@@ -112,27 +113,33 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   >("");
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [count, setCount] = useState<OperationInstructionCount | null>(null);
+  const [loadingItems, setLoadingItems] = useState<boolean>(false);
 
   useEffect(() => {
-    loadStates();
-  }, [statusSelected]);
-  const loadStates = async () => {
+    const tab = getCookie("tabIO");
+    if (tab) {
+      setStatusSelected(tab);
+    }
+    loadStates(tab ? tab : statusSelected);
+  }, []);
+
+  const loadStates = async (status: string = "pending") => {
     const states: ExitPlanState = await getOperationInstructionStates();
     const count: OperationInstructionCount = await countOperationInstruction(
       exit_plan_id
     );
     setCount(count);
-    const list_state = states.states.find(
+    /* const list_state = states.states.find(
       (el) => el.position === statusSelected
-    );
+    ); */
     let opi = null;
     if (exit_plan_id) {
       opi = await getOperationInstructionsByOutputPlan(
         exit_plan_id,
-        list_state?.value
+        status
       );
     } else {
-      opi = await getOperationInstructions(list_state?.value);
+      opi = await getOperationInstructions(status);
     }
     setOperationInstructions(opi);
     setOperationInstructionState(states);
@@ -306,7 +313,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
 
   const confirm = async () => {
     const result = await deleteOperationInstructions(selectedId);
-    await loadStates();
+    await loadStates(statusSelected);
     showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
       type: "success",
     });
@@ -542,8 +549,14 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     return instruction.name;
   };
 
-  const changeTab = (tab: number) => {
-    setStatusSelected(tab);
+  const changeTab = async(tab: string) => {
+    if (tab !== statusSelected && !loadingItems) {
+      setCookie("tabIO", tab);
+      setStatusSelected(tab);
+      await setLoadingItems(true);
+      await loadStates(tab);
+      await setLoadingItems(false);
+    }
   };
 
   const handleProcessing = async (id: number) => {
@@ -640,7 +653,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     setDialogTexts([]);
     setDialogType("");
     setSelectedItems([]);
-    loadStates();
+    loadStates(statusSelected);
     setDisplayOperationInstructionConfirmation(false);
   };
 
@@ -898,7 +911,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             marginRight: exit_plan ? "20px" : "0px",
           }}
         >
-          {statusSelected === 1 && isWMS() && (
+          {statusSelected === "pending" && isWMS() && (
             <Button
               color="primary"
               onClick={() => handleMultiProcessing()}
@@ -908,7 +921,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             </Button>
           )}
 
-          {statusSelected === 1 && isWMS() && (
+          {statusSelected === "pending" && isWMS() && (
             <Button
               color="primary"
               onClick={() => handleMultiCancel()}
@@ -918,7 +931,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             </Button>
           )}
 
-          {statusSelected === 2 && isWMS() && (
+          {statusSelected === "processing" && isWMS() && (
             <Button
               color="primary"
               onClick={() => handleMultiProcess()}
@@ -927,7 +940,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
               {intl.formatMessage({ id: "processed" })}
             </Button>
           )}
-          {statusSelected === 3 && isWMS() && (
+          {statusSelected === "processed" && isWMS() && (
             <Button
               color="primary"
               onClick={() => handleMultiReturn()}
@@ -1005,11 +1018,11 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                     <li className="whitespace-nowrap" key={index}>
                       <button
                         className={
-                          statusSelected === state.position
+                          statusSelected === state.value
                             ? "px-4 py-3 tab-selected"
                             : "px-4 py-3 tab-default"
                         }
-                        onClick={() => changeTab(state.position)}
+                        onClick={() => changeTab(state.value)}
                       >
                         {state[getLanguage(intl)]}(
                         {getCount(
@@ -1024,11 +1037,11 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                     <li className="whitespace-nowrap" key={index}>
                       <button
                         className={
-                          statusSelected === state.position
+                          statusSelected === state.value
                             ? "px-4 py-3 tab-selected"
                             : "px-4 py-3 tab-default"
                         }
-                        onClick={() => changeTab(state.position)}
+                        onClick={() => changeTab(state.value)}
                       >
                         {state[getLanguage(intl)]}(
                         {getCount(
@@ -1075,8 +1088,8 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             )}
           </TableHeader>
           <TableBody
-            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
+            items={loadingItems ? [] : sortedItems}
           >
             {(item: any) => (
               <TableRow key={item.id}>

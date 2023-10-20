@@ -11,6 +11,7 @@ import { FaAngleLeft, FaList } from "react-icons/fa6";
 import { MenuOption } from "../../../../types";
 import { menuWMS, menuOMS } from "./../../../../config/menu";
 import Icons from "./Icons";
+import { removeCookie } from "../../../../helpers/cookieUtils";
 
 const Index = () => {
   const [toggleCollapse, setToggleCollapse] = useState(false);
@@ -162,6 +163,9 @@ const Index = () => {
                       className="flex py-3  px-4"
                       onClick={(e) => {
                         e.preventDefault();
+                        removeCookie("tabSP");
+                        removeCookie("tabEP");
+                        removeCookie("tabIO");
                         router.push(
                           `/${locale}/${isOMS() ? "oms" : ""}${
                             isWMS() ? "wms" : ""

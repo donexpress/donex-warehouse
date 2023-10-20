@@ -339,6 +339,16 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                   {intl.formatMessage({ id: 'go_to_edit' })}
                 </Button>
               </div>
+              <div className='w-100' style={{ marginLeft: '10px' }}>
+                <Button
+                  color="primary"
+                  type="button"
+                  className='px-4'
+                  onClick={()=>cancelSend()}
+                >
+                  {intl.formatMessage({ id: 'back' })}
+                </Button>
+              </div>
             </div>
             <div className='user-form-body__container'>
                 <div className='warehouse-data'>
