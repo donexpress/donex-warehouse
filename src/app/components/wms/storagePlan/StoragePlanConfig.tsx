@@ -555,7 +555,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                   tabToShow === 1 && (
                     <div style={{ paddingTop: '10px' }} className='info-packing-list'>
                       <div>
-                        <div className='info-packing-list__table bg-default-100' style={{ padding: '5px 0px 5px 5px', borderRadius: '5px 5px 0 0' }}>
+                        <div className='info-packing-list__table-ic bg-default-100' style={{ padding: '5px 0px 5px 5px', borderRadius: '5px 5px 0 0' }}>
                           <div className='elements-center'>
                             <input type="checkbox" name="selectAll" checked={selectAllPackingListItems} onChange={handleCheckboxChange} />
                           </div>
@@ -595,7 +595,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                         </div>
                         <div className='boxes-container-values'>
                         {rows.map((row, index) => (
-                          <div key={index} className='info-packing-list__table storage-plan-header' style={{ padding: '8px 0px 8px 5px'}}>
+                          <div key={index} className='info-packing-list__table-ic storage-plan-header' style={{ padding: '8px 0px 8px 5px'}}>
                             <div className='elements-start-center'>
                               <input type="checkbox" style={{ marginTop: '3px' }} name={`packing-list-${index}`} checked={row.checked} onChange={(event) => handleCheckboxChange(event, index)} />
                             </div>
@@ -609,7 +609,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                                 value={ row.case_number }
                               />
                             </div>
-                            <div>--</div>
+                            <div>{row.output_plan_delivered_number ? <CopyColumnToClipboard value={ row.output_plan_delivered_number }/> : '--'}</div>
                             <div>{row.dispatched_time ? `${getDateFormat(row.dispatched_time)}, ${getHourFormat(row.dispatched_time)}` : '--'}</div>
                             <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div>
                             <div>{storagePlan.pr_number ? (

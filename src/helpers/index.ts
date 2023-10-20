@@ -429,7 +429,7 @@ export const packingListDataToExcel = (
 
       pList[key1] = pl.box_number;
       pList[key2] = pl.case_number;
-      pList[key3] =  "--";
+      pList[key3] = pl.output_plan_delivered_number ? pl.output_plan_delivered_number : "--";
       pList[key4] = pl.order_transfer_number ? pl.order_transfer_number : "--";
       pList[key5] = storagePlan.pr_number ? storagePlan.pr_number : "--";
       pList[

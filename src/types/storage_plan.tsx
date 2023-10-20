@@ -23,6 +23,7 @@ export type PackingList = {
   operator_picture?: string,
   storage_plan_id?: number,
   order_transfer_number?: string;
+  output_plan_delivered_number?: string;
   package_shelf?: PackageShelf[];
   meta?: any;
   checked?: boolean;

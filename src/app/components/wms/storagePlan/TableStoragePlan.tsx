@@ -45,7 +45,7 @@ import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
-import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
+import { FaFileExcel, FaFilePdf, FaTrashAlt } from 'react-icons/fa';
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
@@ -431,9 +431,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  {/* <DropdownItem onClick={() => handleDelete(storageP["id"])}>
+                  <DropdownItem className={(!inWMS || (statusSelected !== 'to be storage' && statusSelected !== 'cancelled')) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleDelete(storageP["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
-                  </DropdownItem> */}
+                  </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </div>
@@ -727,6 +727,19 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                 </Button>
               )
             }
+            {
+              (inWMS && (statusSelected === 'to be storage' || statusSelected === 'cancelled')) && (
+                <Button
+                  color="primary"
+                  style={{ width: '121px', marginLeft: '10px' }}
+                  endContent={<FaTrashAlt style={{ fontSize: '20px', color: 'white' }} />}
+                  onClick={() => handleDelete(-1)}
+                  isDisabled={selectedItems.length === 0}
+                >
+                  {intl.formatMessage({ id: "Delete" })}
+                </Button>
+              )
+            }
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
@@ -890,15 +903,37 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
   const confirm = async () => {
     setLoading(true);
-    const response = await removeStoragePlanById(deleteElement);
-    if (response.status >= 200 && response.status <= 299) {
-      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    if (deleteElement !== -1) {
+      const response = await removeStoragePlanById(deleteElement);
+      if (response.status >= 200 && response.status <= 299) {
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        showMsg(message, { type: "error" });
+      }
     } else {
-      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
-      showMsg(message, { type: "error" });
+      for (let i = 0; i < selectedItems.length; i++) {
+        const index = selectedItems[i];
+        const item = storagePlans.filter((sp: StoragePlan) => sp.id === index);
+        
+        if (item.length > 0) {
+          const response: Response = await removeStoragePlanById(Number(item[0].id));
+          if (selectedItems[selectedItems.length-1] === index) {
+            if (response.status >= 200 && response.status <= 299) {
+              const message = selectedItems.length > 1 ? intl.formatMessage({ id: 'successfullyActionMsg' }) : intl.formatMessage({ id: 'item_has_been_canceled' });
+              showMsg(message, { type: "success" });
+            } else {
+              let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+              showMsg(message, { type: "error" });
+            }
+          }
+        }
+      }
+      await setSelectedItems([]);
+      await setSelectedKeys(new Set([]));
     }
     close();
-    await loadStoragePlans(statusSelected);
+    await loadStoragePlans(statusSelected, true);
     setLoading(false);
   };
   
@@ -928,9 +963,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       
       if (item.length > 0) {
         const response: Response = await updateStoragePlanById(index, formatBodyToCancel(item[0]));
-        if (((selectedItems.length-1) === index)) {
+        if (selectedItems[selectedItems.length-1] === index) {
           if (response.status >= 200 && response.status <= 299) {
-            const message = selectedItems.length > 1 ? intl.formatMessage({ id: 'items_has_been_canceled' }) : intl.formatMessage({ id: 'item_has_been_canceled' });
+            const message = selectedItems.length > 1 ? intl.formatMessage({ id: 'successfullyActionMsg' }) : intl.formatMessage({ id: 'item_has_been_canceled' });
             showMsg(message, { type: "success" });
           } else {
             let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
