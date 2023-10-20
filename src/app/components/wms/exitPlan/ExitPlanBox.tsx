@@ -141,7 +141,41 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
     case_number: string;
     warehouse_order_number: string;
   }) => {
-   console.log(await pullBoxes(data)) 
+    if (exitPlan && exitPlan.id) {
+      const response: any = await pullBoxes(exitPlan.id, data);
+      const ep = await getExitPlansById(exitPlan.id);
+      if (ep) {
+        exitPlan = ep;
+        ep.packing_lists?.forEach((pl) => {
+          if (
+            !rows.find((r) => r.packing_lists.case_number === pl.case_number)
+          ) {
+            rows.push({ checked: false, packing_lists: pl });
+          }
+        });
+        const tmprows = rows;
+        setRows([]);
+        setRows(tmprows);
+      }
+      if (response["stored"]) {
+        showMsg(intl.formatMessage({ id: "not_correct_state_msg" }), {
+          type: "warning",
+        });
+      } else if (response["already_used"]) {
+        showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+          type: "error",
+        });
+      } else if (response["duplicated"]) {
+        showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+          type: "warning",
+        });
+      } else {
+        showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+          type: "success",
+        });
+      }
+      closeAddDialog();
+    }
     // if (exitPlan) {
     //   if (!exitPlan.case_numbers) {
     //     exitPlan.case_numbers = [];
@@ -355,8 +389,8 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
         });
         if (result.status < 300) {
           const ep = await getExitPlansById(exitPlan.id);
-          if(ep) {
-            exitPlan = ep
+          if (ep) {
+            exitPlan = ep;
           }
           const new_rows: { packing_lists: PackingList; checked: boolean }[] =
             [];
@@ -372,7 +406,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           }
 
           setRows(new_rows);
-          setSelectedRows(new_rows)
+          setSelectedRows(new_rows);
           showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
             type: "success",
           });
@@ -411,12 +445,22 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="Actions menu">
-                <DropdownItem className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""} onClick={() => handleAction(1)}>
+                <DropdownItem
+                  className={
+                    isOMS() && exitPlan && getState() !== "pending"
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                  onClick={() => handleAction(1)}
+                >
                   {intl.formatMessage({ id: "add" })}
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    (selectedRows.length === 0 || (isOMS() && exitPlan && getState() !== "pending")) ? "do-not-show-dropdown-item" : ""
+                    selectedRows.length === 0 ||
+                    (isOMS() && exitPlan && getState() !== "pending")
+                      ? "do-not-show-dropdown-item"
+                      : ""
                   }
                   onClick={() => handleAction(2)}
                 >
@@ -516,132 +560,146 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 {intl.formatMessage({ id: "delivery_time" })}
               </span>
             </div>
-            <div className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : "elements-center"}>
+            <div
+              className={
+                isOMS() && exitPlan && getState() !== "pending"
+                  ? "do-not-show-dropdown-item"
+                  : "elements-center"
+              }
+            >
               <span className="text-center">
                 {intl.formatMessage({ id: "actions" })}
               </span>
             </div>
           </div>
-          <div className='boxes-container-values'>
-          {rows.map((row, index) => (
-            <div
-              key={index}
-              className="info-epb__table storage-plan-header"
-              style={{ padding: "8px 0px 8px 5px" }}
-            >
-              <div className="elements-start-center">
-                <input
-                  style={{ marginTop: "3px" }}
-                  type="checkbox"
-                  name={`packing-list-${index}`}
-                  checked={row.checked}
-                  onChange={(event) => handleCheckboxChange(event, index)}
-                />
+          <div className="boxes-container-values">
+            {rows.map((row, index) => (
+              <div
+                key={index}
+                className="info-epb__table storage-plan-header"
+                style={{ padding: "8px 0px 8px 5px" }}
+              >
+                <div className="elements-start-center">
+                  <input
+                    style={{ marginTop: "3px" }}
+                    type="checkbox"
+                    name={`packing-list-${index}`}
+                    checked={row.checked}
+                    onChange={(event) => handleCheckboxChange(event, index)}
+                  />
+                </div>
+                <div className="">{row.packing_lists?.box_number}</div>
+                <div className="">{row.packing_lists?.case_number}</div>
+                <div className="">{row.packing_lists?.client_weight}</div>
+                <div className="">{row.packing_lists?.client_height}</div>
+                <div className="">{"--"}</div>
+                <div className="">{"--"}</div>
+                <div className="">{row.packing_lists?.amount}</div>
+                <div>
+                  {row.packing_lists &&
+                  row.packing_lists.package_shelf &&
+                  row.packing_lists.package_shelf.length > 0 ? (
+                    <>
+                      {exitPlan.warehouse ? (
+                        <>
+                          {exitPlan.warehouse.code}-
+                          {String(
+                            row.packing_lists.package_shelf[0].shelf
+                              ?.partition_table
+                          ).padStart(2, "0")}
+                          -
+                          {String(
+                            row.packing_lists.package_shelf[0].shelf
+                              ?.number_of_shelves
+                          ).padStart(2, "0")}
+                          -
+                          {String(
+                            row.packing_lists.package_shelf[0].layer
+                          ).padStart(2, "0")}
+                          -
+                          {String(
+                            row.packing_lists.package_shelf[0].column
+                          ).padStart(2, "0")}
+                          <br />
+                        </>
+                      ) : null}
+                      {intl.formatMessage({ id: "partition" })}:{" "}
+                      {row.packing_lists.package_shelf &&
+                      row.packing_lists.package_shelf.length > 0 &&
+                      row.packing_lists.package_shelf[0].shelf
+                        ? row.packing_lists.package_shelf[0].shelf
+                            .partition_table
+                        : ""}
+                      &nbsp;
+                      {intl.formatMessage({ id: "shelf" })}:{" "}
+                      {row.packing_lists.package_shelf &&
+                      row.packing_lists.package_shelf.length > 0 &&
+                      row.packing_lists.package_shelf[0].shelf
+                        ? row.packing_lists.package_shelf[0].shelf
+                            .number_of_shelves
+                        : ""}
+                      <br />
+                      {intl.formatMessage({ id: "layer" })}:{" "}
+                      {row.packing_lists.package_shelf &&
+                      row.packing_lists.package_shelf.length > 0
+                        ? row.packing_lists.package_shelf[0].layer
+                        : ""}
+                      &nbsp;
+                      {intl.formatMessage({ id: "column" })}:{" "}
+                      {row.packing_lists.package_shelf &&
+                      row.packing_lists.package_shelf.length > 0
+                        ? row.packing_lists.package_shelf[0].column
+                        : ""}
+                    </>
+                  ) : (
+                    "--"
+                  )}
+                </div>
+                <div className="">
+                  {getDateFormat(
+                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                  )}
+                  ,{" "}
+                  {getHourFormat(
+                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                  )}
+                </div>
+                <div className="">
+                  {getDateFormat(
+                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                  )}
+                  ,{" "}
+                  {getHourFormat(
+                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                  )}
+                </div>
+                <div
+                  className={
+                    isOMS() && exitPlan && getState() !== "pending"
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button isIconOnly size="sm" variant="light">
+                        <VerticalDotsIcon className="text-default-300" />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu>
+                      <DropdownItem
+                        onClick={() =>
+                          handleDelete(row.packing_lists.case_number)
+                        }
+                      >
+                        {intl.formatMessage({ id: "Delete" })}
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
               </div>
-              <div className="">{row.packing_lists?.box_number}</div>
-              <div className="">{row.packing_lists?.case_number}</div>
-              <div className="">{row.packing_lists?.client_weight}</div>
-              <div className="">{row.packing_lists?.client_height}</div>
-              <div className="">{"--"}</div>
-              <div className="">{"--"}</div>
-              <div className="">{row.packing_lists?.amount}</div>
-              <div>
-                {row.packing_lists &&
-                row.packing_lists.package_shelf &&
-                row.packing_lists.package_shelf.length > 0 ? (
-                  <>
-                    {exitPlan.warehouse ? (
-                      <>
-                        {exitPlan.warehouse.code}-
-                        {String(
-                          row.packing_lists.package_shelf[0].shelf
-                            ?.partition_table
-                        ).padStart(2, "0")}
-                        -
-                        {String(
-                          row.packing_lists.package_shelf[0].shelf
-                            ?.number_of_shelves
-                        ).padStart(2, "0")}
-                        -
-                        {String(
-                          row.packing_lists.package_shelf[0].layer
-                        ).padStart(2, "0")}
-                        -
-                        {String(
-                          row.packing_lists.package_shelf[0].column
-                        ).padStart(2, "0")}
-                        <br />
-                      </>
-                    ) : null}
-                    {intl.formatMessage({ id: "partition" })}:{" "}
-                    {row.packing_lists.package_shelf &&
-                    row.packing_lists.package_shelf.length > 0 &&
-                    row.packing_lists.package_shelf[0].shelf
-                      ? row.packing_lists.package_shelf[0].shelf.partition_table
-                      : ""}
-                    &nbsp;
-                    {intl.formatMessage({ id: "shelf" })}:{" "}
-                    {row.packing_lists.package_shelf &&
-                    row.packing_lists.package_shelf.length > 0 &&
-                    row.packing_lists.package_shelf[0].shelf
-                      ? row.packing_lists.package_shelf[0].shelf
-                          .number_of_shelves
-                      : ""}
-                    <br />
-                    {intl.formatMessage({ id: "layer" })}:{" "}
-                    {row.packing_lists.package_shelf &&
-                    row.packing_lists.package_shelf.length > 0
-                      ? row.packing_lists.package_shelf[0].layer
-                      : ""}
-                    &nbsp;
-                    {intl.formatMessage({ id: "column" })}:{" "}
-                    {row.packing_lists.package_shelf &&
-                    row.packing_lists.package_shelf.length > 0
-                      ? row.packing_lists.package_shelf[0].column
-                      : ""}
-                  </>
-                ) : (
-                  "--"
-                )}
-              </div>
-              <div className="">
-                {getDateFormat(
-                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                )}
-                ,{" "}
-                {getHourFormat(
-                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                )}
-              </div>
-              <div className="">
-                {getDateFormat(
-                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                )}
-                ,{" "}
-                {getHourFormat(
-                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                )}
-              </div>
-              <div className={(isOMS() && exitPlan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""} style={{ display: "flex", justifyContent: "center" }}>
-                <Dropdown>
-                  <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light">
-                      <VerticalDotsIcon className="text-default-300" />
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu>
-                    <DropdownItem
-                      onClick={() =>
-                        handleDelete(row.packing_lists.case_number)
-                      }
-                    >
-                      {intl.formatMessage({ id: "Delete" })}
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
       </div>
