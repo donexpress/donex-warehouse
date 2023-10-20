@@ -46,6 +46,7 @@ import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
+import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -526,6 +527,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   
   const changeTab = async(tab: string) => {
     if (tab !== statusSelected && !loadingItems) {
+      setCookie("tabSP", tab);
       if (visibleColumns !== "all") {
         let items: Set<React.Key> = new Set(visibleColumns);
         if (tab === 'stocked') {
@@ -547,6 +549,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       await setLoadingItems(false);
       setSelectedItems([]);
       setSelectedKeys(new Set([]));
+      if (page !== 1) {
+        setPage(1);
+      }
     }
   }
 
@@ -802,7 +807,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   /** end*/
 
   useEffect(() => {
-    loadStoragePlans();
+    const tab = getCookie("tabSP");
+    if (tab) {
+      setStatusSelected(tab);
+    }
+    loadStoragePlans(tab ? tab : statusSelected);
   }, []);
 
   useEffect(() => {
@@ -830,10 +839,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const loadStoragePlans = async (loadCount: boolean = false) => {
+  const loadStoragePlans = async (status: string, loadCount: boolean = false) => {
     setLoading(true);
     await setLoadingItems(true);
-    const storagePlanss = await getStoragePlans(statusSelected);
+    const storagePlanss = await getStoragePlans(status);
     
     setStoragePlans(storagePlanss !== null ? storagePlanss : []);
     await setLoadingItems(false);
@@ -889,7 +898,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       showMsg(message, { type: "error" });
     }
     close();
-    await loadStoragePlans();
+    await loadStoragePlans(statusSelected);
     setLoading(false);
   };
   
@@ -933,7 +942,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     await setShowCancelAllDialog(false);
     await setSelectedItems([]);
     await setSelectedKeys(new Set([]));
-    await loadStoragePlans();
+    await loadStoragePlans(statusSelected);
   };
 
   const handleCancel = async() => {
@@ -948,7 +957,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         showMsg(message, { type: "error" });
       }
       closeCancelStoragePlanDialog();
-      await loadStoragePlans(true);
+      await loadStoragePlans(statusSelected, true);
     }
   }
 
@@ -964,7 +973,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         showMsg(message, { type: "error" });
       }
       closeForceEntryStoragePlanDialog();
-      await loadStoragePlans(true);
+      await loadStoragePlans(statusSelected, true);
     }
   }
 
@@ -1039,7 +1048,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
   const confirmBatchOnStoragePlansDialog = async() => {
     closeBatchOnStoragePlansDialog();
-    await loadStoragePlans(true);
+    await loadStoragePlans(statusSelected, true);
   }
 
   const closeBatchOnStoragePlansDialog = () => {

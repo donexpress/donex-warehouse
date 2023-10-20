@@ -65,10 +65,11 @@ const ExitPlanFormBody = ({
   };
 
   const cancelSend = () => {
-    if (isWMS()) {
-      router.push(`/${locale}/wms/exit_plan`);
+    const goBack = router.query.goBack;
+    if (goBack && goBack === 'config' && !!id) {
+      router.push(`/${locale}/${isWMS() ? 'wms' : 'oms'}/exit_plan/${id}/config`);
     } else {
-      router.push(`/${locale}/oms/exit_plan`);
+      router.push(`/${locale}/${isWMS() ? 'wms' : 'oms'}/exit_plan`);
     }
   };
 
@@ -103,7 +104,7 @@ const ExitPlanFormBody = ({
         ? intl.formatMessage({ id: "changedsuccessfullyMsg" })
         : intl.formatMessage({ id: "successfullyMsg" });
       showMsg(message, { type: "success" });
-      router.push(`/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan`);
+      cancelSend();
     } else {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       showMsg(message, { type: "error" });

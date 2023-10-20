@@ -61,6 +61,7 @@ import ExportTable from "../operationInstruction/ExportTable";
 import ExportExitPlanTable from "./ExportExitPlanTable";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import InventoryList from "./InventoryList";
+import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -85,7 +86,7 @@ const ExitPlanTable = () => {
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [cancelElement, setCancelElement] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [statusSelected, setStatusSelected] = useState<number>(1);
+  const [statusSelected, setStatusSelected] = useState<string>("pending");
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
   const [exitPlanState, setExitPlanState] = useState<ExitPlanState | null>(
     null
@@ -566,15 +567,14 @@ const ExitPlanTable = () => {
     setPage(1);
   }, []);
 
-  const changeTab = async (tab: number) => {
+  const changeTab = async (tab: string) => {
     if (tab !== statusSelected && !loadingItems) {
+      setCookie("tabEP", tab);
       await setStatusSelected(tab);
       await setLoadingItems(true);
-      const state = exitPlanState?.states.find((el) => el.position === tab);
-      const storagePlanss = await getExitPlansByState(
-        state ? state.value : "pending"
-      );
-      setCurrentStatePosition(tab);
+      //const state = exitPlanState?.states.find((el) => el.value === tab);
+      const storagePlanss = await getExitPlansByState(tab);
+      //setCurrentStatePosition(tab);
       await setLoadingItems(false);
       await setExitPlans(storagePlanss !== null ? storagePlanss : []);
       // await setExitPlans([]);
@@ -769,11 +769,11 @@ const ExitPlanTable = () => {
                   <li className="whitespace-nowrap" key={index}>
                     <button
                       className={
-                        statusSelected === state.position
+                        statusSelected === state.value
                           ? "px-4 py-3 tab-selected"
                           : "px-4 py-3 tab-default"
                       }
-                      onClick={() => changeTab(state.position)}
+                      onClick={() => changeTab(state.value)}
                     >
                       {state[getLanguage(intl)]}
                       {count && (
@@ -843,7 +843,11 @@ const ExitPlanTable = () => {
   ]);
 
   useEffect(() => {
-    loadExitPlans();
+    const tab = getCookie("tabEP");
+    if (tab) {
+      setStatusSelected(tab);
+    }
+    loadExitPlans(tab ? tab : statusSelected);
   }, []);
 
   useEffect(() => {
@@ -854,9 +858,9 @@ const ExitPlanTable = () => {
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const loadExitPlans = async () => {
+  const loadExitPlans = async (status: string = "pending") => {
     setLoading(true);
-    const pms = await getExitPlansByState("pending");
+    const pms = await getExitPlansByState(status);
     console.log(pms);
     setExitPlans(pms ? pms : []);
     const states = await getExitPlansState();
@@ -969,7 +973,7 @@ const ExitPlanTable = () => {
       type: "success",
     });
     closeListPackage();
-    await loadExitPlans();
+    await loadExitPlans(statusSelected);
     setLoading(false);
   };
 
@@ -1025,7 +1029,7 @@ const ExitPlanTable = () => {
       });
     }
     close();
-    await loadExitPlans();
+    await loadExitPlans(statusSelected);
     setLoading(false);
   };
 
