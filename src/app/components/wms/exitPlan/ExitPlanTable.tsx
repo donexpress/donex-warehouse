@@ -44,6 +44,7 @@ import {
   getDateFormat,
   getHourFormat,
   getLanguage,
+  splitLastOccurrence,
 } from "../../../../helpers/utils";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import PackingListDialog from "../../common/PackingListDialog";
@@ -631,7 +632,7 @@ const ExitPlanTable = () => {
 
     exitPlan.packing_lists?.forEach((pl, index) => {
       if (pl.box_number) {
-        const tmpn = pl.box_number.split("U")[0];
+        const tmpn = splitLastOccurrence(pl.box_number, "U")[0];
         if (!numbers.find((el) => el === tmpn)) {
           numbers.push(tmpn);
         }
