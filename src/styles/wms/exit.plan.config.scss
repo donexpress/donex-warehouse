@@ -1,4 +1,4 @@
-.storage-plan-data {
+.exit-plan-data {
     width: calc(100vw - 365px);
     overflow-x: auto;
     scrollbar-width: thin;
@@ -130,7 +130,7 @@
 }
 
 @media only screen and (max-width: 1250px) {
-    .storage-plan-data {
+    .exit-plan-data {
         width: calc(100vw - 64px);
 
         &__table {
@@ -144,7 +144,7 @@
 }
 
 @media only screen and (max-width: 500px) {
-    .storage-plan-data__header-pl {
+    .exit-plan-data__header-pl {
         grid-template-columns: 1fr;
     }
     .show-sp-desktop {

@@ -112,7 +112,7 @@ const OperationInstructionAppendix = ({
     <>
       <div style={{ paddingTop: "20px" }}>
         <div
-          className="storage-plan-data__header-pl"
+          className="exit-plan-data__header-pl"
           style={{ paddingRight: "16px", paddingBottom: "10px" }}
         >
           <div className="elements-row-start show-sp-desktop"></div>

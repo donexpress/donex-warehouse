@@ -20,10 +20,14 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
     switch (action) {
       case 3:
         {
-          router.push(`/${locale}/${isOMS() ? 'oms' : 'wms'}/exit_plan/${id}/update`);
+          router.push(`/${locale}/${isOMS() ? 'oms' : 'wms'}/exit_plan/${id}/update?goBack=config`);
         }
         break;
     }
+  };
+  
+  const cancelSend = () => {
+      router.push(`/${locale}/${isOMS() ? 'oms' : 'wms'}/exit_plan`);
   };
 
   const getState = (): string => {
@@ -51,12 +55,22 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
             {intl.formatMessage({ id: "go_to_edit" })}
           </Button>
         </div>
+        <div className='w-100' style={{ marginLeft: '10px' }}>
+          <Button
+            color="primary"
+            type="button"
+            className='px-4'
+            onClick={()=>cancelSend()}
+          >
+            {intl.formatMessage({ id: 'back' })}
+          </Button>
+        </div>
       </div>
       <div className="user-form-body__container">
-        <div className="storage-plan-data">
+        <div className="exit-plan-data">
           <div style={{ paddingTop: "10px" }}>
             <div
-              className="storage-plan-data__table bg-default-100"
+              className="exit-plan-data__table bg-default-100"
               style={{
                 padding: "5px 0px 5px 5px",
                 borderRadius: "5px 5px 0 0",
@@ -79,7 +93,7 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
               </div>
             </div>
             <div
-              className="storage-plan-data__table storage-plan-header"
+              className="exit-plan-data__table storage-plan-header"
               style={{
                 padding: "5px 0px 5px 5px",
                 borderRadius: "0 0 5px 5px",
