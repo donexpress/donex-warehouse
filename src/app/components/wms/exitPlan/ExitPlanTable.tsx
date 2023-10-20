@@ -62,6 +62,7 @@ import ExportTable from "../operationInstruction/ExportTable";
 import ExportExitPlanTable from "./ExportExitPlanTable";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import InventoryList from "./InventoryList";
+import { CancelIcon } from "../../common/CancelIcon";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -118,6 +119,7 @@ const ExitPlanTable = () => {
 
   const [destinations, setDestinations] = useState<State[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [cancelALl, setCancellAll] = useState<boolean>(false);
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -641,6 +643,33 @@ const ExitPlanTable = () => {
     return numbers.join(", ");
   };
 
+  const displayCancelAll = () => {
+    setCancellAll(true)
+  }
+
+  const closeCancelAll = () => {
+    setCancellAll(false)
+  }
+  
+  const confirmCancelAll = async () => {
+    try {
+      const promises = selectedItems.map(el =>  updateExitPlan(el, {
+        state: "cancelled",
+      }))
+      await Promise.all(promises)
+      showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+        type: "success",
+      });
+    } catch(e) {
+      showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+        type: "error",
+      });
+    } finally {
+      await loadExitPlans()
+      closeCancelAll()
+    }
+  }
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4 mb-2">
@@ -743,6 +772,18 @@ const ExitPlanTable = () => {
               >
                 {intl.formatMessage({ id: "export_xlsx" })}
               </Button>
+              {(statusSelected === 1) && (
+                <Button
+                  color="primary"
+                  style={{ width: '121px', marginLeft: '10px' }}
+                  endContent={<CancelIcon />}
+                  onClick={() => displayCancelAll()}
+                  isDisabled={selectedItems.length === 0}
+                >
+                  {intl.formatMessage({ id: "cancel" })}
+                </Button>
+              )
+            }
             </div>
           </div>
         </div>
@@ -1077,6 +1118,7 @@ const ExitPlanTable = () => {
         </div>
         {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+        {cancelALl && <ConfirmationDialog close={closeCancelAll} confirm={confirmCancelAll} />}
         {showListPakcage && (
           <PackingListDialog
             close={closeListPackage}
