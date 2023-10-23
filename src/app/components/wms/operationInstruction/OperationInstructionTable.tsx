@@ -268,17 +268,33 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   };
 
   const handleEdit = (id: number) => {
+    let params: ParsedUrlQueryInput = {};
+    if (exit_plan_id && exit_plan) {
+      params = {
+        exit_plan_id: exit_plan_id,
+        exit_plan_state: getState(),
+      };
+    }
     router.push({
       pathname: `/${locale}/${
         isOMS() ? "oms" : "wms"
       }/operation_instruction/${id}/update`,
+      query: params,
     });
   };
 
   const handleConfig = (id: number) => {
-    router.push(
-      `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${id}/config`
-    );
+    let params: ParsedUrlQueryInput = {};
+    if (exit_plan_id && exit_plan) {
+      params = {
+        exit_plan_id: exit_plan_id,
+        exit_plan_state: getState(),
+      };
+    }
+    router.push({
+      pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${id}/config`,
+      query: params,
+    });
   };
 
   const handleCancel = (id: number) => {
