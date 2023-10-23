@@ -129,6 +129,10 @@
     cursor: pointer;
 }
 
+.exit-plan-data__header-aprendix-config {
+    grid-template-columns: 1fr 200px !important;
+}
+
 @media only screen and (max-width: 1250px) {
     .exit-plan-data {
         width: calc(100vw - 64px);
@@ -146,6 +150,9 @@
 @media only screen and (max-width: 500px) {
     .exit-plan-data__header-pl {
         grid-template-columns: 1fr;
+    }
+    .exit-plan-data__header-aprendix-config {
+        grid-template-columns: 1fr !important;
     }
     .show-sp-desktop {
         display: none;

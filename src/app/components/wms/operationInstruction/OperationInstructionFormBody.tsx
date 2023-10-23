@@ -20,6 +20,7 @@ import { isOMS } from "@/helperserege1992";
 import LocationTable from "../../common/LocationTable";
 import "../../../../styles/wms/user.form.scss";
 import OperationInstructionAppendix from "./OperationInstructionAppendix";
+import { ParsedUrlQueryInput } from 'querystring';
 
 interface Props {
   types: State[];
@@ -129,33 +130,77 @@ const OperationInstructionFormBody = ({
       setOI(r)
       setUser(users.find(el => el.id === values.user_id))
     }
-    if (exit_plan_id) {
-      router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exit_plan_id}/config`
-      );
-    } else {
-      router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
-      );
-    }
+    cancelSend();
   };
   const goToEdit = () => {
+    let params: ParsedUrlQueryInput = { goBack: 'vizualice'};
+    const exitPId = router.query.exit_plan_id;
+    const exitPState = router.query.exit_plan_state;
+    if (exitPId) {
+      params = {
+        ...params,
+        exit_plan_id: exitPId,
+      };
+    }
+    if (exitPState) {
+      params = {
+        ...params,
+        exit_plan_state: exitPState,
+      };
+    }
     router.push(
-      `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${
-        operationInstruction?.id
-      }/update`
+      {
+        pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${operationInstruction?.id}/update`,
+        query: params,
+      }
     );
   };
   const cancelSend = () => {
+    const goBack = router.query.goBack;
     const exitPId = router.query.exit_plan_id;
+
     if (exitPId) {
-      router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exitPId}/config`
-      );
+      if (goBack && goBack === 'vizualice') {
+        let params: ParsedUrlQueryInput = {};
+        const exitPState = router.query.exit_plan_state;
+    
+        if (exitPId) {
+          params = {
+            ...params,
+            exit_plan_id: exitPId,
+          };
+        }
+        if (exitPState) {
+          params = {
+            ...params,
+            exit_plan_state: exitPState,
+          };
+        }
+        router.push(
+          {
+            pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${id}/show`,
+            query: params,
+          }
+        );
+      } else {
+        router.push(
+          {
+            pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exitPId}/config`
+          }
+        );
+      }
     } else {
-      router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
-      );
+      if (goBack && goBack === 'vizualice') {
+        router.push(
+          {
+            pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${id}/show`
+          }
+        );
+      } else {
+        router.push(
+          `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
+        );
+      }
     }
   };
 
@@ -258,14 +303,26 @@ const OperationInstructionFormBody = ({
 
   return (
     <div className="user-form-body">
-      <h1 className="text-xl font-semibold">
-        {id
-          ? isFromDetails
-            ? intl.formatMessage({ id: "vizualice" })
-            : intl.formatMessage({ id: "modify" })
-          : intl.formatMessage({ id: "insert" })}{" "}
-        {intl.formatMessage({ id: "operation_instruction" })}
-      </h1>
+      <div className='flex'>
+        <h1 className="flex-1 text-xl font-semibold">
+          {id
+            ? isFromDetails
+              ? intl.formatMessage({ id: "vizualice" })
+              : intl.formatMessage({ id: "modify" })
+            : intl.formatMessage({ id: "insert" })}{" "}
+          {intl.formatMessage({ id: "operation_instruction" })}
+        </h1>
+        <div className='w-100' style={{ marginLeft: '10px' }}>
+          <Button
+            color="primary"
+            type="button"
+            className='px-4'
+            onClick={()=>cancelSend()}
+          >
+            {intl.formatMessage({ id: 'back' })}
+          </Button>
+        </div>
+      </div>
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
