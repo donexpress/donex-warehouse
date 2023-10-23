@@ -95,16 +95,34 @@ const UserLevelFormBody = ({
     router.push(`/${locale}/wms/user_levels/${id}/update`);
   };
 
+  const goBack = () => {
+    router.push(`/${locale}/wms/user_levels`);
+  };
+
   return (
     <div className="user-form-body shadow-small">
-      <h1 className="text-xl font-semibold">
-        {id
-          ? isFromDetails
-            ? intl.formatMessage({ id: "vizualice" })
-            : intl.formatMessage({ id: "modify" })
-          : intl.formatMessage({ id: "insert" })}{" "}
-        {intl.formatMessage({ id: "userLevel" })}
-      </h1>
+      <div className="flex gap-3 flex-wrap justify-between">
+        <h1 className="text-xl font-semibold">
+          {id
+            ? isFromDetails
+              ? intl.formatMessage({ id: "vizualice" })
+              : intl.formatMessage({ id: "modify" })
+            : intl.formatMessage({ id: "insert" })}{" "}
+          {intl.formatMessage({ id: "userLevel" })}
+        </h1>
+        <div className="flex justify-end gap-3">
+          <div>
+            <Button
+              onClick={() => goBack()}
+              color="primary"
+              type="button"
+              className="bg-primary px-4"
+            >
+              {intl.formatMessage({ id: "back" })}
+            </Button>
+          </div>
+        </div>
+      </div>
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
@@ -160,8 +178,8 @@ const UserLevelFormBody = ({
                       {isSubmitting
                         ? intl.formatMessage({ id: "sending" })
                         : id
-                        ? intl.formatMessage({ id: "modify" })
-                        : intl.formatMessage({ id: "add" })}
+                          ? intl.formatMessage({ id: "modify" })
+                          : intl.formatMessage({ id: "add" })}
                     </Button>
                   )}
                   {isFromDetails && id && (
