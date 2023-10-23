@@ -78,7 +78,7 @@ const PaymentMethodFormBody = ({
   };
 
   const goBack = () => {
-    router.push(`/${locale}/wms/payment_methods`);
+    router.back();
   };
 
   return (

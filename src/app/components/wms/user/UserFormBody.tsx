@@ -243,13 +243,13 @@ const UserFormBody = ({
   };
 
   const goBack = () => {
-    router.push(`/${locale}/wms/users`);
+    router.back();
   };
 
   const goToEdit = () => {
     router.push(`/${locale}/wms/users/${id}/update_user`);
   };
-  
+
   return (
     <div className="user-form-body shadow-small" >
       <div className="flex gap-3 flex-wrap justify-between">

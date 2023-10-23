@@ -170,7 +170,7 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
   };
 
   const goBack = () => {
-    router.push(`/${locale}/wms/staff`);
+    router.back();
   };
 
   return (

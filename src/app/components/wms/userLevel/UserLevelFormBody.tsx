@@ -96,7 +96,7 @@ const UserLevelFormBody = ({
   };
 
   const goBack = () => {
-    router.push(`/${locale}/wms/user_levels`);
+    router.back();
   };
 
   return (

@@ -161,7 +161,7 @@ const CargoStationWarehouseFormBody = ({
   };
 
   const goBack = () => {
-    router.push(`/${locale}/wms/warehouse_cargo_station`);
+    router.back();
   };
 
   return (
