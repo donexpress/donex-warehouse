@@ -12,6 +12,7 @@ import { isOMS } from "@/helperserege1992";
 import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { showMsg } from "@/helperserege1992";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
+import { useRouter } from "next/router";
 
 interface Props {
   exitPlan?: ExitPlan;
@@ -20,6 +21,8 @@ interface Props {
 }
 const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
   const intl = useIntl();
+  const router = useRouter();
+  const { locale } = router.query;
   const [showAppendixDialog, setShowAppendixDialog] = useState<boolean>(false);
   const [appendages, setAppendages] = useState<Appendix[]>([]);
   useEffect(() => {
@@ -78,15 +81,31 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
     return exitPlan?.state;
   };
 
+  const cancelSend = () => {
+    const exitPId = router.query.exit_plan_id;
+
+    if (exitPId) {
+        router.push(
+          {
+            pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exitPId}/config`
+          }
+        );
+    } else {
+        router.push(
+          `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
+        );
+    }
+  };
+
   return (
     <>
       <div style={{ paddingTop: "20px" }}>
         <div
-          className="exit-plan-data__header-pl"
+          className="exit-plan-data__header-pl exit-plan-data__header-aprendix-config"
           style={{ paddingRight: "16px", paddingBottom: "10px" }}
         >
           <div className="elements-row-start show-sp-desktop"></div>
-          <div className="elements-center-end">
+          <div className="elements-row-end">
             <Button
               color="primary"
               type="button"
@@ -94,6 +113,15 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
               onClick={addAppendix}
             >
               {intl.formatMessage({ id: "upload_file" })}
+            </Button>
+            <Button
+              color="primary"
+              type="button"
+              className='px-4'
+              style={{ marginLeft: '10px' }}
+              onClick={()=>cancelSend()}
+            >
+              {intl.formatMessage({ id: 'back' })}
             </Button>
           </div>
         </div>
