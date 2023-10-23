@@ -83,10 +83,13 @@ export const countUserLevelPath = () => {
   return getBaseUrl() + "/api/v1/user_level/count";
 };
 
-export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number) => {
+export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number, query?: string) => {
   let params = status !== '' ? `?state=${status}` : "";
   if (page && rowsPerPage) {
-    params = `${ params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+    params += `${ params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  if (query && query !== '') {
+    params += `${ params === "" ? '?' : '&'}query=${query}`;
   }
   return getBaseUrl() + "/api/v1/storage_plan" + params;
 };

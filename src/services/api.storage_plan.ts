@@ -83,8 +83,8 @@ export const removeStoragePlanById = async (storagePlanId: number):Promise<Respo
   }
 }
 
-export const getStoragePlans = async (status: string = '', context?: GetServerSidePropsContext):Promise<StoragePlan[] | null> => {
-  const path = storagePlanPath(status);
+export const getStoragePlans = async (status: string = '', page: number | undefined = undefined, rowsPerPage: number | undefined = undefined, query: string | undefined = undefined, context?: GetServerSidePropsContext):Promise<StoragePlan[] | null> => {
+  const path = storagePlanPath(status, page, rowsPerPage, query);
   try {
     const response = await axios.get(path, getHeaders(context));
     return response.data;

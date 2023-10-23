@@ -41,6 +41,7 @@ import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import ReceiptPDF from '../../common/ReceiptPDF';
 import EvidencePDF from '../../common/EvidencePDF';
+import SpinnerIconButton from "../../common/SpinnerIconButton";
 import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -83,6 +84,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const [statusSelected, setStatusSelected] = useState<string>('to be storage');
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [showPagination, setShowPagination] = useState<boolean>(true);
   
   const [stgPCount, setStgPCount] = useState(storagePCount);
 
@@ -100,6 +102,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
+  const [queryFilter, setQueryFilter] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
   );
@@ -288,7 +291,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const filteredItems = React.useMemo(() => {
     let filteredStoragePlans = [...storagePlans];
 
-    if (hasSearchFilter) {
+    /* if (hasSearchFilter) {
         filteredStoragePlans = filteredStoragePlans.filter(
         (storageP) =>
           storageP.order_number
@@ -314,7 +317,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             ?.toLowerCase()
             ?.includes(filterValue.toLowerCase())
       );
-    }
+    } */
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
@@ -328,22 +331,12 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     return filteredStoragePlans;
   }, [storagePlans, filterValue, statusFilter]);
 
-  const items = React.useMemo(() => {
+  /* const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
-
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: StoragePlan, b: StoragePlan) => {
-      const first = a[sortDescriptor.column as keyof StoragePlan] as number;
-      const second = b[sortDescriptor.column as keyof StoragePlan] as number;
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [sortDescriptor, items]);
+  }, [page, filteredItems, rowsPerPage]); */
 
   const renderCell = React.useCallback(
     (storageP: any, columnKey: React.Key) => {
@@ -483,46 +476,76 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   );
 
   const onRowsPerPageChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setRowsPerPage(Number(e.target.value));
-      setPage(1);
+    async(e: React.ChangeEvent<HTMLSelectElement>) => {
+      if (Number(e.target.value) !== rowsPerPage) {
+        setSelectedItems([]);
+        setSelectedKeys(new Set([]));
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
+        await loadStoragePlans(statusSelected, 1, Number(e.target.value), queryFilter, false, true);
+      }
     },
     []
   );
 
   const getLabelByLanguage = (state: any) => {
     if (locale === 'es') {
-      return state.es_name + getCountByState(state);
+      return state.es_name + getCountByState(state.value);
     } else if (locale === 'zh') {
-      return state.zh_name + getCountByState(state);
+      return state.zh_name + getCountByState(state.value);
     }
-    return state.name + getCountByState(state);
+    return state.name + getCountByState(state.value);
   };
 
   const getCountByState = (state: any) => {
     if (stgPCount) {
-      switch(state.value) {
-        case 'to be storage': return ` (${(statusSelected === 'to be storage' && !loadingItems) ? filteredItems.length : stgPCount.to_be_storage})`;
-        case 'into warehouse': return ` (${(statusSelected === 'into warehouse' && !loadingItems) ? filteredItems.length : stgPCount.into_warehouse})`;
-        case 'stocked': return ` (${(statusSelected === 'stocked' && !loadingItems) ? filteredItems.length : stgPCount.stocked})`;
-        case 'cancelled': return ` (${(statusSelected === 'cancelled' && !loadingItems) ? filteredItems.length : stgPCount.cancelled})`;
+      const myCount = getCount(state);
+      return myCount !== '' ? ` (${myCount})` : myCount;
+    }
+    return '';
+  }
+
+  const getCount = (state: any) => {
+    if (stgPCount) {
+      switch(state) {
+        case 'to be storage': return `${(statusSelected === 'to be storage' && !loadingItems) ? stgPCount.to_be_storage : stgPCount.to_be_storage}`;
+        case 'into warehouse': return `${(statusSelected === 'into warehouse' && !loadingItems) ? stgPCount.into_warehouse : stgPCount.into_warehouse}`;
+        case 'stocked': return `${(statusSelected === 'stocked' && !loadingItems) ? stgPCount.stocked : stgPCount.stocked}`;
+        case 'cancelled': return `${(statusSelected === 'cancelled' && !loadingItems) ? stgPCount.cancelled : stgPCount.cancelled}`;
       }
     }
     return '';
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      searchValues();
+    }
+  }
+
+  const searchValues = async() => {
+    if (filterValue && filterValue !== "") {
+      await setQueryFilter(filterValue);
+    } else {
+      await setQueryFilter("");
+    }
+    await setPage(1);
+    await loadStoragePlans(statusSelected, 1, rowsPerPage, filterValue ? filterValue : "", false, true);
+  }
+
   const onSearchChange = React.useCallback((value?: string) => {
     if (value) {
       setFilterValue(value);
-      setPage(1);
     } else {
       setFilterValue("");
     }
   }, []);
 
-  const onClear = React.useCallback(() => {
-    setFilterValue("");
-    setPage(1);
+  const onClear = React.useCallback(async() => {
+    await setFilterValue("");
+    await setQueryFilter("");
+    await setPage(1);
+    await loadStoragePlans(statusSelected, 1, rowsPerPage, "", false, true);
   }, []);
   
   const changeTab = async(tab: string) => {
@@ -544,7 +567,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       }
       await setLoadingItems(true);
       await setStatusSelected(tab);
-      const storagePlanss = await getStoragePlans(tab);
+      const storagePlanss = await getStoragePlans(tab, 1, rowsPerPage, queryFilter);
       await setStoragePlans(storagePlanss !== null ? storagePlanss : []);      
       await setLoadingItems(false);
       setSelectedItems([]);
@@ -560,7 +583,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     for (let i = 0; i < selectedItems.length; i++) {
       const index = selectedItems[i];
       const item = storagePlans.filter((sp: StoragePlan) => sp.id === index);
-      if (filterValue && (filterValue !== "")) {
+      
+      its.push(item[0]);
+      /* if (filterValue && (filterValue !== "")) {
         const isSearchable = item[0].order_number
         ?.toLowerCase()
         ?.includes(filterValue.toLowerCase()) ||
@@ -589,7 +614,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         }
       } else {
         its.push(item[0]);
-      }
+      } */
     }
     return its;
   }
@@ -602,10 +627,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             isClearable
             className="w-full sm:max-w-[33%] search-input"
             placeholder=""
-            startContent={<SearchIcon />}
+            startContent={<SearchIcon style={{ cursor: 'pointer' }} onClick={() => searchValues()} />}
             value={filterValue}
             onClear={() => onClear()}
             onValueChange={onSearchChange}
+            onKeyPress={handleKeyPress}
           />
           <div className="flex gap-3">
             <Dropdown>
@@ -743,7 +769,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {intl.formatMessage({ id: "total_results" }, { in: filteredItems.length })}
+            {intl.formatMessage({ id: "total_results" }, { in: getCount(statusSelected) })}
           </span>
           <label className="flex items-center text-default-400 text-small">
             {intl.formatMessage({ id: "rows_page" })}
@@ -788,6 +814,17 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     stgPCount,
   ]);
 
+  const changePage = async(newPage: number) => {
+    if (page !== newPage) {
+      setSelectedItems([]);
+      setSelectedKeys(new Set([]));
+      setPage(newPage);
+      await setShowPagination(false);
+      await loadStoragePlans(statusSelected, newPage, rowsPerPage, queryFilter, false, true);
+      await setShowPagination(true);
+    }
+  }
+
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
@@ -796,26 +833,38 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             ? `${intl.formatMessage({ id: "selected_all" })}`
             : `${intl.formatMessage(
                 { id: "selected" },
-                { in: selectedKeys.size, end: filteredItems.length }
+                { in: selectedKeys.size, end: getCount(statusSelected) }
               )}`}
         </span>
-        <PaginationTable
-          totalRecords={filteredItems.slice(0, storagePlans.length).length}
-          pageLimit={rowsPerPage}
-          pageNeighbours={1}
-          page={page}
-          onPageChanged={setPage}
-        />
+        {
+          showPagination && (
+            <PaginationTable
+              totalRecords={getCount(statusSelected)}
+              pageLimit={rowsPerPage}
+              pageNeighbours={1}
+              page={page}
+              onPageChanged={changePage}
+            />
+          )
+        }
+        {
+          !showPagination && (
+            <div className="elements-center" style={{ height: '61px' }}>
+              <SpinnerIconButton style={{width: "20px", height: "20px"}}/>
+            </div>
+          )
+        }
       </div>
     );
   }, [
     selectedKeys,
-    items.length,
+    stgPCount,
     page,
     storagePlans.length,
     rowsPerPage,
     hasSearchFilter,
     intl,
+    showPagination,
   ]);
   /** end*/
 
@@ -852,10 +901,12 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const loadStoragePlans = async (status: string, loadCount: boolean = false) => {
-    setLoading(true);
+  const loadStoragePlans = async (status: string, pageSP: number = -1, rowsPerPageSP: number = -1, querySP: string = "", loadCount: boolean = false, partialLoad: boolean = false) => {
+    if (!partialLoad) {
+      setLoading(true);
+    }
     await setLoadingItems(true);
-    const storagePlanss = await getStoragePlans(status);
+    const storagePlanss = await getStoragePlans(status, pageSP !== -1 ? pageSP : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, querySP);
     
     setStoragePlans(storagePlanss !== null ? storagePlanss : []);
     await setLoadingItems(false);
@@ -933,7 +984,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       await setSelectedKeys(new Set([]));
     }
     close();
-    await loadStoragePlans(statusSelected, true);
+    await loadStoragePlans(statusSelected, page, rowsPerPage, queryFilter, true);
     setLoading(false);
   };
   
@@ -977,7 +1028,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     await setShowCancelAllDialog(false);
     await setSelectedItems([]);
     await setSelectedKeys(new Set([]));
-    await loadStoragePlans(statusSelected);
+    await loadStoragePlans(statusSelected, page, rowsPerPage, queryFilter, true);
   };
 
   const handleCancel = async() => {
@@ -992,7 +1043,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         showMsg(message, { type: "error" });
       }
       closeCancelStoragePlanDialog();
-      await loadStoragePlans(statusSelected, true);
+      await loadStoragePlans(statusSelected, page, rowsPerPage, queryFilter, true);
     }
   }
 
@@ -1008,7 +1059,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         showMsg(message, { type: "error" });
       }
       closeForceEntryStoragePlanDialog();
-      await loadStoragePlans(statusSelected, true);
+      await loadStoragePlans(statusSelected, page, rowsPerPage, queryFilter, true);
     }
   }
 
@@ -1083,7 +1134,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
   const confirmBatchOnStoragePlansDialog = async() => {
     closeBatchOnStoragePlansDialog();
-    await loadStoragePlans(statusSelected, true);
+    await loadStoragePlans(statusSelected, page, rowsPerPage, queryFilter, true);
   }
 
   const closeBatchOnStoragePlansDialog = () => {
@@ -1146,7 +1197,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
           </TableHeader>
           <TableBody
             emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
-            items={loadingItems ? [] : items}
+            items={loadingItems ? [] : filteredItems}
           >
             {(item) => (
               <TableRow key={item.id}>
