@@ -10,7 +10,11 @@ import {
 import { IntlShape } from "react-intl";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackingList } from "@/types/storage_planerege1992";
-import { getDateFormat, getHourFormat, getLanguage } from "@/helpers/utilserege1992";
+import {
+  getDateFormat,
+  getHourFormat,
+  getLanguage,
+} from "@/helpers/utilserege1992";
 import { PackageShelf } from "../../../../types/package_shelf";
 
 const styles = StyleSheet.create({
@@ -155,20 +159,10 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
             </Text>
             <Text style={styles.tableCell}>{exitPlan.box_amount}</Text>
             <View style={styles.tableCell}>
-              {
-              !!exitPlan.destination_ref && (
-                  <Text>
-                    {exitPlan.destination_ref[getLanguage(intl)]}
-                  </Text>
-              )
-              }
-              {
-              !exitPlan.destination_ref && (
-                <Text >
-                  {exitPlan.destination}
-                </Text>
-              )
-              }
+              {!!exitPlan.destination_ref && (
+                <Text>{exitPlan.destination_ref[getLanguage(intl)]}</Text>
+              )}
+              {!exitPlan.destination_ref && <Text>{exitPlan.destination}</Text>}
             </View>
             <Text style={styles.tableCell}>{exitPlan.address}</Text>
             <Text style={styles.tableCell}>{exitPlan.observations}</Text>
@@ -199,17 +193,22 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
           </View>
           {boxes.map((box, index) => (
             <View style={styles.tableRow} key={index}>
-              <Text style={styles.tableCell}>
-                {box.box_number}
-              </Text>
-              <Text style={styles.tableCell}>
-                {box.case_number}
-              </Text>
+              <Text style={styles.tableCell}>{box.box_number}</Text>
+              <Text style={styles.tableCell}>{box.case_number}</Text>
               <Text style={styles.tableCell}>
                 {packageShelfFormat(box.package_shelf)}
               </Text>
-              <Text style={styles.tableCell}>--</Text>
-              <Text style={styles.tableCell}>{exitPlan.delivered_time ? (`${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(exitPlan.delivered_time)}`) : '--'}</Text>
+              <Text style={styles.tableCell}>
+                {/* @ts-ignore */}
+                {box.storage_time} {intl.formatMessage({ id: "days" })}
+              </Text>
+              <Text style={styles.tableCell}>
+                {exitPlan.delivered_time
+                  ? `${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(
+                      exitPlan.delivered_time
+                    )}`
+                  : "--"}
+              </Text>
             </View>
           ))}
         </View>
