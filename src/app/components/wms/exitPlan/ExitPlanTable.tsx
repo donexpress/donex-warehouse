@@ -776,7 +776,7 @@ const ExitPlanTable = () => {
               {(statusSelected === 'pending') && (
                 <Button
                   color="primary"
-                  style={{ width: '121px', marginLeft: '10px' }}
+                  style={{ width: '121px' }}
                   endContent={<CancelIcon />}
                   onClick={() => displayCancelAll()}
                   isDisabled={selectedItems.length === 0}
