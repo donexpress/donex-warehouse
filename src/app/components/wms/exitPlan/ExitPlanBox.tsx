@@ -596,59 +596,62 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 <div className="">{"--"}</div>
                 <div className="">{row.packing_lists?.amount}</div>
                 <div>
-                  {row.packing_lists &&
-                  row.packing_lists.package_shelf &&
-                  row.packing_lists.package_shelf.length > 0 ? (
+                  {row.packing_lists && row.packing_lists.package_shelf ? (
                     <>
                       {exitPlan.warehouse ? (
                         <>
                           {exitPlan.warehouse.code}-
                           {String(
-                            row.packing_lists.package_shelf[0].shelf
+                            // @ts-ignore
+                            row.packing_lists.package_shelf.shelf
                               ?.partition_table
                           ).padStart(2, "0")}
                           -
                           {String(
-                            row.packing_lists.package_shelf[0].shelf
+                            // @ts-ignore
+                            row.packing_lists.package_shelf.shelf
                               ?.number_of_shelves
                           ).padStart(2, "0")}
                           -
                           {String(
-                            row.packing_lists.package_shelf[0].layer
+                            // @ts-ignore
+                            row.packing_lists.package_shelf.layer
                           ).padStart(2, "0")}
                           -
                           {String(
-                            row.packing_lists.package_shelf[0].column
+                            // @ts-ignore
+                            row.packing_lists.package_shelf.column
                           ).padStart(2, "0")}
                           <br />
                         </>
                       ) : null}
                       {intl.formatMessage({ id: "partition" })}:{" "}
                       {row.packing_lists.package_shelf &&
-                      row.packing_lists.package_shelf.length > 0 &&
-                      row.packing_lists.package_shelf[0].shelf
-                        ? row.packing_lists.package_shelf[0].shelf
-                            .partition_table
+                      // @ts-ignore
+                      row.packing_lists.package_shelf.shelf
+                        ? // @ts-ignore
+                          row.packing_lists.package_shelf.shelf.partition_table
                         : ""}
                       &nbsp;
                       {intl.formatMessage({ id: "shelf" })}:{" "}
                       {row.packing_lists.package_shelf &&
-                      row.packing_lists.package_shelf.length > 0 &&
-                      row.packing_lists.package_shelf[0].shelf
-                        ? row.packing_lists.package_shelf[0].shelf
+                      // @ts-ignore
+                      row.packing_lists.package_shelf.shelf
+                        ? // @ts-ignore
+                          row.packing_lists.package_shelf.shelf
                             .number_of_shelves
                         : ""}
                       <br />
                       {intl.formatMessage({ id: "layer" })}:{" "}
-                      {row.packing_lists.package_shelf &&
-                      row.packing_lists.package_shelf.length > 0
-                        ? row.packing_lists.package_shelf[0].layer
+                      {row.packing_lists.package_shelf
+                        ? // @ts-ignore
+                          row.packing_lists.package_shelf.layer
                         : ""}
                       &nbsp;
                       {intl.formatMessage({ id: "column" })}:{" "}
-                      {row.packing_lists.package_shelf &&
-                      row.packing_lists.package_shelf.length > 0
-                        ? row.packing_lists.package_shelf[0].column
+                      {row.packing_lists.package_shelf
+                        ? // @ts-ignore
+                          row.packing_lists.package_shelf.column
                         : ""}
                     </>
                   ) : (
@@ -656,13 +659,9 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                   )}
                 </div>
                 <div className="">
-                  {getDateFormat(
-                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                  )}
-                  ,{" "}
-                  {getHourFormat(
-                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                  )}
+                  {/* @ts-ignore */}
+                  {row.packing_lists.storage_time}{" "}
+                  {intl.formatMessage({ id: "days" })}
                 </div>
                 <div className="">
                   {getDateFormat(
