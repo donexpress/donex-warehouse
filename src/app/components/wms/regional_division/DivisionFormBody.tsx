@@ -1,22 +1,22 @@
-import React, {ChangeEvent, useState} from "react";
-import {Button} from "@nextui-org/react";
+import React, { ChangeEvent, useState } from "react";
+import { Button } from "@nextui-org/react";
 import "../../../../styles/wms/user.form.scss";
-import {showMsg} from "../../../../helpers";
-import {useRouter} from "next/router";
-import {Formik, Form} from "formik";
+import { showMsg } from "../../../../helpers";
+import { useRouter } from "next/router";
+import { Formik, Form } from "formik";
 import GenericInput from "../../common/GenericInput";
-import {useIntl} from "react-intl";
-import {Response} from "../../../../types";
-import {RegionalDivisionForm, RegionalDivisionFormProps} from "../../../../types/regional_division";
-import {createDivision, updateDivision} from "../../../../services/api.regional_division";
+import { useIntl } from "react-intl";
+import { Response } from "../../../../types";
+import { RegionalDivisionForm, RegionalDivisionFormProps } from "../../../../types/regional_division";
+import { createDivision, updateDivision } from "../../../../services/api.regional_division";
 import {
     generateValidationDivisions,
     generateValidationDivisionsModify
 } from "../../../../validation/generateValidationRegionalDivisions";
 
-const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFromDetails}: RegionalDivisionFormProps) => {
+const DivisionsFormBody = ({ regionalDivisionsTypes, id, regionalDivision, isFromDetails }: RegionalDivisionFormProps) => {
     const router = useRouter();
-    const {locale} = router.query;
+    const { locale } = router.query;
     const intl = useIntl();
     const [selectedType, setSelectedType] = useState<{ value: number; label: string }>();
     const [expanded, setExpanded] = React.useState(false)
@@ -75,13 +75,13 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
     const treatmentToResponse = (response: Response) => {
         if (response.status >= 200 && response.status <= 299) {
             const message = id
-                ? intl.formatMessage({id: "changedsuccessfullyMsg"})
-                : intl.formatMessage({id: "successfullyMsg"});
-            showMsg(message, {type: "success"});
+                ? intl.formatMessage({ id: "changedsuccessfullyMsg" })
+                : intl.formatMessage({ id: "successfullyMsg" });
+            showMsg(message, { type: "success" });
             router.push(`/${locale}/wms/regional_division`);
         } else {
-            let message = intl.formatMessage({id: "unknownStatusErrorMsg"});
-            showMsg(message, {type: "error"});
+            let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+            showMsg(message, { type: "error" });
         }
     };
 
@@ -93,30 +93,48 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
         router.push(`/${locale}/wms/regional_division/${id}/update`);
     };
 
+    const goBack = () => {
+        router.back();
+    };
+
     const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         // @ts-ignore
-        const {value} = event.target;
+        const { value } = event.target;
         console.log(value);
-        setSelectedType(regionalDivisionsTypes.find(t=> t.value == Number(value)));
+        setSelectedType(regionalDivisionsTypes.find(t => t.value == Number(value)));
     }
 
     return (
         <div className="user-form-body shadow-small">
-            <h1 className="text-xl font-semibold">
-                {id
-                    ? isFromDetails
-                        ? intl.formatMessage({id: "vizualice"})
-                        : intl.formatMessage({id: "modify"})
-                    : intl.formatMessage({id: "insert"})}{" "}
-                {intl.formatMessage({id: "regionalDivision"})}
-            </h1>
+            <div className="flex gap-3 flex-wrap justify-between">
+                <h1 className="text-xl font-semibold">
+                    {id
+                        ? isFromDetails
+                            ? intl.formatMessage({ id: "vizualice" })
+                            : intl.formatMessage({ id: "modify" })
+                        : intl.formatMessage({ id: "insert" })}{" "}
+                    {intl.formatMessage({ id: "regionalDivision" })}
+                </h1>
+                <div className="flex justify-end gap-3">
+                    <div>
+                        <Button
+                            onClick={() => goBack()}
+                            color="primary"
+                            type="button"
+                            className="bg-primary px-4"
+                        >
+                            {intl.formatMessage({ id: "back" })}
+                        </Button>
+                    </div>
+                </div>
+            </div>
             <div className="user-form-body__container">
                 <Formik
                     initialValues={initialValues}
                     validationSchema={selectedType?.value == 2 ? generateValidationDivisionsModify(intl) : generateValidationDivisions(intl)}
                     onSubmit={handleSubmit}
                 >
-                    {({isSubmitting, isValid}) => (
+                    {({ isSubmitting, isValid }) => (
                         <Form className="flex flex-col gap-3">
                             <div className="flex gap-3 flex-wrap justify-between">
                                 <div className="w-full sm:w-[49%]">
@@ -139,7 +157,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                     <GenericInput
                                         type="text"
                                         name="area_code"
-                                        placeholder={intl.formatMessage({id: "area_code"})}
+                                        placeholder={intl.formatMessage({ id: "area_code" })}
                                         customClass="custom-input"
                                         disabled={isFromDetails}
                                         required
@@ -150,7 +168,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                     <GenericInput
                                         type="text"
                                         name="name"
-                                        placeholder={intl.formatMessage({id: "area_name"})}
+                                        placeholder={intl.formatMessage({ id: "area_name" })}
                                         customClass="custom-input"
                                         disabled={isFromDetails}
                                         required
@@ -161,7 +179,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                     <GenericInput
                                         type="text"
                                         name="company"
-                                        placeholder={intl.formatMessage({id: "company"})}
+                                        placeholder={intl.formatMessage({ id: "company" })}
                                         customClass="custom-input"
                                         disabled={true}
                                     />
@@ -176,7 +194,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                         <GenericInput
                                             type="textarea"
                                             name="contain_country"
-                                            placeholder={intl.formatMessage({id: "contain_country"})}
+                                            placeholder={intl.formatMessage({ id: "contain_country" })}
                                             customClass="custom-input"
                                             disabled={isFromDetails}
                                             required={selectedType?.value == 2}
@@ -187,7 +205,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                         <GenericInput
                                             type="text"
                                             name="zip_start_with"
-                                            placeholder={intl.formatMessage({id: "zip_start_with"})}
+                                            placeholder={intl.formatMessage({ id: "zip_start_with" })}
                                             customClass="custom-input"
                                             disabled={isFromDetails}
                                         />
@@ -197,7 +215,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                         <GenericInput
                                             type="text"
                                             name="num_ruler_pakage_follow"
-                                            placeholder={intl.formatMessage({id: "num_ruler_pakage_follow"})}
+                                            placeholder={intl.formatMessage({ id: "num_ruler_pakage_follow" })}
                                             customClass="custom-input"
                                             disabled={isFromDetails}
                                         />
@@ -205,17 +223,17 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
 
                                     <div className="w-full sm:w-[100%]">
                                         <ul>
-                                            <li style={{fontSize: '14px'}}><b>{intl.formatMessage({id: "num_ruler_pakage_follow"})}</b></li>
-                                            <li style={{marginTop: '5px'}}>{intl.formatMessage({id: "inc4"})}</li>
-                                            <li>{intl.formatMessage({id: "inc5"})}</li>
-                                            <li>{intl.formatMessage({id: "inc6"})}</li>
-                                            <li>{intl.formatMessage({id: "inc7"})}</li>
-                                            <li>{intl.formatMessage({id: "inc8"})}</li>
-                                            <li>{intl.formatMessage({id: "zone_code"})}</li>
-                                            <li>{intl.formatMessage({id: "y2"})}</li>
-                                            <li>{intl.formatMessage({id: "y"})}</li>
-                                            <li>{intl.formatMessage({id: "m"})}</li>
-                                            <li>{intl.formatMessage({id: "d"})}</li>
+                                            <li style={{ fontSize: '14px' }}><b>{intl.formatMessage({ id: "num_ruler_pakage_follow" })}</b></li>
+                                            <li style={{ marginTop: '5px' }}>{intl.formatMessage({ id: "inc4" })}</li>
+                                            <li>{intl.formatMessage({ id: "inc5" })}</li>
+                                            <li>{intl.formatMessage({ id: "inc6" })}</li>
+                                            <li>{intl.formatMessage({ id: "inc7" })}</li>
+                                            <li>{intl.formatMessage({ id: "inc8" })}</li>
+                                            <li>{intl.formatMessage({ id: "zone_code" })}</li>
+                                            <li>{intl.formatMessage({ id: "y2" })}</li>
+                                            <li>{intl.formatMessage({ id: "y" })}</li>
+                                            <li>{intl.formatMessage({ id: "m" })}</li>
+                                            <li>{intl.formatMessage({ id: "d" })}</li>
                                         </ul>
 
                                     </div>
@@ -223,7 +241,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                 </div>
                             )}
 
-                            <div className='flex justify-end gap-3' style={{paddingRight: '20px'}}>
+                            <div className='flex justify-end gap-3' style={{ paddingRight: '20px' }}>
                                 <div>
                                     {
                                         !isFromDetails &&
@@ -234,7 +252,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                                 className='px-4'
                                                 disabled={isSubmitting || !isValid}
                                             >
-                                                {isSubmitting ? intl.formatMessage({id: 'sending'}) : (id ? intl.formatMessage({id: 'modify'}) : intl.formatMessage({id: 'add'}))}
+                                                {isSubmitting ? intl.formatMessage({ id: 'sending' }) : (id ? intl.formatMessage({ id: 'modify' }) : intl.formatMessage({ id: 'add' }))}
                                             </Button>
                                         )
                                     }
@@ -246,7 +264,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                                 className='px-4'
                                                 onClick={() => goToEdit()}
                                             >
-                                                {intl.formatMessage({id: 'go_to_edit'})}
+                                                {intl.formatMessage({ id: 'go_to_edit' })}
                                             </Button>
                                         )
                                     }
@@ -257,7 +275,7 @@ const DivisionsFormBody = ({regionalDivisionsTypes, id, regionalDivision, isFrom
                                         className='bg-secundary px-4'
                                         onClick={() => cancelSend()}
                                     >
-                                        {intl.formatMessage({id: 'cancel'})}
+                                        {intl.formatMessage({ id: 'cancel' })}
                                     </Button>
                                 </div>
                             </div>

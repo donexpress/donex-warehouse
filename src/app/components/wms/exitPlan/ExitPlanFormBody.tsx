@@ -58,10 +58,10 @@ const ExitPlanFormBody = ({
     user_id: isOMS()
       ? users[0].id
       : id && exitPlan && exitPlan.user && exitPlan.user.id
-      ? exitPlan.user.id
-      : undefined,
+        ? exitPlan.user.id
+        : undefined,
     destination: id && exitPlan ? exitPlan.destination : "",
-    reference_number: id && exitPlan ? exitPlan.reference_number: ''
+    reference_number: id && exitPlan ? exitPlan.reference_number : ''
   };
 
   const cancelSend = () => {
@@ -113,6 +113,10 @@ const ExitPlanFormBody = ({
 
   const goToEdit = () => {
     router.push(`/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${id}/update`);
+  };
+
+  const goBack = () => {
+    router.back();
   };
 
   const getUsersFormatted = (users: User[]): ValueSelect[] => {
@@ -196,15 +200,29 @@ const ExitPlanFormBody = ({
   }
 
   return (
-    <div className="user-form-body">
-      <h1 className="text-xl font-semibold">
-        {id
-          ? isFromDetails
-            ? intl.formatMessage({ id: "vizualice" })
-            : intl.formatMessage({ id: "modify" })
-          : intl.formatMessage({ id: "insert" })}{" "}
-        {intl.formatMessage({ id: "exitPlan" })}
-      </h1>
+    <div className="user-form-body shadow-small">
+      <div className="flex gap-3 flex-wrap justify-between">
+        <h1 className="text-xl font-semibold">
+          {id
+            ? isFromDetails
+              ? intl.formatMessage({ id: "vizualice" })
+              : intl.formatMessage({ id: "modify" })
+            : intl.formatMessage({ id: "insert" })}{" "}
+          {intl.formatMessage({ id: "exitPlan" })}
+        </h1>
+        <div className="flex justify-end gap-3">
+          <div>
+            <Button
+              onClick={() => goBack()}
+              color="primary"
+              type="button"
+              className="bg-primary px-4"
+            >
+              {intl.formatMessage({ id: "back" })}
+            </Button>
+          </div>
+        </div>
+      </div>
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
@@ -352,8 +370,8 @@ const ExitPlanFormBody = ({
                         {isSubmitting
                           ? intl.formatMessage({ id: "sending" })
                           : id
-                          ? intl.formatMessage({ id: "modify" })
-                          : intl.formatMessage({ id: "add" })}
+                            ? intl.formatMessage({ id: "modify" })
+                            : intl.formatMessage({ id: "add" })}
                       </Button>
                     )}
                     {isFromDetails && id && (!isOMS() || (isOMS() && exitPlan && checkPendingState(exitPlan.state))) && (

@@ -45,8 +45,8 @@ const OperationInstructionFormBody = ({
   const intl = useIntl();
   const router = useRouter();
   const { locale, exit_plan_id } = router.query;
-  const [user, setUser] = useState<User| undefined>(users.find(el => el.id === operationInstruction?.user_id))
-  const [oI, setOI] = useState<OperationInstruction| undefined>(operationInstruction)
+  const [user, setUser] = useState<User | undefined>(users.find(el => el.id === operationInstruction?.user_id))
+  const [oI, setOI] = useState<OperationInstruction | undefined>(operationInstruction)
   const [filterType, setFilterType] = useState<{
     filter: ExitPlan | Warehouse | User | undefined;
     type: string;
@@ -95,17 +95,17 @@ const OperationInstructionFormBody = ({
         ? id
           ? Number(operationInstruction?.user_id)
           : Number(
-              exitPlans.find((el) => el.id === Number(exit_plan_id))?.user_id
-            )
+            exitPlans.find((el) => el.id === Number(exit_plan_id))?.user_id
+          )
         : 0,
     warehouse_id:
       id || exit_plan_id
         ? id
           ? Number(operationInstruction?.warehouse_id)
           : Number(
-              exitPlans.find((el) => el.id === Number(exit_plan_id))
-                ?.warehouse_id
-            )
+            exitPlans.find((el) => el.id === Number(exit_plan_id))
+              ?.warehouse_id
+          )
         : 0,
   };
 
@@ -141,8 +141,7 @@ const OperationInstructionFormBody = ({
   };
   const goToEdit = () => {
     router.push(
-      `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${
-        operationInstruction?.id
+      `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${operationInstruction?.id
       }/update`
     );
   };
@@ -157,6 +156,10 @@ const OperationInstructionFormBody = ({
         `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
       );
     }
+  };
+
+  const goBack = () => {
+    router.back();
   };
 
   const getTypesFormatted = (types: State[]): ValueSelect[] => {
@@ -257,15 +260,29 @@ const OperationInstructionFormBody = ({
   };
 
   return (
-    <div className="user-form-body">
-      <h1 className="text-xl font-semibold">
-        {id
-          ? isFromDetails
-            ? intl.formatMessage({ id: "vizualice" })
-            : intl.formatMessage({ id: "modify" })
-          : intl.formatMessage({ id: "insert" })}{" "}
-        {intl.formatMessage({ id: "operation_instruction" })}
-      </h1>
+    <div className="user-form-body shadow-small">
+      <div className="flex gap-3 flex-wrap justify-between">
+        <h1 className="text-xl font-semibold">
+          {id
+            ? isFromDetails
+              ? intl.formatMessage({ id: "vizualice" })
+              : intl.formatMessage({ id: "modify" })
+            : intl.formatMessage({ id: "insert" })}{" "}
+          {intl.formatMessage({ id: "operation_instruction" })}
+        </h1>
+        <div className="flex justify-end gap-3">
+          <div>
+            <Button
+              onClick={() => goBack()}
+              color="primary"
+              type="button"
+              className="bg-primary px-4"
+            >
+              {intl.formatMessage({ id: "back" })}
+            </Button>
+          </div>
+        </div>
+      </div>
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
@@ -369,11 +386,11 @@ const OperationInstructionFormBody = ({
                         {isSubmitting
                           ? intl.formatMessage({ id: "sending" })
                           : id
-                          ? intl.formatMessage({ id: "modify" })
-                          : intl.formatMessage({ id: "add" })}
+                            ? intl.formatMessage({ id: "modify" })
+                            : intl.formatMessage({ id: "add" })}
                       </Button>
                     )}
-                    {isFromDetails && id && !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
+                    {isFromDetails && id && !(isOMS() && isFromEPConfig && stateEP !== "pending") && (
                       <Button
                         color="primary"
                         onClick={() => goToEdit()}
@@ -400,13 +417,13 @@ const OperationInstructionFormBody = ({
         </Formik>
       </div>
       {
-        !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
+        !(isOMS() && isFromEPConfig && stateEP !== "pending") && (
           <OperationInstructionAppendix owner={user} operationInstruction={oI} />
         )
       }
-      {isFromDetails && !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
+      {isFromDetails && !(isOMS() && isFromEPConfig && stateEP !== "pending") && (
         <LocationTable
-        // @ts-ignore
+          // @ts-ignore
           exitPlan={exitPlans.find((el) => el.id === operationInstruction?.output_plan_id)}
         />
       )}
