@@ -73,7 +73,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     pr_number: (id && storagePlan) ? storagePlan.pr_number : null,
     rows: [],
   };
-  
+
   const getUsersFormatted = (usersAll: User[]): ValueSelect[] => {
     let response: ValueSelect[] = [];
     usersAll.forEach((user) => {
@@ -195,12 +195,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     const response: Response = await updateStoragePlanById(storagePlanId, formatBody(values));
     if (response.status >= 200 && response.status <= 299) {
       showMsg(intl.formatMessage({ id: 'changedsuccessfullyMsg' }), { type: "success" });
-      const goBack = router.query.goBack;
-      if (goBack && goBack === 'config' && !!id) {
-        router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
-      } else {
-        router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
-      }
+      goBack();
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
       showMsg(message, { type: "error" });
