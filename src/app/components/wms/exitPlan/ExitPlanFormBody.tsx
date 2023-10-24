@@ -64,15 +64,6 @@ const ExitPlanFormBody = ({
     reference_number: id && exitPlan ? exitPlan.reference_number : ''
   };
 
-  const cancelSend = () => {
-    const goBack = router.query.goBack;
-    if (goBack && goBack === 'config' && !!id) {
-      router.push(`/${locale}/${isWMS() ? 'wms' : 'oms'}/exit_plan/${id}/config`);
-    } else {
-      router.push(`/${locale}/${isWMS() ? 'wms' : 'oms'}/exit_plan`);
-    }
-  };
-
   const handleSubmit = async (values: ExitPlan) => {
     if (values.delivered_time === "") {
       values.delivered_time = null;
@@ -104,7 +95,7 @@ const ExitPlanFormBody = ({
         ? intl.formatMessage({ id: "changedsuccessfullyMsg" })
         : intl.formatMessage({ id: "successfullyMsg" });
       showMsg(message, { type: "success" });
-      cancelSend();
+      goBack();
     } else {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       showMsg(message, { type: "error" });
@@ -387,7 +378,7 @@ const ExitPlanFormBody = ({
                   </div>
                   <div>
                     <Button
-                      onClick={() => cancelSend()}
+                      onClick={() => goBack()}
                       type="button"
                       className="bg-secundary px-4"
                     >

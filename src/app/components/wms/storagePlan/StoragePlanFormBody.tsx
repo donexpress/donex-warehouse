@@ -73,16 +73,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     pr_number: (id && storagePlan) ? storagePlan.pr_number : null,
     rows: [],
   };
-
-  const cancelSend = () => {
-    const goBack = router.query.goBack;
-    if (goBack && goBack === 'config' && !!id) {
-      router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
-    } else {
-      router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
-    }
-  };
-
+  
   const getUsersFormatted = (usersAll: User[]): ValueSelect[] => {
     let response: ValueSelect[] = [];
     usersAll.forEach((user) => {
@@ -524,7 +515,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
                   <Button
                     type="button"
                     className='bg-secundary px-4'
-                    onClick={() => cancelSend()}
+                    onClick={() => goBack()}
                   >
                     {intl.formatMessage({ id: 'cancel' })}
                   </Button>
