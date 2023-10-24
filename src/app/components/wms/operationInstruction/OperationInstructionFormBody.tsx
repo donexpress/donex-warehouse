@@ -20,6 +20,7 @@ import { isOMS } from "@/helperserege1992";
 import LocationTable from "../../common/LocationTable";
 import "../../../../styles/wms/user.form.scss";
 import OperationInstructionAppendix from "./OperationInstructionAppendix";
+import { ParsedUrlQueryInput } from 'querystring';
 
 interface Props {
   types: State[];
@@ -45,8 +46,8 @@ const OperationInstructionFormBody = ({
   const intl = useIntl();
   const router = useRouter();
   const { locale, exit_plan_id } = router.query;
-  const [user, setUser] = useState<User | undefined>(users.find(el => el.id === operationInstruction?.user_id))
-  const [oI, setOI] = useState<OperationInstruction | undefined>(operationInstruction)
+  const [user, setUser] = useState<User| undefined>(users.find(el => el.id === operationInstruction?.user_id))
+  const [oI, setOI] = useState<OperationInstruction| undefined>(operationInstruction)
   const [filterType, setFilterType] = useState<{
     filter: ExitPlan | Warehouse | User | undefined;
     type: string;
@@ -95,17 +96,17 @@ const OperationInstructionFormBody = ({
         ? id
           ? Number(operationInstruction?.user_id)
           : Number(
-            exitPlans.find((el) => el.id === Number(exit_plan_id))?.user_id
-          )
+              exitPlans.find((el) => el.id === Number(exit_plan_id))?.user_id
+            )
         : 0,
     warehouse_id:
       id || exit_plan_id
         ? id
           ? Number(operationInstruction?.warehouse_id)
           : Number(
-            exitPlans.find((el) => el.id === Number(exit_plan_id))
-              ?.warehouse_id
-          )
+              exitPlans.find((el) => el.id === Number(exit_plan_id))
+                ?.warehouse_id
+            )
         : 0,
   };
 
@@ -129,37 +130,78 @@ const OperationInstructionFormBody = ({
       setOI(r)
       setUser(users.find(el => el.id === values.user_id))
     }
-    if (exit_plan_id) {
-      router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exit_plan_id}/config`
-      );
-    } else {
-      router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
-      );
-    }
+    cancelSend();
   };
   const goToEdit = () => {
+    let params: ParsedUrlQueryInput = { goBack: 'vizualice'};
+    const exitPId = router.query.exit_plan_id;
+    const exitPState = router.query.exit_plan_state;
+    if (exitPId) {
+      params = {
+        ...params,
+        exit_plan_id: exitPId,
+      };
+    }
+    if (exitPState) {
+      params = {
+        ...params,
+        exit_plan_state: exitPState,
+      };
+    }
     router.push(
-      `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${operationInstruction?.id
-      }/update`
+      {
+        pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${operationInstruction?.id}/update`,
+        query: params,
+      }
     );
   };
   const cancelSend = () => {
+    const goBack = router.query.goBack;
     const exitPId = router.query.exit_plan_id;
-    if (exitPId) {
-      router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exitPId}/config`
-      );
-    } else {
-      router.push(
-        `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
-      );
-    }
-  };
 
-  const goBack = () => {
-    router.back();
+    if (exitPId) {
+      if (goBack && goBack === 'vizualice') {
+        let params: ParsedUrlQueryInput = {};
+        const exitPState = router.query.exit_plan_state;
+    
+        if (exitPId) {
+          params = {
+            ...params,
+            exit_plan_id: exitPId,
+          };
+        }
+        if (exitPState) {
+          params = {
+            ...params,
+            exit_plan_state: exitPState,
+          };
+        }
+        router.push(
+          {
+            pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${id}/show`,
+            query: params,
+          }
+        );
+      } else {
+        router.push(
+          {
+            pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/exit_plan/${exitPId}/config`
+          }
+        );
+      }
+    } else {
+      if (goBack && goBack === 'vizualice') {
+        router.push(
+          {
+            pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${id}/show`
+          }
+        );
+      } else {
+        router.push(
+          `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction`
+        );
+      }
+    }
   };
 
   const getTypesFormatted = (types: State[]): ValueSelect[] => {
@@ -260,9 +302,9 @@ const OperationInstructionFormBody = ({
   };
 
   return (
-    <div className="user-form-body shadow-small">
-      <div className="flex gap-3 flex-wrap justify-between">
-        <h1 className="text-xl font-semibold">
+    <div className="user-form-body">
+      <div className='flex'>
+        <h1 className="flex-1 text-xl font-semibold">
           {id
             ? isFromDetails
               ? intl.formatMessage({ id: "vizualice" })
@@ -270,17 +312,15 @@ const OperationInstructionFormBody = ({
             : intl.formatMessage({ id: "insert" })}{" "}
           {intl.formatMessage({ id: "operation_instruction" })}
         </h1>
-        <div className="flex justify-end gap-3">
-          <div>
-            <Button
-              onClick={() => goBack()}
-              color="primary"
-              type="button"
-              className="bg-primary px-4"
-            >
-              {intl.formatMessage({ id: "back" })}
-            </Button>
-          </div>
+        <div className='w-100' style={{ marginLeft: '10px' }}>
+          <Button
+            color="primary"
+            type="button"
+            className='px-4'
+            onClick={()=>cancelSend()}
+          >
+            {intl.formatMessage({ id: 'back' })}
+          </Button>
         </div>
       </div>
       <div className="user-form-body__container">
@@ -386,11 +426,11 @@ const OperationInstructionFormBody = ({
                         {isSubmitting
                           ? intl.formatMessage({ id: "sending" })
                           : id
-                            ? intl.formatMessage({ id: "modify" })
-                            : intl.formatMessage({ id: "add" })}
+                          ? intl.formatMessage({ id: "modify" })
+                          : intl.formatMessage({ id: "add" })}
                       </Button>
                     )}
-                    {isFromDetails && id && !(isOMS() && isFromEPConfig && stateEP !== "pending") && (
+                    {isFromDetails && id && !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
                       <Button
                         color="primary"
                         onClick={() => goToEdit()}
@@ -417,13 +457,13 @@ const OperationInstructionFormBody = ({
         </Formik>
       </div>
       {
-        !(isOMS() && isFromEPConfig && stateEP !== "pending") && (
+        !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
           <OperationInstructionAppendix owner={user} operationInstruction={oI} />
         )
       }
-      {isFromDetails && !(isOMS() && isFromEPConfig && stateEP !== "pending") && (
+      {isFromDetails && !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
         <LocationTable
-          // @ts-ignore
+        // @ts-ignore
           exitPlan={exitPlans.find((el) => el.id === operationInstruction?.output_plan_id)}
         />
       )}

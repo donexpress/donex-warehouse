@@ -64,6 +64,7 @@ import { PackageShelf } from "@/types/package_shelferege1992";
 import InventoryList from "./InventoryList";
 import { CancelIcon } from "../../common/CancelIcon";
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
+import { getAppendagesByExitPlanId } from "@/services/api.appendixerege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -775,7 +776,7 @@ const ExitPlanTable = () => {
               {(statusSelected === 'pending') && (
                 <Button
                   color="primary"
-                  style={{ width: '121px', marginLeft: '10px' }}
+                  style={{ width: '121px' }}
                   endContent={<CancelIcon />}
                   onClick={() => displayCancelAll()}
                   isDisabled={selectedItems.length === 0}
@@ -1007,6 +1008,17 @@ const ExitPlanTable = () => {
       case "return-dispatched":
         state = "processing";
         break;
+    }
+    if(state === 'dispatched') {
+      const appendix = await getAppendagesByExitPlanId(changeExitPlanId)
+      if(!appendix || (appendix && appendix.length === 0)) {
+        showMsg(intl.formatMessage({ id: "missing_apendix_msg" }), {
+          type: "warning",
+        });
+        closeListPackage();
+        setLoading(false);
+        return;
+      }
     }
     const reponse = await updateExitPlan(changeExitPlanId, {
       state,

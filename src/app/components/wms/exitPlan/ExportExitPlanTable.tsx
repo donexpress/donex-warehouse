@@ -194,7 +194,7 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                     }
                     return (
                       <Text key={index} style={styles.tableCell}>
-                        {oi.address_ref}
+                        {oi.address}
                       </Text>
                     );
                   }
