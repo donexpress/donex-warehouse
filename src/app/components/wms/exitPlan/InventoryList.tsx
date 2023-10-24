@@ -10,7 +10,7 @@ import {
 import { IntlShape } from "react-intl";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackingList } from "@/types/storage_planerege1992";
-import { getDateFormat, getHourFormat } from "@/helpers/utilserege1992";
+import { getDateFormat, getHourFormat, getLanguage } from "@/helpers/utilserege1992";
 import { PackageShelf } from "../../../../types/package_shelf";
 
 const styles = StyleSheet.create({
@@ -137,6 +137,9 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
             <Text style={[styles.headerCell]}>
               {intl.formatMessage({ id: "address" })}
             </Text>
+            <Text style={[styles.headerCell]}>
+              {intl.formatMessage({ id: "observations" })}
+            </Text>
           </View>
           <View style={styles.tableRow}>
             <Text style={styles.tableCell}>
@@ -151,8 +154,24 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
                 : ""}
             </Text>
             <Text style={styles.tableCell}>{exitPlan.box_amount}</Text>
-            <Text style={styles.tableCell}>{exitPlan.destination}</Text>
+            <View style={styles.tableCell}>
+              {
+              !!exitPlan.destination_ref && (
+                  <Text>
+                    {exitPlan.destination_ref[getLanguage(intl)]}
+                  </Text>
+              )
+              }
+              {
+              !exitPlan.destination_ref && (
+                <Text >
+                  {exitPlan.destination}
+                </Text>
+              )
+              }
+            </View>
             <Text style={styles.tableCell}>{exitPlan.address}</Text>
+            <Text style={styles.tableCell}>{exitPlan.observations}</Text>
           </View>
         </View>
 

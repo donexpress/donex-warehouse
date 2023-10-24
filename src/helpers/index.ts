@@ -7,7 +7,7 @@ import { StoragePlan, PackingList } from "../types/storage_plan";
 import * as FileSaver from "file-saver";
 import XLSX from "sheetjs-style";
 import { IntlShape } from "react-intl";
-import { getDateFormat, getHourFormat, getLanguage } from "./utils";
+import { getDateFormat, getHourFormat, getLanguage, splitLastOccurrence } from "./utils";
 import { Selection } from "@nextui-org/react";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
@@ -747,6 +747,20 @@ export const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
   return uniqueArray;
 };
 
+const getCustomerOrderNumber = (exitPlan: ExitPlan): string => {
+  const numbers: string[] = [];
+
+  exitPlan.packing_lists?.forEach((pl, index) => {
+    if (pl.box_number) {
+      const tmpn = splitLastOccurrence(pl.box_number, "U")[0];
+      if (!numbers.find((el) => el === tmpn)) {
+        numbers.push(tmpn);
+      }
+    }
+  });
+  return numbers.join(", ");
+};
+
 export const exitPlanDataToExcel = (
   exiPlan: ExitPlan[],
   intl: IntlShape,
@@ -813,6 +827,9 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
         case "location":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getLocation(oi);
+        case "customer_order_number":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = getCustomerOrderNumber(oi);
         case "updated_at":
         case "created_at":
         case "delivered_time":
