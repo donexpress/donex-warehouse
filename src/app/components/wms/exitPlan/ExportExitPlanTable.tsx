@@ -12,6 +12,7 @@ import {
   getDateFormat,
   getHourFormat,
   getLanguage,
+  splitLastOccurrence,
 } from "@/helpers/utilserege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
@@ -135,6 +136,20 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
     return uniqueArray;
   };
 
+  const getCustomerOrderNumber = (exitPlan: ExitPlan): string => {
+    const numbers: string[] = [];
+
+    exitPlan.packing_lists?.forEach((pl, index) => {
+      if (pl.box_number) {
+        const tmpn = splitLastOccurrence(pl.box_number, "U")[0];
+        if (!numbers.find((el) => el === tmpn)) {
+          numbers.push(tmpn);
+        }
+      }
+    });
+    return numbers.join(", ");
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page} orientation="landscape">
@@ -168,6 +183,12 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                     return (
                       <Text key={index} style={styles.tableCell}>
                         {oi.user?.username}
+                      </Text>
+                    );
+                  case "customer_order_number":
+                    return (
+                      <Text key={index} style={styles.tableCell}>
+                        {getCustomerOrderNumber(oi)}
                       </Text>
                     );
                   case "destination": {
