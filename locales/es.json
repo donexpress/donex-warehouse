@@ -383,7 +383,8 @@
   "wrongStateMsg": "Las cajas seleccionadas necesitan estar almacenadas para ser adicionadas a un plan de salida.",
   "dispatch_date": "Fecha de despacho",
   "dispatched_boxes": "Cajas despachadas",
-  "operation_instruction_box_requirement_amount": "Necesitas al menos 1 caja para adicionar una instruccion de operación"
+  "operation_instruction_box_requirement_amount": "Necesitas al menos 1 caja para adicionar una instruccion de operación",
+  "days": "Días"
 
 
 }

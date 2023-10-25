@@ -12,6 +12,7 @@ import OperationInstructionTable from "../operationInstruction/OperationInstruct
 import { isOMS } from "@/helperserege1992";
 
 const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
+  console.log(exitPlan)
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();

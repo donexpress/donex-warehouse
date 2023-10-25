@@ -583,7 +583,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
       if (
         // @ts-ignore
         op.operation_instruction_type.instruction_type.find((el) => {
-          return el.value === "change label" || el.value === "photograph";
+          return el.value === "change label" || el.value === "photograph" || el.value === "change boxes";
         }) &&
         (!appendages || appendages.length === 0)
       ) {
@@ -806,28 +806,34 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     );
   };
 
-  const getLocation = (ep: OperationInstruction): string => {
-    let locations = "";
-    if (
-      ep.output_plan &&
-      ep.output_plan.packing_lists &&
-      ep.output_plan.packing_lists?.length == 0
-    ) {
+  const getLocation = (ep: any): string => {
+    const locations: string[] = [];
+    if (ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists?.length == 0) {
       return "--";
     }
-    if (
-      ep.output_plan &&
-      ep.output_plan.packing_lists &&
-      ep.output_plan.packing_lists?.length > 1
-    ) {
-      return "Multiple";
-    }
-    ep.output_plan &&
-      ep.output_plan.packing_lists &&
-      ep.output_plan.packing_lists.forEach((pl) => {
-        locations += packageShelfFormat(pl.package_shelf);
+    if(ep.output_plan && ep.output_plan.packing_lists) {
+      ep.output_plan.packing_lists?.forEach((pl: any) => {
+        console.log(pl);
+        if (
+          pl.package_shelf &&
+          pl.package_shelf.shelf
+        ) {
+          const tmpl = `${ep.warehouse?.code}-${String(
+            pl.package_shelf.shelf.partition_table
+          ).padStart(2, "0")}-${String(
+            pl.package_shelf.shelf.number_of_shelves
+          ).padStart(2, "0")}-${String(pl.package_shelf.layer).padStart(
+            2,
+            "0"
+          )}-${String(pl.package_shelf.column).padStart(2, "0")}`;
+          if (!locations.find((el) => el === tmpl)) {
+            locations.push(tmpl);
+          }
+        }
       });
-    return locations;
+    }
+    console.log(ep.output_plan && ep.output_plan.packing_lists)
+    return locations.join(", ");
   };
 
   const getState = (): string => {

@@ -63,9 +63,9 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
   );
 
 
-  const packageShelfFormat = (packageShelfs: PackageShelf[] | undefined) => {
-    if (packageShelfs && packageShelfs.length > 0) {
-      const packageShelf: PackageShelf = packageShelfs[0];
+  const packageShelfFormat = (packageShelfs: PackageShelf | undefined) => {
+    if (packageShelfs ) {
+      const packageShelf: PackageShelf = packageShelfs;
       return `${intl.formatMessage({ id: "partition" })}: ${
         packageShelf.shelf?.partition_table
       }
@@ -175,6 +175,7 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
               </div>
               <div className="elements-center">{exitPlan.warehouse?.name}</div>
               <div className="elements-center">
+                {/* @ts-ignore */}
                 {packageShelfFormat(row.packing_lists.package_shelf)}
               </div>
             </div>

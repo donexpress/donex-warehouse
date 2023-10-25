@@ -362,7 +362,8 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
               : ""
           } `
         : "--";
-    pList[key9] = "--";
+        // @ts-ignore
+    pList[key9] = `${pl.storage_time} ${intl.formatMessage({ id: "days" })}`;
     pList[key10] = exitPlan.delivered_time
       ? `${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(
         exitPlan.delivered_time
