@@ -384,7 +384,8 @@
   "dispatch_date": "Fecha de despacho",
   "dispatched_boxes": "Cajas despachadas",
   "operation_instruction_box_requirement_amount": "Necesitas al menos 1 caja para adicionar una instruccion de operación",
-  "days": "Días"
-
+  "days": "Días",
+  "finances": "Finanzas",
+  "airGuide": "Guía aéra"
 
 }

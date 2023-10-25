@@ -384,7 +384,9 @@
   "dispatch_date": "出貨日期",
 	"dispatched_boxes": "已发货的箱子",
 	"operation_instruction_box_requirement_amount": "您至少需要1个盒子来添加操作说明",
-	"days": "天"
+	"days": "天",
+	"finances": "财务",
+	"airGuide": "空气指南"
 
 
 }
