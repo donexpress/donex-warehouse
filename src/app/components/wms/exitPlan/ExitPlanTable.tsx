@@ -440,7 +440,7 @@ const ExitPlanTable = () => {
                   {intl.formatMessage({ id: "cancel" })}
                 </DropdownItem>
                 <DropdownItem
-                  className={checkOMS ? "do-not-show-dropdown-item" : ""}
+                  className={(checkOMS && user.state.value !== "pending" && user.state.value !== "cancelled") ? "do-not-show-dropdown-item" : ""}
                   onClick={() => handleDelete(Number(user["id"]))}
                 >
                   {intl.formatMessage({ id: "Delete" })}
