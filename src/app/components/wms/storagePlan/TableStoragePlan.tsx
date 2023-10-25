@@ -424,7 +424,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  <DropdownItem className={(!inWMS || (statusSelected !== 'to be storage' && statusSelected !== 'cancelled')) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleDelete(storageP["id"])}>
+                  <DropdownItem className={(!inWMS && statusSelected !== 'to be storage') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleDelete(storageP["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
                 </DropdownMenu>
@@ -754,7 +754,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               )
             }
             {
-              (inWMS && (statusSelected === 'to be storage' || statusSelected === 'cancelled')) && (
+              (inWMS || (!inWMS && statusSelected === 'to be storage')) && (
                 <Button
                   color="primary"
                   style={{ width: '121px', marginLeft: '10px' }}

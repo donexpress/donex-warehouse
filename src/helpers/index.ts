@@ -7,7 +7,7 @@ import { StoragePlan, PackingList } from "../types/storage_plan";
 import * as FileSaver from "file-saver";
 import XLSX from "sheetjs-style";
 import { IntlShape } from "react-intl";
-import { getDateFormat, getHourFormat, getLanguage } from "./utils";
+import { getDateFormat, getHourFormat, getLanguage, splitLastOccurrence } from "./utils";
 import { Selection } from "@nextui-org/react";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
@@ -315,6 +315,7 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   
   packingLists.forEach((pl: PackingList) => {
     const pList: { [key: string]: string } = {};
+    const packageShelf: PackageShelf | null = !!Array.isArray(pl.package_shelf) ? (pl.package_shelf.length > 0 ? pl.package_shelf[0] : null) : (pl.package_shelf ? pl.package_shelf : null);
 
     pList[key1] = pl.box_number;
     pList[key2] = pl.case_number;
@@ -325,44 +326,37 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
     pList[key6] = "--";
     pList[key7] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
     pList[key8] =
-      pl.package_shelf && pl.package_shelf.length > 0
+      packageShelf !== null
         ? (exitPlan.warehouse
             ? `${exitPlan.warehouse.code}-${String(
-                pl.package_shelf[0].shelf?.partition_table
+              packageShelf.shelf?.partition_table
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].shelf?.number_of_shelves
+                packageShelf.shelf?.number_of_shelves
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].layer
+                packageShelf.layer
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].column
+                packageShelf.column
               ).padStart(2, "0")} `
             : "") +
           `${intl.formatMessage({ id: "partition" })}: ${
-            pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-              ? pl.package_shelf[0].shelf.partition_table
+            packageShelf.shelf
+              ? packageShelf.shelf.partition_table
               : ""
           } ` +
           `${intl.formatMessage({ id: "shelf" })}: ${
-            pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-              ? pl.package_shelf[0].shelf.number_of_shelves
+            packageShelf.shelf
+              ? packageShelf.shelf.number_of_shelves
               : ""
           } ` +
           `${intl.formatMessage({ id: "layer" })}: ${
-            pl.package_shelf && pl.package_shelf.length > 0
-              ? pl.package_shelf[0].layer
-              : ""
+            packageShelf.layer
           }  ` +
           `${intl.formatMessage({ id: "column" })}: ${
-            pl.package_shelf && pl.package_shelf.length > 0
-              ? pl.package_shelf[0].column
-              : ""
+            packageShelf.column
           } `
         : "--";
-    pList[key9] = "--";
+        // @ts-ignore
+    pList[key9] = `${pl.storage_time} ${intl.formatMessage({ id: "days" })}`;
     pList[key10] = exitPlan.delivered_time
       ? `${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(
         exitPlan.delivered_time
@@ -747,6 +741,20 @@ export const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
   return uniqueArray;
 };
 
+const getCustomerOrderNumber = (exitPlan: ExitPlan): string => {
+  const numbers: string[] = [];
+
+  exitPlan.packing_lists?.forEach((pl, index) => {
+    if (pl.box_number) {
+      const tmpn = splitLastOccurrence(pl.box_number, "U")[0];
+      if (!numbers.find((el) => el === tmpn)) {
+        numbers.push(tmpn);
+      }
+    }
+  });
+  return numbers.join(", ");
+};
+
 export const exitPlanDataToExcel = (
   exiPlan: ExitPlan[],
   intl: IntlShape,
@@ -813,6 +821,9 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
         case "location":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getLocation(oi);
+        case "customer_order_number":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = getCustomerOrderNumber(oi);
         case "updated_at":
         case "created_at":
         case "delivered_time":

@@ -383,5 +383,6 @@
 	"wrongStateMsg": "The selected boxes need to be stored to be added to an output plan.",
 	"dispatch_date": "Dispatch date",
 	"dispatched_boxes": "Dispatched boxes",
-	"operation_instruction_box_requirement_amount": "You need at least 1 box to add an operating instruction"
+	"operation_instruction_box_requirement_amount": "You need at least 1 box to add an operating instruction",
+	"days": "Days"
 }
