@@ -1,5 +1,5 @@
-import {RouteMenu} from "./../helpers/enums";
-import {IntlShape} from "react-intl";
+import { RouteMenu } from "./../helpers/enums";
+import { IntlShape } from "react-intl";
 
 export const menuWMS = (intl: IntlShape) => {
   return [
@@ -86,21 +86,33 @@ export const menuWMS = (intl: IntlShape) => {
     },
     {
       id: 4,
+      icon: "BiCoin",
+      label: intl.formatMessage({ id: "finances" }),
+      items: [
+        {
+          id: 4.1,
+          label: intl.formatMessage({ id: "airGuide" }),
+          route: RouteMenu.LIST_STAFF,
+        },
+      ],
+    },
+    {
+      id: 5,
       icon: "BiStation",
       label: intl.formatMessage({ id: "equipment" }),
       items: [
         {
-          id: 4.1,
+          id: 5.1,
           label: intl.formatMessage({ id: "staff" }),
           route: RouteMenu.LIST_STAFF,
         },
         {
-          id: 4.2,
+          id: 5.2,
           label: intl.formatMessage({ id: "organization" }),
           route: RouteMenu.LIST_ORGANIZATION,
         },
         /* {
-          id: 4.3,
+          id: 5.3,
           label: intl.formatMessage({ id: "employeeRole" }),
           route: "#",
         }, */
@@ -165,4 +177,4 @@ export const menuOMS = (intl: IntlShape) => {
   ];
 };
 
-export const Icons = () => {};
+export const Icons = () => { };
