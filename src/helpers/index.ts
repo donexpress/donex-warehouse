@@ -315,6 +315,7 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   
   packingLists.forEach((pl: PackingList) => {
     const pList: { [key: string]: string } = {};
+    const packageShelf: PackageShelf | null = !!Array.isArray(pl.package_shelf) ? (pl.package_shelf.length > 0 ? pl.package_shelf[0] : null) : (pl.package_shelf ? pl.package_shelf : null);
 
     pList[key1] = pl.box_number;
     pList[key2] = pl.case_number;
@@ -325,41 +326,33 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
     pList[key6] = "--";
     pList[key7] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
     pList[key8] =
-      pl.package_shelf && pl.package_shelf.length > 0
+      packageShelf !== null
         ? (exitPlan.warehouse
             ? `${exitPlan.warehouse.code}-${String(
-                pl.package_shelf[0].shelf?.partition_table
+              packageShelf.shelf?.partition_table
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].shelf?.number_of_shelves
+                packageShelf.shelf?.number_of_shelves
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].layer
+                packageShelf.layer
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].column
+                packageShelf.column
               ).padStart(2, "0")} `
             : "") +
           `${intl.formatMessage({ id: "partition" })}: ${
-            pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-              ? pl.package_shelf[0].shelf.partition_table
+            packageShelf.shelf
+              ? packageShelf.shelf.partition_table
               : ""
           } ` +
           `${intl.formatMessage({ id: "shelf" })}: ${
-            pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-              ? pl.package_shelf[0].shelf.number_of_shelves
+            packageShelf.shelf
+              ? packageShelf.shelf.number_of_shelves
               : ""
           } ` +
           `${intl.formatMessage({ id: "layer" })}: ${
-            pl.package_shelf && pl.package_shelf.length > 0
-              ? pl.package_shelf[0].layer
-              : ""
+            packageShelf.layer
           }  ` +
           `${intl.formatMessage({ id: "column" })}: ${
-            pl.package_shelf && pl.package_shelf.length > 0
-              ? pl.package_shelf[0].column
-              : ""
+            packageShelf.column
           } `
         : "--";
         // @ts-ignore

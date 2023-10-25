@@ -243,12 +243,29 @@ const ExitPlanTable = () => {
     );
   }, [visibleColumns, intl]);
 
+  const getCustomerOrderNumber = (exitPlan: ExitPlan): string => {
+    const numbers: string[] = [];
+
+    exitPlan.packing_lists?.forEach((pl, index) => {
+      if (pl.box_number) {
+        const tmpn = splitLastOccurrence(pl.box_number, "U")[0];
+        if (!numbers.find((el) => el === tmpn)) {
+          numbers.push(tmpn);
+        }
+      }
+    });
+    return numbers.join(", ");
+  };
+
   const filteredItems = useMemo(() => {
     let filteredUsers = [...exitPlans];
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) => {
         return (
           user.output_number
+            ?.toLowerCase()
+            .includes(filterValue.toLowerCase()) ||
+          user.reference_number
             ?.toLowerCase()
             .includes(filterValue.toLowerCase()) ||
           (user.user ? user.user.username : "")
@@ -265,7 +282,8 @@ const ExitPlanTable = () => {
           (user.destination_ref ? user.destination_ref.name : "")
             ?.toString()
             ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase())
+            ?.includes(filterValue.toLowerCase()) ||
+          getCustomerOrderNumber(user).toString().toLowerCase().includes(filterValue.toLowerCase())
         );
       });
     }
@@ -628,20 +646,6 @@ const ExitPlanTable = () => {
 
   const handleExportExcel = () => {
     exitPlanDataToExcel(getSelectedExitPlans(), intl, getVisibleColumns());
-  };
-
-  const getCustomerOrderNumber = (exitPlan: ExitPlan): string => {
-    const numbers: string[] = [];
-
-    exitPlan.packing_lists?.forEach((pl, index) => {
-      if (pl.box_number) {
-        const tmpn = splitLastOccurrence(pl.box_number, "U")[0];
-        if (!numbers.find((el) => el === tmpn)) {
-          numbers.push(tmpn);
-        }
-      }
-    });
-    return numbers.join(", ");
   };
 
   const displayCancelAll = () => {
