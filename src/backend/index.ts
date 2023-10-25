@@ -98,8 +98,12 @@ export const storagePlanStatePath = () => {
   return getBaseUrl() + "/api/v1/storage_plan/states";
 };
 
-export const storagePlanCountPath = () => {
-  return getBaseUrl() + "/api/v1/storage_plan/count";
+export const storagePlanCountPath = (query: string = "") => {
+  let params = "";
+  if (query && query !== "") {
+    params += `?query=${query}`;
+  }
+  return getBaseUrl() + "/api/v1/storage_plan/count" + params;
 };
 
 export const storagePlanByOrderNumberPath = (order_number: string) => {

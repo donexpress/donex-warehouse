@@ -530,7 +530,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       await setQueryFilter("");
     }
     await setPage(1);
-    await loadStoragePlans(statusSelected, 1, rowsPerPage, filterValue ? filterValue : "", false, true);
+    await loadStoragePlans(statusSelected, 1, rowsPerPage, filterValue ? filterValue : "", true, true);
   }
 
   const onSearchChange = React.useCallback((value?: string) => {
@@ -545,7 +545,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     await setFilterValue("");
     await setQueryFilter("");
     await setPage(1);
-    await loadStoragePlans(statusSelected, 1, rowsPerPage, "", false, true);
+    await loadStoragePlans(statusSelected, 1, rowsPerPage, "", true, true);
   }, []);
   
   const changeTab = async(tab: string) => {
@@ -911,7 +911,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     setStoragePlans(storagePlanss !== null ? storagePlanss : []);
     await setLoadingItems(false);
     if (loadCount) {
-      const storagePCount = await storagePlanCount();
+      const storagePCount = await storagePlanCount(querySP);
       setStgPCount(storagePCount ? storagePCount : undefined);
     }
     setLoading(false);

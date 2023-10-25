@@ -63,8 +63,8 @@ export const getStoragePlanById = async (storagePlanId: number, context?: GetSer
   }
 }
 
-export const storagePlanCount = async (context?: GetServerSidePropsContext):Promise<StoragePlanCount | null> => {
-  const path = storagePlanCountPath();
+export const storagePlanCount = async (query: string = "", context?: GetServerSidePropsContext):Promise<StoragePlanCount | null> => {
+  const path = storagePlanCountPath(query);
   try {
     const response = await axios.get(path, getHeaders(context));
     return response.data;
