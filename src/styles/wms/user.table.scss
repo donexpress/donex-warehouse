@@ -182,6 +182,10 @@
     overflow-y: auto;
 }
 
+.input-search-list {
+    width: calc(100% - 35px) !important;
+}
+
 @media only screen and (max-width: 990px) {
     .tab-system-table {
         width: calc(100vw - 25px);

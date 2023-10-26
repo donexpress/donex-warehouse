@@ -475,8 +475,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     [intl, statusSelected]
   );
 
-  const onRowsPerPageChange = React.useCallback(
-    async(e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onRowsPerPageChange = async(e: React.ChangeEvent<HTMLSelectElement>) => {
       if (Number(e.target.value) !== rowsPerPage) {
         setSelectedItems([]);
         setSelectedKeys(new Set([]));
@@ -484,9 +483,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         setPage(1);
         await loadStoragePlans(statusSelected, 1, Number(e.target.value), queryFilter, false, true);
       }
-    },
-    []
-  );
+  }
 
   const getLabelByLanguage = (state: any) => {
     if (locale === 'es') {
@@ -623,16 +620,20 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     return (
       <div className="flex flex-col gap-2 mb-2">
         <div className="flex justify-between gap-3 items-end">
-          <Input
-            isClearable
-            className="w-full sm:max-w-[33%] search-input"
-            placeholder=""
-            startContent={<SearchIcon style={{ cursor: 'pointer' }} onClick={() => searchValues()} />}
-            value={filterValue}
-            onClear={() => onClear()}
-            onValueChange={onSearchChange}
-            onKeyPress={handleKeyPress}
-          />
+          <div className="w-full sm:max-w-[33%]" style={{ position: 'relative' }}>
+            <Input
+              isClearable
+              className="search-input input-search-list"
+              placeholder=""
+              value={filterValue}
+              onClear={() => onClear()}
+              onValueChange={onSearchChange}
+              onKeyPress={handleKeyPress}
+            />
+            <div style={{ position: 'absolute', top: '0px', right: '0px', bottom: '0px', width: '40px', background: '#37446b', borderRadius: '0 5px 5px 0', cursor: 'pointer' }} className="elements-center" onClick={() => searchValues()}>
+              <SearchIcon />
+            </div>
+          </div>
           <div className="flex gap-3">
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
