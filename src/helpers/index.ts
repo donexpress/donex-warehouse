@@ -821,9 +821,11 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
         case "location":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getLocation(oi);
+          break;
         case "customer_order_number":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getCustomerOrderNumber(oi);
+          break;
         case "updated_at":
         case "created_at":
         case "delivered_time":

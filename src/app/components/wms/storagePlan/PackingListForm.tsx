@@ -9,7 +9,7 @@ import GenericInput from '../../common/GenericInput';
 import { useIntl } from 'react-intl';
 import { Response, ValueSelect } from '../../../../types';
 import { createStoragePlan, updateStoragePlanById } from '../../../../services/api.storage_plan';
-import { createPackingList, updatePackingListById } from '../../../../services/api.packing_list';
+import { createPackingList, updatePackingListById, bulkPackingList } from '../../../../services/api.packing_list';
 import { PackingListProps, StoragePlan, PackingList, BoxNumberLabelFn } from '../../../../types/storage_plan';
 import RowStoragePlan from '../../common/RowStoragePlan';
 import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
@@ -224,13 +224,23 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
         if (response.status >= 200 && response.status <= 299) {
           const responseSP: StoragePlan = response.data;
           if (responseSP) {
+            let pls: PackingList[]= [];
             for (let index = 0; index < rows.length; index++) {
               const element: PackingList = rows[index];
-              await createPackingList(formatBodyPackingList(element, storagePlanId));
+              pls.push(formatBodyPackingList(element, storagePlanId));
+            }
+            const resp: Response = await bulkPackingList({
+              storage_plan_id: storagePlanId,
+              data: pls,
+            });
+            if (resp && resp.status >= 200 && resp.status <= 299) {
+              showMsg(intl.formatMessage({ id: 'successfullyMsg' }), { type: "success" });
+              router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
+            } else {
+              let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+              showMsg(message, { type: "error" });
             }
           }
-          showMsg(intl.formatMessage({ id: 'successfullyMsg' }), { type: "success" });
-          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan/${id}/config`);
         } else {
           let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
           showMsg(message, { type: "error" });
