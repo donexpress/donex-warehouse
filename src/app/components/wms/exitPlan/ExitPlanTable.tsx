@@ -1081,6 +1081,12 @@ const ExitPlanTable = () => {
     setLoading(true);
     if (deleteElement !== -1) {
       const reponse = await removeExitPlan(deleteElement);
+      if (reponse.status >= 200 && reponse.status <= 299) {
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        showMsg(message, { type: "error" });
+      }
     } else if (cancelElement !== -1) {
       const reponse = await updateExitPlan(cancelElement, {
         state: "cancelled",
