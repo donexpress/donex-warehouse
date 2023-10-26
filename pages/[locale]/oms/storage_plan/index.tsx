@@ -22,7 +22,7 @@ const StoragePlanIndex = ({ storagePlanStates, storagePCount, inWMS = false }: S
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const storagePlanStates = await getStoragePlansState(context);
-  const storagePCount = await storagePlanCount(context);
+  const storagePCount = await storagePlanCount("", context);
 
   return {
     props: {

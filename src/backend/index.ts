@@ -83,10 +83,13 @@ export const countUserLevelPath = () => {
   return getBaseUrl() + "/api/v1/user_level/count";
 };
 
-export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number) => {
+export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number, query?: string) => {
   let params = status !== '' ? `?state=${status}` : "";
   if (page && rowsPerPage) {
-    params = `${ params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+    params += `${ params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  if (query && query !== '') {
+    params += `${ params === "" ? '?' : '&'}query=${query}`;
   }
   return getBaseUrl() + "/api/v1/storage_plan" + params;
 };
@@ -95,8 +98,12 @@ export const storagePlanStatePath = () => {
   return getBaseUrl() + "/api/v1/storage_plan/states";
 };
 
-export const storagePlanCountPath = () => {
-  return getBaseUrl() + "/api/v1/storage_plan/count";
+export const storagePlanCountPath = (query: string = "") => {
+  let params = "";
+  if (query && query !== "") {
+    params += `?query=${query}`;
+  }
+  return getBaseUrl() + "/api/v1/storage_plan/count" + params;
 };
 
 export const storagePlanByOrderNumberPath = (order_number: string) => {
