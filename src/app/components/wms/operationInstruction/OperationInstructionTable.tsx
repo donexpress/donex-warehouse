@@ -549,7 +549,6 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
           }
         }
         default:
-          console.log(cellValue);
           return cellValue;
       }
     },
@@ -579,7 +578,6 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     const op = operationInstructions.find((el) => el.id === id);
     if (op && op.id) {
       const appendages = await getAppendagesByOperationInstructionId(op.id);
-      console.log(op.operation_instruction_type);
       if (
         // @ts-ignore
         op.operation_instruction_type.instruction_type.find((el) => {
@@ -813,26 +811,24 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     }
     if(ep.output_plan && ep.output_plan.packing_lists) {
       ep.output_plan.packing_lists?.forEach((pl: any) => {
-        console.log(pl);
         if (
           pl.package_shelf &&
-          pl.package_shelf.shelf
+          pl.package_shelf[0].shelf
         ) {
           const tmpl = `${ep.warehouse?.code}-${String(
-            pl.package_shelf.shelf.partition_table
+            pl.package_shelf[0].shelf.partition_table
           ).padStart(2, "0")}-${String(
-            pl.package_shelf.shelf.number_of_shelves
-          ).padStart(2, "0")}-${String(pl.package_shelf.layer).padStart(
+            pl.package_shelf[0].shelf.number_of_shelves
+          ).padStart(2, "0")}-${String(pl.package_shelf[0].layer).padStart(
             2,
             "0"
-          )}-${String(pl.package_shelf.column).padStart(2, "0")}`;
+          )}-${String(pl.package_shelf[0].column).padStart(2, "0")}`;
           if (!locations.find((el) => el === tmpl)) {
             locations.push(tmpl);
           }
         }
       });
     }
-    console.log(ep.output_plan && ep.output_plan.packing_lists)
     return locations.join(", ");
   };
 
