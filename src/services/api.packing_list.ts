@@ -3,7 +3,7 @@ import { countPackingListPath, packingListPath } from '../backend';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
 import { Response } from '../types/index';
-import { PackingList } from '../types/storage_plan';
+import { PackingList, BulkPLRequest } from '../types/storage_plan';
 
 export const countPackingList = async ():Promise<{count: number}> => {
     const response = await axios.get(countPackingListPath())
@@ -12,6 +12,20 @@ export const countPackingList = async ():Promise<{count: number}> => {
 
 export const createPackingList = async (values: PackingList): Promise<Response> => {
   const path = packingListPath();
+  try {
+    const response = await axios.post(path, values, getHeaders());
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {data: response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const bulkPackingList = async (values: BulkPLRequest): Promise<Response> => {
+  const path = `${packingListPath()}/bulk_create`;
   try {
     const response = await axios.post(path, values, getHeaders());
     
