@@ -528,7 +528,6 @@ const ExitPlanTable = () => {
       return "--";
     }
     ep.packing_lists?.forEach((pl) => {
-      console.log(pl);
       if (
         pl.package_shelf &&
         pl.package_shelf[0] &&
