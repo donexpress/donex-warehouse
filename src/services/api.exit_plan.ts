@@ -17,6 +17,18 @@ export const getExitPlans = async (
   }
 };
 
+export const getCleanExitPlans = async (
+  context?: GetServerSidePropsContext
+): Promise<ExitPlan[] | null> => {
+  const path = `${exitPlanPath()}/cleanIndex`;
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export const getExitPlansById = async (
   exit_plan_id: number,
   context?: GetServerSidePropsContext
