@@ -61,10 +61,10 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
         }))
       : []
   );
-
+  console.log(exitPlan);
 
   const packageShelfFormat = (packageShelfs: PackageShelf | undefined) => {
-    if (packageShelfs ) {
+    if (packageShelfs) {
       const packageShelf: PackageShelf = packageShelfs;
       return `${intl.formatMessage({ id: "partition" })}: ${
         packageShelf.shelf?.partition_table
@@ -94,7 +94,8 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
             className="info-packing-list__table_display bg-default-100"
             style={{
               padding: "5px 0px 5px 5px",
-              borderRadius: "5px 5px 5px 5px", marginRight: '0px'
+              borderRadius: "5px 5px 5px 5px",
+              marginRight: "0px",
             }}
           >
             <div className="elements-center">
@@ -139,47 +140,54 @@ const LocationTable = ({ exitPlan, isDetail }: Props) => {
             </div>
           </div>
           <div className="boxes-container-values">
-          {rows.map((row, index) => (
-            <div
-              key={index}
-              className="info-packing-list__table_display storage-plan-header"
-              style={{ padding: "8px 0px 8px 5px", marginRight: '0px' }}
-            >
-              <div className="elements-center">
-                {row.packing_lists?.box_number}
+            {rows.map((row, index) => (
+              <div
+                key={index}
+                className="info-packing-list__table_display storage-plan-header"
+                style={{ padding: "8px 0px 8px 5px", marginRight: "0px" }}
+              >
+                <div className="elements-center">
+                  {row.packing_lists?.box_number}
+                </div>
+                <div className="elements-center">
+                  {row.packing_lists?.case_number}
+                </div>
+                <div className="elements-center">
+                  {row.packing_lists?.client_height}
+                </div>
+                <div className="elements-center">
+                  {row.packing_lists?.amount}
+                </div>
+                <div className="elements-center">
+                  {
+                    // @ts-ignore
+                    row.packing_lists && row.packing_lists.storage_time
+                      ? // @ts-ignore
+                        row.packing_lists.storage_time
+                      : 0
+                  }
+                  {" "}
+                  {intl.formatMessage({ id: "days" })}
+
+                </div>
+                <div className="elements-center">
+                  {getDateFormat(
+                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                  )}
+                  ,{" "}
+                  {getHourFormat(
+                    exitPlan.delivered_time ? exitPlan.delivered_time : ""
+                  )}
+                </div>
+                <div className="elements-center">
+                  {exitPlan.warehouse?.name}
+                </div>
+                <div className="elements-center">
+                  {/* @ts-ignore */}
+                  {packageShelfFormat(row.packing_lists.package_shelf)}
+                </div>
               </div>
-              <div className="elements-center">
-                {row.packing_lists?.case_number}
-              </div>
-              <div className="elements-center">
-                {row.packing_lists?.client_height}
-              </div>
-              <div className="elements-center">{row.packing_lists?.amount}</div>
-              <div className="elements-center">
-                {getDateFormat(
-                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                )}
-                ,{" "}
-                {getHourFormat(
-                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                )}
-              </div>
-              <div className="elements-center">
-                {getDateFormat(
-                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                )}
-                ,{" "}
-                {getHourFormat(
-                  exitPlan.delivered_time ? exitPlan.delivered_time : ""
-                )}
-              </div>
-              <div className="elements-center">{exitPlan.warehouse?.name}</div>
-              <div className="elements-center">
-                {/* @ts-ignore */}
-                {packageShelfFormat(row.packing_lists.package_shelf)}
-              </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
       </div>
