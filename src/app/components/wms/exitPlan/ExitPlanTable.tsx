@@ -740,6 +740,8 @@ const ExitPlanTable = () => {
             <FilterExitPlan
               onFinish={onFinishFilter}
               destionations={destinations}
+              current_page={page}
+              number_of_rows={rowsPerPage}
             />
           </div>
           <div

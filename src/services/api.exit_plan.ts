@@ -191,8 +191,12 @@ export const getExitPlanDestinationsAddresses = async (
   return response.data;
 };
 
-export const getExitPlanByFilter = async (filter:any, context?: GetServerSidePropsContext): Promise<ExitPlan[]> => {
-  const response = await axios.post<ExitPlan[]>(`${exitPlanPath()}/filter`,filter, getHeaders(context))
+export const getExitPlanByFilter = async (filter:any, page: number | undefined = undefined, rowsPerPage: number | undefined = undefined, context?: GetServerSidePropsContext): Promise<ExitPlan[]> => {
+  let params = "";
+  if (page && rowsPerPage) {
+    params += `?current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  const response = await axios.post<ExitPlan[]>(`${exitPlanPath()}/filter${params}`,filter, getHeaders(context))
   return response.data
 }
 

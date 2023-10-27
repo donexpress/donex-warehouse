@@ -13,6 +13,8 @@ import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 interface Props {
   onFinish: (data: ExitPlan[]) => any;
   destionations: State[];
+  current_page: number,
+  number_of_rows: number
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -21,7 +23,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "private_address",
 ];
 
-const FilterExitPlan = ({ onFinish, destionations }: Props) => {
+const FilterExitPlan = ({ onFinish, destionations,current_page, number_of_rows }: Props) => {
   const [date, setDate] = useState<string>("");
   const [finalDate, setFinalDate] = useState<string>("");
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
@@ -31,7 +33,7 @@ const FilterExitPlan = ({ onFinish, destionations }: Props) => {
 
   const handleFilter = async () => {
     const columns = getVisibleColumns();
-    const data = await getExitPlanByFilter({ initialDate: date, finalDate, location: columns });
+    const data = await getExitPlanByFilter({ initialDate: date, finalDate, location: columns }, current_page, number_of_rows);
     onFinish(data);
   };
 
