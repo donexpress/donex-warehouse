@@ -144,9 +144,16 @@ export const getExitPlansState = async () => {
 };
 
 export const getExitPlansByState = async (
-  state: string
+  state: string, page: number | undefined = undefined, rowsPerPage: number | undefined = undefined, query: string | undefined = undefined
 ): Promise<ExitPlan[] | null> => {
-  const path = exitPlanPath() + `?state=${state}`;
+  let params = "";
+  if (page && rowsPerPage) {
+    params += `&current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  if (query && query !== '') {
+    params += `&query=${query}`;
+  }
+  const path = exitPlanPath() + `?state=${state}${params}`;
   try {
     const response = await axios.get<ExitPlan[]>(path, getHeaders());
     return response.data;
@@ -155,8 +162,12 @@ export const getExitPlansByState = async (
   }
 };
 
-export const countExitPlans = async (): Promise<StateCount> => {
-  const response = await axios.get(`${exitPlanPath()}/count`, getHeaders());
+export const countExitPlans = async (query: string = ""): Promise<StateCount> => {
+  let params = "";
+  if (query && query !== "") {
+    params += `?query=${query}`;
+  }
+  const response = await axios.get(`${exitPlanPath()}/count${params}`, getHeaders());
   return response.data;
 };
 
