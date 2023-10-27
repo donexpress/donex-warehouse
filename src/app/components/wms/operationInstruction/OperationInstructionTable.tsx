@@ -60,7 +60,7 @@ import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { getAppendagesByOperationInstructionId } from "@/services/api.appendixerege1992";
 import { getExitPlansById } from "@/services/api.exit_planerege1992";
-import { ParsedUrlQueryInput } from 'querystring';
+import { ParsedUrlQueryInput } from "querystring";
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -134,10 +134,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     ); */
     let opi = null;
     if (exit_plan_id) {
-      opi = await getOperationInstructionsByOutputPlan(
-        exit_plan_id,
-        status
-      );
+      opi = await getOperationInstructionsByOutputPlan(exit_plan_id, status);
     } else {
       opi = await getOperationInstructions(status);
     }
@@ -240,7 +237,12 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
           search: `?exit_plan_id=${exit_plan_id}`,
         });
       } else {
-        showMsg(intl.formatMessage({ id: "operation_instruction_box_requirement_amount" }), {type: 'warning'})
+        showMsg(
+          intl.formatMessage({
+            id: "operation_instruction_box_requirement_amount",
+          }),
+          { type: "warning" }
+        );
       }
     } else {
       router.push({
@@ -292,7 +294,9 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
       };
     }
     router.push({
-      pathname: `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${id}/config`,
+      pathname: `/${locale}/${
+        isOMS() ? "oms" : "wms"
+      }/operation_instruction/${id}/config`,
       query: params,
     });
   };
@@ -423,7 +427,14 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                   <DropdownItem onClick={() => handleShow(Number(user["id"]))}>
                     {intl.formatMessage({ id: "View" })}
                   </DropdownItem>
-                  <DropdownItem className={(isOMS() && exit_plan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""} onClick={() => handleEdit(Number(user["id"]))}>
+                  <DropdownItem
+                    className={
+                      isOMS() && exit_plan && getState() !== "pending"
+                        ? "do-not-show-dropdown-item"
+                        : ""
+                    }
+                    onClick={() => handleEdit(Number(user["id"]))}
+                  >
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
                   <DropdownItem
@@ -456,14 +467,20 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                   >
                     {intl.formatMessage({ id: "return" })}
                   </DropdownItem>
-                  <DropdownItem className={(isOMS() && exit_plan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""}
+                  <DropdownItem
+                    className={
+                      isOMS() && exit_plan && getState() !== "pending"
+                        ? "do-not-show-dropdown-item"
+                        : ""
+                    }
                     onClick={() => handleConfig(Number(user["id"]))}
                   >
                     {intl.formatMessage({ id: "config" })}
                   </DropdownItem>
                   <DropdownItem
                     className={
-                      (user.state !== "pending" || (isOMS() && exit_plan && getState() !== "pending"))
+                      user.state !== "pending" ||
+                      (isOMS() && exit_plan && getState() !== "pending")
                         ? "do-not-show-dropdown-item"
                         : ""
                     }
@@ -491,9 +508,14 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
           );
           return (
             <a
-              href={`/${locale}/${
-                isOMS() ? "oms" : "wms"
-              }/operation_instruction/${user.id}/show` + ((exit_plan_id && exit_plan) ? `?exit_plan_id=${exit_plan_id}&exit_plan_state=${getState()}` : '')}
+              href={
+                `/${locale}/${isOMS() ? "oms" : "wms"}/operation_instruction/${
+                  user.id
+                }/show` +
+                (exit_plan_id && exit_plan
+                  ? `?exit_plan_id=${exit_plan_id}&exit_plan_state=${getState()}`
+                  : "")
+              }
             >
               {values.join(", ")}
             </a>
@@ -506,7 +528,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
           return user.user.username;
         }
         case "output_plan_id": {
-          return user.output_plan ? user.output_plan.output_number: '--';
+          return user.output_plan ? user.output_plan.output_number : "--";
         }
         case "number_delivery": {
           return <CopyColumnToClipboard value={cellValue} />;
@@ -549,7 +571,6 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
           }
         }
         default:
-          console.log(cellValue);
           return cellValue;
       }
     },
@@ -565,7 +586,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     return instruction.name;
   };
 
-  const changeTab = async(tab: string) => {
+  const changeTab = async (tab: string) => {
     if (tab !== statusSelected && !loadingItems) {
       setCookie("tabIO", tab);
       setStatusSelected(tab);
@@ -579,11 +600,14 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     const op = operationInstructions.find((el) => el.id === id);
     if (op && op.id) {
       const appendages = await getAppendagesByOperationInstructionId(op.id);
-      console.log(op.operation_instruction_type);
       if (
         // @ts-ignore
         op.operation_instruction_type.instruction_type.find((el) => {
-          return el.value === "change label" || el.value === "photograph" || el.value === "change boxes";
+          return (
+            el.value === "change label" ||
+            el.value === "photograph" ||
+            el.value === "change boxes"
+          );
         }) &&
         (!appendages || appendages.length === 0)
       ) {
@@ -808,31 +832,53 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
 
   const getLocation = (ep: any): string => {
     const locations: string[] = [];
-    if (ep.output_plan && ep.output_plan.packing_lists && ep.output_plan.packing_lists?.length == 0) {
+    if (
+      ep.output_plan &&
+      ep.output_plan.packing_lists &&
+      ep.output_plan.packing_lists?.length == 0
+    ) {
       return "--";
     }
-    if(ep.output_plan && ep.output_plan.packing_lists) {
+    if (ep.output_plan && ep.output_plan.packing_lists) {
       ep.output_plan.packing_lists?.forEach((pl: any) => {
-        console.log(pl);
-        if (
-          pl.package_shelf &&
-          pl.package_shelf.shelf
-        ) {
-          const tmpl = `${ep.warehouse?.code}-${String(
-            pl.package_shelf.shelf.partition_table
-          ).padStart(2, "0")}-${String(
-            pl.package_shelf.shelf.number_of_shelves
-          ).padStart(2, "0")}-${String(pl.package_shelf.layer).padStart(
-            2,
-            "0"
-          )}-${String(pl.package_shelf.column).padStart(2, "0")}`;
-          if (!locations.find((el) => el === tmpl)) {
-            locations.push(tmpl);
+        if (exit_plan_id) {
+          if (
+            pl.package_shelf &&
+            pl.package_shelf.shelf
+          ) {
+            const tmpl = `${ep.warehouse?.code}-${String(
+              pl.package_shelf.shelf.partition_table
+            ).padStart(2, "0")}-${String(
+              pl.package_shelf.shelf.number_of_shelves
+            ).padStart(2, "0")}-${String(pl.package_shelf.layer).padStart(
+              2,
+              "0"
+            )}-${String(pl.package_shelf.column).padStart(2, "0")}`;
+            if (!locations.find((el) => el === tmpl)) {
+              locations.push(tmpl);
+            }
+          }
+        } else {
+          if (
+            pl.package_shelf &&
+            pl.package_shelf[0] &&
+            pl.package_shelf[0].shelf
+          ) {
+            const tmpl = `${ep.warehouse?.code}-${String(
+              pl.package_shelf[0].shelf.partition_table
+            ).padStart(2, "0")}-${String(
+              pl.package_shelf[0].shelf.number_of_shelves
+            ).padStart(2, "0")}-${String(pl.package_shelf[0].layer).padStart(
+              2,
+              "0"
+            )}-${String(pl.package_shelf[0].column).padStart(2, "0")}`;
+            if (!locations.find((el) => el === tmpl)) {
+              locations.push(tmpl);
+            }
           }
         }
       });
     }
-    console.log(ep.output_plan && ep.output_plan.packing_lists)
     return locations.join(", ");
   };
 
@@ -917,7 +963,11 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
               color="primary"
               endContent={<PlusIcon />}
               onClick={() => handleAdd()}
-              className={(isOMS() && exit_plan && getState() !== "pending") ? "do-not-show-dropdown-item" : ""}
+              className={
+                isOMS() && exit_plan && getState() !== "pending"
+                  ? "do-not-show-dropdown-item"
+                  : ""
+              }
             >
               {intl.formatMessage({ id: "create" })}
             </Button>
@@ -1005,7 +1055,10 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             {intl.formatMessage({ id: "export" })}
           </Button>
         </div>
-        <div className="flex justify-between items-center" style={{ marginRight: exit_plan ? "15px" : "0px" }}>
+        <div
+          className="flex justify-between items-center"
+          style={{ marginRight: exit_plan ? "15px" : "0px" }}
+        >
           <span className="text-default-400 text-small">
             {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
           </span>
@@ -1110,7 +1163,11 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             )}
           </TableHeader>
           <TableBody
-            emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
+            emptyContent={`${
+              loadingItems
+                ? intl.formatMessage({ id: "loading_items" })
+                : intl.formatMessage({ id: "no_results_found" })
+            }`}
             items={loadingItems ? [] : sortedItems}
           >
             {(item: any) => (

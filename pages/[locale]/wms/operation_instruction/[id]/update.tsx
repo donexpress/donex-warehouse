@@ -1,7 +1,7 @@
 import ProtectedRoute from "@/app/components/common/ProtectedRouteerege1992";
 import OperationInstructionFormBody from "@/app/components/wms/operationInstruction/OperationInstructionFormBodyerege1992";
 import Layout from "@/app/layouterege1992";
-import { getExitPlans } from "@/services/api.exit_planerege1992";
+import { getCleanExitPlans, getExitPlans } from "@/services/api.exit_planerege1992";
 import {
   getOperationInstructionType,
   getOperationInstructionsById,
@@ -55,7 +55,7 @@ const Update = ({
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
   const operationInstructionTypes = await getOperationInstructionType(context);
-  const exitPlans = await getExitPlans(context);
+  const exitPlans = await getCleanExitPlans(context);
   const warehouses = await getWhs(context);
   const users = await getUsers(context);
   const operationInstruction = await getOperationInstructionsById(id);
