@@ -528,7 +528,6 @@ const ExitPlanTable = () => {
       return "--";
     }
     ep.packing_lists?.forEach((pl) => {
-      console.log(pl);
       if (
         pl.package_shelf &&
         pl.package_shelf[0] &&
@@ -1091,6 +1090,12 @@ const ExitPlanTable = () => {
       const reponse = await updateExitPlan(cancelElement, {
         state: "cancelled",
       });
+      if (reponse.status >= 200 && reponse.status <= 299) {
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        showMsg(message, { type: "error" });
+      }
     }
     close();
     await loadExitPlans(statusSelected);
