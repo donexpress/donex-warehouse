@@ -616,31 +616,39 @@ export const operationInstructionDataToExcel = (
   visibleColumn: string[]
 ) => {
   let dataToExport: object[] = [];
-  const packageShelfFormat = (
-    packageShelfs: PackageShelf[] | undefined
-  ): string => {
-    if (packageShelfs && packageShelfs.length > 0) {
-      const packageShelf: PackageShelf = packageShelfs[0];
-      return `${intl.formatMessage({ id: "partition" })}: ${
-        packageShelf.shelf?.partition_table
-      }
-        ${intl.formatMessage({ id: "shelf" })}: ${
-        packageShelf.shelf?.number_of_shelves
-      }
-        ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
-        ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
-    }
-    return "";
-  };
-
   const getLocation = (ep: OperationInstruction): string => {
-    let locations = "";
+    const locations: string[] = [];
     ep.output_plan &&
       ep.output_plan.packing_lists &&
       ep.output_plan.packing_lists.forEach((pl) => {
-        locations += packageShelfFormat(pl.package_shelf);
+        const l = packageShelfFormat(pl.package_shelf)
+        if(locations.find(el => el === l) === undefined) {
+          locations.push(l)
+        }
       });
-    return locations;
+    return locations.join('\n');
+  };
+
+  const packageShelfFormat = (packageShelfs: any): string => {
+    if (packageShelfs) {
+      let packageShelf: PackageShelf | null = null;
+      if (packageShelfs.length > 0) {
+        packageShelf = packageShelfs[0];
+      } else {
+        packageShelf = packageShelfs;
+      }
+      if (packageShelf) {
+        return `${intl.formatMessage({ id: "partition" })}: ${
+          packageShelf.shelf?.partition_table
+        }
+      ${intl.formatMessage({ id: "shelf" })}: ${
+          packageShelf.shelf?.number_of_shelves
+        }
+      ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
+      ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
+      }
+    }
+    return "";
   };
 
   const getType = (data: any[]): string[] => {

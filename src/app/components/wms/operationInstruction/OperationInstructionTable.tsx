@@ -115,6 +115,8 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   const [count, setCount] = useState<OperationInstructionCount | null>(null);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
 
+  console.log(exit_plan)
+
   useEffect(() => {
     const tab = getCookie("tabIO");
     if (tab) {
