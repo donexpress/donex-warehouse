@@ -813,6 +813,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
       ep.output_plan.packing_lists?.forEach((pl: any) => {
         if (
           pl.package_shelf &&
+          pl.package_shelf[0] &&
           pl.package_shelf[0].shelf
         ) {
           const tmpl = `${ep.warehouse?.code}-${String(
