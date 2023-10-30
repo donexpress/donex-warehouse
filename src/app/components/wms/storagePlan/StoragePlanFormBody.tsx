@@ -9,8 +9,8 @@ import GenericInput from '../../common/GenericInput';
 import { useIntl } from 'react-intl';
 import { Response, ValueSelect } from '../../../../types';
 import { createStoragePlan, updateStoragePlanById } from '../../../../services/api.storage_plan';
-import { createPackingList } from '../../../../services/api.packing_list';
-import { StoragePlanProps, StoragePlan, PackingList, BoxNumberLabelFn } from '../../../../types/storage_plan';
+import { bulkPackingList, createPackingList } from '../../../../services/api.packing_list';
+import { StoragePlanProps, StoragePlan, PackingList, BulkPLRequest, BoxNumberLabelFn } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
 import { Warehouse } from '../../../../types/warehouse';
 import RowStoragePlan from '../../common/RowStoragePlan';
@@ -124,7 +124,6 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
   }
 
   const getState = (state: string | undefined) => {
-    console.log(state)
     if (state) {
       return state;
     }
@@ -178,13 +177,23 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
     if (response.status >= 200 && response.status <= 299) {
       const responseSP: StoragePlan = response.data;
       if (responseSP) {
+        let pls: PackingList[]= [];
         for (let index = 0; index < rows.length; index++) {
           const element: PackingList = rows[index];
-          await createPackingList(formatBodyPackingList(element, Number(responseSP.id)));
+          pls.push(formatBodyPackingList(element, Number(responseSP.id)));
+        }
+        const resp: Response = await bulkPackingList({
+          storage_plan_id: Number(responseSP.id),
+          data: pls,
+        });
+        if (resp && resp.status >= 200 && resp.status <= 299) {
+          showMsg(intl.formatMessage({ id: 'successfullyMsg' }), { type: "success" });
+          router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
+        } else {
+          let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+          showMsg(message, { type: "error" });
         }
       }
-      showMsg(intl.formatMessage({ id: 'successfullyMsg' }), { type: "success" });
-      router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/storage_plan`);
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
       showMsg(message, { type: "error" });
@@ -349,7 +358,7 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
             <Form className='flex flex-col gap-3'>
               <div className='flex gap-3 flex-wrap justify-between'>
                 <div className="w-full sm:w-[49%]">
-                  <CustomerOrderNumberStoragePlan isFromDetails={!!isFromDetails} changeCustomerOrderNumber={changeCustomerOrderNumber}></CustomerOrderNumberStoragePlan>
+                  <CustomerOrderNumberStoragePlan isFromDetails={!!id} changeCustomerOrderNumber={changeCustomerOrderNumber}></CustomerOrderNumberStoragePlan>
                 </div>
                 {
                   inWMS && (

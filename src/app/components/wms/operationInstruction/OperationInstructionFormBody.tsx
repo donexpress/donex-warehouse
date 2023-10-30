@@ -123,7 +123,6 @@ const OperationInstructionFormBody = ({
     });
     values.operation_instruction_type = instruction_type;
     if (isModify) {
-      console.log(values);
       await updateOperationInstruction(id ? id : -1, values);
     } else {
       const r = await createOperationInstruction(values);

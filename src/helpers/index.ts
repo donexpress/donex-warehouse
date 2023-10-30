@@ -315,6 +315,7 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   
   packingLists.forEach((pl: PackingList) => {
     const pList: { [key: string]: string } = {};
+    const packageShelf: PackageShelf | null = !!Array.isArray(pl.package_shelf) ? (pl.package_shelf.length > 0 ? pl.package_shelf[0] : null) : (pl.package_shelf ? pl.package_shelf : null);
 
     pList[key1] = pl.box_number;
     pList[key2] = pl.case_number;
@@ -325,41 +326,33 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
     pList[key6] = "--";
     pList[key7] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
     pList[key8] =
-      pl.package_shelf && pl.package_shelf.length > 0
+      packageShelf !== null
         ? (exitPlan.warehouse
             ? `${exitPlan.warehouse.code}-${String(
-                pl.package_shelf[0].shelf?.partition_table
+              packageShelf.shelf?.partition_table
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].shelf?.number_of_shelves
+                packageShelf.shelf?.number_of_shelves
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].layer
+                packageShelf.layer
               ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].column
+                packageShelf.column
               ).padStart(2, "0")} `
             : "") +
           `${intl.formatMessage({ id: "partition" })}: ${
-            pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-              ? pl.package_shelf[0].shelf.partition_table
+            packageShelf.shelf
+              ? packageShelf.shelf.partition_table
               : ""
           } ` +
           `${intl.formatMessage({ id: "shelf" })}: ${
-            pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-              ? pl.package_shelf[0].shelf.number_of_shelves
+            packageShelf.shelf
+              ? packageShelf.shelf.number_of_shelves
               : ""
           } ` +
           `${intl.formatMessage({ id: "layer" })}: ${
-            pl.package_shelf && pl.package_shelf.length > 0
-              ? pl.package_shelf[0].layer
-              : ""
+            packageShelf.layer
           }  ` +
           `${intl.formatMessage({ id: "column" })}: ${
-            pl.package_shelf && pl.package_shelf.length > 0
-              ? pl.package_shelf[0].column
-              : ""
+            packageShelf.column
           } `
         : "--";
         // @ts-ignore
@@ -623,31 +616,39 @@ export const operationInstructionDataToExcel = (
   visibleColumn: string[]
 ) => {
   let dataToExport: object[] = [];
-  const packageShelfFormat = (
-    packageShelfs: PackageShelf[] | undefined
-  ): string => {
-    if (packageShelfs && packageShelfs.length > 0) {
-      const packageShelf: PackageShelf = packageShelfs[0];
-      return `${intl.formatMessage({ id: "partition" })}: ${
-        packageShelf.shelf?.partition_table
-      }
-        ${intl.formatMessage({ id: "shelf" })}: ${
-        packageShelf.shelf?.number_of_shelves
-      }
-        ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
-        ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
-    }
-    return "";
-  };
-
   const getLocation = (ep: OperationInstruction): string => {
-    let locations = "";
+    const locations: string[] = [];
     ep.output_plan &&
       ep.output_plan.packing_lists &&
       ep.output_plan.packing_lists.forEach((pl) => {
-        locations += packageShelfFormat(pl.package_shelf);
+        const l = packageShelfFormat(pl.package_shelf)
+        if(locations.find(el => el === l) === undefined) {
+          locations.push(l)
+        }
       });
-    return locations;
+    return locations.join('\n');
+  };
+
+  const packageShelfFormat = (packageShelfs: any): string => {
+    if (packageShelfs) {
+      let packageShelf: PackageShelf | null = null;
+      if (packageShelfs.length > 0) {
+        packageShelf = packageShelfs[0];
+      } else {
+        packageShelf = packageShelfs;
+      }
+      if (packageShelf) {
+        return `${intl.formatMessage({ id: "partition" })}: ${
+          packageShelf.shelf?.partition_table
+        }
+      ${intl.formatMessage({ id: "shelf" })}: ${
+          packageShelf.shelf?.number_of_shelves
+        }
+      ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
+      ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
+      }
+    }
+    return "";
   };
 
   const getType = (data: any[]): string[] => {
@@ -828,9 +829,11 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
         case "location":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getLocation(oi);
+          break;
         case "customer_order_number":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getCustomerOrderNumber(oi);
+          break;
         case "updated_at":
         case "created_at":
         case "delivered_time":

@@ -2,6 +2,11 @@ import { User } from './user';
 import { Warehouse } from './warehouse';
 import { PackageShelf } from './package_shelf';
 
+export type BulkPLRequest = {
+  storage_plan_id: number;
+  data: PackingList[];
+};
+
 export type PackingList = {
   id?: number,
   box_number: string,

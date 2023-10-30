@@ -91,10 +91,10 @@ interface Props {
 
 const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
   const packageShelfFormat = (
-    packageShelfs: PackageShelf[] | undefined
+    packageShelfs: PackageShelf[] | PackageShelf | undefined
   ): string => {
-    if (packageShelfs && packageShelfs.length > 0) {
-      const packageShelf: PackageShelf = packageShelfs[0];
+    if (packageShelfs && ((!!Array.isArray(packageShelfs) && packageShelfs.length > 0) || !Array.isArray(packageShelfs))) {
+      const packageShelf: PackageShelf = !!Array.isArray(packageShelfs) ? packageShelfs[0] : packageShelfs;
       return `${intl.formatMessage({ id: "partition" })}: ${
         packageShelf.shelf?.partition_table
       }
