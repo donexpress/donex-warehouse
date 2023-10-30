@@ -12,7 +12,7 @@ import "../../../styles/common.scss";
 import SelectLanguage from "./SelectLanguage";
 import generateValidationSchema from "../../../validation/generateValidationSchema";
 import { login, indexProfile } from "../../../services/api.users";
-import { setCookie } from "../../../helpers/cookieUtils";
+import { setCookie, removeCookie } from "../../../helpers/cookieUtils";
 import { showMsg } from "../../../helpers";
 import { useRouter } from "next/router";
 import { Button } from "@nextui-org/react";
@@ -27,6 +27,14 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
   };
 
   const handleSubmit = async (values: LoginBody) => {
+    /* if (inWMS) {
+      removeCookie("tokenWMS");
+      removeCookie("profileWMS");
+    }
+    if (inOMS) {
+      removeCookie("tokenOMS");
+      removeCookie("profileOMS");
+    } */
     const response: LoginResponse = await login(values);
     const { locale } = router.query;
     if (
@@ -34,10 +42,15 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
       response.status <= 299 &&
       response.token !== undefined
     ) {
+      let options: any = {};
+      if (response.expiration) {
+        //options.expires = new Date(response.expiration * 1000);
+        options.expires = new Date((new Date()).getTime() + 10000);
+      }
       if (inWMS) {
-        setCookie("tokenWMS", response.token);
+        setCookie("tokenWMS", response.token, options);
       } else {
-        setCookie("tokenOMS", response.token);
+        setCookie("tokenOMS", response.token, options);
       }
 
       const profile: Profile | null = await indexProfile();
@@ -47,10 +60,10 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
         });
   
         if (inWMS) {
-          setCookie("profileWMS", profile);
+          setCookie("profileWMS", profile, options);
           router.push(`/${locale}/wms`);
         } else {
-          setCookie("profileOMS", profile);
+          setCookie("profileOMS", profile, options);
           router.push(`/${locale}/oms`);
         }
       } else {

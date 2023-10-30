@@ -9,7 +9,7 @@ export const getCookie = (name: string): any | undefined => {
 
 // Función para establecer una cookie
 export const setCookie = (name: string, value: any, options: any = {}): void => {
-  cookies.set(name, value, {...{ path: '/'}, ...options});
+  cookies.set(name, value, {...{ path: '/', sameSite: 'strict'}, ...options});
 };
 
 // Función para eliminar una cookie

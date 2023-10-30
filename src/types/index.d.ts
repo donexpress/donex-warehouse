@@ -147,6 +147,7 @@ export type LoginResponse = {
   status: number;
   token?: string;
   message?: string;
+  expiration?: number;
 };
 
 export type Country = {
