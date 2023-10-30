@@ -145,7 +145,7 @@ const BatchOnStoragePlansDialog = ({ close, confirm, title }: Params) => {
                     className="px-4"
                     style={{ marginRight: '15px' }}
                     onClick={handleSubmit}
-                    isDisabled={batch.length === 0 || sendRequest}
+                    disabled={batch.length === 0 || sendRequest}
                   >
                     {intl.formatMessage({ id: "confirmation_header" })}
                   </Button>

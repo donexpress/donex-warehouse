@@ -116,6 +116,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     direction: "descending",
   });
   const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>([]);
+  const [isLoadCounts, setIsLoadCounts] = React.useState<boolean>(false);
 
   const [page, setPage] = useState(1);
 
@@ -505,10 +506,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const getCount = (state: any) => {
     if (stgPCount) {
       switch(state) {
-        case 'to be storage': return `${(statusSelected === 'to be storage' && !loadingItems) ? stgPCount.to_be_storage : stgPCount.to_be_storage}`;
-        case 'into warehouse': return `${(statusSelected === 'into warehouse' && !loadingItems) ? stgPCount.into_warehouse : stgPCount.into_warehouse}`;
-        case 'stocked': return `${(statusSelected === 'stocked' && !loadingItems) ? stgPCount.stocked : stgPCount.stocked}`;
-        case 'cancelled': return `${(statusSelected === 'cancelled' && !loadingItems) ? stgPCount.cancelled : stgPCount.cancelled}`;
+        case 'to be storage': return `${(statusSelected === 'to be storage' && isLoadCounts) ? 0 : stgPCount.to_be_storage}`;
+        case 'into warehouse': return `${(statusSelected === 'into warehouse' && isLoadCounts) ? 0 : stgPCount.into_warehouse}`;
+        case 'stocked': return `${(statusSelected === 'stocked' && isLoadCounts) ? 0 : stgPCount.stocked}`;
+        case 'cancelled': return `${(statusSelected === 'cancelled' && isLoadCounts) ? 0 : stgPCount.cancelled}`;
       }
     }
     return '';
@@ -906,6 +907,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     if (!partialLoad) {
       setLoading(true);
     }
+    if (loadCount) {
+      setIsLoadCounts(true);
+    }
     await setLoadingItems(true);
     const storagePlanss = await getStoragePlans(status, pageSP !== -1 ? pageSP : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, querySP);
     
@@ -914,6 +918,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     if (loadCount) {
       const storagePCount = await storagePlanCount(querySP);
       setStgPCount(storagePCount ? storagePCount : undefined);
+      setIsLoadCounts(false);
     }
     setLoading(false);
   };
