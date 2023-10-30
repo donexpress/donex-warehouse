@@ -530,7 +530,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
           return user.user.username;
         }
         case "output_plan_id": {
-          return user.output_plan ? user.output_plan.output_number : "--";
+          return user.output_plan ? (<CopyColumnToClipboard value={user.output_plan.output_number} />) : "--";
         }
         case "number_delivery": {
           return <CopyColumnToClipboard value={cellValue} />;
