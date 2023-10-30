@@ -47,7 +47,6 @@ const AddAppendixDialog = ({
   });
 
   const uploadImageClient = (imagePath: string) => {
-    console.log(imagePath);
     let name = initialValues.name;
     if (name === "") {
       const name_arr = imagePath.split("/");
