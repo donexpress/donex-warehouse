@@ -86,21 +86,22 @@ export type StoragePlanProps = {
 
 export type StoragePlanConfigProps = {
   id: number;
-  storagePlan: StoragePlan;
+  //storagePlan: StoragePlan;
   inWMS: boolean;
 };
 
 export type PackingListProps = {
   id: number;
-  storagePlan: StoragePlan;
+  storagePlan: StoragePlan | null;
   isFromAddPackingList?: boolean;
   isFromModifyPackingList?: boolean;
+  loading: boolean;
   inWMS: boolean;
 }
 
 export type HistoryStoragePlanProps = {
   id: number;
-  storagePlan: StoragePlan;
+  storagePlan: StoragePlan | null;
   users: User[];
   warehouses: Warehouse[];
   inWMS: boolean;
