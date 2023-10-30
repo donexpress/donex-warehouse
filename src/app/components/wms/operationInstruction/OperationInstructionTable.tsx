@@ -84,6 +84,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   const [operationInstructionState, setOperationInstructionState] =
     useState<ExitPlanState | null>(null);
   const [statusSelected, setStatusSelected] = useState<string>("pending");
+  const [showPagination, setShowPagination] = useState<boolean>(true);
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
@@ -94,6 +95,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   });
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [filterValue, setFilterValue] = useState("");
+  const [queryFilter, setQueryFilter] = React.useState("");
   const hasSearchFilter = Boolean(filterValue);
   const [page, setPage] = useState(1);
   const [operationInstructions, setOperationInstructions] = useState<
@@ -122,26 +124,30 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     if (tab) {
       setStatusSelected(tab);
     }
-    loadStates(tab ? tab : statusSelected);
+    loadStates(tab ? tab : statusSelected, page, rowsPerPage, "", true, true);
   }, []);
 
-  const loadStates = async (status: string = "pending") => {
-    const states: ExitPlanState = await getOperationInstructionStates();
-    const count: OperationInstructionCount = await countOperationInstruction(
-      exit_plan_id
-    );
-    setCount(count);
-    /* const list_state = states.states.find(
-      (el) => el.position === statusSelected
-    ); */
+  const loadStates = async (status: string = "pending", pageSP: number = -1, rowsPerPageSP: number = -1, querySP: string = "", loadCount: boolean = false, isFirstLoad: boolean = false) => {
+    setLoadingItems(true);
+    if (isFirstLoad) {
+      const states: ExitPlanState = await getOperationInstructionStates();
+      setOperationInstructionState(states);
+    }
+    if (loadCount) {
+      const count: OperationInstructionCount = await countOperationInstruction(
+        exit_plan_id, querySP
+      );
+      setCount(count);
+    }
+    
     let opi = null;
     if (exit_plan_id) {
-      opi = await getOperationInstructionsByOutputPlan(exit_plan_id, status);
+      opi = await getOperationInstructionsByOutputPlan(exit_plan_id, status, pageSP !== -1 ? pageSP : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, querySP);
     } else {
-      opi = await getOperationInstructions(status);
+      opi = await getOperationInstructions(status, pageSP !== -1 ? pageSP : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, querySP);
     }
     setOperationInstructions(opi);
-    setOperationInstructionState(states);
+    setLoadingItems(false);
   };
 
   const getCount = (
@@ -335,7 +341,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
 
   const confirm = async () => {
     const result = await deleteOperationInstructions(selectedId);
-    await loadStates(statusSelected);
+    await loadStates(statusSelected, page, rowsPerPage, queryFilter, true);
     showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
       type: "success",
     });
@@ -592,9 +598,8 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     if (tab !== statusSelected && !loadingItems) {
       setCookie("tabIO", tab);
       setStatusSelected(tab);
-      await setLoadingItems(true);
-      await loadStates(tab);
-      await setLoadingItems(false);
+      await loadStates(tab, 1, rowsPerPage, queryFilter, false);
+      setPage(1);
     }
   };
 
@@ -695,7 +700,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     setDialogTexts([]);
     setDialogType("");
     setSelectedItems([]);
-    loadStates(statusSelected);
+    loadStates(statusSelected, page, rowsPerPage, queryFilter, true);
     setDisplayOperationInstructionConfirmation(false);
   };
 
@@ -758,6 +763,17 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     },
     []
   );
+
+  const changePage = async(newPage: number) => {
+    if (page !== newPage) {
+      setSelectedItems([]);
+      setSelectedKeys(new Set([]));
+      setPage(newPage);
+      await setShowPagination(false);
+      await loadStates(statusSelected, newPage, rowsPerPage, queryFilter, false);
+      await setShowPagination(true);
+    }
+  }
 
   const bottomContent = React.useMemo(() => {
     return (
