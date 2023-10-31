@@ -78,7 +78,7 @@ export const updateExitPlan = async (
     console.log({
       status:
         error.response && error.response.status ? error.response.status : 0,
-    })
+    });
     return {
       status:
         error.response && error.response.status ? error.response.status : 0,
@@ -102,7 +102,7 @@ export const removeBoxesExitPlan = async (
     console.log({
       status:
         error.response && error.response.status ? error.response.status : 0,
-    })
+    });
     return {
       status:
         error.response && error.response.status ? error.response.status : 0,
@@ -144,14 +144,29 @@ export const getExitPlansState = async () => {
 };
 
 export const getExitPlansByState = async (
-  state: string, page: number | undefined = undefined, rowsPerPage: number | undefined = undefined, query: string | undefined = undefined
+  state: string,
+  page: number | undefined = undefined,
+  rowsPerPage: number | undefined = undefined,
+  query: string | undefined = undefined,
+  initialDate: string | undefined = undefined,
+  finalDate: string | undefined = undefined,
+  location: string[] | undefined = undefined
 ): Promise<ExitPlan[] | null> => {
   let params = "";
   if (page && rowsPerPage) {
     params += `&current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
-  if (query && query !== '') {
+  if (query && query !== "") {
     params += `&query=${query}`;
+  }
+  if(initialDate && initialDate !== "") {
+    params += `&initialDate=${initialDate}`
+  }
+  if(finalDate && finalDate !== "") {
+    params += `&finalDate=${finalDate}`
+  }
+  if(location && location.length > 0) {
+    params += `&location=${encodeURIComponent(JSON.stringify(location))}`
   }
   const path = exitPlanPath() + `?state=${state}${params}`;
   try {
@@ -162,12 +177,17 @@ export const getExitPlansByState = async (
   }
 };
 
-export const countExitPlans = async (query: string = ""): Promise<StateCount> => {
+export const countExitPlans = async (
+  query: string = ""
+): Promise<StateCount> => {
   let params = "";
   if (query && query !== "") {
     params += `?query=${query}`;
   }
-  const response = await axios.get(`${exitPlanPath()}/count${params}`, getHeaders());
+  const response = await axios.get(
+    `${exitPlanPath()}/count${params}`,
+    getHeaders()
+  );
   return response.data;
 };
 
@@ -191,14 +211,23 @@ export const getExitPlanDestinationsAddresses = async (
   return response.data;
 };
 
-export const getExitPlanByFilter = async (filter:any, page: number | undefined = undefined, rowsPerPage: number | undefined = undefined, context?: GetServerSidePropsContext): Promise<ExitPlan[]> => {
+export const getExitPlanByFilter = async (
+  filter: any,
+  page: number | undefined = undefined,
+  rowsPerPage: number | undefined = undefined,
+  context?: GetServerSidePropsContext
+): Promise<ExitPlan[]> => {
   let params = "";
   if (page && rowsPerPage) {
     params += `?current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
-  const response = await axios.post<ExitPlan[]>(`${exitPlanPath()}/filter${params}`,filter, getHeaders(context))
-  return response.data
-}
+  const response = await axios.post<ExitPlan[]>(
+    `${exitPlanPath()}/filter${params}`,
+    filter,
+    getHeaders(context)
+  );
+  return response.data;
+};
 
 export const getNonBoxesOnExitPlans = async (
   excluded_output_plan: number,
@@ -206,7 +235,11 @@ export const getNonBoxesOnExitPlans = async (
 ): Promise<Response> => {
   const path = exitPlanPath() + `/get_non_boxes_on_output_plans`;
   try {
-    const response = await axios.post(path, {case_numbers, excluded_output_plan}, getHeaders());
+    const response = await axios.post(
+      path,
+      { case_numbers, excluded_output_plan },
+      getHeaders()
+    );
 
     if (response.status && response.status >= 200 && response.status <= 299) {
       return { data: response.data, status: response.status };
@@ -216,7 +249,7 @@ export const getNonBoxesOnExitPlans = async (
     console.log({
       status:
         error.response && error.response.status ? error.response.status : 0,
-    })
+    });
     return {
       status:
         error.response && error.response.status ? error.response.status : 0,
@@ -224,10 +257,18 @@ export const getNonBoxesOnExitPlans = async (
   }
 };
 
-export const pullBoxes = async(id: number, data: {
-  case_number: string;
-  warehouse_order_number: string;
-}, context?: GetServerSidePropsContext) => {
-  const response = await axios.post<ExitPlan>(`${exitPlanPath()}/pull_boxes`, {id, data}, getHeaders(context))
-  return response.data
-}
+export const pullBoxes = async (
+  id: number,
+  data: {
+    case_number: string;
+    warehouse_order_number: string;
+  },
+  context?: GetServerSidePropsContext
+) => {
+  const response = await axios.post<ExitPlan>(
+    `${exitPlanPath()}/pull_boxes`,
+    { id, data },
+    getHeaders(context)
+  );
+  return response.data;
+};
