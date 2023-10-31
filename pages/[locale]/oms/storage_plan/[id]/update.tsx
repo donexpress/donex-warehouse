@@ -5,7 +5,7 @@ import StoragePlanFormBody from '../../../../../src/app/components/wms/storagePl
 import { StoragePlanProps } from '../../../../../src/types/storage_plan';
 import { getUsers } from '../../../../../src/services/api.users';
 import { getWhs } from '../../../../../src/services/api.wh';
-import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
+import { getStoragePlanByIdNoDependencies } from '../../../../../src/services/api.storage_plan';
 
 const UpdateStoragePlan = ({ warehouses, users, id, storagePlan, inWMS = false }: StoragePlanProps) => {
   
@@ -24,7 +24,7 @@ const UpdateStoragePlan = ({ warehouses, users, id, storagePlan, inWMS = false }
 
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
-  const storagePlan = await getStoragePlanById(id, context);
+  const storagePlan = await getStoragePlanByIdNoDependencies(id, context);
   const users = await getUsers(context);
   const warehouses = await getWhs(context);
 
