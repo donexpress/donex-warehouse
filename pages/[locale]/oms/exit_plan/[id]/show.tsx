@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { useEffect, useState } from 'react';
 import Layout from "../../../../../src/app/layout";
 import ProtectedRoute from "../../../../../src/app/components/common/ProtectedRoute";
 import {
@@ -7,13 +8,13 @@ import {
   getExitPlansById,
 } from "../../../../../src/services/api.exit_plan";
 import ExitPlanFormBody from "../../../../../src/app/components/wms/exitPlan/ExitPlanFormBody";
-import { ExitPlanProps } from "../../../../../src/types/exit_plan";
+import { ExitPlanProps, ExitPlan } from "../../../../../src/types/exit_plan";
 import { indexCountries } from "../../../../../src/services/api.countries";
 import { getUsers } from "../../../../../src/services/api.users";
 import { getWhs } from "../../../../../src/services/api.wh";
+import { Loading } from '../../../../../src/app/components/common/Loading';
 
 const ShowExitPlan = ({
-  exitPlan,
   id,
   countries,
   users,
@@ -21,6 +22,19 @@ const ShowExitPlan = ({
   destinations,
   addresses
 }: ExitPlanProps) => {
+  const [exitPlan, setExitPlan] = useState<ExitPlan | null>(null)
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setup()
+  },[])
+
+  const setup = async () => {
+    setLoading(true);
+    const sPlan = await getExitPlansById(Number(id));
+    setExitPlan(sPlan);
+    setLoading(false);
+  }
   return (
     <Layout>
       <Head>
@@ -28,8 +42,9 @@ const ShowExitPlan = ({
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
+        <Loading loading={loading}>
         <ExitPlanFormBody
-          exitPlan={exitPlan}
+          exitPlan={exitPlan as ExitPlan}
           id={id}
           isFromDetails={true}
           countries={countries}
@@ -38,6 +53,7 @@ const ShowExitPlan = ({
           destinations={destinations}
           addresses={addresses}
         />
+        </Loading>
       </ProtectedRoute>
     </Layout>
   );
@@ -45,7 +61,7 @@ const ShowExitPlan = ({
 
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
-  const exitPlan = await getExitPlansById(id, context);
+  //const exitPlan = await getExitPlansById(id, context);
   const users = await getUsers(context);
   const countries = await indexCountries(context);
   const warehouses = await getWhs(context);
@@ -53,7 +69,6 @@ export async function getServerSideProps(context: any) {
   const addresses = await getExitPlanDestinationsAddresses(context)
   return {
     props: {
-      exitPlan,
       id,
       users,
       countries,
