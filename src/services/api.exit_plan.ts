@@ -170,11 +170,23 @@ export const getExitPlansByState = async (
 };
 
 export const countExitPlans = async (
-  query: string = ""
+  query: string = "",
+  initialDate: string | undefined = undefined,
+  finalDate: string | undefined = undefined,
+  location: string[] | undefined = undefined
 ): Promise<StateCount> => {
-  let params = "";
+  let params = "?api=back";
   if (query && query !== "") {
-    params += `?query=${query}`;
+    params += `&query=${query}`;
+  }
+  if(initialDate && initialDate !== "") {
+    params += `&initialDate=${initialDate}`
+  }
+  if(finalDate && finalDate !== "") {
+    params += `&finalDate=${finalDate}`
+  }
+  if(location && location.length > 0) {
+    params += `&location=${encodeURIComponent(JSON.stringify(location))}`
   }
   const response = await axios.get(
     `${exitPlanPath()}/count${params}`,

@@ -692,15 +692,16 @@ const ExitPlanTable = () => {
       await setStatusSelected(tab);
       await setLoadingItems(true);
 
-      const storagePlanss = await getExitPlansByState(
-        tab,
-        1,
-        rowsPerPage,
-        queryFilter
-      );
+      // const storagePlanss = await getExitPlansByState(
+      //   tab,
+      //   1,
+      //   rowsPerPage,
+      //   queryFilter
+      // );
 
-      await setLoadingItems(false);
-      await setExitPlans(storagePlanss !== null ? storagePlanss : []);
+      // await setLoadingItems(false);
+      // await setExitPlans(storagePlanss !== null ? storagePlanss : []);
+      await loadExitPlans(tab, 1, rowsPerPage, queryFilter, true, true, false)
       setSelectedItems([]);
       setSelectedKeys(new Set([]));
       if (page !== 1) {
@@ -1108,7 +1109,7 @@ const ExitPlanTable = () => {
       setExitPlanState(states);
     }
     if (loadCount) {
-      const count = await countExitPlans(querySP);
+      const count = await countExitPlans(querySP,filterInitialDate, filterFinalDate, filterLocation);
       setCount(count);
     }
     if (firstLoad) {
