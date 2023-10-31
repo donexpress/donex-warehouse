@@ -75,10 +75,6 @@ export const updateExitPlan = async (
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    console.log({
-      status:
-        error.response && error.response.status ? error.response.status : 0,
-    });
     return {
       status:
         error.response && error.response.status ? error.response.status : 0,
@@ -99,10 +95,6 @@ export const removeBoxesExitPlan = async (
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    console.log({
-      status:
-        error.response && error.response.status ? error.response.status : 0,
-    });
     return {
       status:
         error.response && error.response.status ? error.response.status : 0,
@@ -246,10 +238,6 @@ export const getNonBoxesOnExitPlans = async (
     }
     return { status: response.status ? response.status : 0 };
   } catch (error: any) {
-    console.log({
-      status:
-        error.response && error.response.status ? error.response.status : 0,
-    });
     return {
       status:
         error.response && error.response.status ? error.response.status : 0,

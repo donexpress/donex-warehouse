@@ -5,7 +5,7 @@ import StoragePlanConfig from '../../../../../src/app/components/wms/storagePlan
 import { StoragePlanConfigProps } from '../../../../../src/types/storage_plan';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const ConfigStoragePlan = ({ id, storagePlan, inWMS = false }: StoragePlanConfigProps) => {
+const ConfigStoragePlan = ({ id, inWMS = false }: StoragePlanConfigProps) => {
   
   return (
   <ProtectedRoute>
@@ -14,7 +14,7 @@ const ConfigStoragePlan = ({ id, storagePlan, inWMS = false }: StoragePlanConfig
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <StoragePlanConfig storagePlan={storagePlan} id={id} inWMS={ inWMS } />
+        <StoragePlanConfig id={id} inWMS={ inWMS } />
       </Layout>
     </ProtectedRoute>
     );
@@ -22,11 +22,10 @@ const ConfigStoragePlan = ({ id, storagePlan, inWMS = false }: StoragePlanConfig
 
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
-  let storagePlan = await getStoragePlanById(id, context);
+  //let storagePlan = await getStoragePlanById(id, context);
 
   return {
     props: {
-        storagePlan,
         id,
     }
   }

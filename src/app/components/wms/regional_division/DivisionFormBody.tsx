@@ -100,7 +100,6 @@ const DivisionsFormBody = ({ regionalDivisionsTypes, id, regionalDivision, isFro
     const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         // @ts-ignore
         const { value } = event.target;
-        console.log(value);
         setSelectedType(regionalDivisionsTypes.find(t => t.value == Number(value)));
     }
 

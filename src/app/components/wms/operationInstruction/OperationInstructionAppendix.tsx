@@ -60,7 +60,6 @@ const OperationInstructionAppendix = ({
     result = await getAppendagesByOperationInstructionId(
       operationInstruction?.id ? operationInstruction.id : -1
     );
-    console.log(owner);
 
     if (result) {
       setAppendages(result);
