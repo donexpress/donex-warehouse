@@ -232,7 +232,7 @@ export const storagePlanDataToExcel = (
           : "0";
     }
     if (selection === "all" || selection.has("location")) {
-      sPlan[key6_1] = getLocationPackages(sp);
+      sPlan[key6_1] = getLocationPackages(sp, intl, true);
     }
     if (selection === "all" || selection.has("dispatched_boxes")) {
       sPlan[key11_1] =
@@ -397,7 +397,7 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   );
 }
 
-export const getLocationPackages = (sp: StoragePlan): string => {
+export const getLocationPackages = (sp: StoragePlan, intl?: IntlShape,  isFromDownload: boolean = false): string => {
   const locations: string[] = [];
   if (sp.packing_list && sp.packing_list?.length == 0) {
     return "--";
@@ -415,13 +415,37 @@ export const getLocationPackages = (sp: StoragePlan): string => {
       ).padStart(2, "0")}-${String(pl.package_shelf[0].layer).padStart(
         2,
         "0"
-      )}-${String(pl.package_shelf[0].column).padStart(2, "0")}`;
+      )}-${String(pl.package_shelf[0].column).padStart(2, "0")}` + 
+      ((isFromDownload && intl !== undefined) ? (` ${intl.formatMessage({ id: "partition" })}: ${
+        pl.package_shelf &&
+        pl.package_shelf.length > 0 &&
+        pl.package_shelf[0].shelf
+          ? pl.package_shelf[0].shelf.partition_table
+          : ""
+      } ` +
+      `${intl.formatMessage({ id: "shelf" })}: ${
+        pl.package_shelf &&
+        pl.package_shelf.length > 0 &&
+        pl.package_shelf[0].shelf
+          ? pl.package_shelf[0].shelf.number_of_shelves
+          : ""
+      } ` +
+      `${intl.formatMessage({ id: "layer" })}: ${
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? pl.package_shelf[0].layer
+          : ""
+      }  ` +
+      `${intl.formatMessage({ id: "column" })}: ${
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? pl.package_shelf[0].column
+          : ""
+      } `) : '');
       if (!locations.find((el) => el === tmpl)) {
         locations.push(tmpl);
       }
     }
   });
-  return locations.join(", ");
+  return locations.join((isFromDownload && intl !== undefined) ? "\n\n" : ", ");
 };
 
 export const packingListDataToExcel = (
