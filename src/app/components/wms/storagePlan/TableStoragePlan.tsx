@@ -25,7 +25,7 @@ import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
-import { showMsg, storagePlanDataToExcel, packingListDataToExcel } from "../../../../helpers";
+import { showMsg, storagePlanDataToExcel, packingListDataToExcel, getLocationPackages } from "../../../../helpers";
 
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
@@ -59,6 +59,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "order_number",
   "customer_order_number",
   "number_of_boxes_stored",
+  "location",
   "reference_number",
   "box_amount",
   "actions",
@@ -69,6 +70,7 @@ const INITIAL_VISIBLE_COLUMNS_OMS = [
   "customer_order_number",
   "box_amount",
   "number_of_boxes_stored",
+  "location",
   "evidence",
   "actions",
 ];
@@ -161,6 +163,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         sortable: false,
       },
       {
+        name: intl.formatMessage({ id: "location" }),
+        uid: "location",
+        sortable: false,
+      },
+      {
         name: intl.formatMessage({ id: "evidence" }),
         uid: "evidence",
         sortable: false,
@@ -226,6 +233,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "dispatched_boxes" }),
         uid: "dispatched_boxes",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "location" }),
+        uid: "location",
         sortable: false,
       },
       {
@@ -468,7 +480,21 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
           storageP.packing_list && storageP.packing_list.length > 0 ? (storageP.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0'
         ) - storageP.packing_list.filter((el: any) => el.dispatched).length;
         case "dispatched_boxes":
-          return storageP.packing_list.filter((el: any) => el.dispatched).length
+          return storageP.packing_list.filter((el: any) => el.dispatched).length;
+        case "location":
+          return (
+            <span
+              style={{
+                maxWidth: "250px",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                display: "block",
+              }}
+            >
+              {getLocationPackages(storageP)}
+            </span>
+          );
         default:
           return cellValue;
       }
