@@ -11,8 +11,10 @@ import { capitalize, getLanguage } from "@/helpers/utilserege1992";
 import "../../../../styles/wms/exit.plan.config.scss";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 interface Props {
-  onFinish: (data: ExitPlan[]) => any;
-  destionations: State[];
+  onFinish: () => any;
+  setParentInitialDate: (date: string) => any;
+  setParentFinalDate: (date: string) => any;
+  setParentLocations: (locations: string[]) => any
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -21,7 +23,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "private_address",
 ];
 
-const FilterExitPlan = ({ onFinish, destionations }: Props) => {
+const FilterExitPlan = ({ onFinish, setParentFinalDate, setParentInitialDate, setParentLocations }: Props) => {
   const [date, setDate] = useState<string>("");
   const [finalDate, setFinalDate] = useState<string>("");
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
@@ -30,9 +32,7 @@ const FilterExitPlan = ({ onFinish, destionations }: Props) => {
   const intl = useIntl();
 
   const handleFilter = async () => {
-    const columns = getVisibleColumns();
-    const data = await getExitPlanByFilter({ initialDate: date, finalDate, location: columns });
-    onFinish(data);
+    onFinish();
   };
 
   const getVisibleColumns = (): string[] => {
@@ -84,7 +84,10 @@ const FilterExitPlan = ({ onFinish, destionations }: Props) => {
             closeOnSelect={false}
             selectedKeys={visibleColumns}
             selectionMode="multiple"
-            onSelectionChange={setVisibleColumns}
+            onSelectionChange={(value) => {
+              setVisibleColumns(value)
+              setParentLocations(Array.from(value) as string[])
+            }}
           >
             {getColumns.map((column) => (
               <DropdownItem key={column.uid} className="capitalize">
@@ -101,7 +104,10 @@ const FilterExitPlan = ({ onFinish, destionations }: Props) => {
           className="search-input"
           startContent={<FaClock />}
           value={date}
-          onValueChange={setDate}
+          onValueChange={(value: string)=> {
+            setDate(value),
+            setParentInitialDate(value)
+          }}
         />
       </div>
 
@@ -112,7 +118,10 @@ const FilterExitPlan = ({ onFinish, destionations }: Props) => {
           className="search-input"
           startContent={<FaClock />}
           value={finalDate}
-          onValueChange={setFinalDate}
+          onValueChange={(value: string) => {
+            setFinalDate(value),
+            setParentFinalDate(value)
+          }}
         />
       </div>
 
