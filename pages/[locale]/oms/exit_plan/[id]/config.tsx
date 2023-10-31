@@ -49,7 +49,6 @@ const Config = ({ id, users, warehouses,addresses }: ExitPlanProps) => {
 
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
-  const storagePlan = await getStoragePlanById(id, context);
   const users = await getUsers(context);
   const warehouses = await getWhs(context);
   //const exitPlan = await getExitPlansById(id)
@@ -59,7 +58,6 @@ export async function getServerSideProps(context: any) {
     props: {
       warehouses,
       users,
-      storagePlan,
       id,
       addresses
     },
