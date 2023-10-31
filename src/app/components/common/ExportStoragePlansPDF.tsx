@@ -3,7 +3,7 @@ import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/render
 import { StoragePlan, PackingList } from "../../../types/storage_plan";
 import { PackageShelf } from "../../../types/package_shelf";
 import { IntlShape } from 'react-intl';
-import { getDateFromStr, getHourFromStr } from '../../../helpers'
+import { getDateFromStr, getHourFromStr, getLocationPackages } from '../../../helpers'
 import { getDateFormat, getHourFormat } from '../../../helpers/utils'
 import { Selection } from "@nextui-org/react";
 
@@ -88,6 +88,7 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     const key4: string = intl.formatMessage({ id: 'storage' });
     const key5: string = intl.formatMessage({ id: 'number_of_boxes_entered' });
     const key6: string = intl.formatMessage({ id: 'number_of_boxes_stored' });
+    const key6_1: string = intl.formatMessage({ id: "location" });
     const key7: string = intl.formatMessage({ id: 'evidence' });
     const key8: string = intl.formatMessage({ id: 'reference_number' });
     const key9: string = intl.formatMessage({ id: 'pr_number' });
@@ -115,6 +116,9 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     }
     if (selection === "all" || selection.has("number_of_boxes_stored")) {
         titles.push(key6);
+    }
+    if (selection === "all" || selection.has("location")) {
+        titles.push(key6_1);
     }
     if (selection === "all" || selection.has("dispatched_boxes")) {
         titles.push(key11_1);
@@ -175,6 +179,10 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
         }
         if (selection === "all" || selection.has("number_of_boxes_stored")) {
           values[index][i] = sp.packing_list && sp.packing_list.length > 0 ? (sp.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length.toString()) : '0';
+          i++;
+        }
+        if (selection === "all" || selection.has("location")) {
+          values[index][i] = getLocationPackages(sp);
           i++;
         }
         if (selection === "all" || selection.has("dispatched_boxes")) {
