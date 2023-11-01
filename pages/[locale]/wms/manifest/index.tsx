@@ -1,7 +1,7 @@
 import ProtectedRoute from "@/app/components/common/ProtectedRouteerege1992";
 import Layout from "@/app/layouterege1992";
 import Head from "next/head";
-import AirGuideTable from "@/app/components/wms/air_guide/Tableerege1992";
+import ManifestTable from "@/app/components/wms/manifest/Tableerege1992";
 
 const Index = () => {
   return (
@@ -11,7 +11,7 @@ const Index = () => {
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
-        <AirGuideTable />
+        <ManifestTable />
       </ProtectedRoute>
     </Layout>
   );

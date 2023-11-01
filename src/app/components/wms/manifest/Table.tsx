@@ -15,8 +15,8 @@ import {
   SortDescriptor,
   Input,
 } from "@nextui-org/react";
-import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
-import { SearchIcon } from "./../../common/SearchIcon";
+import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
+import { SearchIcon } from "../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
@@ -47,7 +47,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "carrier"
 ];
 
-const AirGuideTable = () => {
+const ManifestTable = () => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
@@ -298,7 +298,7 @@ const AirGuideTable = () => {
             />
           </div>
 
-          <div className="flexbox-item" style={{ paddingRight: 0 }}>
+          {/* <div className="flexbox-item" style={{ paddingRight: 0 }}>
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -317,17 +317,17 @@ const AirGuideTable = () => {
                 selectedKeys={visibleColumns}
                 selectionMode="multiple"
                 onSelectionChange={setVisibleColumns}
-              >
+              > */}
                 {/* {getColumns.map((column) => (
                   <DropdownItem key={column.uid} className="capitalize">
                     {capitalize(column.name)}
                   </DropdownItem>
                 ))} */}
-              </DropdownMenu>
-            </Dropdown>
-          </div>
+              {/* </DropdownMenu>
+            </Dropdown> */}
+          {/* </div> */}
 
-          <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+          <div className="flexbox-item">
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -353,7 +353,7 @@ const AirGuideTable = () => {
             </Dropdown>
           </div>
 
-          <div className="flexbox-item">
+          <div className="flexbox-item" style={{ paddingRight: 0 }}>
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -443,9 +443,9 @@ const AirGuideTable = () => {
               className="outline-none text-default-400 text-small m-1"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
         </div>
@@ -558,17 +558,17 @@ const AirGuideTable = () => {
 
   const handleEdit = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/aereal_guide/${id}/update`);
+    router.push(`/${locale}/wms/manifest/${id}/update`);
   };
 
   const handleShow = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/aereal_guide/${id}/show`);
+    router.push(`/${locale}/wms/manifest/${id}/show`);
   };
 
   const handleAdd = () => {
     setLoading(true);
-    router.push(`/${locale}/wms/aereal_guide/insert_guide`);
+    router.push(`/${locale}/wms/manifest/insert_manifest`);
   };
 
   const close = () => {
@@ -631,4 +631,4 @@ const AirGuideTable = () => {
     </>
   );
 };
-export default AirGuideTable;
+export default ManifestTable;

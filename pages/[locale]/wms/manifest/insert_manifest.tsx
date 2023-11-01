@@ -7,7 +7,7 @@ import { getOrganizations } from "../../../../src/services/api.organization";
 import { getWarehouses } from "../../../../src/services/api.warehouse";
 import { GetServerSidePropsContext } from "next";
 import { StaffFormProps } from "@/typeserege1992";
-import GuideFormBody from "@/app/components/wms/air_guide/GuideFormBodyerege1992";
+import ManifestFormBody from "@/app/components/wms/manifest/ManifestFormBodyerege1992";
 
 const InsertGuide = () => {
   return (
@@ -17,7 +17,7 @@ const InsertGuide = () => {
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
-        <GuideFormBody/>
+        <ManifestFormBody />
       </ProtectedRoute>
     </Layout>
   );

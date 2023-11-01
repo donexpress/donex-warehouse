@@ -22,7 +22,7 @@ import { generateValidationLines, generateValidationLinesModify } from "../../..
 //   return response;
 // };
 
-const GuideFormBody = ({ id, line, isFromDetails }: LineFormProps) => {
+const ManifestFormBody = ({ id, line, isFromDetails }: LineFormProps) => {
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
@@ -199,4 +199,4 @@ const GuideFormBody = ({ id, line, isFromDetails }: LineFormProps) => {
   );
 };
 
-export default GuideFormBody;
+export default ManifestFormBody;
