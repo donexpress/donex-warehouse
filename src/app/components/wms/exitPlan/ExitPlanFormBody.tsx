@@ -141,7 +141,7 @@ const ExitPlanFormBody = ({
             type: "warning",
           });
         } else if (resp["already_used"]) {
-          showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+          showMsg(intl.formatMessage({ id: "alreadyUsedmsg" }), {
             type: "error",
           });
         } else if (resp["duplicated"]) {
