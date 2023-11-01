@@ -35,10 +35,13 @@ export const getOperationInstructionType = async (context?: GetServerSidePropsCo
   }
 }
 
-export const countOperationInstruction = async (exit_plan_id?: number,context?: GetServerSidePropsContext) => {
+export const countOperationInstruction = async (exit_plan_id?: number, query?: string, context?: GetServerSidePropsContext) => {
   let path: string = operationInstructionPath() + `/count`
   if(exit_plan_id) {
     path += `?output_plan_id=${exit_plan_id}`
+  }
+  if (query && (query !== '')) {
+    path += `${ exit_plan_id ? '&' : '?'}query=${query}`;
   }
   try {
     const response = await axios.get(path, getHeaders(context));
@@ -88,8 +91,15 @@ export const updateOperationInstruction = async (id: number, data: any, context?
 
 
 
-export const getOperationInstructions = async (state:string = 'pending', context?: GetServerSidePropsContext) => {
-  const path = `${operationInstructionPath()}?state=${state}`
+export const getOperationInstructions = async (state:string = 'pending', page?: number, rowsPerPage?: number, query?: string, context?: GetServerSidePropsContext) => {
+  let params = '';
+  if (page && rowsPerPage) {
+    params += `&current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  if (query && query !== '') {
+    params += `&query=${query}`;
+  }
+  const path = `${operationInstructionPath()}?state=${state}${params}`
   try {
     const response = await axios.get(path,getHeaders(context));
     if(response.status && response.status >=200 && response.status <= 299) {
@@ -120,8 +130,15 @@ export const deleteOperationInstructions = async (id: number, context?: GetServe
   }
 }
 
-export const getOperationInstructionsByOutputPlan = async (outputPlan: number, state:string = 'pending', context?: GetServerSidePropsContext) => {
-  const path = `${operationInstructionPath()}/output_plan/${outputPlan}?state=${state}`
+export const getOperationInstructionsByOutputPlan = async (outputPlan: number, state:string = 'pending', page?: number, rowsPerPage?: number, query?: string, context?: GetServerSidePropsContext) => {
+  let params = '';
+  if (page && rowsPerPage) {
+    params += `&current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  if (query && query !== '') {
+    params += `&query=${query}`;
+  }
+  const path = `${operationInstructionPath()}/output_plan/${outputPlan}?state=${state}${params}`
   try {
     const response = await axios.get(path,getHeaders(context));
     if(response.status && response.status >=200 && response.status <= 299) {
