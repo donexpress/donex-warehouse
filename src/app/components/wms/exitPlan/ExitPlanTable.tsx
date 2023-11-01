@@ -399,7 +399,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "pending" || checkOMS
+                    user.state !== "pending" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -409,7 +409,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "to_be_processed" || checkOMS
+                    user.state !== "to_be_processed" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -419,7 +419,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "processing" || checkOMS
+                    user.state !== "processing" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -429,8 +429,8 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    (user.state.value !== "dispatched" &&
-                      user.state.value !== "to_be_processed") ||
+                    (user.state !== "dispatched" &&
+                      user.state !== "to_be_processed") ||
                     checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
@@ -444,7 +444,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "pending"
+                    user.state !== "pending"
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -455,8 +455,8 @@ const ExitPlanTable = () => {
                 <DropdownItem
                   className={
                     checkOMS &&
-                    user.state.value !== "pending" &&
-                    user.state.value !== "cancelled"
+                    user.state !== "pending" &&
+                    user.state !== "cancelled"
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
