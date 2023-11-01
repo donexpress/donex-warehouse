@@ -249,6 +249,7 @@ const AirGuideTable = () => {
     setClientReferenceValue("");
     setTrackingNumberValue("");
     setCarrierValue("");
+    setPaidValue("");
     reloadData();
   };
 
@@ -317,11 +318,11 @@ const AirGuideTable = () => {
                 selectionMode="multiple"
                 onSelectionChange={setVisibleColumns}
               >
-                {getColumns.map((column) => (
+                {/* {getColumns.map((column) => (
                   <DropdownItem key={column.uid} className="capitalize">
                     {capitalize(column.name)}
                   </DropdownItem>
-                ))}
+                ))} */}
               </DropdownMenu>
             </Dropdown>
           </div>
