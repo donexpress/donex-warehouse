@@ -422,7 +422,6 @@ const ExitPlanFormBody = ({
                     })}
                     customClass="custom-input"
                     disabled={isFromDetails}
-                    required={destinationSelected !== "private_address"}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
