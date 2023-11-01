@@ -6,60 +6,77 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Input,
   Button,
   DropdownTrigger,
   Dropdown,
   DropdownMenu,
   DropdownItem,
-  Chip,
   Selection,
-  ChipProps,
   SortDescriptor,
+  Input,
 } from "@nextui-org/react";
-import { PlusIcon } from "./../../common/PlusIcon";
 import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import { Line } from "../../../../types/line";
 import PaginationTable from "../../common/Pagination";
-import { getLine, removeLine } from "@/services/api.lineserege1992";
+import { removeLine } from "@/services/api.lineserege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
-import { BiColumns, BiFilter } from "react-icons/bi";
-
-const statusColorMap: Record<string, ChipProps["color"]> = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
+import { ChevronDownIcon } from "../../common/ChevronDownIcon";
+import { getGuides } from "@/services/api.guideerege1992";
+import { Guide } from "@/types/guideerege1992";
+import { indexCarriers } from "@/services/api.carrierserege1992";
+import { Carrier } from "@/typeserege1992";
+import { isString } from "formik";
+import { PlusIcon } from "../../common/PlusIcon";
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "name",
-  "contain_channels",
-  "include_order_account",
-  "actions",
+  "waybill_id",
+  "tracking_number",
+  "weigth",
+  "total_declare",
+  "currency",
+  "shipping_cost",
+  "sale_price",
+  "invoice_weight",
+  "paid",
+  "carrier"
 ];
 
 const AirGuideTable = () => {
   const intl = useIntl();
   const router = useRouter();
   const { locale } = router.query;
-  const [lines, setLines] = useState<Line[]>([]);
+  const [guides, setGuides] = useState<any[]>([]);
+  const [carriers, setCarriers] = useState<Carrier[] | null>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+
+  // const [showGuideNumber, setshowGuideNumber] = useState<boolean>(true);
+  // const [showTrackingNumber, setshowTrackingNumber] = useState<boolean>(true);
+  // const [showclientReference, setshowclientReference] = useState<boolean>(true);
+  // const [showAccountStatus, setshowAccountStatus] = useState<boolean>(true);
+  // const [showCarrier, setshowCarrier] = useState<boolean>(true);
+  // const [showPaid, setshowPaid] = useState<boolean>(true);
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
   );
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+
+  const [aerealGuideNumberValue, setAerealGuideNumberValue] = React.useState("");
+  const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
+  const [clientReferenceValue, setClientReferenceValue] = React.useState("");
+  const [carrierValue, setCarrierValue] = React.useState("");
+  const [paidValue, setPaidValue] = React.useState("");
+
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
@@ -77,19 +94,55 @@ const AirGuideTable = () => {
   const getColumns = React.useMemo(() => {
     const columns = [
       { name: "ID", uid: "id", sortable: true },
+      { name: intl.formatMessage({ id: "waybill_id" }), uid: "waybill_id", sortable: true },
       {
-        name: intl.formatMessage({ id: "name" }),
-        uid: "name",
+        name: intl.formatMessage({ id: "trackingNumber" }),
+        uid: "tracking_number",
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "contain_channels" }),
-        uid: "contain_channels",
+        name: intl.formatMessage({ id: "weigth" }),
+        uid: "weigth",
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "include_order_account" }),
-        uid: "include_order_account",
+        name: intl.formatMessage({ id: "total_declare" }),
+        uid: "total_declare",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "currency" }),
+        uid: "currency",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "shipping_cost" }),
+        uid: "shipping_cost",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "sale_price" }),
+        uid: "sale_price",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "paid" }),
+        uid: "paid",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "carrier" }),
+        uid: "carrier",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "bag_code" }),
+        uid: "bag_code",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "clientReference" }),
+        uid: "client_reference",
         sortable: true,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -108,27 +161,9 @@ const AirGuideTable = () => {
   }, [visibleColumns, intl]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredLines = [...lines];
-
-    if (hasSearchFilter) {
-      filteredLines = filteredLines.filter(
-        (storageP) =>
-          storageP.name
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          storageP.contain_channels
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          storageP.include_order_account
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase())
-      );
-    }
-
-    return filteredLines;
-  }, [lines, filterValue, statusFilter]);
+    let filteredGuides = [...guides];
+    return filteredGuides;
+  }, [guides, filterValue, statusFilter]);
 
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
@@ -141,9 +176,9 @@ const AirGuideTable = () => {
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: Line, b: Line) => {
-      const first = a[sortDescriptor.column as keyof Line] as number;
-      const second = b[sortDescriptor.column as keyof Line] as number;
+    return [...items].sort((a: Guide, b: Guide) => {
+      const first = a[sortDescriptor.column as keyof Guide] as number;
+      const second = b[sortDescriptor.column as keyof Guide] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -151,19 +186,12 @@ const AirGuideTable = () => {
   }, [sortDescriptor, items]);
 
   const renderCell = React.useCallback(
-    (user: any, columnKey: React.Key) => {
-      const cellValue = user[columnKey];
+    (guide: any, columnKey: React.Key) => {
+      const cellValue = guide[columnKey];
       switch (columnKey) {
-        case "status":
+        case "paid":
           return (
-            <Chip
-              className="capitalize"
-              color={statusColorMap[user.status]}
-              size="sm"
-              variant="flat"
-            >
-              {cellValue}
-            </Chip>
+            cellValue ? "Pagados" : "No pagados"
           );
         case "actions":
           return (
@@ -175,25 +203,19 @@ const AirGuideTable = () => {
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
-                  <DropdownItem onClick={() => handleShow(user["id"])}>
+                  <DropdownItem onClick={() => handleShow(guide["waybill_id"])}>
                     {intl.formatMessage({ id: "View" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleEdit(user["id"])}>
+                  <DropdownItem onClick={() => handleEdit(guide["waybill_id"])}>
                     {intl.formatMessage({ id: "Edit" })}
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleDelete(user["id"])}>
+                  <DropdownItem onClick={() => handleDelete(guide["waybill_id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </div>
           );
-        case "organization_id":
-          return user.organization ? user.organization.name : "";
-        case "role_id":
-          return user.role ? user.role.name : "";
-        case "state":
-          return user.state ? getLabelByLanguage(user.state) : "";
         default:
           return cellValue;
       }
@@ -218,135 +240,201 @@ const AirGuideTable = () => {
     []
   );
 
-  const onSearchChange = React.useCallback((value?: string) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
+  const onClear = React.useCallback((filter: string) => {
+    eval(`set${filter}("")`);
   }, []);
 
-  const onClear = React.useCallback(() => {
-    setFilterValue("");
-    setPage(1);
-  }, []);
-
-  const handleShowFilters = () => {
-    setShowFilters(prevShowFilters => !prevShowFilters);
+  const handleClearAll = () => {
+    setAerealGuideNumberValue("");
+    setClientReferenceValue("");
+    setTrackingNumberValue("");
+    setCarrierValue("");
+    reloadData();
   };
+
+  const arrayPaids = [
+    { value: "Pagados", id: 0 },
+    { value: "No pagados", id: 1 }
+  ]
 
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        {
-          showFilters &&
-          <div className="mb-4 flex flex-col gap-5">
-            <div className="flex justify-between">
-              <Input
-                isClearable
-                className="w-full sm:max-w-[32%] search-input"
-                placeholder=""
-                startContent={<SearchIcon />}
-                value={filterValue}
-                onClear={() => onClear()}
-                onValueChange={onSearchChange}
-              />
-              <Input
-                isClearable
-                className="w-full sm:max-w-[32%] search-input"
-                placeholder=""
-                startContent={<SearchIcon />}
-                value={filterValue}
-                onClear={() => onClear()}
-                onValueChange={onSearchChange}
-              />
-              <Input
-                isClearable
-                className="w-full sm:max-w-[32%] search-input"
-                placeholder=""
-                startContent={<SearchIcon />}
-                value={filterValue}
-                onClear={() => onClear()}
-                onValueChange={onSearchChange}
-              />
-            </div>
-
-            <div className="flex justify-between">
-              <Input
-                isClearable
-                className="w-full sm:max-w-[32%] search-input"
-                placeholder=""
-                startContent={<SearchIcon />}
-                value={filterValue}
-                onClear={() => onClear()}
-                onValueChange={onSearchChange}
-              />
-              <Input
-                isClearable
-                className="w-full sm:max-w-[32%] search-input"
-                placeholder=""
-                startContent={<SearchIcon />}
-                value={filterValue}
-                onClear={() => onClear()}
-                onValueChange={onSearchChange}
-              />
-              <Input
-                isClearable
-                className="w-full sm:max-w-[32%] search-input"
-                placeholder=""
-                startContent={<SearchIcon />}
-                value={filterValue}
-                onClear={() => onClear()}
-                onValueChange={onSearchChange}
-              />
-            </div>
+        <div className="flexbox-container">
+          <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+            <Input
+              isClearable
+              className="search-input"
+              placeholder={intl.formatMessage({ id: "waybill_id" })}
+              startContent={<SearchIcon />}
+              value={aerealGuideNumberValue}
+              onClear={() => onClear("AerealGuideNumberValue")}
+              onChange={(e) => setAerealGuideNumberValue(e.target.value)}
+            />
           </div>
-        }
-        <div className="flex justify-end gap-3 items-end">
-          <Dropdown>
-            <DropdownTrigger className="hidden sm:flex">
-              <Button
-                className="bnt-select"
-                isIconOnly
-                startContent={<BiColumns size={30} />}
-              >
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              disallowEmptySelection
-              aria-label="Table Columns"
-              closeOnSelect={false}
-              selectedKeys={visibleColumns}
-              selectionMode="multiple"
-              onSelectionChange={setVisibleColumns}
-            >
-              {getColumns.map((column) => (
-                <DropdownItem key={column.uid} className="capitalize">
-                  {capitalize(column.name)}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
 
-          <Button
-            className={showFilters ? `bnt-filters-active` : `bnt-filters`}
-            isIconOnly
-            startContent={<BiFilter size={30} />}
-            onClick={handleShowFilters}
-          >
-          </Button>
-          <Button
-            color="primary"
-            endContent={<PlusIcon />}
-            onClick={() => handleAdd()}
-          >
-            {intl.formatMessage({ id: "create" })}
-          </Button>
+          <div className="flexbox-item">
+            <Input
+              isClearable
+              className="search-input"
+              placeholder={intl.formatMessage({ id: "trackingNumber" })}
+              startContent={<SearchIcon />}
+              value={trackingNumberValue}
+              onClear={() => onClear("TrackingNumberValue")}
+              onChange={(e) => setTrackingNumberValue(e.target.value)}
+            />
+          </div>
+
+          <div className="flexbox-item">
+            <Input
+              isClearable
+              className="search-input"
+              placeholder={intl.formatMessage({ id: "clientReference" })}
+              startContent={<SearchIcon />}
+              value={clientReferenceValue}
+              onClear={() => onClear("ClientReferenceValue")}
+              onChange={(e) => setClientReferenceValue(e.target.value)}
+            />
+          </div>
+
+          <div className="flexbox-item" style={{ paddingRight: 0 }}>
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  className="bnt-dropdown"
+                  // isIconOnly
+                  style={{ width: "-webkit-fill-available" }}
+                  endContent={<ChevronDownIcon className="text-small" />}
+                >
+                  {intl.formatMessage({ id: "accountStatus" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Account Status"
+                closeOnSelect={false}
+                selectedKeys={visibleColumns}
+                selectionMode="multiple"
+                onSelectionChange={setVisibleColumns}
+              >
+                {getColumns.map((column) => (
+                  <DropdownItem key={column.uid} className="capitalize">
+                    {capitalize(column.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+
+          <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  className="bnt-dropdown"
+                  style={{ width: "-webkit-fill-available" }}
+                  endContent={<ChevronDownIcon className="text-small" />}
+                >
+                  {carrierValue.trim() !== "" ? carrierValue : intl.formatMessage({ id: "carrier" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Carrier"
+                closeOnSelect={true}
+                selectionMode="single"
+              >
+                {carriers ? carriers.map((column) => (
+                  <DropdownItem onClick={(e) => setCarrierValue(column.name)} key={column.position} className="capitalize">
+                    {capitalize(column.name)}
+                  </DropdownItem>
+                )) : []}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+
+          <div className="flexbox-item">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  className="bnt-dropdown"
+                  // isIconOnly
+                  style={{ width: "-webkit-fill-available" }}
+                  endContent={<ChevronDownIcon className="text-small" />}
+                >
+                  {paidValue.trim() !== "" ? paidValue : intl.formatMessage({ id: "paid" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Paid"
+                closeOnSelect={true}
+                selectionMode="single"
+              >
+                {arrayPaids.map((column) => (
+                  <DropdownItem onClick={(e) => setPaidValue(column.value)} key={column.id} className="capitalize">
+                    {capitalize(column.value)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+        </div>
+        <div className="flex justify-between">
+          <div className="flex justify-start gap-3 items-start">
+            <Button
+              className="bnt-select"
+              onClick={(e) => handleSelectedFilters(e)}
+            >
+              {intl.formatMessage({ id: "filter" })}
+            </Button>
+
+            <Button
+              className="bnt-select"
+              onClick={handleClearAll}
+            >
+              {intl.formatMessage({ id: "clear" })}
+            </Button>
+          </div>
+
+          <div className="flex justify-end gap-3 items-end">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  className="bnt-select"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                >
+                  {intl.formatMessage({ id: "columns" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={visibleColumns}
+                selectionMode="multiple"
+                onSelectionChange={setVisibleColumns}
+              >
+                {getColumns.map((column) => (
+                  <DropdownItem key={column.uid} className="capitalize">
+                    {capitalize(column.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+
+            <Button
+              color="primary"
+              // isIconOnly
+              endContent={<PlusIcon />}
+              onClick={() => handleAdd()}
+            >
+              {intl.formatMessage({ id: "create" })}
+            </Button>
+          </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {intl.formatMessage({ id: "total_results" }, { in: lines.length })}
+            {intl.formatMessage({ id: "total_results" }, { in: guides.length })}
           </span>
           <label className="flex items-center text-default-400 text-small">
             {intl.formatMessage({ id: "rows_page" })}
@@ -360,18 +448,21 @@ const AirGuideTable = () => {
             </select>
           </label>
         </div>
-      </div>
+      </div >
     );
   }, [
     filterValue,
     statusFilter,
     visibleColumns,
-    onSearchChange,
     onRowsPerPageChange,
-    lines.length,
+    guides.length,
     hasSearchFilter,
     intl,
-    showFilters
+    trackingNumberValue,
+    clientReferenceValue,
+    aerealGuideNumberValue,
+    carrierValue,
+    paidValue
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -386,7 +477,7 @@ const AirGuideTable = () => {
             )}`}
         </span>
         <PaginationTable
-          totalRecords={filteredItems.slice(0, lines.length).length}
+          totalRecords={filteredItems.slice(0, guides.length).length}
           pageLimit={rowsPerPage}
           pageNeighbours={1}
           page={page}
@@ -400,14 +491,14 @@ const AirGuideTable = () => {
     page,
     hasSearchFilter,
     sortedItems.length,
-    lines.length,
+    guides.length,
     rowsPerPage,
     intl,
   ]);
   /** end*/
 
   useEffect(() => {
-    loadLines();
+    loadGuides();
   }, []);
 
   useEffect(() => {
@@ -418,12 +509,45 @@ const AirGuideTable = () => {
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const loadLines = async () => {
+  const loadGuides = async () => {
     setLoading(true);
-    const _lines = await getLine();
-    setLines(_lines);
-
+    const _guides = await getGuides();
+    const _carriers = await indexCarriers();
+    setGuides(_guides);
+    setCarriers(_carriers);
     setLoading(false);
+  };
+
+  const handleSelectedFilters = (event: any) => {
+    let filters = [];
+    if (trackingNumberValue.trim() !== "") {
+      filters.push(`tracking_number=${trackingNumberValue}`);
+    }
+    if (clientReferenceValue.trim() !== "") {
+      filters.push(`client_reference=${clientReferenceValue}`);
+    }
+    if (aerealGuideNumberValue.trim() !== "") {
+      filters.push(`waybill_id=${aerealGuideNumberValue}`);
+    }
+    if (carrierValue.trim() !== "") {
+      filters.push(`carrier=${carrierValue}`);
+    }
+    if (paidValue.trim() !== "") {
+      filters.push(`paid=${paidValue === "Pagados" ? true : false}`);
+    }
+    reloadData(filters.join("&"));
+  }
+
+  const reloadData = async (filters?: string[] | string) => {
+    if (isString(filters)) {
+      // setLoading(true);
+      const _guides = await getGuides(filters);
+      setGuides(_guides);
+      // setLoading(false);
+    } else {
+      const _guides = await getGuides();
+      setGuides(_guides);
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -433,17 +557,17 @@ const AirGuideTable = () => {
 
   const handleEdit = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/line_classification/${id}/update`);
+    router.push(`/${locale}/wms/aereal_guide/${id}/update`);
   };
 
   const handleShow = (id: number) => {
     setLoading(true);
-    router.push(`/${locale}/wms/line_classification/${id}/show`);
+    router.push(`/${locale}/wms/aereal_guide/${id}/show`);
   };
 
   const handleAdd = () => {
     setLoading(true);
-    router.push(`/${locale}/wms/line_classification/insert_line`);
+    router.push(`/${locale}/wms/aereal_guide/insert_guide`);
   };
 
   const close = () => {
@@ -455,14 +579,14 @@ const AirGuideTable = () => {
     setLoading(true);
     const reponse = await removeLine(deleteElement);
     close();
-    await loadLines();
+    await loadGuides();
     setLoading(false);
   };
   return (
     <>
       <Loading loading={loading}>
         <Table
-          aria-label="LINE"
+          aria-label="GUIDE"
           isHeaderSticky
           bottomContent={bottomContent}
           bottomContentPlacement="outside"
