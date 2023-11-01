@@ -384,5 +384,7 @@
 	"dispatch_date": "Dispatch date",
 	"dispatched_boxes": "Dispatched boxes",
 	"operation_instruction_box_requirement_amount": "You need at least 1 box to add an operating instruction",
-	"days": "Days"
+	"days": "Days",
+	"relabel": "Relabel",
+	"alreadyUsedmsg": "The box(es) you are trying to add are already in another output plan"
 }

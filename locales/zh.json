@@ -384,7 +384,8 @@
   "dispatch_date": "出貨日期",
 	"dispatched_boxes": "已发货的箱子",
 	"operation_instruction_box_requirement_amount": "您至少需要1个盒子来添加操作说明",
-	"days": "天"
-
+	"days": "天",
+	"relabel": "重新贴标签",
+	"alreadyUsedmsg": "您尝试添加的框已在另一个输出计划中"
 
 }
