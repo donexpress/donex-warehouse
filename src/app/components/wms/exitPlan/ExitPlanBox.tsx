@@ -249,7 +249,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           }
 
           setRows(new_rows);
-          setSelectedRows(new_rows);
+          setSelectedRows([]);
           showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
             type: "success",
           });
@@ -258,6 +258,15 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
             type: "error",
           });
         } else {
+          const new_rows: { packing_lists: PackingList; checked: boolean }[] = [];
+          rows.forEach((value) => {
+            const findI = new_case_numbers.findIndex((cn: string) => cn===value.packing_lists.case_number);
+            if (findI !== -1) {
+              new_rows.push(value);
+            }
+          });
+          setRows(new_rows);
+          setSelectedRows([]);
           showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
             type: "success",
           });
