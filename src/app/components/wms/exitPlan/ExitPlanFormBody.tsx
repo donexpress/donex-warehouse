@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import "../../../../styles/wms/user.form.scss";
 import { showMsg, isOMS, isWMS } from "../../../../helpers";
 import { useRouter } from "next/router";
@@ -10,9 +10,10 @@ import { Country, Response, ValueSelect } from "../../../../types";
 import {
   createExitPlan,
   updateExitPlan,
+  pullBoxes,
 } from "../../../../services/api.exit_plan";
 import { Button } from "@nextui-org/react";
-import { ExitPlan, ExitPlanProps, State } from "../../../../types/exit_plan";
+import { ExitPlan, ExitPlanProps, State, AddBoxes } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
 import { Warehouse } from "../../../../types/warehouse";
 import { getHourFormat, getLanguage } from "@/helpers/utilserege1992";
@@ -41,6 +42,8 @@ const ExitPlanFormBody = ({
   const [destinationSelected, setDestinationSelected] = useState<string>(
     id && exitPlan && exitPlan.destination ? exitPlan.destination : ""
   );
+  const [showAddPackages, setShowAddPackages] = useState<boolean>(false);
+
   let initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
     warehouse_id:
@@ -64,6 +67,21 @@ const ExitPlanFormBody = ({
     reference_number: id && exitPlan ? exitPlan.reference_number : ''
   };
 
+  const formatBody = (values: ExitPlan): ExitPlan => {
+    return {
+      address: values.address,
+      warehouse_id: values.warehouse_id,
+      city: values.city,
+      country: values.country,
+      delivered_time: values.delivered_time,
+      observations: values.observations,
+      type: values.type,
+      user_id: values.user_id,
+      destination: values.destination,
+      reference_number: values.reference_number,
+    };
+  }
+
   const handleSubmit = async (values: ExitPlan) => {
     if (values.delivered_time === "") {
       values.delivered_time = null;
@@ -80,13 +98,58 @@ const ExitPlanFormBody = ({
       (el) => el.value === destinationSelected
     );
     values.destination = d?.value;
-    const response: Response = await createExitPlan(values);
-    treatmentToResponse(response);
+    const response: Response = await createExitPlan(formatBody(values));
+    if (response.status >= 200 && response.status <= 299) {
+      const responseEP: ExitPlan = response.data;
+      // @ts-ignore
+      const caseNumber: string = values.case_number ? values.case_number : '';
+      // @ts-ignore
+      const warehouseOrderNumber: string = values.warehouse_order_number ? values.warehouse_order_number : '';
+      if (responseEP && showAddPackages && (caseNumber !== '' || warehouseOrderNumber !== '')) {
+        const data: AddBoxes = {
+          case_number: caseNumber,
+          warehouse_order_number: warehouseOrderNumber
+        }
+        const resp: any = await pullBoxes(Number(responseEP.id), data);
+        
+        if (resp["stored"]) {
+          showMsg(intl.formatMessage({ id: "not_correct_state_msg" }), {
+            type: "warning",
+          });
+        } else if (resp["already_used"]) {
+          showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+            type: "error",
+          });
+        } else if (resp["duplicated"]) {
+          showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+            type: "warning",
+          });
+        } else {
+          showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+            type: "success",
+          });
+        }
+      } else {
+        const message = intl.formatMessage({ id: "successfullyMsg" });
+        showMsg(message, { type: "success" });
+      }
+      goBack();
+    } else {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
   };
 
   const modify = async (paymentMethodId: number, values: ExitPlan) => {
-    const response: Response = await updateExitPlan(paymentMethodId, values);
-    treatmentToResponse(response);
+    const response: Response = await updateExitPlan(paymentMethodId, formatBody(values));
+    if (response.status >= 200 && response.status <= 299) {
+      const message = intl.formatMessage({ id: "changedsuccessfullyMsg" });
+      showMsg(message, { type: "success" });
+      goBack();
+    } else {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
   };
 
   const treatmentToResponse = (response: Response) => {
@@ -189,6 +252,16 @@ const ExitPlanFormBody = ({
   const checkPendingState = (state: any) => {
     return state === "pending";
   }
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    // @ts-ignore
+    const { name, value, type, checked } = event.target;
+    const fieldValue = type === "checkbox" ? checked : value;
+
+    if (name === 'show_add_packages') {
+      setShowAddPackages(fieldValue);
+    }
+  };
 
   return (
     <div className="user-form-body shadow-small">
@@ -348,6 +421,42 @@ const ExitPlanFormBody = ({
                   />
                 </div>
               </div>
+              {
+                !id && (
+                  <div className="flex gap-2 flex-wrap">
+                    <GenericInput onChangeFunction={handleInputChange} hideErrorContent={true} type='checkbox' name="show_add_packages" placeholder={intl.formatMessage({ id: 'add_exit_plan_boxes' })} customClass='custom-input' />
+                  </div>
+                )
+              }
+              {
+                showAddPackages &&
+                <div className='flex gap-3 flex-wrap justify-between' style={{ paddingRight: '16px' }}>
+                  <div className="w-full sm:w-[49%]">
+                    <GenericInput
+                      type="text"
+                      name="case_number"
+                      placeholder={`${intl.formatMessage({
+                        id: "expansion_box_number",
+                      })} / ${intl.formatMessage({
+                        id: "box_number",
+                      })}`}
+                      customClass="custom-input"
+                    />
+                  </div>
+                  <div className="w-full sm:w-[49%]">
+                    <GenericInput
+                      type="text"
+                      name="warehouse_order_number"
+                      placeholder={`${intl.formatMessage({
+                        id: "warehouse_order_number",
+                      })} / ${intl.formatMessage({
+                        id: "customer_order_number",
+                      })}`}
+                      customClass="custom-input"
+                    />
+                  </div>
+                </div>
+              }
               <div className="flex justify-end gap-3">
                 <div className="flex justify-end gap-3">
                   <div>
