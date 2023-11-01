@@ -10,9 +10,10 @@ import { Country, Response, ValueSelect } from "../../../../types";
 import {
   createExitPlan,
   updateExitPlan,
+  pullBoxes,
 } from "../../../../services/api.exit_plan";
 import { Button } from "@nextui-org/react";
-import { ExitPlan, ExitPlanProps, State } from "../../../../types/exit_plan";
+import { ExitPlan, ExitPlanProps, State, AddBoxes } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
 import { Warehouse } from "../../../../types/warehouse";
 import { getHourFormat, getLanguage } from "@/helpers/utilserege1992";
@@ -97,13 +98,58 @@ const ExitPlanFormBody = ({
       (el) => el.value === destinationSelected
     );
     values.destination = d?.value;
-    const response: Response = await createExitPlan(values);
-    treatmentToResponse(response);
+    const response: Response = await createExitPlan(formatBody(values));
+    if (response.status >= 200 && response.status <= 299) {
+      const responseEP: ExitPlan = response.data;
+      // @ts-ignore
+      const caseNumber: string = values.case_number ? values.case_number : '';
+      // @ts-ignore
+      const warehouseOrderNumber: string = values.warehouse_order_number ? values.warehouse_order_number : '';
+      if (responseEP && showAddPackages && (caseNumber !== '' || warehouseOrderNumber !== '')) {
+        const data: AddBoxes = {
+          case_number: caseNumber,
+          warehouse_order_number: warehouseOrderNumber
+        }
+        const resp: any = await pullBoxes(Number(responseEP.id), data);
+        
+        if (resp["stored"]) {
+          showMsg(intl.formatMessage({ id: "not_correct_state_msg" }), {
+            type: "warning",
+          });
+        } else if (resp["already_used"]) {
+          showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+            type: "error",
+          });
+        } else if (resp["duplicated"]) {
+          showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
+            type: "warning",
+          });
+        } else {
+          showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+            type: "success",
+          });
+        }
+      } else {
+        const message = intl.formatMessage({ id: "successfullyMsg" });
+        showMsg(message, { type: "success" });
+      }
+      goBack();
+    } else {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
   };
 
   const modify = async (paymentMethodId: number, values: ExitPlan) => {
-    const response: Response = await updateExitPlan(paymentMethodId, values);
-    treatmentToResponse(response);
+    const response: Response = await updateExitPlan(paymentMethodId, formatBody(values));
+    if (response.status >= 200 && response.status <= 299) {
+      const message = intl.formatMessage({ id: "changedsuccessfullyMsg" });
+      showMsg(message, { type: "success" });
+      goBack();
+    } else {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
   };
 
   const treatmentToResponse = (response: Response) => {

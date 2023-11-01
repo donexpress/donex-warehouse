@@ -41,6 +41,11 @@ export type ExitPlan = {
   reference_number: string | null
 };
 
+export type AddBoxes = {
+  case_number: string;
+  warehouse_order_number: string;
+};
+
 export type ExitPlanProps = {
   id?: number;
   exitPlan?: ExitPlan;
