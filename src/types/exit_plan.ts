@@ -39,6 +39,7 @@ export type ExitPlan = {
   }
   address_ref?: State;
   reference_number: string | null
+  relabel?: boolean | null
 };
 
 export type AddBoxes = {
