@@ -62,6 +62,7 @@ import { getAppendagesByOperationInstructionId } from "@/services/api.appendixer
 import { getExitPlansById } from "@/services/api.exit_planerege1992";
 import { ParsedUrlQueryInput } from "querystring";
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
+import SpinnerIconButton from "../../common/SpinnerIconButton";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "operation_instruction_type",
@@ -76,6 +77,12 @@ interface Props {
   exit_plan_id?: number;
   exit_plan?: ExitPlan;
 }
+type OIState = "total"
+| "audited"
+| "pending"
+| "processed"
+| "processing"
+| "cancelled";
 
 const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   const intl = useIntl();
@@ -84,6 +91,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   const [operationInstructionState, setOperationInstructionState] =
     useState<ExitPlanState | null>(null);
   const [statusSelected, setStatusSelected] = useState<string>("pending");
+  const [showPagination, setShowPagination] = useState<boolean>(true);
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
@@ -94,6 +102,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   });
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [filterValue, setFilterValue] = useState("");
+  const [queryFilter, setQueryFilter] = React.useState("");
   const hasSearchFilter = Boolean(filterValue);
   const [page, setPage] = useState(1);
   const [operationInstructions, setOperationInstructions] = useState<
@@ -115,33 +124,35 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   const [count, setCount] = useState<OperationInstructionCount | null>(null);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
 
-  console.log(exit_plan)
-
   useEffect(() => {
     const tab = getCookie("tabIO");
     if (tab) {
       setStatusSelected(tab);
     }
-    loadStates(tab ? tab : statusSelected);
+    loadStates(tab ? tab : statusSelected, page, rowsPerPage, "", true, true);
   }, []);
 
-  const loadStates = async (status: string = "pending") => {
-    const states: ExitPlanState = await getOperationInstructionStates();
-    const count: OperationInstructionCount = await countOperationInstruction(
-      exit_plan_id
-    );
-    setCount(count);
-    /* const list_state = states.states.find(
-      (el) => el.position === statusSelected
-    ); */
+  const loadStates = async (status: string = "pending", pageSP: number = -1, rowsPerPageSP: number = -1, querySP: string = "", loadCount: boolean = false, isFirstLoad: boolean = false) => {
+    setLoadingItems(true);
+    if (isFirstLoad) {
+      const states: ExitPlanState = await getOperationInstructionStates();
+      setOperationInstructionState(states);
+    }
+    if (loadCount) {
+      const count: OperationInstructionCount = await countOperationInstruction(
+        exit_plan_id, querySP
+      );
+      setCount(count);
+    }
+    
     let opi = null;
     if (exit_plan_id) {
-      opi = await getOperationInstructionsByOutputPlan(exit_plan_id, status);
+      opi = await getOperationInstructionsByOutputPlan(exit_plan_id, status, pageSP !== -1 ? pageSP : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, querySP);
     } else {
-      opi = await getOperationInstructions(status);
+      opi = await getOperationInstructions(status, pageSP !== -1 ? pageSP : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, querySP);
     }
     setOperationInstructions(opi);
-    setOperationInstructionState(states);
+    setLoadingItems(false);
   };
 
   const getCount = (
@@ -335,7 +346,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
 
   const confirm = async () => {
     const result = await deleteOperationInstructions(selectedId);
-    await loadStates(statusSelected);
+    await loadStates(statusSelected, page, rowsPerPage, queryFilter, true);
     showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
       type: "success",
     });
@@ -374,7 +385,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
 
   const filteredItems = useMemo(() => {
     let filteredUsers = [...operationInstructions];
-    if (hasSearchFilter) {
+    /* if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) => {
         return (
           user.number_delivery
@@ -385,32 +396,16 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             .includes(filterValue.toLowerCase())
         );
       });
-    }
+    } */
     return filteredUsers;
   }, [operationInstructions, filterValue]);
 
-  const items = useMemo(() => {
+  /* const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
-
-  const sortedItems = useMemo(() => {
-    return [...items].sort(
-      (a: OperationInstruction, b: OperationInstruction) => {
-        const first = a[
-          sortDescriptor.column as keyof OperationInstruction
-        ] as number;
-        const second = b[
-          sortDescriptor.column as keyof OperationInstruction
-        ] as number;
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-        return sortDescriptor.direction === "descending" ? -cmp : cmp;
-      }
-    );
-  }, [sortDescriptor, items]);
+  }, [page, filteredItems, rowsPerPage]); */
 
   const renderCell = useCallback(
     (user: any, columnKey: React.Key) => {
@@ -592,9 +587,12 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     if (tab !== statusSelected && !loadingItems) {
       setCookie("tabIO", tab);
       setStatusSelected(tab);
-      await setLoadingItems(true);
-      await loadStates(tab);
-      await setLoadingItems(false);
+      await loadStates(tab, 1, rowsPerPage, queryFilter, false);
+      setSelectedItems([]);
+      setSelectedKeys(new Set([]));
+      if (page !== 1) {
+        setPage(1);
+      }
     }
   };
 
@@ -695,7 +693,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     setDialogTexts([]);
     setDialogType("");
     setSelectedItems([]);
-    loadStates(statusSelected);
+    loadStates(statusSelected, page, rowsPerPage, queryFilter, true);
     setDisplayOperationInstructionConfirmation(false);
   };
 
@@ -737,27 +735,57 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     return intl.formatMessage({ id: dialogType });
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      searchValues();
+    }
+  }
+
+  const searchValues = async() => {
+    if (filterValue && filterValue !== "") {
+      await setQueryFilter(filterValue);
+    } else {
+      await setQueryFilter("");
+    }
+    await setPage(1);
+    await loadStates(statusSelected, 1, rowsPerPage, filterValue ? filterValue : "", true);
+  }
+
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
       setFilterValue(value);
-      setPage(1);
     } else {
       setFilterValue("");
     }
   }, []);
 
-  const onClear = useCallback(() => {
-    setFilterValue("");
-    setPage(1);
+  const onClear = useCallback(async() => {
+    await setFilterValue("");
+    await setQueryFilter("");
+    await setPage(1);
+    await loadStates(statusSelected, 1, rowsPerPage, "", true);
   }, []);
 
-  const onRowsPerPageChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setRowsPerPage(Number(e.target.value));
-      setPage(1);
-    },
-    []
-  );
+  const onRowsPerPageChange = async(e: React.ChangeEvent<HTMLSelectElement>) => {
+      if (Number(e.target.value) !== rowsPerPage) {
+        setSelectedItems([]);
+        setSelectedKeys(new Set([]));
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
+        await loadStates(statusSelected, 1, Number(e.target.value), queryFilter, false);
+      }
+    }
+
+  const changePage = async(newPage: number) => {
+    if (page !== newPage) {
+      setSelectedItems([]);
+      setSelectedKeys(new Set([]));
+      setPage(newPage);
+      await setShowPagination(false);
+      await loadStates(statusSelected, newPage, rowsPerPage, queryFilter, false);
+      await setShowPagination(true);
+    }
+  }
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -767,24 +795,34 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             ? `${intl.formatMessage({ id: "selected_all" })}`
             : `${intl.formatMessage(
                 { id: "selected" },
-                { in: selectedKeys.size, end: filteredItems.length }
+                { in: selectedKeys.size, end: getCount((statusSelected === "all" ? "total" : statusSelected) as OIState) }
               )}`}
         </span>
-        <PaginationTable
-          totalRecords={
-            filteredItems.slice(0, operationInstructions.length).length
-          }
-          pageLimit={rowsPerPage}
-          pageNeighbours={1}
-          page={page}
-          onPageChanged={setPage}
-        />
+        {
+          showPagination && (
+            <PaginationTable
+              totalRecords={
+                getCount((statusSelected === "all" ? "total" : statusSelected) as OIState)
+              }
+              pageLimit={rowsPerPage}
+              pageNeighbours={1}
+              page={page}
+              onPageChanged={changePage}
+            />
+          )
+        }
+        {
+          !showPagination && (
+            <div className="elements-center" style={{ height: '61px' }}>
+              <SpinnerIconButton style={{width: "20px", height: "20px"}}/>
+            </div>
+          )
+        }
       </div>
     );
   }, [
     selectedKeys,
-    items.length,
-    sortedItems.length,
+    filteredItems,
     page,
     operationInstructions.length,
     rowsPerPage,
@@ -792,6 +830,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     onSearchChange,
     onRowsPerPageChange,
     intl,
+    showPagination,
   ]);
 
   const getVisibleColumns = (): string[] => {
@@ -806,7 +845,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
       const item = operationInstructions.filter(
         (sp: OperationInstruction) => sp.id === index
       );
-      if (filterValue && filterValue !== "") {
+      /* if (filterValue && filterValue !== "") {
         const isSearchable =
           item[0].number_delivery
             ?.toLowerCase()
@@ -819,7 +858,8 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
         }
       } else {
         its.push(item[0]);
-      }
+      } */
+      its.push(item[0]);
     }
     return its;
   };
@@ -925,15 +965,20 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
           }
         >
           {exit_plan_id === undefined && (
-            <Input
-              isClearable
-              className="w-full sm:max-w-[33%] search-input"
-              placeholder=""
-              startContent={<SearchIcon />}
-              value={filterValue}
-              onClear={() => onClear()}
-              onValueChange={onSearchChange}
-            />
+            <div className="w-full sm:max-w-[33%]" style={{ position: 'relative' }}>
+              <Input
+                isClearable
+                className="search-input input-search-list"
+                placeholder=""
+                value={filterValue}
+                onClear={() => onClear()}
+                onValueChange={onSearchChange}
+                onKeyPress={handleKeyPress}
+              />
+              <div style={{ position: 'absolute', top: '0px', right: '0px', bottom: '0px', width: '40px', background: '#37446b', borderRadius: '0 5px 5px 0', cursor: 'pointer' }} className="elements-center" onClick={() => searchValues()}>
+                <SearchIcon />
+              </div>
+            </div>
           )}
           <div className="flex gap-3">
             <Dropdown>
@@ -1101,7 +1146,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                         }
                         onClick={() => changeTab(state.value)}
                       >
-                        {state[getLanguage(intl)]}(
+                        {state[getLanguage(intl)]} (
                         {getCount(
                           state.value === "all" ? "total" : state.value
                         )}
@@ -1120,7 +1165,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                         }
                         onClick={() => changeTab(state.value)}
                       >
-                        {state[getLanguage(intl)]}(
+                        {state[getLanguage(intl)]} (
                         {getCount(
                           state.value === "all" ? "total" : state.value
                         )}
@@ -1170,7 +1215,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
                 ? intl.formatMessage({ id: "loading_items" })
                 : intl.formatMessage({ id: "no_results_found" })
             }`}
-            items={loadingItems ? [] : sortedItems}
+            items={loadingItems ? [] : filteredItems}
           >
             {(item: any) => (
               <TableRow key={item.id}>
