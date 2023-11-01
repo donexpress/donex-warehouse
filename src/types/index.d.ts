@@ -161,6 +161,12 @@ export type Country = {
   emojiU: string;
 };
 
+export type Carrier = {
+  name: string;
+  value: string;
+  position: string;
+}
+
 export type CargoStationWarehouseResponse = {
   status: number;
   warehouse?: CargoStationWarehouseForm;
