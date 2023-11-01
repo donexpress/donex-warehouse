@@ -565,6 +565,17 @@ button.bnt-filters-active {
   transition: color 0.3s, border-color 0.3s;
 }
 
+button.bnt-dropdown {
+  color: #aeb9e1 !important;
+  background-color: #212c4d !important;
+  border: 1px solid #37446b !important;
+  border-radius: 4px !important;
+  padding: 8px;
+  transition: color 0.3s, border-color 0.3s;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
 button.bnt-select,
 button.bg-secundary {
   color: #aeb9e1 !important;
@@ -599,4 +610,16 @@ button:disabled {
 
 .no-padding-left {
   padding-left: 0px !important;
+}
+
+.flexbox-item {
+  flex: 0 0 25%;
+  box-sizing: border-box;
+  padding: 10px;
+  display: inline-block;
+}
+
+.flexbox-container {
+  display: flex;
+  flex-wrap: wrap;
 }
