@@ -12,6 +12,7 @@ import { Selection } from "@nextui-org/react";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import { Warehouse } from "@/types/warehouseerege1992";
 
 const baseMessageOpts: Pick<
   MessageOpts,
@@ -825,13 +826,14 @@ export const exitPlanDataToExcel = (
 ) => {
   let dataToExport: object[] = [];
   const packageShelfFormat = (
-    packageShelfs: PackageShelf[] | undefined
+    packageShelfs: PackageShelf[] | undefined, warehouse?: Warehouse
   ): string => {
     if (packageShelfs && packageShelfs.length > 0) {
       const packageShelf: PackageShelf = packageShelfs[0];
-      return `${intl.formatMessage({ id: "partition" })}: ${
-        packageShelf.shelf?.partition_table
-      } 
+      return `${(warehouse && warehouse.code) ? (warehouse.code + '-' + String(packageShelf.shelf?.partition_table).padStart(2, "0") + '-' + String(packageShelf.shelf?.number_of_shelves).padStart(2, "0") + '-' + String(packageShelf.layer).padStart(2, "0") + '-' + String(packageShelf.column).padStart(2, "0")) : ''} 
+${intl.formatMessage({ id: "partition" })}: ${
+  packageShelf.shelf?.partition_table
+} 
 ${intl.formatMessage({ id: "shelf" })}: ${
   packageShelf.shelf?.number_of_shelves
 } 
@@ -844,7 +846,7 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
   const getLocation = (ep: ExitPlan): string => {
     let locations = "";
     getPLUnique(ep.packing_lists ? ep.packing_lists : []).forEach((pl) => {
-      locations += packageShelfFormat(pl.package_shelf);
+      locations += packageShelfFormat(pl.package_shelf, ep.warehouse);
     });
     return locations;
   };
