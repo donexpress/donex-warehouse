@@ -11,16 +11,16 @@ import { LineFormProps, CargoStationWarehouseForm, ValueSelect } from "../../../
 import { createLine, updateLine } from '../../../../services/api.lines';
 import { generateValidationLines, generateValidationLinesModify } from "../../../../validation/generateValidationLines";
 
-const getAffiliationsFormatted = (affiliationsAll: CargoStationWarehouseForm[]): ValueSelect[] => {
-  let response: ValueSelect[] = [];
-  affiliationsAll.forEach((affiliation) => {
-    response.push({
-      value: Number(affiliation.id),
-      label: affiliation.name,
-    });
-  });
-  return response;
-};
+// const getAffiliationsFormatted = (affiliationsAll: CargoStationWarehouseForm[]): ValueSelect[] => {
+//   let response: ValueSelect[] = [];
+//   affiliationsAll.forEach((affiliation) => {
+//     response.push({
+//       value: Number(affiliation.id),
+//       label: affiliation.name,
+//     });
+//   });
+//   return response;
+// };
 
 const GuideFormBody = ({ id, line, isFromDetails }: LineFormProps) => {
   const router = useRouter();

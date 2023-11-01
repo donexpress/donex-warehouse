@@ -7,9 +7,9 @@ import { getOrganizations } from "../../../../src/services/api.organization";
 import { getWarehouses } from "../../../../src/services/api.warehouse";
 import { GetServerSidePropsContext } from "next";
 import { StaffFormProps } from "@/typeserege1992";
-import LineFormBody from "@/app/components/wms/line_classification/LineFormBodyerege1992";
+import GuideFormBody from "@/app/components/wms/air_guide/GuideFormBodyerege1992";
 
-const InsertLine = () => {
+const InsertGuide = () => {
   return (
     <Layout>
       <Head>
@@ -17,7 +17,7 @@ const InsertLine = () => {
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
-        <LineFormBody/>
+        <GuideFormBody/>
       </ProtectedRoute>
     </Layout>
   );
@@ -40,4 +40,4 @@ const InsertLine = () => {
 //   };
 // }
 
-export default InsertLine;
+export default InsertGuide;
