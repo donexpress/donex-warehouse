@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import "../../../../styles/wms/user.form.scss";
 import { showMsg, isOMS, isWMS } from "../../../../helpers";
 import { useRouter } from "next/router";
@@ -32,8 +32,8 @@ const ExitPlanFormBody = ({
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
-  const [filter_user, set_filter_user] = useState<string>("");
-  const [filter_warehouse, set_filter_warehouse] = useState<string>("");
+  // const [filter_user, set_filter_user] = useState<string>("");
+  // const [filter_warehouse, set_filter_warehouse] = useState<string>("");
   const date = new Date(
     exitPlan ? (exitPlan.delivered_time ? exitPlan.delivered_time : "") : ""
   );
@@ -41,6 +41,30 @@ const ExitPlanFormBody = ({
   const [destinationSelected, setDestinationSelected] = useState<string>(
     id && exitPlan && exitPlan.destination ? exitPlan.destination : ""
   );
+  const [user, setUser] = useState<number | undefined>(
+    isOMS()
+      ? users[0].id
+      : id && exitPlan && exitPlan.user && exitPlan.user.id
+      ? exitPlan.user.id
+      : undefined
+  );
+  const [warehouse, setWarehouse] = useState<number | undefined>(
+    id && exitPlan && exitPlan.warehouse_id ? exitPlan.warehouse_id : undefined
+  );
+  const [address, setAddress] = useState<string>(
+    id && exitPlan && exitPlan.address ? exitPlan.address : ""
+  );
+  const [delivered_time, setDeliveredTime] = useState<string>(
+    id && exitPlan && exitPlan.delivered_time
+      ? date.toISOString().slice(0, 16)
+      : ""
+  );
+  const [relabel, setRelabel] = useState<boolean>(
+    id && exitPlan && exitPlan.relabel ? exitPlan.relabel : false
+  );
+
+  const [disableButton, setDisableButton] = useState<boolean>(true);
+
   let initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
     warehouse_id:
@@ -58,10 +82,11 @@ const ExitPlanFormBody = ({
     user_id: isOMS()
       ? users[0].id
       : id && exitPlan && exitPlan.user && exitPlan.user.id
-        ? exitPlan.user.id
-        : undefined,
+      ? exitPlan.user.id
+      : undefined,
     destination: id && exitPlan ? exitPlan.destination : "",
-    reference_number: id && exitPlan ? exitPlan.reference_number : ''
+    reference_number: id && exitPlan ? exitPlan.reference_number : "",
+    relabel: id && exitPlan ? exitPlan.relabel : false,
   };
 
   const handleSubmit = async (values: ExitPlan) => {
@@ -133,13 +158,19 @@ const ExitPlanFormBody = ({
   };
 
   const getValueChange = (value: any) => {
-    if (value !== filter_user) {
-      set_filter_user(value);
-    }
+    setUser(value);
+  };
+  const getWarehouseValueChange = (value: any) => {
+    setWarehouse(value);
+  };
+
+  const getAddressValueChange = (value: any) => {
+    setAddress(value);
   };
 
   const changeDestination = (value: any) => {
     setDestinationSelected(value);
+    initialValues.address = "";
   };
 
   const getStatesFormattedCountries = (
@@ -188,7 +219,57 @@ const ExitPlanFormBody = ({
 
   const checkPendingState = (state: any) => {
     return state === "pending";
-  }
+  };
+
+  const handleInputChange = (
+    event: ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    // @ts-ignore
+    const { name, value, type, checked } = event.target;
+    const fieldValue = type === "checkbox" ? checked : value;
+    console.log(name, fieldValue);
+
+    switch (name) {
+      case "user_id":
+        setUser(fieldValue);
+        break;
+      case "warehouse_id":
+        setWarehouse(fieldValue);
+        break;
+      case "address":
+        setAddress(fieldValue);
+        break;
+      case "delivered_time":
+        setDeliveredTime(fieldValue);
+        break;
+      case "relabel":
+        setRelabel(fieldValue);
+        break;
+    }
+  };
+
+  useEffect(() => {
+    if (relabel) {
+      if (user === undefined || warehouse === undefined || address === "") {
+        setDisableButton(true);
+      } else {
+        setDisableButton(false);
+      }
+    } else {
+      if (
+        user === undefined ||
+        warehouse === undefined ||
+        address === "" ||
+        delivered_time === ""
+      ) {
+        setDisableButton(true);
+      } else {
+        setDisableButton(false);
+      }
+    }
+  }, [user, warehouse, delivered_time, address, relabel]);
 
   return (
     <div className="user-form-body shadow-small">
@@ -217,7 +298,7 @@ const ExitPlanFormBody = ({
       <div className="user-form-body__container">
         <Formik
           initialValues={initialValues}
-          validationSchema={generateValidationSchemaExitPlan(intl, destinationSelected)}
+          // validationSchema={generateValidationSchemaExitPlan(intl, destinationSelected)}
           onSubmit={handleSubmit}
           enableReinitialize
         >
@@ -226,6 +307,7 @@ const ExitPlanFormBody = ({
               <div className="flex gap-3 flex-wrap justify-between">
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
+                    onChangeFunction={handleInputChange}
                     type="select-filter"
                     name="user_id"
                     placeholder={intl.formatMessage({ id: "user" })}
@@ -239,13 +321,14 @@ const ExitPlanFormBody = ({
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
+                    onChangeFunction={handleInputChange}
                     type="select-filter"
                     name="warehouse_id"
                     placeholder={intl.formatMessage({ id: "warehouse" })}
                     options={getwarehouseFormatted(warehouses)}
                     customClass="select-filter"
                     isMulti={false}
-                    getValueChangeFn={getValueChange}
+                    getValueChangeFn={getWarehouseValueChange}
                     disabled={isFromDetails}
                     required
                   />
@@ -287,8 +370,10 @@ const ExitPlanFormBody = ({
                 {destinationSelected === "private_address" && (
                   <div className="w-full sm:w-[49%]">
                     <GenericInput
+                      onChangeFunction={handleInputChange}
                       type="text"
                       name="address"
+                      required
                       placeholder={intl.formatMessage({
                         id: "address",
                       })}
@@ -303,8 +388,11 @@ const ExitPlanFormBody = ({
                 {destinationSelected !== "private_address" && (
                   <div className="w-full sm:w-[49%]">
                     <GenericInput
+                      onChangeFunction={handleInputChange}
                       type="select-filter"
+                      required
                       name="address"
+                      getValueChangeFn={getAddressValueChange}
                       placeholder={intl.formatMessage({ id: "address" })}
                       options={getStatesFormattedAddresses(addresses)}
                       customClass="select-filter"
@@ -326,6 +414,7 @@ const ExitPlanFormBody = ({
                 </div>
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
+                    onChangeFunction={handleInputChange}
                     type="datetime-local"
                     name="delivered_time"
                     placeholder={intl.formatMessage({
@@ -347,6 +436,18 @@ const ExitPlanFormBody = ({
                     disabled={isFromDetails}
                   />
                 </div>
+                <div className="w-full sm:w-[49%]">
+                  <GenericInput
+                    onChangeFunction={handleInputChange}
+                    hideErrorContent={true}
+                    type="checkbox"
+                    name="relabel"
+                    placeholder={intl.formatMessage({
+                      id: "relabel",
+                    })}
+                    customClass="custom-input"
+                  />
+                </div>
               </div>
               <div className="flex justify-end gap-3">
                 <div className="flex justify-end gap-3">
@@ -356,25 +457,30 @@ const ExitPlanFormBody = ({
                         color="primary"
                         type="submit"
                         className="px-4"
-                        disabled={isSubmitting || !isValid}
+                        disabled={isSubmitting || disableButton}
                       >
                         {isSubmitting
                           ? intl.formatMessage({ id: "sending" })
                           : id
-                            ? intl.formatMessage({ id: "modify" })
-                            : intl.formatMessage({ id: "add" })}
+                          ? intl.formatMessage({ id: "modify" })
+                          : intl.formatMessage({ id: "add" })}
                       </Button>
                     )}
-                    {isFromDetails && id && (!isOMS() || (isOMS() && exitPlan && checkPendingState(exitPlan.state))) && (
-                      <Button
-                        color="primary"
-                        onClick={() => goToEdit()}
-                        className="px-4"
-                        type="button"
-                      >
-                        {intl.formatMessage({ id: "go_to_edit" })}
-                      </Button>
-                    )}
+                    {isFromDetails &&
+                      id &&
+                      (!isOMS() ||
+                        (isOMS() &&
+                          exitPlan &&
+                          checkPendingState(exitPlan.state))) && (
+                        <Button
+                          color="primary"
+                          onClick={() => goToEdit()}
+                          className="px-4"
+                          type="button"
+                        >
+                          {intl.formatMessage({ id: "go_to_edit" })}
+                        </Button>
+                      )}
                   </div>
                   <div>
                     <Button
@@ -391,7 +497,9 @@ const ExitPlanFormBody = ({
           )}
         </Formik>
       </div>
-      {isFromDetails && exitPlan && <LocationTable exitPlan={exitPlan} isDetail />}
+      {isFromDetails && exitPlan && (
+        <LocationTable exitPlan={exitPlan} isDetail />
+      )}
     </div>
   );
 };
