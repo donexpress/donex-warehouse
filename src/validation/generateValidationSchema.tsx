@@ -84,12 +84,16 @@ export const generateValidationSchemaExitPlan = (intl: IntlShape, destinationSel
     user_id: Yup.string()
       .required(intl.formatMessage({ id: 'required' })),
     delivered_time: Yup.string()
+      .required(intl.formatMessage({ id: 'required' })),
+    address: Yup.string()
       .required(intl.formatMessage({ id: 'required' }))
   }) :  Yup.object({
     warehouse_id: Yup.string()
       .required(intl.formatMessage({ id: 'required' })),
     user_id: Yup.string()
       .required(intl.formatMessage({ id: 'required' })),
+    address: Yup.string()
+      .required(intl.formatMessage({ id: 'required' }))
   });
 };
 

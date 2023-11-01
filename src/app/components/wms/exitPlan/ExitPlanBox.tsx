@@ -162,7 +162,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
           type: "warning",
         });
       } else if (response["already_used"]) {
-        showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+        showMsg(intl.formatMessage({ id: "alreadyUsedmsg" }), {
           type: "error",
         });
       } else if (response["duplicated"]) {
