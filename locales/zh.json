@@ -38,6 +38,7 @@
   "storageAndTransshipment": "存儲和轉運",
   "storagePlan": "進入計劃",
   "insertStoragePlan": "插入進入計劃",
+	"insertOutputPlan": "插入退出計劃",
   "exitPlan": "退出計劃",
   "warehouseManagement": "倉庫管理",
   "listWarehouses": "列出倉庫",
