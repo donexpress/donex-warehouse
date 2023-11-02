@@ -351,6 +351,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]); */
 
+  const somePLWithoutOutputPlanDeliveredNumber = (pls: PackingList[] | undefined): boolean => {
+    return !!pls && (pls.length > 0) && pls.some((pl: PackingList) => !pl.output_plan_delivered_number);
+  }
+
   const renderCell = React.useCallback(
     (storageP: any, columnKey: React.Key) => {
       const cellValue = storageP[columnKey];
@@ -429,6 +433,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                         intl.formatMessage({ id: "generate_pdf_inventory" })
                       }
                     </PDFDownloadLink>
+                  </DropdownItem>
+                  <DropdownItem className={(statusSelected !== 'stocked' || !somePLWithoutOutputPlanDeliveredNumber(storageP.packing_list)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleCreateExitPlan(storageP["customer_order_number"])}>
+                    {intl.formatMessage({ id: intl.formatMessage({ id: "insertOutputPlan" }) })}
                   </DropdownItem>
                   <DropdownItem className={(statusSelected !== 'stocked' && statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''}>
                     <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={storageP["packing_list"] ? storageP["packing_list"] : []} warehouseCode={String(storageP["warehouse"]?.code)} orderNumber={String(storageP["order_number"])} intl={intl} />} fileName="entry_plan_labels.pdf">
@@ -987,6 +994,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const close = () => {
     setShowConfirm(false);
     setDeleteElemtent(-1);
+  };
+
+  const handleCreateExitPlan = (warehouseOrderNumber: string) => {
+    setLoading(true);
+    router.push(`/${locale}/${inWMS ? 'wms' : 'oms'}/exit_plan/insert?warehouseOrderNumber=${warehouseOrderNumber}`);
   };
 
   const confirm = async () => {
