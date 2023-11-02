@@ -17,6 +17,7 @@ import {
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { PackingList } from "@/types/storage_planerege1992";
+import { Warehouse } from "@/types/warehouseerege1992";
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
@@ -94,11 +95,12 @@ interface Props {
 
 const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
   const packageShelfFormat = (
-    packageShelfs: PackageShelf[] | undefined
+    packageShelfs: PackageShelf[] | undefined, warehouse?: Warehouse
   ): string => {
     if (packageShelfs && packageShelfs.length > 0) {
       const packageShelf: PackageShelf = packageShelfs[0];
-      return `${intl.formatMessage({ id: "partition" })}: ${
+      return `${(warehouse && warehouse.code) ? (warehouse.code + '-' + String(packageShelf.shelf?.partition_table).padStart(2, "0") + '-' + String(packageShelf.shelf?.number_of_shelves).padStart(2, "0") + '-' + String(packageShelf.layer).padStart(2, "0") + '-' + String(packageShelf.column).padStart(2, "0")) : ''} 
+      ${intl.formatMessage({ id: "partition" })}: ${
         packageShelf.shelf?.partition_table
       }
         ${intl.formatMessage({ id: "shelf" })}: ${
@@ -109,13 +111,13 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
     }
     return "";
   };
-  const getLocation = (ep: ExitPlan): string => {
+  /* const getLocation = (ep: ExitPlan): string => {
     let locations = "";
     ep.packing_lists?.forEach((pl) => {
       locations += packageShelfFormat(pl.package_shelf);
     });
     return locations;
-  };
+  }; */
 
   const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
     const pls = packingLists.filter(
@@ -242,7 +244,7 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                         ).map((pl, plIndex) =>
                           pl.package_shelf ? (
                             <Text key={plIndex} style={styles.locationCell}>
-                              {packageShelfFormat(pl.package_shelf)}
+                              {packageShelfFormat(pl.package_shelf, oi.warehouse)}
                             </Text>
                           ) : (
                             ""

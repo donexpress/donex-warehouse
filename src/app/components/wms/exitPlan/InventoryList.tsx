@@ -90,6 +90,7 @@ interface Props {
 }
 
 const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
+  console.log(boxes)
   const packageShelfFormat = (
     packageShelfs: PackageShelf[] | PackageShelf | undefined
   ): string => {

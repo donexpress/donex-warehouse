@@ -386,7 +386,9 @@
 	"operation_instruction_box_requirement_amount": "您至少需要1个盒子来添加操作说明",
 	"days": "天",
 	"finances": "财务",
-	"airGuide": "空气指南"
+	"airGuide": "空气指南",
+  "relabel": "重新贴标签",
+  "alreadyUsedmsg": "您尝试添加的框已在另一个输出计划中"
 
 
 }

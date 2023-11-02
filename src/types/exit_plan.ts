@@ -39,6 +39,12 @@ export type ExitPlan = {
   }
   address_ref?: State;
   reference_number: string | null
+  relabel?: boolean | null
+};
+
+export type AddBoxes = {
+  case_number: string;
+  warehouse_order_number: string;
 };
 
 export type ExitPlanProps = {

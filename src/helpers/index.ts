@@ -12,6 +12,7 @@ import { Selection } from "@nextui-org/react";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import { Warehouse } from "@/types/warehouseerege1992";
 
 const baseMessageOpts: Pick<
   MessageOpts,
@@ -149,7 +150,7 @@ export const downloadTemplateSP = () => {
       return: '',
       rejected_boxes: '',
       digits_box_number: ''
-    } :
+    } : 
     {
       customer_order_number: '',
       username: '',
@@ -258,22 +259,22 @@ export const storagePlanDataToExcel = (
     if (selection === "all" || selection.has("number_of_boxes_stored")) {
       sPlan[key6] =
         sp.packing_list && sp.packing_list.length > 0
-          ? sp.packing_list
-            .filter(
-              (pl: PackingList) =>
-                pl.package_shelf && pl.package_shelf.length > 0
-            )
-            .length.toString()
+          ? ((sp.packing_list
+              .filter(
+                (pl: PackingList) =>
+                  pl.package_shelf && pl.package_shelf.length > 0
+              )
+              .length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString()
           : "0";
-    }
-    if (selection === "all" || selection.has("location")) {
-      sPlan[key6_1] = getLocationPackages(sp, intl, true);
     }
     if (selection === "all" || selection.has("dispatched_boxes")) {
       sPlan[key11_1] =
         sp.packing_list && sp.packing_list.length > 0
           ? sp.packing_list.filter((pl: PackingList) => pl.dispatched).length.toString()
           : "0";
+    }
+    if (selection === "all" || selection.has("location")) {
+      sPlan[key6_1] = getLocationPackages(sp, intl, true);
     }
     if (selection === "all" || selection.has("evidence")) {
       sPlan[key7] = sp.images ? sp.images.length.toString() : "0";
@@ -288,23 +289,26 @@ export const storagePlanDataToExcel = (
       sPlan[key10] = sp.rejected_boxes
         ? intl.formatMessage({ id: "rejected_boxes" })
         : sp.return
-          ? intl.formatMessage({ id: "return" })
-          : intl.formatMessage({ id: "normal" });
+        ? intl.formatMessage({ id: "return" })
+        : intl.formatMessage({ id: "normal" });
     }
     if (selection === "all" || selection.has("delivered_time")) {
-      sPlan[key11] = `${sp.delivered_time ? getDateFormat(sp.delivered_time) : ""
-        } ${sp.delivered_time ? getHourFormat(sp.delivered_time) : ""}`;
+      sPlan[key11] = `${
+        sp.delivered_time ? getDateFormat(sp.delivered_time) : ""
+      } ${sp.delivered_time ? getHourFormat(sp.delivered_time) : ""}`;
     }
     if (selection === "all" || selection.has("observations")) {
       sPlan[key12] = sp.observations;
     }
     if (selection === "all" || selection.has("created_at")) {
-      sPlan[key13] = `${sp.created_at ? getDateFormat(sp.created_at) : ""
-        } ${sp.created_at ? getHourFormat(sp.created_at) : ""}`;
+      sPlan[key13] = `${
+        sp.created_at ? getDateFormat(sp.created_at) : ""
+      } ${sp.created_at ? getHourFormat(sp.created_at) : ""}`;
     }
     if (selection === "all" || selection.has("updated_at")) {
-      sPlan[key14] = `${sp.updated_at ? getDateFormat(sp.updated_at) : ""
-        } ${sp.updated_at ? getHourFormat(sp.updated_at) : ""}`;
+      sPlan[key14] = `${
+        sp.updated_at ? getDateFormat(sp.updated_at) : ""
+      } ${sp.updated_at ? getHourFormat(sp.updated_at) : ""}`;
     }
 
     dataToExport.push(sPlan);
@@ -322,13 +326,13 @@ export const storagePlanDataToExcel = (
   FileSaver.saveAs(
     data,
     `${intl.formatMessage({ id: "storage_plans" })}(` +
-    date.getDate() +
-    "-" +
-    (date.getMonth() + 1) +
-    "-" +
-    date.getFullYear() +
-    ")" +
-    fileExtension
+      date.getDate() +
+      "-" +
+      (date.getMonth() + 1) +
+      "-" +
+      date.getFullYear() +
+      ")" +
+      fileExtension
   );
 };
 
@@ -348,7 +352,7 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   const key11: string = intl.formatMessage({ id: "reference_number" });
   const key12: string = intl.formatMessage({ id: "dispatch_date" });
 
-
+  
   packingLists.forEach((pl: PackingList) => {
     const pList: { [key: string]: string } = {};
     const packageShelf: PackageShelf | null = !!Array.isArray(pl.package_shelf) ? (pl.package_shelf.length > 0 ? pl.package_shelf[0] : null) : (pl.package_shelf ? pl.package_shelf : null);
@@ -364,40 +368,44 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
     pList[key8] =
       packageShelf !== null
         ? (exitPlan.warehouse
-          ? `${exitPlan.warehouse.code}-${String(
-            packageShelf.shelf?.partition_table
-          ).padStart(2, "0")}-${String(
-            packageShelf.shelf?.number_of_shelves
-          ).padStart(2, "0")}-${String(
+            ? `${exitPlan.warehouse.code}-${String(
+              packageShelf.shelf?.partition_table
+              ).padStart(2, "0")}-${String(
+                packageShelf.shelf?.number_of_shelves
+              ).padStart(2, "0")}-${String(
+                packageShelf.layer
+              ).padStart(2, "0")}-${String(
+                packageShelf.column
+              ).padStart(2, "0")} `
+            : "") +
+          `${intl.formatMessage({ id: "partition" })}: ${
+            packageShelf.shelf
+              ? packageShelf.shelf.partition_table
+              : ""
+          } ` +
+          `${intl.formatMessage({ id: "shelf" })}: ${
+            packageShelf.shelf
+              ? packageShelf.shelf.number_of_shelves
+              : ""
+          } ` +
+          `${intl.formatMessage({ id: "layer" })}: ${
             packageShelf.layer
-          ).padStart(2, "0")}-${String(
+          }  ` +
+          `${intl.formatMessage({ id: "column" })}: ${
             packageShelf.column
-          ).padStart(2, "0")} `
-          : "") +
-        `${intl.formatMessage({ id: "partition" })}: ${packageShelf.shelf
-          ? packageShelf.shelf.partition_table
-          : ""
-        } ` +
-        `${intl.formatMessage({ id: "shelf" })}: ${packageShelf.shelf
-          ? packageShelf.shelf.number_of_shelves
-          : ""
-        } ` +
-        `${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer
-        }  ` +
-        `${intl.formatMessage({ id: "column" })}: ${packageShelf.column
-        } `
+          } `
         : "--";
-    // @ts-ignore
+        // @ts-ignore
     pList[key9] = `${pl.storage_time} ${intl.formatMessage({ id: "days" })}`;
     pList[key10] = exitPlan.delivered_time
       ? `${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(
         exitPlan.delivered_time
-      )}`
+        )}`
       : "--";
     pList[key12] = pl.dispatched_time
       ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
         pl.dispatched_time
-      )}`
+        )}`
       : "--";
 
     dataToExport.push(pList);
@@ -415,17 +423,17 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   FileSaver.saveAs(
     data,
     `exit_plan_inventory_${exitPlan.output_number} (` +
-    date.getDate() +
-    "-" +
-    (date.getMonth() + 1) +
-    "-" +
-    date.getFullYear() +
-    ")" +
-    fileExtension
+      date.getDate() +
+      "-" +
+      (date.getMonth() + 1) +
+      "-" +
+      date.getFullYear() +
+      ")" +
+      fileExtension
   );
 }
 
-export const getLocationPackages = (sp: StoragePlan, intl?: IntlShape, isFromDownload: boolean = false): string => {
+export const getLocationPackages = (sp: StoragePlan, intl?: IntlShape,  isFromDownload: boolean = false): string => {
   const locations: string[] = [];
   if (sp.packing_list && sp.packing_list?.length == 0) {
     return "--";
@@ -443,27 +451,31 @@ export const getLocationPackages = (sp: StoragePlan, intl?: IntlShape, isFromDow
       ).padStart(2, "0")}-${String(pl.package_shelf[0].layer).padStart(
         2,
         "0"
-      )}-${String(pl.package_shelf[0].column).padStart(2, "0")}` +
-        ((isFromDownload && intl !== undefined) ? (` ${intl.formatMessage({ id: "partition" })}: ${pl.package_shelf &&
-          pl.package_shelf.length > 0 &&
-          pl.package_shelf[0].shelf
+      )}-${String(pl.package_shelf[0].column).padStart(2, "0")}` + 
+      ((isFromDownload && intl !== undefined) ? (` ${intl.formatMessage({ id: "partition" })}: ${
+        pl.package_shelf &&
+        pl.package_shelf.length > 0 &&
+        pl.package_shelf[0].shelf
           ? pl.package_shelf[0].shelf.partition_table
           : ""
-          } ` +
-          `${intl.formatMessage({ id: "shelf" })}: ${pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-            ? pl.package_shelf[0].shelf.number_of_shelves
-            : ""
-          } ` +
-          `${intl.formatMessage({ id: "layer" })}: ${pl.package_shelf && pl.package_shelf.length > 0
-            ? pl.package_shelf[0].layer
-            : ""
-          }  ` +
-          `${intl.formatMessage({ id: "column" })}: ${pl.package_shelf && pl.package_shelf.length > 0
-            ? pl.package_shelf[0].column
-            : ""
-          } `) : '');
+      } ` +
+      `${intl.formatMessage({ id: "shelf" })}: ${
+        pl.package_shelf &&
+        pl.package_shelf.length > 0 &&
+        pl.package_shelf[0].shelf
+          ? pl.package_shelf[0].shelf.number_of_shelves
+          : ""
+      } ` +
+      `${intl.formatMessage({ id: "layer" })}: ${
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? pl.package_shelf[0].layer
+          : ""
+      }  ` +
+      `${intl.formatMessage({ id: "column" })}: ${
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? pl.package_shelf[0].column
+          : ""
+      } `) : '');
       if (!locations.find((el) => el === tmpl)) {
         locations.push(tmpl);
       }
@@ -512,47 +524,51 @@ export const packingListDataToExcel = (
       pList[key8] =
         pl.package_shelf && pl.package_shelf.length > 0
           ? (storagePlan.warehouse
-            ? `${storagePlan.warehouse.code}-${String(
-              pl.package_shelf[0].shelf?.partition_table
-            ).padStart(2, "0")}-${String(
-              pl.package_shelf[0].shelf?.number_of_shelves
-            ).padStart(2, "0")}-${String(
-              pl.package_shelf[0].layer
-            ).padStart(2, "0")}-${String(
-              pl.package_shelf[0].column
-            ).padStart(2, "0")} `
-            : "") +
-          `${intl.formatMessage({ id: "partition" })}: ${pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-            ? pl.package_shelf[0].shelf.partition_table
-            : ""
-          } ` +
-          `${intl.formatMessage({ id: "shelf" })}: ${pl.package_shelf &&
-            pl.package_shelf.length > 0 &&
-            pl.package_shelf[0].shelf
-            ? pl.package_shelf[0].shelf.number_of_shelves
-            : ""
-          } ` +
-          `${intl.formatMessage({ id: "layer" })}: ${pl.package_shelf && pl.package_shelf.length > 0
-            ? pl.package_shelf[0].layer
-            : ""
-          }  ` +
-          `${intl.formatMessage({ id: "column" })}: ${pl.package_shelf && pl.package_shelf.length > 0
-            ? pl.package_shelf[0].column
-            : ""
-          } `
+              ? `${storagePlan.warehouse.code}-${String(
+                  pl.package_shelf[0].shelf?.partition_table
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].shelf?.number_of_shelves
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].layer
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].column
+                ).padStart(2, "0")} `
+              : "") +
+            `${intl.formatMessage({ id: "partition" })}: ${
+              pl.package_shelf &&
+              pl.package_shelf.length > 0 &&
+              pl.package_shelf[0].shelf
+                ? pl.package_shelf[0].shelf.partition_table
+                : ""
+            } ` +
+            `${intl.formatMessage({ id: "shelf" })}: ${
+              pl.package_shelf &&
+              pl.package_shelf.length > 0 &&
+              pl.package_shelf[0].shelf
+                ? pl.package_shelf[0].shelf.number_of_shelves
+                : ""
+            } ` +
+            `${intl.formatMessage({ id: "layer" })}: ${
+              pl.package_shelf && pl.package_shelf.length > 0
+                ? pl.package_shelf[0].layer
+                : ""
+            }  ` +
+            `${intl.formatMessage({ id: "column" })}: ${
+              pl.package_shelf && pl.package_shelf.length > 0
+                ? pl.package_shelf[0].column
+                : ""
+            } `
           : "--";
       pList[key9] = "--";
       pList[key10] = storagePlan.delivered_time
         ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(
-          storagePlan.delivered_time
-        )}`
+            storagePlan.delivered_time
+          )}`
         : "--";
       pList[key11] = pl.dispatched_time
         ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
           pl.dispatched_time
-        )}`
+          )}`
         : "--";
 
       dataToExport.push(pList);
@@ -561,7 +577,7 @@ export const packingListDataToExcel = (
     const key1: string = intl.formatMessage({ id: "box_number" });
     const key2: string = intl.formatMessage({ id: "expansion_box_number" });
     const key3: string = intl.formatMessage({ id: "transfer_order_number" });
-
+    
     const key3_1: string = intl.formatMessage({ id: "location" });
     const key3_2: string = intl.formatMessage({ id: "storage_time" });
     const key3_3: string = intl.formatMessage({ id: "delivery_time" });
@@ -587,50 +603,54 @@ export const packingListDataToExcel = (
       pList[key1] = pl.box_number ? pl.box_number : "--";
       pList[key2] = pl.case_number ? pl.case_number : "--";
       if (type === "fl") {
-        pList[key3_1] =
-          pl.package_shelf && pl.package_shelf.length > 0
-            ? (storagePlan.warehouse
+        pList[key3_1] = 
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? (storagePlan.warehouse
               ? `${storagePlan.warehouse.code}-${String(
-                pl.package_shelf[0].shelf?.partition_table
-              ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].shelf?.number_of_shelves
-              ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].layer
-              ).padStart(2, "0")}-${String(
-                pl.package_shelf[0].column
-              ).padStart(2, "0")} `
+                  pl.package_shelf[0].shelf?.partition_table
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].shelf?.number_of_shelves
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].layer
+                ).padStart(2, "0")}-${String(
+                  pl.package_shelf[0].column
+                ).padStart(2, "0")} `
               : "") +
-            `${intl.formatMessage({ id: "partition" })}: ${pl.package_shelf &&
+            `${intl.formatMessage({ id: "partition" })}: ${
+              pl.package_shelf &&
               pl.package_shelf.length > 0 &&
               pl.package_shelf[0].shelf
-              ? pl.package_shelf[0].shelf.partition_table
-              : ""
+                ? pl.package_shelf[0].shelf.partition_table
+                : ""
             } ` +
-            `${intl.formatMessage({ id: "shelf" })}: ${pl.package_shelf &&
+            `${intl.formatMessage({ id: "shelf" })}: ${
+              pl.package_shelf &&
               pl.package_shelf.length > 0 &&
               pl.package_shelf[0].shelf
-              ? pl.package_shelf[0].shelf.number_of_shelves
-              : ""
+                ? pl.package_shelf[0].shelf.number_of_shelves
+                : ""
             } ` +
-            `${intl.formatMessage({ id: "layer" })}: ${pl.package_shelf && pl.package_shelf.length > 0
-              ? pl.package_shelf[0].layer
-              : ""
+            `${intl.formatMessage({ id: "layer" })}: ${
+              pl.package_shelf && pl.package_shelf.length > 0
+                ? pl.package_shelf[0].layer
+                : ""
             }  ` +
-            `${intl.formatMessage({ id: "column" })}: ${pl.package_shelf && pl.package_shelf.length > 0
-              ? pl.package_shelf[0].column
-              : ""
+            `${intl.formatMessage({ id: "column" })}: ${
+              pl.package_shelf && pl.package_shelf.length > 0
+                ? pl.package_shelf[0].column
+                : ""
             } `
-            : "--";
+          : "--";
         pList[key3_2] = "--";
         pList[key3_3] = storagePlan.delivered_time
           ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(
-            storagePlan.delivered_time
-          )}`
+              storagePlan.delivered_time
+            )}`
           : "--";
         pList[key3_6] = pl.dispatched_time
           ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
             pl.dispatched_time
-          )}`
+            )}`
           : "--";
         pList[key3_4] = storagePlan.pr_number ? storagePlan.pr_number : "--";
         pList[key3_5] = storagePlan.reference_number ? storagePlan.reference_number : "--";
@@ -639,7 +659,7 @@ export const packingListDataToExcel = (
         pList[key3_6] = pl.dispatched_time
           ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
             pl.dispatched_time
-          )}`
+            )}`
           : "--";
       }
       pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
@@ -671,13 +691,13 @@ export const packingListDataToExcel = (
   FileSaver.saveAs(
     data,
     `storage_plan_inventory (` +
-    date.getDate() +
-    "-" +
-    (date.getMonth() + 1) +
-    "-" +
-    date.getFullYear() +
-    ")" +
-    fileExtension
+      date.getDate() +
+      "-" +
+      (date.getMonth() + 1) +
+      "-" +
+      date.getFullYear() +
+      ")" +
+      fileExtension
   );
 };
 
@@ -693,7 +713,7 @@ export const operationInstructionDataToExcel = (
       ep.output_plan.packing_lists &&
       ep.output_plan.packing_lists.forEach((pl) => {
         const l = packageShelfFormat(pl.package_shelf)
-        if (locations.find(el => el === l) === undefined) {
+        if(locations.find(el => el === l) === undefined) {
           locations.push(l)
         }
       });
@@ -709,10 +729,12 @@ export const operationInstructionDataToExcel = (
         packageShelf = packageShelfs;
       }
       if (packageShelf) {
-        return `${intl.formatMessage({ id: "partition" })}: ${packageShelf.shelf?.partition_table
-          }
-      ${intl.formatMessage({ id: "shelf" })}: ${packageShelf.shelf?.number_of_shelves
-          }
+        return `${intl.formatMessage({ id: "partition" })}: ${
+          packageShelf.shelf?.partition_table
+        }
+      ${intl.formatMessage({ id: "shelf" })}: ${
+          packageShelf.shelf?.number_of_shelves
+        }
       ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
       ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
       }
@@ -727,7 +749,7 @@ export const operationInstructionDataToExcel = (
     });
     return result;
   };
-
+  
   operationInstructions.forEach((oi: OperationInstruction) => {
     const oInst: { [key: string]: string } = {};
     visibleColumn.forEach((column) => {
@@ -789,32 +811,32 @@ export const operationInstructionDataToExcel = (
   FileSaver.saveAs(
     data,
     `${intl.formatMessage({ id: "operation_instruction" })}(` +
-    date.getDate() +
-    "-" +
-    (date.getMonth() + 1) +
-    "-" +
-    date.getFullYear() +
-    ")" +
-    fileExtension
+      date.getDate() +
+      "-" +
+      (date.getMonth() + 1) +
+      "-" +
+      date.getFullYear() +
+      ")" +
+      fileExtension
   );
 };
 
 export const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
   const pls = packingLists.filter((pl) => (pl.package_shelf && (pl.package_shelf.length > 0)));
-
+  
   const uniqueCombinationSet = new Set<string>();
   const uniqueArray: PackingList[] = [];
 
   for (const pl of pls) {
-    const combinationKey = `${Number((pl.package_shelf as PackageShelf[])[0].shelf?.partition_table)}_${Number((pl.package_shelf as PackageShelf[])[0].shelf?.number_of_shelves)}_${(pl.package_shelf as PackageShelf[])[0].layer}_${(pl.package_shelf as PackageShelf[])[0].column}`;
+      const combinationKey = `${Number((pl.package_shelf as PackageShelf[])[0].shelf?.partition_table)}_${Number((pl.package_shelf as PackageShelf[])[0].shelf?.number_of_shelves)}_${(pl.package_shelf as PackageShelf[])[0].layer}_${(pl.package_shelf as PackageShelf[])[0].column}`;
 
-    if (!uniqueCombinationSet.has(combinationKey)) {
-      uniqueCombinationSet.add(combinationKey);
+      if (!uniqueCombinationSet.has(combinationKey)) {
+          uniqueCombinationSet.add(combinationKey);
 
-      uniqueArray.push(pl);
-    }
+          uniqueArray.push(pl);
+      }
   }
-
+  
   return uniqueArray;
 };
 
@@ -839,14 +861,17 @@ export const exitPlanDataToExcel = (
 ) => {
   let dataToExport: object[] = [];
   const packageShelfFormat = (
-    packageShelfs: PackageShelf[] | undefined
+    packageShelfs: PackageShelf[] | undefined, warehouse?: Warehouse
   ): string => {
     if (packageShelfs && packageShelfs.length > 0) {
       const packageShelf: PackageShelf = packageShelfs[0];
-      return `${intl.formatMessage({ id: "partition" })}: ${packageShelf.shelf?.partition_table
-        } 
-${intl.formatMessage({ id: "shelf" })}: ${packageShelf.shelf?.number_of_shelves
-        } 
+      return `${(warehouse && warehouse.code) ? (warehouse.code + '-' + String(packageShelf.shelf?.partition_table).padStart(2, "0") + '-' + String(packageShelf.shelf?.number_of_shelves).padStart(2, "0") + '-' + String(packageShelf.layer).padStart(2, "0") + '-' + String(packageShelf.column).padStart(2, "0")) : ''}
+${intl.formatMessage({ id: "partition" })}: ${
+  packageShelf.shelf?.partition_table
+}
+${intl.formatMessage({ id: "shelf" })}: ${
+  packageShelf.shelf?.number_of_shelves
+} 
 ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer} 
 ${intl.formatMessage({ id: "column" })}: ${packageShelf.column} 
 \n`;
@@ -856,7 +881,7 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
   const getLocation = (ep: ExitPlan): string => {
     let locations = "";
     getPLUnique(ep.packing_lists ? ep.packing_lists : []).forEach((pl) => {
-      locations += packageShelfFormat(pl.package_shelf);
+      locations += packageShelfFormat(pl.package_shelf, ep.warehouse);
     });
     return locations;
   };
@@ -936,12 +961,12 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
   FileSaver.saveAs(
     data,
     `${intl.formatMessage({ id: "exitPlan" })}(` +
-    date.getDate() +
-    "-" +
-    (date.getMonth() + 1) +
-    "-" +
-    date.getFullYear() +
-    ")" +
-    fileExtension
+      date.getDate() +
+      "-" +
+      (date.getMonth() + 1) +
+      "-" +
+      date.getFullYear() +
+      ")" +
+      fileExtension
   );
 };
