@@ -900,6 +900,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     const tab = getCookie("tabSP");
     if (tab) {
       setStatusSelected(tab);
+      if (tab === 'stocked') {
+        let items: Set<React.Key> = new Set(visibleColumns);
+        items.add("dispatched_boxes");
+        setVisibleColumns(items);
+      }
     }
     loadStoragePlans(tab ? tab : statusSelected);
   }, []);

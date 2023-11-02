@@ -126,11 +126,11 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     if (selection === "all" || selection.has("number_of_boxes_stored")) {
         titles.push(key6);
     }
-    if (selection === "all" || selection.has("location")) {
-        titles.push(key6_1);
-    }
     if (selection === "all" || selection.has("dispatched_boxes")) {
         titles.push(key11_1);
+    }
+    if (selection === "all" || selection.has("location")) {
+        titles.push(key6_1);
     }
     if (selection === "all" || selection.has("evidence")) {
         titles.push(key7);
@@ -213,7 +213,18 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
         }
         if (selection === "all" || selection.has("number_of_boxes_stored")) {
           const keyWord: string = "number_of_boxes_stored";
-          const value: string = sp.packing_list && sp.packing_list.length > 0 ? (sp.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length.toString()) : '0';
+          const value: string = sp.packing_list && sp.packing_list.length > 0 ? ((sp.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString() : '0';
+          values[index][i] = {
+            keyWord,
+            value
+          };
+          i++;
+        }
+        if (selection === "all" || selection.has("dispatched_boxes")) {
+          const keyWord: string = "dispatched_boxes";
+          const value: string = sp.packing_list && sp.packing_list.length > 0
+          ? sp.packing_list.filter((pl: PackingList) => pl.dispatched).length.toString()
+          : "0";
           values[index][i] = {
             keyWord,
             value
@@ -227,17 +238,6 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
             keyWord,
             value,
             sp
-          };
-          i++;
-        }
-        if (selection === "all" || selection.has("dispatched_boxes")) {
-          const keyWord: string = "dispatched_boxes";
-          const value: string = sp.packing_list && sp.packing_list.length > 0
-          ? sp.packing_list.filter((pl: PackingList) => pl.dispatched).length.toString()
-          : "0";
-          values[index][i] = {
-            keyWord,
-            value
           };
           i++;
         }
