@@ -393,6 +393,13 @@
   "sale_price": "Precio de venta",
   "bag_code": "Código de bolsa",
   "filter": "Filtrar",
-	"clear": "Limpiar",
-	"waybill_id": "MWB"
+  "clear": "Limpiar",
+  "waybill_id": "MWB",
+  "manifest": "Manifiesto",
+  "update": "Actualizar",
+  "import_manifest": "Importar manifiesto",
+  "update_manifest_customer": "Actualizar manifiesto cliente",
+  "update_manifest_supplier": "Actualizar manifiesto proveedor",
+  "customer_manifest": "Manifiesto cliente",
+  "supplier_manifest": "Manifiesto proveedor"
 }
