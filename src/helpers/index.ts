@@ -305,7 +305,7 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   let dataToExport: object[] = [];
 
   const key1: string = intl.formatMessage({ id: "box_number" });
-  const key2: string = intl.formatMessage({ id: "case_number" });
+  const key2: string = intl.formatMessage({ id: "expansion_box_number" });
   const key3: string = `${intl.formatMessage({ id: "client_weight" })} (kg)`;
   const key4: string = `${intl.formatMessage({ id: "client_height" })} (cm)`;
   const key5: string = `${intl.formatMessage({ id: "storage_weight" })} (kg)`;

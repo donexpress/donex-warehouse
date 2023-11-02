@@ -528,7 +528,11 @@ const ExitPlanFormBody = ({
                         id: "box_number",
                       })}`}
                       customClass="custom-input"
+                      hideErrorContent={true}
                     />
+                    <span className="text_example">{intl.formatMessage({
+                        id: "input_example_1",
+                      })}</span>
                   </div>
                   <div className="w-full sm:w-[49%]">
                     <GenericInput
@@ -540,7 +544,11 @@ const ExitPlanFormBody = ({
                         id: "customer_order_number",
                       })}`}
                       customClass="custom-input"
+                      hideErrorContent={true}
                     />
+                    <span className="text_example">{intl.formatMessage({
+                        id: "input_example_2",
+                      })}</span>
                   </div>
                 </div>
               }
