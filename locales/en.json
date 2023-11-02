@@ -38,6 +38,7 @@
 	"storageAndTransshipment": "Storage and Transshipment",
 	"storagePlan": "Entry plan",
 	"insertStoragePlan": "Insert entry plan",
+	"insertOutputPlan": "Insert exit plan",
 	"exitPlan": "Exit plan",
 	"warehouseManagement": "Warehouse management",
 	"listWarehouses": "List warehouses",
