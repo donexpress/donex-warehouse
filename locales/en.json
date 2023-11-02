@@ -409,5 +409,8 @@
 	"customer_manifest": "Customer manifest",
 	"supplier_manifest": "Supplier manifest",
 	"relabel": "Relabel",
-	"alreadyUsedmsg": "The box(es) you are trying to add are already in another output plan"
+	"alreadyUsedmsg": "The box(es) you are trying to add are already in another output plan",
+	"create_manifest_sucessfully": "Successfully added {manifest_count} products from the manifest {waybill_id}",
+	"update_customer_manifest_sucessfully": "Successfully updated {manifest_count} customer costs",
+	"update_supplier_manifest_sucessfully": "Successfully updated {manifest_paid_count} sales price of the logistics provider"
 }
