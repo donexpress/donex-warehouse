@@ -224,12 +224,12 @@ export const storagePlanDataToExcel = (
     if (selection === "all" || selection.has("number_of_boxes_stored")) {
       sPlan[key6] =
         sp.packing_list && sp.packing_list.length > 0
-          ? sp.packing_list
+          ? ((sp.packing_list
               .filter(
                 (pl: PackingList) =>
                   pl.package_shelf && pl.package_shelf.length > 0
               )
-              .length.toString()
+              .length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString()
           : "0";
     }
     if (selection === "all" || selection.has("location")) {
