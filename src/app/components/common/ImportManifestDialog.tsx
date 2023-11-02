@@ -54,7 +54,14 @@ const ImportManifestDialog = ({ close, confirm, title, where }: Params) => {
 
       if (response !== undefined && response.status >= 200 && response.status <= 299) {
         setLoading(false);
-        let message = intl.formatMessage({ id: "successfullyActionMsg" });
+        let message: string = "";
+        if (where === undefined) {
+          message = intl.formatMessage({ id: "create_manifest_sucessfully" }, { manifest_count: response.data.manifest_count, waybill_id: response.data.waybill_id });
+        } else if (where === "customer") {
+          message = intl.formatMessage({ id: "update_customer_manifest_sucessfully" }, { manifest_count: response.data.manifest_count });
+        } else {
+          message = intl.formatMessage({ id: "update_supplier_manifest_sucessfully" }, { manifest_paid_count: response.data.manifest_paid_count });
+        }
         showMsg(message, { type: "success" });
         confirm();
       } else {
