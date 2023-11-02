@@ -232,14 +232,14 @@ export const storagePlanDataToExcel = (
               .length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString()
           : "0";
     }
-    if (selection === "all" || selection.has("location")) {
-      sPlan[key6_1] = getLocationPackages(sp, intl, true);
-    }
     if (selection === "all" || selection.has("dispatched_boxes")) {
       sPlan[key11_1] =
         sp.packing_list && sp.packing_list.length > 0
           ? sp.packing_list.filter((pl: PackingList) => pl.dispatched).length.toString()
           : "0";
+    }
+    if (selection === "all" || selection.has("location")) {
+      sPlan[key6_1] = getLocationPackages(sp, intl, true);
     }
     if (selection === "all" || selection.has("evidence")) {
       sPlan[key7] = sp.images ? sp.images.length.toString() : "0";

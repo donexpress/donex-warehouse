@@ -126,11 +126,11 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     if (selection === "all" || selection.has("number_of_boxes_stored")) {
         titles.push(key6);
     }
-    if (selection === "all" || selection.has("location")) {
-        titles.push(key6_1);
-    }
     if (selection === "all" || selection.has("dispatched_boxes")) {
         titles.push(key11_1);
+    }
+    if (selection === "all" || selection.has("location")) {
+        titles.push(key6_1);
     }
     if (selection === "all" || selection.has("evidence")) {
         titles.push(key7);
@@ -220,16 +220,6 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
           };
           i++;
         }
-        if (selection === "all" || selection.has("location")) {
-          const keyWord: string = "location";
-          const value: string = getLocationPackages(sp, intl, true);
-          values[index][i] = {
-            keyWord,
-            value,
-            sp
-          };
-          i++;
-        }
         if (selection === "all" || selection.has("dispatched_boxes")) {
           const keyWord: string = "dispatched_boxes";
           const value: string = sp.packing_list && sp.packing_list.length > 0
@@ -238,6 +228,16 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
           values[index][i] = {
             keyWord,
             value
+          };
+          i++;
+        }
+        if (selection === "all" || selection.has("location")) {
+          const keyWord: string = "location";
+          const value: string = getLocationPackages(sp, intl, true);
+          values[index][i] = {
+            keyWord,
+            value,
+            sp
           };
           i++;
         }
