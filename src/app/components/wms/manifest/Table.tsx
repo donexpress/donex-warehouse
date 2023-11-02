@@ -27,12 +27,14 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
-import { getGuides } from "@/services/api.guideerege1992";
+import { getGuides } from "@/services/api.manifesterege1992";
 import { Guide } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier } from "@/typeserege1992";
 import { isString } from "formik";
 import { PlusIcon } from "../../common/PlusIcon";
+import { FaFileExcel, FaFilter, FaSync, FaTimes } from "react-icons/fa";
+import ImportManifestDialog from "../../common/ImportManifestDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -65,11 +67,12 @@ const ManifestTable = () => {
   // const [showPaid, setshowPaid] = useState<boolean>(true);
 
   /** start*/
-  const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
   );
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
+  const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
+  const [whereUpdate, setWhereUpdate] = useState<string>("");
 
   const [aerealGuideNumberValue, setAerealGuideNumberValue] = React.useState("");
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
@@ -88,8 +91,6 @@ const ManifestTable = () => {
   });
 
   const [page, setPage] = useState(1);
-
-  const hasSearchFilter = Boolean(filterValue);
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -163,7 +164,7 @@ const ManifestTable = () => {
   const filteredItems = React.useMemo(() => {
     let filteredGuides = [...guides];
     return filteredGuides;
-  }, [guides, filterValue, statusFilter]);
+  }, [guides, statusFilter]);
 
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
@@ -203,12 +204,6 @@ const ManifestTable = () => {
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
-                  <DropdownItem onClick={() => handleShow(guide["waybill_id"])}>
-                    {intl.formatMessage({ id: "View" })}
-                  </DropdownItem>
-                  <DropdownItem onClick={() => handleEdit(guide["waybill_id"])}>
-                    {intl.formatMessage({ id: "Edit" })}
-                  </DropdownItem>
                   <DropdownItem onClick={() => handleDelete(guide["waybill_id"])}>
                     {intl.formatMessage({ id: "Delete" })}
                   </DropdownItem>
@@ -222,15 +217,6 @@ const ManifestTable = () => {
     },
     [intl]
   );
-
-  const getLabelByLanguage = (state: any) => {
-    if (locale === 'es') {
-      return state.es_name;
-    } else if (locale === 'zh') {
-      return state.zh_name;
-    }
-    return state.name;
-  };
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -256,6 +242,11 @@ const ManifestTable = () => {
   const arrayPaids = [
     { value: "Pagados", id: 0 },
     { value: "No pagados", id: 1 }
+  ]
+
+  const arrayUpdateManifest = [
+    { value: intl.formatMessage({ id: "customer_manifest" }), id: 0 },
+    { value: intl.formatMessage({ id: "supplier_manifest" }), id: 1 }
   ]
 
   const topContent = React.useMemo(() => {
@@ -318,12 +309,12 @@ const ManifestTable = () => {
                 selectionMode="multiple"
                 onSelectionChange={setVisibleColumns}
               > */}
-                {/* {getColumns.map((column) => (
+          {/* {getColumns.map((column) => (
                   <DropdownItem key={column.uid} className="capitalize">
                     {capitalize(column.name)}
                   </DropdownItem>
                 ))} */}
-              {/* </DropdownMenu>
+          {/* </DropdownMenu>
             </Dropdown> */}
           {/* </div> */}
 
@@ -383,17 +374,17 @@ const ManifestTable = () => {
         <div className="flex justify-between">
           <div className="flex justify-start gap-3 items-start">
             <Button
-              className="bnt-select"
+              color="primary"
               onClick={(e) => handleSelectedFilters(e)}
             >
-              {intl.formatMessage({ id: "filter" })}
+              <FaFilter />
             </Button>
 
             <Button
-              className="bnt-select"
+              color="primary"
               onClick={handleClearAll}
             >
-              {intl.formatMessage({ id: "clear" })}
+              <FaTimes />
             </Button>
           </div>
 
@@ -423,11 +414,33 @@ const ManifestTable = () => {
               </DropdownMenu>
             </Dropdown>
 
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  className="bnt-select"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                >
+                  {intl.formatMessage({ id: "update" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Carrier"
+                closeOnSelect={true}
+                selectionMode="single"
+              >
+                {arrayUpdateManifest.map((column) => (
+                  <DropdownItem key={column.id} onClick={(e) => openUpdateManifestDialog(column.id)} className="capitalize">
+                    {capitalize(column.value)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+
             <Button
               color="primary"
-              // isIconOnly
               endContent={<PlusIcon />}
-              onClick={() => handleAdd()}
+              onClick={() => openImportManifestDialog()}
             >
               {intl.formatMessage({ id: "create" })}
             </Button>
@@ -452,12 +465,10 @@ const ManifestTable = () => {
       </div >
     );
   }, [
-    filterValue,
     statusFilter,
     visibleColumns,
     onRowsPerPageChange,
     guides.length,
-    hasSearchFilter,
     intl,
     trackingNumberValue,
     clientReferenceValue,
@@ -490,7 +501,6 @@ const ManifestTable = () => {
     selectedKeys,
     items.length,
     page,
-    hasSearchFilter,
     sortedItems.length,
     guides.length,
     rowsPerPage,
@@ -566,10 +576,37 @@ const ManifestTable = () => {
     router.push(`/${locale}/wms/manifest/${id}/show`);
   };
 
-  const handleAdd = () => {
-    setLoading(true);
-    router.push(`/${locale}/wms/manifest/insert_manifest`);
-  };
+  // const handleAdd = () => {
+  //   setLoading(true);
+  //   router.push(`/${locale}/wms/manifest/insert_manifest`);
+  // };
+
+  const openImportManifestDialog = () => {
+    setShowImportManifestDialog(true);
+  }
+
+  const closeImportManifestDialog = () => {
+    setShowImportManifestDialog(false);
+  }
+
+  const openUpdateManifestDialog = (where: number) => {
+    setWhereUpdate(where === 0 ? "customer" : "supplier");
+    setShowUpdateManifestDialog(true);
+  }
+
+  const closeUpdateManifestDialog = () => {
+    setShowUpdateManifestDialog(false);
+  }
+
+  const confirmImportDialog = async () => {
+    closeImportManifestDialog();
+    await loadGuides();
+  }
+
+  const confirmUpdateDialog = async () => {
+    closeUpdateManifestDialog();
+    await loadGuides();
+  }
 
   const close = () => {
     setShowConfirm(false);
@@ -627,6 +664,8 @@ const ManifestTable = () => {
           </TableBody>
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+        {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
+        {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} />}
       </Loading>
     </>
   );
