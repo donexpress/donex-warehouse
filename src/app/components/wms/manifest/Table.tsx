@@ -84,7 +84,7 @@ const ManifestTable = () => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "id",
     direction: "descending",
