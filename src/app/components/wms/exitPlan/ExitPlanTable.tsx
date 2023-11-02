@@ -65,6 +65,7 @@ import InventoryList from "./InventoryList";
 import { CancelIcon } from "../../common/CancelIcon";
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 import { getAppendagesByExitPlanId } from "@/services/api.appendixerege1992";
+import SpinnerIconButton from "../../common/SpinnerIconButton";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -96,6 +97,8 @@ const ExitPlanTable = () => {
   );
 
   const [filterValue, setFilterValue] = useState("");
+  const [queryFilter, setQueryFilter] = React.useState("");
+  const [showPagination, setShowPagination] = useState<boolean>(true);
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [currentStatePosition, setCurrentStatePosition] = useState<number>(1);
@@ -122,6 +125,14 @@ const ExitPlanTable = () => {
   const [destinations, setDestinations] = useState<State[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [cancelALl, setCancellAll] = useState<boolean>(false);
+
+  const [filterInitialDate, setFilterInitialDate] = useState<string>("");
+  const [filterFinalDate, setFilterFinalDate] = useState<string>("");
+  const [filterLocation, setFilterLocation] = useState<string[]>([
+    "meli",
+    "private_address",
+    "amazon",
+  ]);
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -259,7 +270,7 @@ const ExitPlanTable = () => {
 
   const filteredItems = useMemo(() => {
     let filteredUsers = [...exitPlans];
-    if (hasSearchFilter) {
+    /* if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) => {
         return (
           user.output_number
@@ -286,26 +297,26 @@ const ExitPlanTable = () => {
           getCustomerOrderNumber(user).toString().toLowerCase().includes(filterValue.toLowerCase())
         );
       });
-    }
+    } */
     return filteredUsers;
   }, [exitPlans, filterValue]);
 
-  const items = useMemo(() => {
+  /* const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
+  }, [page, filteredItems, rowsPerPage]); */
 
   const sortedItems = useMemo(() => {
-    return [...items].sort((a: ExitPlan, b: ExitPlan) => {
+    return [...filteredItems].sort((a: ExitPlan, b: ExitPlan) => {
       const first = a[sortDescriptor.column as keyof ExitPlan] as number;
       const second = b[sortDescriptor.column as keyof ExitPlan] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, items]);
+  }, [sortDescriptor, filteredItems]);
 
   const selectedItemsFn = (selection: Selection) => {
     setSelectedKeys(selection);
@@ -339,10 +350,12 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    (user.state.value !== "pending" && checkOMS)
+                    user.state.value !== "pending" && checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
-                  } onClick={() => handleEdit(Number(user["id"]))}>
+                  }
+                  onClick={() => handleEdit(Number(user["id"]))}
+                >
                   {intl.formatMessage({ id: "Edit" })}
                 </DropdownItem>
                 <DropdownItem onClick={() => handleConfig(Number(user["id"]))}>
@@ -386,7 +399,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "pending" || checkOMS
+                    user.state !== "pending" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -396,7 +409,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "to_be_processed" || checkOMS
+                    user.state !== "to_be_processed" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -406,7 +419,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "processing" || checkOMS
+                    user.state !== "processing" || checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -416,8 +429,8 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    (user.state.value !== "dispatched" &&
-                      user.state.value !== "to_be_processed") ||
+                    (user.state !== "dispatched" &&
+                      user.state !== "to_be_processed") ||
                     checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
@@ -431,7 +444,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "pending"
+                    user.state !== "pending"
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -440,7 +453,13 @@ const ExitPlanTable = () => {
                   {intl.formatMessage({ id: "cancel" })}
                 </DropdownItem>
                 <DropdownItem
-                  className={(checkOMS && user.state.value !== "pending" && user.state.value !== "cancelled") ? "do-not-show-dropdown-item" : ""}
+                  className={
+                    checkOMS &&
+                    user.state !== "pending" &&
+                    user.state !== "cancelled"
+                      ? "do-not-show-dropdown-item"
+                      : ""
+                  }
                   onClick={() => handleDelete(Number(user["id"]))}
                 >
                   {intl.formatMessage({ id: "Delete" })}
@@ -566,39 +585,128 @@ const ExitPlanTable = () => {
     return "";
   };
 
-  const onRowsPerPageChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onRowsPerPageChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    if (Number(e.target.value) !== rowsPerPage) {
+      setSelectedItems([]);
+      setSelectedKeys(new Set([]));
       setRowsPerPage(Number(e.target.value));
       setPage(1);
-    },
-    []
-  );
+      await loadExitPlans(
+        statusSelected,
+        1,
+        Number(e.target.value),
+        queryFilter,
+        false,
+        true
+      );
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      searchValues();
+    }
+  };
+
+  const searchValues = async () => {
+    if (filterValue && filterValue !== "") {
+      await setQueryFilter(filterValue);
+    } else {
+      await setQueryFilter("");
+    }
+    await setPage(1);
+    await loadExitPlans(
+      statusSelected,
+      1,
+      rowsPerPage,
+      filterValue ? filterValue : "",
+      true,
+      true
+    );
+  };
 
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
       setFilterValue(value);
-      setPage(1);
     } else {
       setFilterValue("");
     }
   }, []);
 
-  const onClear = useCallback(() => {
-    setFilterValue("");
-    setPage(1);
+  const onClear = useCallback(async () => {
+    await setFilterValue("");
+    await setQueryFilter("");
+    await setPage(1);
+    await loadExitPlans(statusSelected, 1, rowsPerPage, "", true, true);
   }, []);
+
+  const getCount = (state: any) => {
+    if (count) {
+      switch (state) {
+        case "pending":
+          return `${
+            statusSelected === "pending" && !loadingItems
+              ? count.pending
+              : count.pending
+          }`;
+        case "to_be_processed":
+          return `${
+            statusSelected === "to_be_processed" && !loadingItems
+              ? count.to_be_processed
+              : count.to_be_processed
+          }`;
+        case "processing":
+          return `${
+            statusSelected === "processing" && !loadingItems
+              ? count.processing
+              : count.processing
+          }`;
+        case "dispatched":
+          return `${
+            statusSelected === "dispatched" && !loadingItems
+              ? count.dispatched
+              : count.dispatched
+          }`;
+        case "cancelled":
+          return `${
+            statusSelected === "cancelled" && !loadingItems
+              ? count.cancelled
+              : count.cancelled
+          }`;
+        case "all":
+          return `${
+            statusSelected === "all" && !loadingItems
+              ? count.total
+              : count.total
+          }`;
+      }
+    }
+    return "";
+  };
 
   const changeTab = async (tab: string) => {
     if (tab !== statusSelected && !loadingItems) {
       setCookie("tabEP", tab);
       await setStatusSelected(tab);
       await setLoadingItems(true);
-      //const state = exitPlanState?.states.find((el) => el.value === tab);
-      const storagePlanss = await getExitPlansByState(tab);
-      //setCurrentStatePosition(tab);
-      await setLoadingItems(false);
-      await setExitPlans(storagePlanss !== null ? storagePlanss : []);
-      // await setExitPlans([]);
+
+      // const storagePlanss = await getExitPlansByState(
+      //   tab,
+      //   1,
+      //   rowsPerPage,
+      //   queryFilter
+      // );
+
+      // await setLoadingItems(false);
+      // await setExitPlans(storagePlanss !== null ? storagePlanss : []);
+      await loadExitPlans(tab, 1, rowsPerPage, queryFilter, true, true, false)
+      setSelectedItems([]);
+      setSelectedKeys(new Set([]));
+      if (page !== 1) {
+        setPage(1);
+      }
     }
   };
 
@@ -613,8 +721,8 @@ const ExitPlanTable = () => {
     return count[value];
   };
 
-  const onFinishFilter = (data: ExitPlan[]) => {
-    setExitPlans(data);
+  const onFinishFilter = async () => {
+    await loadExitPlans(statusSelected, page, rowsPerPage, queryFilter, true, true, false)
   };
 
   const getSelectedExitPlans = (): ExitPlan[] => {
@@ -622,7 +730,11 @@ const ExitPlanTable = () => {
     for (let i = 0; i < selectedItems.length; i++) {
       const index = selectedItems[i];
       const item = exitPlans.filter((ep: ExitPlan) => ep.id === index);
-      if (filterValue && filterValue !== "") {
+
+      if (item.length > 0) {
+        its.push(item[0]);
+      }
+      /* if (filterValue && filterValue !== "") {
         const isSearchable = item[0].output_number
           ?.toLowerCase()
           ?.includes(filterValue.toLowerCase());
@@ -633,7 +745,7 @@ const ExitPlanTable = () => {
         if (item[0]) {
           its.push(item[0]);
         }
-      }
+      } */
     }
     return its;
   };
@@ -648,49 +760,78 @@ const ExitPlanTable = () => {
   };
 
   const displayCancelAll = () => {
-    setCancellAll(true)
-  }
+    setCancellAll(true);
+  };
 
   const closeCancelAll = () => {
-    setCancellAll(false)
-  }
-  
+    setCancellAll(false);
+  };
+
   const confirmCancelAll = async () => {
     try {
-      const promises = selectedItems.map(el =>  updateExitPlan(el, {
-        state: "cancelled",
-      }))
-      await Promise.all(promises)
+      const promises = selectedItems.map((el) =>
+        updateExitPlan(el, {
+          state: "cancelled",
+        })
+      );
+      await Promise.all(promises);
       showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
         type: "success",
       });
-    } catch(e) {
+    } catch (e) {
       showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
         type: "error",
       });
     } finally {
-      await loadExitPlans()
-      closeCancelAll()
+      await loadExitPlans(
+        statusSelected,
+        page,
+        rowsPerPage,
+        queryFilter,
+        true,
+        true
+      );
+      closeCancelAll();
     }
-  }
+  };
 
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4 mb-2">
         <div className="flex justify-between gap-3">
           <div>
-            <Input
-              isClearable
-              className="w-full search-input"
-              placeholder=""
-              startContent={<SearchIcon />}
-              value={filterValue}
-              onClear={() => onClear()}
-              onValueChange={onSearchChange}
-            />
+            <div className="w-full" style={{ position: "relative" }}>
+              <Input
+                isClearable
+                className="w-full search-input input-search-list"
+                placeholder=""
+                value={filterValue}
+                onClear={() => onClear()}
+                onValueChange={onSearchChange}
+                onKeyPress={handleKeyPress}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: "0px",
+                  right: "0px",
+                  bottom: "0px",
+                  width: "40px",
+                  background: "#37446b",
+                  borderRadius: "0 5px 5px 0",
+                  cursor: "pointer",
+                }}
+                className="elements-center"
+                onClick={() => searchValues()}
+              >
+                <SearchIcon />
+              </div>
+            </div>
             <FilterExitPlan
               onFinish={onFinishFilter}
-              destionations={destinations}
+              setParentFinalDate={setFilterFinalDate}
+              setParentInitialDate={setFilterInitialDate}
+              setParentLocations={setFilterLocation}
             />
           </div>
           <div
@@ -776,24 +917,26 @@ const ExitPlanTable = () => {
               >
                 {intl.formatMessage({ id: "export_xlsx" })}
               </Button>
-              {(statusSelected === 'pending') && (
+              {statusSelected === "pending" && (
                 <Button
                   color="primary"
-                  style={{ width: '121px' }}
+                  style={{ width: "121px" }}
                   endContent={<CancelIcon />}
                   onClick={() => displayCancelAll()}
                   isDisabled={selectedItems.length === 0}
                 >
                   {intl.formatMessage({ id: "cancel" })}
                 </Button>
-              )
-            }
+              )}
             </div>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {intl.formatMessage({ id: "total_results" }, { in: count?.total })}
+            {intl.formatMessage(
+              { id: "total_results" },
+              { in: getCount(statusSelected) }
+            )}
           </span>
           <label className="flex items-center text-default-400 text-small">
             {intl.formatMessage({ id: "rows_page" })}
@@ -855,6 +998,24 @@ const ExitPlanTable = () => {
     selectedItems,
   ]);
 
+  const changePage = async (newPage: number) => {
+    if (page !== newPage) {
+      setSelectedItems([]);
+      setSelectedKeys(new Set([]));
+      setPage(newPage);
+      await setShowPagination(false);
+      await loadExitPlans(
+        statusSelected,
+        newPage,
+        rowsPerPage,
+        queryFilter,
+        false,
+        true
+      );
+      await setShowPagination(true);
+    }
+  };
+
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
@@ -863,29 +1024,36 @@ const ExitPlanTable = () => {
             ? `${intl.formatMessage({ id: "selected_all" })}`
             : `${intl.formatMessage(
                 { id: "selected" },
-                { in: selectedKeys.size, end: filteredItems.length }
+                { in: selectedKeys.size, end: getCount(statusSelected) }
               )}`}
         </span>
-        <PaginationTable
-          totalRecords={filteredItems.slice(0, exitPlans.length).length}
-          pageLimit={rowsPerPage}
-          pageNeighbours={1}
-          page={page}
-          onPageChanged={setPage}
-        />
+        {showPagination && (
+          <PaginationTable
+            totalRecords={getCount(statusSelected)}
+            pageLimit={rowsPerPage}
+            pageNeighbours={1}
+            page={page}
+            onPageChanged={changePage}
+          />
+        )}
+        {!showPagination && (
+          <div className="elements-center" style={{ height: "61px" }}>
+            <SpinnerIconButton style={{ width: "20px", height: "20px" }} />
+          </div>
+        )}
       </div>
     );
   }, [
     selectedKeys,
-    items.length,
+    filteredItems,
     sortedItems.length,
     page,
     exitPlans.length,
     rowsPerPage,
     hasSearchFilter,
-    onSearchChange,
-    onRowsPerPageChange,
     intl,
+    showPagination,
+    count,
   ]);
 
   useEffect(() => {
@@ -893,7 +1061,15 @@ const ExitPlanTable = () => {
     if (tab) {
       setStatusSelected(tab);
     }
-    loadExitPlans(tab ? tab : statusSelected);
+    loadExitPlans(
+      tab ? tab : statusSelected,
+      page,
+      rowsPerPage,
+      "",
+      true,
+      false,
+      true
+    );
   }, []);
 
   useEffect(() => {
@@ -904,17 +1080,42 @@ const ExitPlanTable = () => {
     return () => clearTimeout(timer);
   }, [intl]);
 
-  const loadExitPlans = async (status: string = "pending") => {
-    setLoading(true);
-    const pms = await getExitPlansByState(status);
-    console.log(pms);
+  const loadExitPlans = async (
+    status: string = "pending",
+    pageSP: number = -1,
+    rowsPerPageSP: number = -1,
+    querySP: string = "",
+    loadCount: boolean = false,
+    partialLoad: boolean = false,
+    firstLoad: boolean = false
+  ) => {
+    if (!partialLoad) {
+      setLoading(true);
+    }
+    await setLoadingItems(true);
+    const pms = await getExitPlansByState(
+      status,
+      pageSP !== -1 ? pageSP : page,
+      rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage,
+      querySP,
+      filterInitialDate,
+      filterFinalDate,
+      filterLocation
+    );
     setExitPlans(pms ? pms : []);
-    const states = await getExitPlansState();
-    const count = await countExitPlans();
-    const destinations = await getExitPlanDestinations();
-    setDestinations(destinations.destinations);
-    setCount(count);
-    setExitPlanState(states);
+    await setLoadingItems(false);
+    if (firstLoad) {
+      const states = await getExitPlansState();
+      setExitPlanState(states);
+    }
+    if (loadCount) {
+      const count = await countExitPlans(querySP,filterInitialDate, filterFinalDate, filterLocation);
+      setCount(count);
+    }
+    if (firstLoad) {
+      const destinations = await getExitPlanDestinations();
+      setDestinations(destinations.destinations);
+    }
     setLoading(false);
   };
 
@@ -978,7 +1179,12 @@ const ExitPlanTable = () => {
         );
       }
     } else {
-      showMsg(intl.formatMessage({ id: "operation_instruction_box_requirement_amount" }), {type: 'warning'})
+      showMsg(
+        intl.formatMessage({
+          id: "operation_instruction_box_requirement_amount",
+        }),
+        { type: "warning" }
+      );
     }
   };
 
@@ -1012,9 +1218,9 @@ const ExitPlanTable = () => {
         state = "processing";
         break;
     }
-    if(state === 'dispatched') {
-      const appendix = await getAppendagesByExitPlanId(changeExitPlanId)
-      if(!appendix || (appendix && appendix.length === 0)) {
+    if (state === "dispatched") {
+      const appendix = await getAppendagesByExitPlanId(changeExitPlanId);
+      if (!appendix || (appendix && appendix.length === 0)) {
         showMsg(intl.formatMessage({ id: "missing_apendix_msg" }), {
           type: "warning",
         });
@@ -1030,7 +1236,14 @@ const ExitPlanTable = () => {
       type: "success",
     });
     closeListPackage();
-    await loadExitPlans(statusSelected);
+    await loadExitPlans(
+      statusSelected,
+      page,
+      rowsPerPage,
+      queryFilter,
+      true,
+      true
+    );
     setLoading(false);
   };
 
@@ -1080,13 +1293,32 @@ const ExitPlanTable = () => {
     setLoading(true);
     if (deleteElement !== -1) {
       const reponse = await removeExitPlan(deleteElement);
+      if (reponse.status >= 200 && reponse.status <= 299) {
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        showMsg(message, { type: "error" });
+      }
     } else if (cancelElement !== -1) {
       const reponse = await updateExitPlan(cancelElement, {
         state: "cancelled",
       });
+      if (reponse.status >= 200 && reponse.status <= 299) {
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        showMsg(message, { type: "error" });
+      }
     }
     close();
-    await loadExitPlans(statusSelected);
+    await loadExitPlans(
+      statusSelected,
+      page,
+      rowsPerPage,
+      queryFilter,
+      true,
+      true
+    );
     setLoading(false);
   };
 
@@ -1122,8 +1354,12 @@ const ExitPlanTable = () => {
               )}
             </TableHeader>
             <TableBody
-              emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-              items={sortedItems}
+              emptyContent={`${
+                loadingItems
+                  ? intl.formatMessage({ id: "loading_items" })
+                  : intl.formatMessage({ id: "no_results_found" })
+              }`}
+              items={loadingItems ? [] : filteredItems}
             >
               {(item: any) => (
                 <TableRow key={item.id}>
@@ -1137,7 +1373,12 @@ const ExitPlanTable = () => {
         </div>
         {bottomContent}
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
-        {cancelALl && <ConfirmationDialog close={closeCancelAll} confirm={confirmCancelAll} />}
+        {cancelALl && (
+          <ConfirmationDialog
+            close={closeCancelAll}
+            confirm={confirmCancelAll}
+          />
+        )}
         {showListPakcage && (
           <PackingListDialog
             close={closeListPackage}

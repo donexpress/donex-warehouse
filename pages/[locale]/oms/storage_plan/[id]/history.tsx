@@ -1,14 +1,25 @@
 import Head from 'next/head';
+import { useEffect, useState } from 'react';
 import Layout from '../../../../../src/app/layout';
 import ProtectedRoute from '../../../../../src/app/components/common/ProtectedRoute';
 import StoragePlanHistory from '../../../../../src/app/components/wms/storagePlan/StoragePlanHistory';
-import { HistoryStoragePlanProps } from '../../../../../src/types/storage_plan';
+import { HistoryStoragePlanProps, StoragePlan } from '../../../../../src/types/storage_plan';
 import { getUsers } from '../../../../../src/services/api.users';
 import { getWhs } from '../../../../../src/services/api.wh';
 import { getStoragePlanById } from '../../../../../src/services/api.storage_plan';
 
-const HistoryStoragePlan = ({ id, storagePlan, warehouses, users, inWMS = false }: HistoryStoragePlanProps) => {
+const HistoryStoragePlan = ({ id, warehouses, users, inWMS = false }: HistoryStoragePlanProps) => {
   
+  const [storagePlan, setStoragePlan] = useState<StoragePlan | null>(null)
+
+  useEffect(() => {
+    setup()
+  },[])
+
+  const setup = async () => {
+    const sPlan = await getStoragePlanById(id);
+    setStoragePlan(sPlan);
+  }
   return (
   <ProtectedRoute>
       <Layout>
@@ -24,7 +35,7 @@ const HistoryStoragePlan = ({ id, storagePlan, warehouses, users, inWMS = false 
 
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
-  const storagePlan = await getStoragePlanById(id, context);
+  //const storagePlan = await getStoragePlanById(id, context);
   const users = await getUsers(context);
   const warehouses = await getWhs(context);
 
@@ -32,7 +43,6 @@ export async function getServerSideProps(context: any) {
     props: {
         warehouses,
         users,
-        storagePlan,
         id,
     }
   }

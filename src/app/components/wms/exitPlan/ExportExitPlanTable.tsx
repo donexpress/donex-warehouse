@@ -17,6 +17,7 @@ import {
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { PackingList } from "@/types/storage_planerege1992";
+import { Warehouse } from "@/types/warehouseerege1992";
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   },
   locationCell: {
     marginBottom: 5,
-  }
+  },
 });
 
 interface Props {
@@ -94,11 +95,12 @@ interface Props {
 
 const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
   const packageShelfFormat = (
-    packageShelfs: PackageShelf[] | undefined
+    packageShelfs: PackageShelf[] | undefined, warehouse?: Warehouse
   ): string => {
     if (packageShelfs && packageShelfs.length > 0) {
       const packageShelf: PackageShelf = packageShelfs[0];
-      return `${intl.formatMessage({ id: "partition" })}: ${
+      return `${(warehouse && warehouse.code) ? (warehouse.code + '-' + String(packageShelf.shelf?.partition_table).padStart(2, "0") + '-' + String(packageShelf.shelf?.number_of_shelves).padStart(2, "0") + '-' + String(packageShelf.layer).padStart(2, "0") + '-' + String(packageShelf.column).padStart(2, "0")) : ''} 
+      ${intl.formatMessage({ id: "partition" })}: ${
         packageShelf.shelf?.partition_table
       }
         ${intl.formatMessage({ id: "shelf" })}: ${
@@ -109,30 +111,38 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
     }
     return "";
   };
-  const getLocation = (ep: ExitPlan): string => {
+  /* const getLocation = (ep: ExitPlan): string => {
     let locations = "";
     ep.packing_lists?.forEach((pl) => {
       locations += packageShelfFormat(pl.package_shelf);
     });
     return locations;
-  };
+  }; */
 
   const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
-    const pls = packingLists.filter((pl) => (pl.package_shelf && (pl.package_shelf.length > 0)));
-    
+    const pls = packingLists.filter(
+      (pl) => pl.package_shelf && pl.package_shelf.length > 0
+    );
+
     const uniqueCombinationSet = new Set<string>();
     const uniqueArray: PackingList[] = [];
 
     for (const pl of pls) {
-        const combinationKey = `${Number((pl.package_shelf as PackageShelf[])[0].shelf?.partition_table)}_${Number((pl.package_shelf as PackageShelf[])[0].shelf?.number_of_shelves)}_${(pl.package_shelf as PackageShelf[])[0].layer}_${(pl.package_shelf as PackageShelf[])[0].column}`;
+      const combinationKey = `${Number(
+        (pl.package_shelf as PackageShelf[])[0].shelf?.partition_table
+      )}_${Number(
+        (pl.package_shelf as PackageShelf[])[0].shelf?.number_of_shelves
+      )}_${(pl.package_shelf as PackageShelf[])[0].layer}_${
+        (pl.package_shelf as PackageShelf[])[0].column
+      }`;
 
-        if (!uniqueCombinationSet.has(combinationKey)) {
-            uniqueCombinationSet.add(combinationKey);
+      if (!uniqueCombinationSet.has(combinationKey)) {
+        uniqueCombinationSet.add(combinationKey);
 
-            uniqueArray.push(pl);
-        }
+        uniqueArray.push(pl);
+      }
     }
-    
+
     return uniqueArray;
   };
 
@@ -164,7 +174,14 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
         <View style={styles.table}>
           <View style={styles.tableRow}>
             {columns.map((column, index) => (
-              <Text style={ column === "output_number" ? [styles.headerCell, styles.minorCell] : [styles.headerCell]} key={index}>
+              <Text
+                style={
+                  column === "output_number"
+                    ? [styles.headerCell, styles.minorCell]
+                    : [styles.headerCell]
+                }
+                key={index}
+              >
                 {intl.formatMessage({ id: column })}
               </Text>
             ))}
@@ -222,18 +239,22 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                   case "location":
                     return (
                       <View key={index} style={styles.tableCell}>
-                        {getPLUnique(oi.packing_lists ? oi.packing_lists : []).map((pl, plIndex) => (
-                          pl.package_shelf ?
-                          <Text key={plIndex} style={styles.locationCell}>
-                            {packageShelfFormat(pl.package_shelf)}
-                          </Text>
-                          : ''
-                        ))}
+                        {getPLUnique(
+                          oi.packing_lists ? oi.packing_lists : []
+                        ).map((pl, plIndex) =>
+                          pl.package_shelf ? (
+                            <Text key={plIndex} style={styles.locationCell}>
+                              {packageShelfFormat(pl.package_shelf, oi.warehouse)}
+                            </Text>
+                          ) : (
+                            ""
+                          )
+                        )}
                       </View>
                     );
                   case "delivered_time":
                   case "updated_at":
-                  case "created_at":{
+                  case "created_at": {
                     // @ts-ignore
                     if (oi[column] && oi[column] !== "") {
                       return (
@@ -245,17 +266,33 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                       );
                     } else {
                       return (
-                      <Text key={index} style={styles.tableCell}>
-                        --
-                      </Text>
+                        <Text key={index} style={styles.tableCell}>
+                          --
+                        </Text>
                       );
                     }
                   }
                   case "output_number":
                     return (
-                      <Text key={index} style={[styles.tableCell, styles.minorCell]}>
+                      <Text
+                        key={index}
+                        style={[styles.tableCell, styles.minorCell]}
+                      >
                         {/* @ts-ignore */}
                         {oi[column]}
+                      </Text>
+                    );
+                  case "operation_instructions":
+                    return (
+                      <Text
+                        key={index}
+                        style={[styles.tableCell, styles.minorCell]}
+                      >
+                        {/* @ts-ignore */}
+                        {oi.operation_instructions &&
+                        oi.operation_instructions.length > 0
+                          ? oi.operation_instructions.length
+                          : 0}
                       </Text>
                     );
                   default:

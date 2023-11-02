@@ -12,6 +12,7 @@ import { Selection } from "@nextui-org/react";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import { Warehouse } from "@/types/warehouseerege1992";
 
 const baseMessageOpts: Pick<
   MessageOpts,
@@ -190,6 +191,7 @@ export const storagePlanDataToExcel = (
   const key4: string = intl.formatMessage({ id: "storage" });
   const key5: string = intl.formatMessage({ id: "number_of_boxes_entered" });
   const key6: string = intl.formatMessage({ id: "number_of_boxes_stored" });
+  const key6_1: string = intl.formatMessage({ id: "location" });
   const key7: string = intl.formatMessage({ id: "evidence" });
   const key8: string = intl.formatMessage({ id: "reference_number" });
   const key9: string = intl.formatMessage({ id: "pr_number" });
@@ -222,12 +224,12 @@ export const storagePlanDataToExcel = (
     if (selection === "all" || selection.has("number_of_boxes_stored")) {
       sPlan[key6] =
         sp.packing_list && sp.packing_list.length > 0
-          ? sp.packing_list
+          ? ((sp.packing_list
               .filter(
                 (pl: PackingList) =>
                   pl.package_shelf && pl.package_shelf.length > 0
               )
-              .length.toString()
+              .length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString()
           : "0";
     }
     if (selection === "all" || selection.has("dispatched_boxes")) {
@@ -235,6 +237,9 @@ export const storagePlanDataToExcel = (
         sp.packing_list && sp.packing_list.length > 0
           ? sp.packing_list.filter((pl: PackingList) => pl.dispatched).length.toString()
           : "0";
+    }
+    if (selection === "all" || selection.has("location")) {
+      sPlan[key6_1] = getLocationPackages(sp, intl, true);
     }
     if (selection === "all" || selection.has("evidence")) {
       sPlan[key7] = sp.images ? sp.images.length.toString() : "0";
@@ -392,6 +397,57 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
       fileExtension
   );
 }
+
+export const getLocationPackages = (sp: StoragePlan, intl?: IntlShape,  isFromDownload: boolean = false): string => {
+  const locations: string[] = [];
+  if (sp.packing_list && sp.packing_list?.length == 0) {
+    return "--";
+  }
+  sp.packing_list?.forEach((pl) => {
+    if (
+      pl.package_shelf &&
+      pl.package_shelf[0] &&
+      pl.package_shelf[0].shelf
+    ) {
+      const tmpl = `${sp.warehouse?.code}-${String(
+        pl.package_shelf[0].shelf.partition_table
+      ).padStart(2, "0")}-${String(
+        pl.package_shelf[0].shelf.number_of_shelves
+      ).padStart(2, "0")}-${String(pl.package_shelf[0].layer).padStart(
+        2,
+        "0"
+      )}-${String(pl.package_shelf[0].column).padStart(2, "0")}` + 
+      ((isFromDownload && intl !== undefined) ? (` ${intl.formatMessage({ id: "partition" })}: ${
+        pl.package_shelf &&
+        pl.package_shelf.length > 0 &&
+        pl.package_shelf[0].shelf
+          ? pl.package_shelf[0].shelf.partition_table
+          : ""
+      } ` +
+      `${intl.formatMessage({ id: "shelf" })}: ${
+        pl.package_shelf &&
+        pl.package_shelf.length > 0 &&
+        pl.package_shelf[0].shelf
+          ? pl.package_shelf[0].shelf.number_of_shelves
+          : ""
+      } ` +
+      `${intl.formatMessage({ id: "layer" })}: ${
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? pl.package_shelf[0].layer
+          : ""
+      }  ` +
+      `${intl.formatMessage({ id: "column" })}: ${
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? pl.package_shelf[0].column
+          : ""
+      } `) : '');
+      if (!locations.find((el) => el === tmpl)) {
+        locations.push(tmpl);
+      }
+    }
+  });
+  return locations.join((isFromDownload && intl !== undefined) ? "\n\n" : ", ");
+};
 
 export const packingListDataToExcel = (
   storagePlan: StoragePlan,
@@ -770,13 +826,14 @@ export const exitPlanDataToExcel = (
 ) => {
   let dataToExport: object[] = [];
   const packageShelfFormat = (
-    packageShelfs: PackageShelf[] | undefined
+    packageShelfs: PackageShelf[] | undefined, warehouse?: Warehouse
   ): string => {
     if (packageShelfs && packageShelfs.length > 0) {
       const packageShelf: PackageShelf = packageShelfs[0];
-      return `${intl.formatMessage({ id: "partition" })}: ${
-        packageShelf.shelf?.partition_table
-      } 
+      return `${(warehouse && warehouse.code) ? (warehouse.code + '-' + String(packageShelf.shelf?.partition_table).padStart(2, "0") + '-' + String(packageShelf.shelf?.number_of_shelves).padStart(2, "0") + '-' + String(packageShelf.layer).padStart(2, "0") + '-' + String(packageShelf.column).padStart(2, "0")) : ''} 
+${intl.formatMessage({ id: "partition" })}: ${
+  packageShelf.shelf?.partition_table
+} 
 ${intl.formatMessage({ id: "shelf" })}: ${
   packageShelf.shelf?.number_of_shelves
 } 
@@ -789,7 +846,7 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
   const getLocation = (ep: ExitPlan): string => {
     let locations = "";
     getPLUnique(ep.packing_lists ? ep.packing_lists : []).forEach((pl) => {
-      locations += packageShelfFormat(pl.package_shelf);
+      locations += packageShelfFormat(pl.package_shelf, ep.warehouse);
     });
     return locations;
   };

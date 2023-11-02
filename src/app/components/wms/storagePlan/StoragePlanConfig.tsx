@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { Button,
   DropdownTrigger,
   Dropdown,
@@ -10,7 +10,7 @@ import { showMsg, isOMS, isWMS, packingListDataToExcel } from '../../../../helpe
 import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
 import { updatePackingListById, removePackingListById } from '../../../../services/api.packing_list';
-import { updateStoragePlanById, createStoragePlan} from '../../../../services/api.storage_plan';
+import { updateStoragePlanById, createStoragePlan, getStoragePlanById } from '../../../../services/api.storage_plan';
 import { StoragePlanConfigProps, PackingList, StoragePlan } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
 import { Response } from '../../../../types/index';
@@ -26,6 +26,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import { getDateFormat, getHourFormat } from '../../../../helpers/utils';
 import ConfirmationDialog from "../../common/ConfirmationDialog";
+import { Loading } from "../../common/Loading";
 
 const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boolean = true): PackingList[] => {
   return packingLists.map((packingList: PackingList) => {
@@ -36,11 +37,11 @@ const changeAllCheckedPackingList = (packingLists: PackingList[], checked: boole
   });
 };
 
-const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) => {
+const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
-    const [rows, setRows] = useState<PackingList[]>(storagePlan && storagePlan.packing_list ? changeAllCheckedPackingList(storagePlan.packing_list, false) : []);
+    const [rows, setRows] = useState<PackingList[]>([]);
     const [selectedRows, setSelectedRows] = useState<PackingList[]>([]);
     const [tabToShow, setTabToShow] = useState<number>(1);
     const [selectAllPackingListItems, setSelectAllPackingListItems] = useState<boolean>(false);
@@ -48,9 +49,27 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
     const [showSplitBillDialog, setShowSplitBillDialog] = useState<boolean>(false);
     const [showBatchOnShelvesDialog, setShowBatchOnShelvesDialog] = useState<boolean>(false);
     const [showForceEntryDialog, setShowForceEntryDialog] = useState<boolean>(false);
-    const [boxNumber, setBoxNumber] = useState<number | null>(storagePlan?.box_amount ? storagePlan?.box_amount : null);
-    const [stateStoragePlan, setStateStoragePlan] = useState<string>(storagePlan.state ? storagePlan.state : 'to be storage')
-    
+    const [boxNumber, setBoxNumber] = useState<number | null>(null);
+    const [stateStoragePlan, setStateStoragePlan] = useState<string>('to be storage')
+    const [storagePlan, setStoragePlan] = useState<StoragePlan | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+      getStoragePlan(id);
+    }, []);
+
+    const getStoragePlan = async(storagePlanId: number) => {
+      setLoading(true);
+      let sPlan = await getStoragePlanById(storagePlanId);
+      if (sPlan !== null) {
+        setStoragePlan(sPlan);
+        setRows (sPlan.packing_list ? changeAllCheckedPackingList(sPlan.packing_list, false) : []);
+        setBoxNumber(sPlan?.box_amount ? sPlan?.box_amount : null);
+        setStateStoragePlan(sPlan.state ? sPlan.state : 'to be storage');
+      }
+      setLoading(false);
+    }
+
     const initialValues = {
         rows: [],
     };
@@ -302,7 +321,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
       }
 
       const handleForceEntry = async() => {
-          const response: Response = await updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'stocked'));
+          const response: Response = await updateStoragePlanById(Number(id), formatBody(storagePlan as StoragePlan, false, 'stocked'));
           if (response.status >= 200 && response.status <= 299) {
             const message = intl.formatMessage({ id: 'successfullyActionMsg' });
             setStateStoragePlan('stocked');
@@ -343,6 +362,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                 </Button>
               </div>
             </div>
+            <Loading loading={loading}>
             <div className='user-form-body__container'>
                 <div className='storage-plan-data'>
                   <div style={{ paddingTop: '10px' }}>
@@ -435,14 +455,14 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                       {
                         !inWMS && (
                           <div>
-                            { rows.length > 0 ? (rows.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0' }
+                            { rows.length > 0 ? (rows.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length - rows.filter((pl: PackingList) => pl.dispatched).length) : '0' }
                           </div>
                         )
                       }
                       {
                         !inWMS && (
                           <div>
-                            { storagePlan.images ? storagePlan.images.length : '0' }
+                            { (storagePlan && storagePlan.images) ? storagePlan.images.length : '0' }
                           </div>
                         )
                       }
@@ -490,7 +510,8 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                       </div>
                     </div>
                     <div className='elements-center-end'>
-                      <Dropdown>
+                      {(storagePlan && (storagePlan !== null)) && 
+                      (<Dropdown>
                         <DropdownTrigger>
                           <Button color="primary" type="button" className='px-4'>
                             {intl.formatMessage({ id: "actions" })}
@@ -506,7 +527,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                           {/* <DropdownItem className={((storagePlan && (stateStoragePlan === 'to be storage' || stateStoragePlan === 4))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(7)}>
                             {intl.formatMessage({ id: "fast_delivery" })}
                           </DropdownItem> */}
-                          <DropdownItem onClick={() => packingListDataToExcel(storagePlan, rows, intl, tabToShow === 1 ? 'ic' : 'lg' )}>
+                          <DropdownItem onClick={() => packingListDataToExcel(storagePlan as StoragePlan, rows, intl, tabToShow === 1 ? 'ic' : 'lg' )}>
                             {intl.formatMessage({ id: "generate_xlsx_inventory" })}
                           </DropdownItem>
                           <DropdownItem>
@@ -517,7 +538,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             </PDFDownloadLink>
                           </DropdownItem>
                           <DropdownItem className={(!inWMS || (storagePlan && (stateStoragePlan !== 'stocked' && stateStoragePlan !== 'into warehouse'))) ? 'do-not-show-dropdown-item' : ''}>
-                            <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={rows} warehouseCode={String(storagePlan.warehouse?.code)} orderNumber={String(storagePlan.order_number)} intl={intl} />} fileName="entry_plan_labels.pdf">
+                            <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={rows} warehouseCode={String((storagePlan as StoragePlan).warehouse?.code)} orderNumber={String((storagePlan as StoragePlan).order_number)} intl={intl} />} fileName="entry_plan_labels.pdf">
                               {({ blob, url, loading, error }) =>
                                 intl.formatMessage({ id: "generate_labels" })
                               }
@@ -539,7 +560,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             {intl.formatMessage({ id: "modify_packing_list" })}
                           </DropdownItem>
                         </DropdownMenu>
-                      </Dropdown>
+                      </Dropdown>)}
                     </div>
                     <div className='elements-row-start show-sp-mobile'>
                       <div className={tabToShow === 1 ? 'tab-selected' : 'tag-default'} onClick={()=>{ setTabToShow(1) }}>
@@ -612,7 +633,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             <div>{row.output_plan_delivered_number ? <CopyColumnToClipboard value={ row.output_plan_delivered_number }/> : '--'}</div>
                             <div>{row.dispatched_time ? `${getDateFormat(row.dispatched_time)}, ${getHourFormat(row.dispatched_time)}` : '--'}</div>
                             <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div>
-                            <div>{storagePlan.pr_number ? (
+                            <div>{(storagePlan && storagePlan.pr_number) ? (
                               <CopyColumnToClipboard value={ storagePlan.pr_number } />
                             ) : '--'}</div>
                             <div>{`${row.client_weight} / ${row.client_length}*${row.client_width}*${row.client_height}`}</div>
@@ -621,7 +642,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             {
                               (row.package_shelf && row.package_shelf.length > 0) ? (
                                 <>
-                                  {storagePlan.warehouse ? (
+                                  {(storagePlan && storagePlan.warehouse) ? (
                                     <>
                                       {storagePlan.warehouse.code}-{String(row.package_shelf[0].shelf?.partition_table).padStart(2, '0')}-{String(row.package_shelf[0].shelf?.number_of_shelves).padStart(2, '0')}-{String(row.package_shelf[0].layer).padStart(2, '0')}-{String(row.package_shelf[0].column).padStart(2, '0')}
                                       <br />
@@ -639,7 +660,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                             }
                             </div>
                             <div>{'--'}</div>
-                            <div>{storagePlan.delivered_time ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '--'}</div>
+                            <div>{(storagePlan && storagePlan.delivered_time) ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '--'}</div>
                           </div>
                         ))}
                         </div>
@@ -669,6 +690,7 @@ const StoragePlanConfig = ({ id, storagePlan, inWMS }: StoragePlanConfigProps) =
                   )
                 }
             </div>
+            </Loading>
             { showRemoveBoxDialog && <PackingListDialog close={closeRemoveBoxesDialog} confirm={removeBoxes} title={intl.formatMessage({ id: 'remove_box' })} packingLists={selectedRows} /> }
             { showSplitBillDialog && <PackingListDialog close={closeSplitBillDialog} confirm={splitBill} title={intl.formatMessage({ id: 'split_bill' })} packingLists={selectedRows} /> }
             { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows} warehouse={storagePlan?.warehouse} /> }

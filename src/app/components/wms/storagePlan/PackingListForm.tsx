@@ -99,15 +99,15 @@ const getInitialBNL = (value: number, params: BoxNumberLabelFn, isRejectedBoxes 
   return value.toString();
 }
 
-const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModifyPackingList, inWMS }: PackingListProps) => {
+const PackingListFormBody = ({ id, storagePlan, loading, isFromAddPackingList, isFromModifyPackingList, inWMS }: PackingListProps) => {
     const router = useRouter();
     const { locale } = router.query;
     const intl = useIntl();
-    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>(getInitialLabel(storagePlan));
-    const [digitsBoxNumber, setDigitsBoxNumber] = useState<number>(getInitialDigits(storagePlan.packing_list));
+    const [prefixExpansionBoxNumber, setPrefixExpansionBoxNumber] = useState<string>((storagePlan && !loading) ? getInitialLabel(storagePlan) : "");
+    const [digitsBoxNumber, setDigitsBoxNumber] = useState<number>((storagePlan && !loading) ? getInitialDigits(storagePlan.packing_list) : 6);
     const [showExpansionBoxNumber, setShowExpansionBoxNumber] = useState<boolean>(true);
     //const [showExpansionBoxNumber, setShowExpansionBoxNumber] = useState<boolean>(isFromModifyPackingList ? true : false);
-    const [rows, setRows] = useState<PackingList[]>(isFromAddPackingList ? 
+    const [rows, setRows] = useState<PackingList[]>((storagePlan && !loading) ? (isFromAddPackingList ? 
         ([
             {
                 id: (storagePlan.packing_list && (storagePlan.packing_list.length > 0)) ? (Number(storagePlan.packing_list[storagePlan.packing_list.length - 1].id) + 1) : storagePlan.box_amount, 
@@ -131,7 +131,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
             }
         ])
         :
-        getPackingListFromSP(!!isFromModifyPackingList, storagePlan.packing_list));
+        getPackingListFromSP(!!isFromModifyPackingList, storagePlan.packing_list)) : []);
     const digitsBoxNumberOptions: ValueSelect[] = [
       {
         value: 3,
@@ -158,13 +158,13 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
       const formatBody = (value: number): StoragePlan => {
         return {
                 user_id: storagePlan ? Number(storagePlan.user_id) : null,
-                warehouse_id: storagePlan.warehouse_id ? Number(storagePlan.warehouse_id) : null,
-                customer_order_number: storagePlan.customer_order_number,
-                box_amount: storagePlan.box_amount + value,
-                delivered_time: (storagePlan.delivered_time ? storagePlan.delivered_time.substring(0,10) : null),
-                observations: storagePlan.observations,
-                rejected_boxes: storagePlan.rejected_boxes,
-                return: storagePlan.return
+                warehouse_id: (storagePlan && !loading && storagePlan.warehouse_id) ? Number(storagePlan.warehouse_id) : null,
+                customer_order_number: (storagePlan && !loading) ? storagePlan.customer_order_number : '',
+                box_amount: (storagePlan && !loading) ? (storagePlan.box_amount + value) : 0,
+                delivered_time: ((storagePlan && !loading && storagePlan.delivered_time) ? storagePlan.delivered_time.substring(0,10) : null),
+                observations: (storagePlan && !loading) ? storagePlan.observations : '',
+                rejected_boxes: (storagePlan && !loading) ? storagePlan.rejected_boxes : false,
+                return: (storagePlan && !loading) ? storagePlan.return : false
               };
       }
 
@@ -289,7 +289,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
         } else if (rows.length < value) {
           const count = value - rows.length;
           let items: PackingList[] = [];
-
+          if (storagePlan && !loading) {
           for (let index = 0; index < count; index++) {
             items.push({
               id: ((storagePlan.packing_list && (storagePlan.packing_list.length > 0)) ? (Number(storagePlan.packing_list[storagePlan.packing_list.length - 1].id) + 1) : storagePlan.box_amount) + rows.length + index, 
@@ -311,6 +311,7 @@ const PackingListFormBody = ({ id, storagePlan, isFromAddPackingList, isFromModi
               custome_picture: '',
               operator_picture: '',
             });
+          }
           }
           setRows(rows.concat(items));
         }

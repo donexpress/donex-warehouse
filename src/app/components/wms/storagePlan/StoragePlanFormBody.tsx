@@ -124,7 +124,6 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
   }
 
   const getState = (state: string | undefined) => {
-    console.log(state)
     if (state) {
       return state;
     }

@@ -25,7 +25,7 @@ import { VerticalDotsIcon } from "./../../common/VerticalDotsIcon";
 import { ChevronDownIcon } from "./../../common/ChevronDownIcon";
 import { SearchIcon } from "./../../common/SearchIcon";
 import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
-import { showMsg, storagePlanDataToExcel, packingListDataToExcel } from "../../../../helpers";
+import { showMsg, storagePlanDataToExcel, packingListDataToExcel, getLocationPackages } from "../../../../helpers";
 
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
@@ -59,6 +59,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "order_number",
   "customer_order_number",
   "number_of_boxes_stored",
+  "location",
   "reference_number",
   "box_amount",
   "actions",
@@ -69,6 +70,7 @@ const INITIAL_VISIBLE_COLUMNS_OMS = [
   "customer_order_number",
   "box_amount",
   "number_of_boxes_stored",
+  "location",
   "evidence",
   "actions",
 ];
@@ -116,6 +118,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     direction: "descending",
   });
   const [statusOptions, setStatusOptions] = React.useState<{ name: string, uid: string}[]>([]);
+  const [isLoadCounts, setIsLoadCounts] = React.useState<boolean>(false);
 
   const [page, setPage] = useState(1);
 
@@ -157,6 +160,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "dispatched_boxes" }),
         uid: "dispatched_boxes",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "location" }),
+        uid: "location",
         sortable: false,
       },
       {
@@ -225,6 +233,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "dispatched_boxes" }),
         uid: "dispatched_boxes",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "location" }),
+        uid: "location",
         sortable: false,
       },
       {
@@ -467,7 +480,21 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
           storageP.packing_list && storageP.packing_list.length > 0 ? (storageP.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0'
         ) - storageP.packing_list.filter((el: any) => el.dispatched).length;
         case "dispatched_boxes":
-          return storageP.packing_list.filter((el: any) => el.dispatched).length
+          return storageP.packing_list.filter((el: any) => el.dispatched).length;
+        case "location":
+          return (
+            <span
+              style={{
+                maxWidth: "250px",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                display: "block",
+              }}
+            >
+              {getLocationPackages(storageP)}
+            </span>
+          );
         default:
           return cellValue;
       }
@@ -505,10 +532,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const getCount = (state: any) => {
     if (stgPCount) {
       switch(state) {
-        case 'to be storage': return `${(statusSelected === 'to be storage' && !loadingItems) ? stgPCount.to_be_storage : stgPCount.to_be_storage}`;
-        case 'into warehouse': return `${(statusSelected === 'into warehouse' && !loadingItems) ? stgPCount.into_warehouse : stgPCount.into_warehouse}`;
-        case 'stocked': return `${(statusSelected === 'stocked' && !loadingItems) ? stgPCount.stocked : stgPCount.stocked}`;
-        case 'cancelled': return `${(statusSelected === 'cancelled' && !loadingItems) ? stgPCount.cancelled : stgPCount.cancelled}`;
+        case 'to be storage': return `${(statusSelected === 'to be storage' && isLoadCounts) ? 0 : stgPCount.to_be_storage}`;
+        case 'into warehouse': return `${(statusSelected === 'into warehouse' && isLoadCounts) ? 0 : stgPCount.into_warehouse}`;
+        case 'stocked': return `${(statusSelected === 'stocked' && isLoadCounts) ? 0 : stgPCount.stocked}`;
+        case 'cancelled': return `${(statusSelected === 'cancelled' && isLoadCounts) ? 0 : stgPCount.cancelled}`;
       }
     }
     return '';
@@ -873,6 +900,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     const tab = getCookie("tabSP");
     if (tab) {
       setStatusSelected(tab);
+      if (tab === 'stocked') {
+        let items: Set<React.Key> = new Set(visibleColumns);
+        items.add("dispatched_boxes");
+        setVisibleColumns(items);
+      }
     }
     loadStoragePlans(tab ? tab : statusSelected);
   }, []);
@@ -906,6 +938,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     if (!partialLoad) {
       setLoading(true);
     }
+    if (loadCount) {
+      setIsLoadCounts(true);
+    }
     await setLoadingItems(true);
     const storagePlanss = await getStoragePlans(status, pageSP !== -1 ? pageSP : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, querySP);
     
@@ -914,6 +949,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     if (loadCount) {
       const storagePCount = await storagePlanCount(querySP);
       setStgPCount(storagePCount ? storagePCount : undefined);
+      setIsLoadCounts(false);
     }
     setLoading(false);
   };
