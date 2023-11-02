@@ -455,7 +455,7 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
                       {
                         !inWMS && (
                           <div>
-                            { rows.length > 0 ? (rows.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0' }
+                            { rows.length > 0 ? (rows.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length - rows.filter((pl: PackingList) => pl.dispatched).length) : '0' }
                           </div>
                         )
                       }
