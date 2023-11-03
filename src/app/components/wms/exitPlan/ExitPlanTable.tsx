@@ -350,7 +350,7 @@ const ExitPlanTable = () => {
                 </DropdownItem>
                 <DropdownItem
                   className={
-                    user.state.value !== "pending" && checkOMS
+                    user.state !== "pending" && checkOMS
                       ? "do-not-show-dropdown-item"
                       : ""
                   }
@@ -1152,7 +1152,7 @@ const ExitPlanTable = () => {
   };
 
   const handleReturn = (exitPlan: ExitPlan) => {
-    setExitPlanAction("return-" + exitPlan.state?.value);
+    setExitPlanAction("return-" + exitPlan.state);
     setChangeStatePackages([
       { box_number: exitPlan.output_number ? exitPlan.output_number : "" },
     ]);
@@ -1198,6 +1198,7 @@ const ExitPlanTable = () => {
   const confirmListPackage = async () => {
     setLoading(true);
     let state = "";
+    console.log(exitPlanAction)
     switch (exitPlanAction) {
       case "already_sent":
         state = "to_be_processed";
