@@ -1,5 +1,6 @@
 import { Country } from ".";
 import { OperationInstruction } from "./operation_instruction";
+import { Staff } from "./staff";
 import { PackingList, StoragePlan } from "./storage_plan";
 import { User } from "./user";
 import { Warehouse } from "./warehouse";
@@ -56,6 +57,7 @@ export type ExitPlanProps = {
   warehouses: Warehouse[];
   destinations?: {destinations: State[]}
   addresses: {addresses: {amazon:State[], meli:State[]}}
+  user?: User | Staff
 };
 
 export type ExitPlanState = {

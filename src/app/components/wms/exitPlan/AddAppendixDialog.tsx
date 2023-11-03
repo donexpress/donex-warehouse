@@ -10,12 +10,14 @@ import { ExitPlan } from "../../../../types/exit_plan";
 import { createAppendix } from "@/services/api.appendixerege1992";
 import { Appendix } from "@/types/appendixerege1992";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
+import { isWMS } from "@/helperserege1992";
+import { Staff } from "@/types/stafferege1992";
 
 interface Props {
   close: () => any;
   confirm: () => any;
   title: string;
-  owner: User;
+  owner: User | Staff;
   exitPlan?: ExitPlan;
   operationInstruction?: OperationInstruction;
 }
@@ -40,7 +42,7 @@ const AddAppendixDialog = ({
   }
   const [initialValues, setInitialValues] = useState({
     name: "",
-    user: owner.nickname,
+    user: owner.username,
     exit_plan: calcExitplan(),
     function: "",
     url: "",
@@ -70,6 +72,7 @@ const AddAppendixDialog = ({
         output_plan_id: exitPlan.id ? exitPlan.id : -1,
         function: values.function,
         url: values.url,
+        is_owner_admin: isWMS() ? true : false
       };
     } else if(operationInstruction) {
       appendix = {
@@ -77,7 +80,8 @@ const AddAppendixDialog = ({
         user_id: owner.id,
         function: values.function,
         url: values.url,
-        operation_instruction_id: operationInstruction.id
+        operation_instruction_id: operationInstruction.id,
+        is_owner_admin: isWMS() ? true : false
       };
     } 
     if(appendix) {

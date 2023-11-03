@@ -7,6 +7,9 @@ import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { User } from "@/types/usererege1992";
 import { getUserById } from "@/services/api.userserege1992";
 import "../../../../../src/styles/wms/exit.plan.config.scss";
+import { isWMS } from "@/helperserege1992";
+import { getSelf, getStaffById } from "@/services/api.stafferege1992";
+import { Staff } from "@/types/stafferege1992";
 
 interface Props {
   operationInstruction: OperationInstruction;
@@ -34,7 +37,13 @@ const Config = ({ id, operationInstruction, user }: Props) => {
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
   const operationInstruction: OperationInstruction = await getOperationInstructionsById(id, context);
-  const user = await getUserById(operationInstruction.user_id, context)
+  let user: User | Staff | null = null
+  user = await getSelf(context)
+
+  // if(isWMS()) {
+  // } else {
+  //   user = await getUserById(operationInstruction.user_id, context)
+  // }
 
   return {
     props: {
