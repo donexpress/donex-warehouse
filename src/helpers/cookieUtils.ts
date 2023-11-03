@@ -28,6 +28,22 @@ export const verifySessionOMS = () => {
   return !!token;
 };
 
+export const sessionWMSIsExpires = () => {
+  const expires = getCookie('expireWMS');
+  if (!!expires && (Number(expires) <= (new Date()).getTime())) {
+    return true;
+  }
+  return false;
+};
+
+export const sessionOMSIsExpires = () => {
+  const expires = getCookie('expireOMS');
+  if (!!expires && (Number(expires) <= (new Date()).getTime())) {
+    return true;
+  }
+  return false;
+};
+
 // Función para eliminar todas las cookies
 export const removeAllCookies = () => {
   const allCookieNames = Object.keys(cookies.getAll());

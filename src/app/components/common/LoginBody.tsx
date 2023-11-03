@@ -34,15 +34,20 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
       response.status <= 299 &&
       response.token !== undefined
     ) {
-      let options: any = {};
       if (response.expiration) {
         //options.expires = new Date(response.expiration * 1000);
-        options.expires = new Date((new Date()).getTime() + 10000);
+        //options.expires = new Date((new Date()).getTime() + 10000);
       }
       if (inWMS) {
-        setCookie("tokenWMS", response.token, options);
+        if (response.expiration) {
+          setCookie("expireWMS", response.expiration * 1000);
+        }
+        setCookie("tokenWMS", response.token);
       } else {
-        setCookie("tokenOMS", response.token, options);
+        if (response.expiration) {
+          setCookie("expireOMS", response.expiration * 1000);
+        }
+        setCookie("tokenOMS", response.token);
       }
 
       const profile: Profile | null = await indexProfile();
