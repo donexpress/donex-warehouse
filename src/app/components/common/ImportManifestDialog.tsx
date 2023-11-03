@@ -41,8 +41,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   }
 
   const closeManifestDialog = (content: Guide[]) => {
-    onClose(content);
-    // close();
+    onClose && onClose(content);
   }
 
   const handleSubmit = async () => {
