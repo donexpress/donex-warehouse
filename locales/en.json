@@ -409,7 +409,7 @@
 	"update_manifest_supplier": "Update manifest supplier",
 	"customer_manifest": "Customer manifest",
 	"supplier_manifest": "Supplier manifest",
-	"relabel": "Relabel",
+	"relabel": "Operation instruction",
 	"alreadyUsedmsg": "The box(es) you are trying to add are already in another output plan",
 	"create_manifest_sucessfully": "Successfully added {manifest_count} products from the manifest {waybill_id}",
 	"update_customer_manifest_sucessfully": "Successfully updated {manifest_count} customer costs",
