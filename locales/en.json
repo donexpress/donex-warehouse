@@ -387,7 +387,7 @@
 	"days": "Days",
 	"finances": "Finances",
 	"airGuide": "Air guide",
-	"trackingNumber": "Tracking number",
+	"tracking_number": "Tracking number",
 	"clientReference": "Client reference",
 	"accountStatus": "Account status",
 	"carrier": "Carrier",
@@ -412,5 +412,6 @@
 	"alreadyUsedmsg": "The box(es) you are trying to add are already in another output plan",
 	"create_manifest_sucessfully": "Successfully added {manifest_count} products from the manifest {waybill_id}",
 	"update_customer_manifest_sucessfully": "Successfully updated {manifest_count} customer costs",
-	"update_supplier_manifest_sucessfully": "Successfully updated {manifest_paid_count} sales price of the logistics provider"
+	"update_supplier_manifest_sucessfully": "Successfully updated {manifest_paid_count} sales price of the logistics provider",
+	"invoice_weight": "Invoice weight"
 }

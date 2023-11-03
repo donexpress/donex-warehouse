@@ -387,7 +387,7 @@
   "days": "Días",
   "finances": "Finanzas",
   "airGuide": "Guía aérea",
-  "trackingNumber": "Número de seguimiento",
+  "tracking_number": "Número de seguimiento",
   "clientReference": "Referencia del cliente",
   "accountStatus": "Estado de cuenta",
   "carrier": "Transportista",
@@ -412,5 +412,6 @@
   "alreadyUsedmsg": "La(s) caja(s) que está intentando adicionar ya se encuentran en otro plan de salida",
   "create_manifest_sucessfully": "Se adicionaron satisfactoriamente {manifest_count} productos del manifiesto {waybill_id}",
 	"update_customer_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_count} costos del cliente",
-	"update_supplier_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_paid_count} precio de venta del proveedor logistico"
+	"update_supplier_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_paid_count} precio de venta del proveedor logistico",
+  "invoice_weight": "Peso de la factura"
 }
