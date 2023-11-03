@@ -66,7 +66,6 @@ const ManifestTableDialog = ({ close, content }: Params) => {
     }, [intl]);
 
     const getColumns = React.useMemo(() => {
-        
         const columns = [
             { name: "ID", uid: "id", sortable: true },
             { name: intl.formatMessage({ id: "waybill_id" }), uid: "waybill_id", sortable: true },
