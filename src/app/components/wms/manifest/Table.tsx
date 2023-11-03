@@ -35,6 +35,7 @@ import { isString } from "formik";
 import { PlusIcon } from "../../common/PlusIcon";
 import { FaFileExcel, FaFilter, FaSync, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
+import ManifestTableDialog from "../../common/ManifestTableDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -72,6 +73,7 @@ const ManifestTable = () => {
   );
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
   const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
+  const [visibleDialogTable, setVisibleDialogTable] = useState<boolean>(false);
   const [whereUpdate, setWhereUpdate] = useState<string>("");
 
   const [aerealGuideNumberValue, setAerealGuideNumberValue] = React.useState("");
@@ -80,10 +82,11 @@ const ManifestTable = () => {
   const [carrierValue, setCarrierValue] = React.useState("");
   const [paidValue, setPaidValue] = React.useState("");
 
+  const [manifestPaidData, setManifestPaidData] = React.useState<Guide[]>([]);
+
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "id",
@@ -97,7 +100,7 @@ const ManifestTable = () => {
       { name: "ID", uid: "id", sortable: true },
       { name: intl.formatMessage({ id: "waybill_id" }), uid: "waybill_id", sortable: true },
       {
-        name: intl.formatMessage({ id: "trackingNumber" }),
+        name: intl.formatMessage({ id: "tracking_number" }),
         uid: "tracking_number",
         sortable: true,
       },
@@ -164,7 +167,8 @@ const ManifestTable = () => {
   const filteredItems = React.useMemo(() => {
     let filteredGuides = [...guides];
     return filteredGuides;
-  }, [guides, statusFilter]);
+  }, [guides]);
+
 
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
@@ -269,7 +273,7 @@ const ManifestTable = () => {
             <Input
               isClearable
               className="search-input"
-              placeholder={intl.formatMessage({ id: "trackingNumber" })}
+              placeholder={intl.formatMessage({ id: "tracking_number" })}
               startContent={<SearchIcon />}
               value={trackingNumberValue}
               onClear={() => onClear("TrackingNumberValue")}
@@ -465,7 +469,6 @@ const ManifestTable = () => {
       </div >
     );
   }, [
-    statusFilter,
     visibleColumns,
     onRowsPerPageChange,
     guides.length,
@@ -566,21 +569,6 @@ const ManifestTable = () => {
     setDeleteElemtent(id);
   };
 
-  const handleEdit = (id: number) => {
-    setLoading(true);
-    router.push(`/${locale}/wms/manifest/${id}/update`);
-  };
-
-  const handleShow = (id: number) => {
-    setLoading(true);
-    router.push(`/${locale}/wms/manifest/${id}/show`);
-  };
-
-  // const handleAdd = () => {
-  //   setLoading(true);
-  //   router.push(`/${locale}/wms/manifest/insert_manifest`);
-  // };
-
   const openImportManifestDialog = () => {
     setShowImportManifestDialog(true);
   }
@@ -612,6 +600,18 @@ const ManifestTable = () => {
     setShowConfirm(false);
     setDeleteElemtent(-1);
   };
+
+  const closeManifestTableDialog = () => {
+    setVisibleDialogTable(false);
+  }
+
+  const handleManifestTableDialog = (content: Guide[]) => {
+    setShowUpdateManifestDialog(false);
+    if (whereUpdate === "supplier") {
+      setManifestPaidData(content);
+      setVisibleDialogTable(true);
+    }
+  }
 
   const confirm = async () => {
     setLoading(true);
@@ -665,7 +665,8 @@ const ManifestTable = () => {
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
-        {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} />}
+        {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
+        {visibleDialogTable && <ManifestTableDialog close={closeManifestTableDialog} content={manifestPaidData} />}
       </Loading>
     </>
   );
