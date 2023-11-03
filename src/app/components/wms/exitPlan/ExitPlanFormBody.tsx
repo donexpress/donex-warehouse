@@ -35,6 +35,10 @@ const ExitPlanFormBody = ({
   const intl = useIntl();
   // const [filter_user, set_filter_user] = useState<string>("");
   // const [filter_warehouse, set_filter_warehouse] = useState<string>("");
+  const getWarehouseOrderNumber = (): string => {
+    const warehouseOrderNumber = router.query.warehouseOrderNumber;
+    return (warehouseOrderNumber && warehouseOrderNumber !== '') ? ((!!Array.isArray(warehouseOrderNumber)) ? (warehouseOrderNumber.length > 0 ? warehouseOrderNumber[0] : '') : warehouseOrderNumber) : '';
+  };
   const date = new Date(
     exitPlan ? (exitPlan.delivered_time ? exitPlan.delivered_time : "") : ""
   );
@@ -65,7 +69,7 @@ const ExitPlanFormBody = ({
   );
 
   const [disableButton, setDisableButton] = useState<boolean>(true);
-  const [showAddPackages, setShowAddPackages] = useState<boolean>(false);
+  const [showAddPackages, setShowAddPackages] = useState<boolean>(getWarehouseOrderNumber() !== '');
 
   let initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
@@ -89,6 +93,12 @@ const ExitPlanFormBody = ({
     destination: id && exitPlan ? exitPlan.destination : "",
     reference_number: id && exitPlan ? exitPlan.reference_number : "",
     relabel: id && exitPlan ? exitPlan.relabel : false,
+    // @ts-ignore
+    show_add_packages: getWarehouseOrderNumber() !== '',
+    // @ts-ignore
+    case_number: "",
+    // @ts-ignore
+    warehouse_order_number: getWarehouseOrderNumber(),
   };
 
   const formatBody = (values: ExitPlan): ExitPlan => {
@@ -528,7 +538,11 @@ const ExitPlanFormBody = ({
                         id: "box_number",
                       })}`}
                       customClass="custom-input"
+                      hideErrorContent={true}
                     />
+                    <span className="text_example">{intl.formatMessage({
+                        id: "input_example_1",
+                      })}</span>
                   </div>
                   <div className="w-full sm:w-[49%]">
                     <GenericInput
@@ -540,7 +554,11 @@ const ExitPlanFormBody = ({
                         id: "customer_order_number",
                       })}`}
                       customClass="custom-input"
+                      hideErrorContent={true}
                     />
+                    <span className="text_example">{intl.formatMessage({
+                        id: "input_example_2",
+                      })}</span>
                   </div>
                 </div>
               }

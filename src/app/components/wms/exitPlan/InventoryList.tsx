@@ -180,7 +180,7 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
               {intl.formatMessage({ id: "box_number" })}
             </Text>
             <Text style={[styles.headerCell]}>
-              {intl.formatMessage({ id: "case_number" })}
+              {intl.formatMessage({ id: "expansion_box_number" })}
             </Text>
             <Text style={[styles.headerCell]}>
               {intl.formatMessage({ id: "location" })}

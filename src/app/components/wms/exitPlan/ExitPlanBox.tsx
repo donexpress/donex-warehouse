@@ -371,7 +371,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
             </div>
             <div className="elements-center-start">
               <span className="">
-                {intl.formatMessage({ id: "case_number" })}
+                {intl.formatMessage({ id: "expansion_box_number" })}
               </span>
             </div>
             <div className="elements-center-start">
