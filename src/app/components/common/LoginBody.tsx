@@ -27,14 +27,6 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
   };
 
   const handleSubmit = async (values: LoginBody) => {
-    /* if (inWMS) {
-      removeCookie("tokenWMS");
-      removeCookie("profileWMS");
-    }
-    if (inOMS) {
-      removeCookie("tokenOMS");
-      removeCookie("profileOMS");
-    } */
     const response: LoginResponse = await login(values);
     const { locale } = router.query;
     if (
@@ -60,10 +52,10 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
         });
   
         if (inWMS) {
-          setCookie("profileWMS", profile, options);
+          setCookie("profileWMS", profile);
           router.push(`/${locale}/wms`);
         } else {
-          setCookie("profileOMS", profile, options);
+          setCookie("profileOMS", profile);
           router.push(`/${locale}/oms`);
         }
       } else {

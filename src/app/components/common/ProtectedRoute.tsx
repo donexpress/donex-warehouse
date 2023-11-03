@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { verifySessionOMS, verifySessionWMS, removeAllCookies } from '../../../helpers/cookieUtils';
+import { verifySessionOMS, verifySessionWMS, removeAllCookies, removeCookie } from '../../../helpers/cookieUtils';
 import { isOMS, isWMS} from '../../../helpers';
 import { Loading } from './Loading';
 
