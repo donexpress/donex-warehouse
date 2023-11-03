@@ -386,7 +386,7 @@
   "dispatched_boxes": "Cajas despachadas",
   "operation_instruction_box_requirement_amount": "Necesitas al menos 1 caja para adicionar una instruccion de operación",
   "days": "Días",
-  "relabel": "Reetiquetar",
+  "relabel": "Instrucción de operación",
   "alreadyUsedmsg": "La(s) caja(s) que está intentando adicionar ya se encuentran en otro plan de salida"
 
 
