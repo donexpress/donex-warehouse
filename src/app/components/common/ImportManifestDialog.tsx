@@ -11,15 +11,17 @@ import { indexCarriers } from "@/services/api.carrierserege1992";
 import React from "react";
 import { createManifest, updateCustomerManifest, updateSupplierManifest } from "@/services/api.manifesterege1992";
 import { Loading } from "./Loading";
+import { Guide } from "@/types/guideerege1992";
 
 interface Params {
   close: () => any;
   confirm: () => any;
   title: string;
   where?: string;
+  onClose?: (content: Guide[]) => void;
 }
 
-const ImportManifestDialog = ({ close, confirm, title, where }: Params) => {
+const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params) => {
   const intl = useIntl();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [data, setData] = useState<FormData | undefined>(undefined);
@@ -36,6 +38,11 @@ const ImportManifestDialog = ({ close, confirm, title, where }: Params) => {
   const loadCarriers = async () => {
     const _carriers = await indexCarriers();
     setCarriers(_carriers);
+  }
+
+  const closeManifestDialog = (content: Guide[]) => {
+    onClose(content);
+    // close();
   }
 
   const handleSubmit = async () => {
@@ -57,13 +64,19 @@ const ImportManifestDialog = ({ close, confirm, title, where }: Params) => {
         let message: string = "";
         if (where === undefined) {
           message = intl.formatMessage({ id: "create_manifest_sucessfully" }, { manifest_count: response.data.manifest_count, waybill_id: response.data.waybill_id });
+          showMsg(message, { type: "success" });
+          confirm();
         } else if (where === "customer") {
           message = intl.formatMessage({ id: "update_customer_manifest_sucessfully" }, { manifest_count: response.data.manifest_count });
-        } else {
+          showMsg(message, { type: "success" });
+          confirm();
+        } else if (response.data.manifest_paid.length === 0) {
           message = intl.formatMessage({ id: "update_supplier_manifest_sucessfully" }, { manifest_paid_count: response.data.manifest_paid_count });
+          showMsg(message, { type: "success" });
+          confirm();
+        } else if (where === "supplier" && response.data.manifest_paid.length > 0) {
+          closeManifestDialog(response.data.manifest_paid);
         }
-        showMsg(message, { type: "success" });
-        confirm();
       } else {
         let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
         showMsg(message, { type: "error" });
