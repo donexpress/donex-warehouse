@@ -10,6 +10,7 @@ import { ExitPlan } from "../../../../types/exit_plan";
 import { createAppendix } from "@/services/api.appendixerege1992";
 import { Appendix } from "@/types/appendixerege1992";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
+import { isWMS } from "@/helperserege1992";
 
 interface Props {
   close: () => any;
@@ -69,6 +70,7 @@ const AddAppendixOperationInstructionDialog = ({
         function: values.function,
         url: values.url,
         operation_instruction_id: operationInstruction ? operationInstruction.id: -1,
+        is_owner_admin: isWMS() ? true : false
       };
     if (appendix) {
       const response = await createAppendix(appendix);

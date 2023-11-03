@@ -225,3 +225,7 @@ export const countDivisionPath = () => {
 export const removeDivisionPath = (id: number) => {
   return `${getBaseUrl()}/api/v1/regional_division/${id}`;
 };
+
+export const self = () => {
+  return getBaseUrl() + "/api/v1/self";
+};
