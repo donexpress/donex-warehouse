@@ -33,29 +33,20 @@ const INITIAL_VISIBLE_COLUMNS = [
 interface Params {
     close: () => any;
     content: Guide[];
+    title: string;
 }
 
-const ManifestTableDialog = ({ close, content }: Params) => {
+const ManifestTableDialog = ({ title, close, content }: Params) => {
     const intl = useIntl();
     const [loading, setLoading] = useState<boolean>(true);
     const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
         new Set(INITIAL_VISIBLE_COLUMNS)
     );
 
-    const [page, setPage] = useState(1);
-
-    const [guides, setGuides] = useState<Guide[]>(content);
-
-    const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
-        column: "id",
-        direction: "descending",
-    });
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
     const filteredItems = React.useMemo(() => {
-        let filteredGuides = [...guides];
+        let filteredGuides = [...content];
         return filteredGuides;
-    }, [guides]);
+    }, [content]);
 
     useEffect(() => {
         setLoading(true);
@@ -131,7 +122,7 @@ const ManifestTableDialog = ({ close, content }: Params) => {
             switch (columnKey) {
                 case "paid":
                     return (
-                        cellValue ? "Pagados" : "No pagados"
+                        cellValue ? intl.formatMessage({ id: "paid" }) : intl.formatMessage({ id: "no_paid" })
                     );
                 default:
                     return cellValue;
@@ -147,24 +138,7 @@ const ManifestTableDialog = ({ close, content }: Params) => {
         return columns.filter((column) =>
             Array.from(visibleColumns).includes(column.uid)
         );
-    }, [visibleColumns, intl]);
-
-    const items = React.useMemo(() => {
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-
-        return filteredItems.slice(start, end);
-    }, [page, filteredItems, rowsPerPage]);
-
-    const sortedItems = React.useMemo(() => {
-        return [...items].sort((a: Guide, b: Guide) => {
-            const first = a[sortDescriptor.column as keyof Guide] as number;
-            const second = b[sortDescriptor.column as keyof Guide] as number;
-            const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-            return sortDescriptor.direction === "descending" ? -cmp : cmp;
-        });
-    }, [sortDescriptor, items]);
+    }, [getColumns, visibleColumns]);
 
     const getVisibleColumns = (): string[] => {
         const t = Array.from(visibleColumns) as string[];
@@ -181,7 +155,12 @@ const ManifestTableDialog = ({ close, content }: Params) => {
 
     const topContent = React.useMemo(() => {
         return (
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div className="confirmation_card_header" style={{ color: '#aeb9e1' }}>
+                    <div style={{ fontSize: 16 }}>
+                        <strong>{title}</strong>
+                    </div>
+                </div>
                 <div
                     className="upload_button_evidence"
                     onClick={() => handleExportExcel()}
@@ -193,7 +172,7 @@ const ManifestTableDialog = ({ close, content }: Params) => {
                 </div>
             </div>
         );
-    }, []);
+    }, [intl]);
 
     const bottomContent = React.useMemo(() => {
         return (
@@ -203,42 +182,50 @@ const ManifestTableDialog = ({ close, content }: Params) => {
                 </Button>
             </div>
         );
-    }, []);
+    }, [close, intl]);
 
     return (
         <div className="table_dialog">
             <div className="confirmation_card dialog-table-background">
-                <Table
-                    aria-label="GUIDE"
-                    topContent={topContent}
-                    bottomContent={bottomContent}
-                    bottomContentPlacement="outside"
-                >
-                    <TableHeader columns={headerColumns}>
-                        {(column) => (
-                            <TableColumn
-                                key={column.uid}
-                                align={column.uid === "actions" ? "center" : "start"}
-                                allowsSorting={column.sortable}
-                            >
-                                {column.name}
-                            </TableColumn>
-                        )}
-                    </TableHeader>
-                    <TableBody
-
-                        emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-                        items={sortedItems}
+                <div>
+                    <Table
+                        aria-label="GUIDE"
+                        isHeaderSticky
+                        topContentPlacement="outside"
+                        topContent={topContent}
+                        bottomContentPlacement="outside"
+                        bottomContent={bottomContent}
+                        classNames={{
+                            base: "max-h-[420px] overflow-hidden",
+                            table: "min-h-[420px]",
+                        }}
                     >
-                        {(item) => (
-                            <TableRow key={item.waybill_id}>
-                                {(columnKey) => (
-                                    <TableCell>{renderCell(item, columnKey)}</TableCell>
-                                )}
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                        <TableHeader columns={headerColumns}>
+                            {(column) => (
+                                <TableColumn
+                                    key={column.uid}
+                                    align={column.uid === "actions" ? "center" : "start"}
+                                    allowsSorting={column.sortable}
+                                >
+                                    {column.name}
+                                </TableColumn>
+                            )}
+                        </TableHeader>
+                        <TableBody
+                            className="table-manifest-body"
+                            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
+                            items={filteredItems}
+                        >
+                            {(item) => (
+                                <TableRow key={item.id}>
+                                    {(columnKey) => (
+                                        <TableCell>{renderCell(item, columnKey)}</TableCell>
+                                    )}
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div >
     );
