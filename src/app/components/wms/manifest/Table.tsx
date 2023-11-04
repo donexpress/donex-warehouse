@@ -27,15 +27,15 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
-import { getGuides } from "@/services/api.manifesterege1992";
-import { Guide } from "@/types/guideerege1992";
+import { getGuides, guidesCount } from "@/services/api.manifesterege1992";
+import { Guide, GuidesCount } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier } from "@/typeserege1992";
-import { isString } from "formik";
 import { PlusIcon } from "../../common/PlusIcon";
-import { FaFileExcel, FaFilter, FaSync, FaTimes } from "react-icons/fa";
+import { FaFilter, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
 import ManifestTableDialog from "../../common/ManifestTableDialog";
+import SpinnerIconButton from "../../common/SpinnerIconButton";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -52,25 +52,20 @@ const INITIAL_VISIBLE_COLUMNS = [
 
 const ManifestTable = () => {
   const intl = useIntl();
-  const router = useRouter();
-  const { locale } = router.query;
-  const [guides, setGuides] = useState<any[]>([]);
+  const [guides, setGuides] = useState<Guide[]>([]);
   const [carriers, setCarriers] = useState<Carrier[] | null>([]);
+  const [guidesTotal, setGuidesTotal] = useState<GuidesCount | null>();
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
-
-  // const [showGuideNumber, setshowGuideNumber] = useState<boolean>(true);
-  // const [showTrackingNumber, setshowTrackingNumber] = useState<boolean>(true);
-  // const [showclientReference, setshowclientReference] = useState<boolean>(true);
-  // const [showAccountStatus, setshowAccountStatus] = useState<boolean>(true);
-  // const [showCarrier, setshowCarrier] = useState<boolean>(true);
-  // const [showPaid, setshowPaid] = useState<boolean>(true);
 
   /** start*/
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
   );
+  const [filters, setFilters] = React.useState<string>("");
+  const [showPagination, setShowPagination] = useState<boolean>(true);
+
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
   const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
   const [visibleDialogTable, setVisibleDialogTable] = useState<boolean>(false);
@@ -92,6 +87,8 @@ const ManifestTable = () => {
     column: "id",
     direction: "descending",
   });
+  const [loadingItems, setLoadingItems] = useState<boolean>(false);
+
 
   const [page, setPage] = useState(1);
 
@@ -169,27 +166,6 @@ const ManifestTable = () => {
     return filteredGuides;
   }, [guides]);
 
-
-
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
-
-  const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
-
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: Guide, b: Guide) => {
-      const first = a[sortDescriptor.column as keyof Guide] as number;
-      const second = b[sortDescriptor.column as keyof Guide] as number;
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [sortDescriptor, items]);
-
   const renderCell = React.useCallback(
     (guide: any, columnKey: React.Key) => {
       const cellValue = guide[columnKey];
@@ -222,25 +198,26 @@ const ManifestTable = () => {
     [intl]
   );
 
-  const onRowsPerPageChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onRowsPerPageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (Number(e.target.value) !== rowsPerPage) {
+      setSelectedKeys(new Set([]));
       setRowsPerPage(Number(e.target.value));
       setPage(1);
-    },
-    []
-  );
+      await reloadData(1, Number(e.target.value), filters);
+    }
+  }
 
   const onClear = React.useCallback((filter: string) => {
     eval(`set${filter}("")`);
   }, []);
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     setAerealGuideNumberValue("");
     setClientReferenceValue("");
     setTrackingNumberValue("");
     setCarrierValue("");
     setPaidValue("");
-    reloadData();
+    await reloadData(-1, -1, "");
   };
 
   const arrayPaids = [
@@ -480,6 +457,16 @@ const ManifestTable = () => {
     paidValue
   ]);
 
+  const changePage = async (newPage: number) => {
+    if (page !== newPage) {
+      setSelectedKeys(new Set([]));
+      setPage(newPage);
+      setShowPagination(false);
+      await reloadData(newPage, rowsPerPage, filters);
+      setShowPagination(true);
+    }
+  }
+
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
@@ -488,26 +475,39 @@ const ManifestTable = () => {
             ? `${intl.formatMessage({ id: "selected_all" })}`
             : `${intl.formatMessage(
               { id: "selected" },
-              { in: selectedKeys.size, end: filteredItems.length }
+              { in: selectedKeys.size, end: guidesTotal?.count }
             )}`}
         </span>
-        <PaginationTable
-          totalRecords={filteredItems.slice(0, guides.length).length}
-          pageLimit={rowsPerPage}
-          pageNeighbours={1}
-          page={page}
-          onPageChanged={setPage}
-        />
+        {
+          showPagination && (
+            <PaginationTable
+              totalRecords={guidesTotal?.count}
+              pageLimit={rowsPerPage}
+              pageNeighbours={1}
+              page={page}
+              onPageChanged={changePage}
+            />
+          )
+        }
+        {
+          !showPagination && (
+            <div className="elements-center" style={{ height: '61px' }}>
+              <SpinnerIconButton style={{ width: "20px", height: "20px" }} />
+            </div>
+          )
+        }
       </div>
-    );
+    )
   }, [
     selectedKeys,
-    items.length,
     page,
-    sortedItems.length,
+    guidesTotal,
+    guidesTotal?.count,
     guides.length,
+    guides,
     rowsPerPage,
     intl,
+    showPagination,
   ]);
   /** end*/
 
@@ -525,43 +525,43 @@ const ManifestTable = () => {
 
   const loadGuides = async () => {
     setLoading(true);
-    const _guides = await getGuides();
+    const _guides = await getGuides(1, 25, filters);
     const _carriers = await indexCarriers();
+    const _guidesCount = await guidesCount(filters);
     setGuides(_guides);
     setCarriers(_carriers);
+    setGuidesTotal(_guidesCount);
     setLoading(false);
   };
 
-  const handleSelectedFilters = (event: any) => {
-    let filters = [];
+  const handleSelectedFilters = async (event: any) => {
+    let arrayFilters = [];
     if (trackingNumberValue.trim() !== "") {
-      filters.push(`tracking_number=${trackingNumberValue}`);
+      arrayFilters.push(`tracking_number=${trackingNumberValue}`);
     }
     if (clientReferenceValue.trim() !== "") {
-      filters.push(`client_reference=${clientReferenceValue}`);
+      arrayFilters.push(`client_reference=${clientReferenceValue}`);
     }
     if (aerealGuideNumberValue.trim() !== "") {
-      filters.push(`waybill_id=${aerealGuideNumberValue}`);
+      arrayFilters.push(`waybill_id=${aerealGuideNumberValue}`);
     }
     if (carrierValue.trim() !== "") {
-      filters.push(`carrier=${carrierValue}`);
+      arrayFilters.push(`carrier=${carrierValue}`);
     }
     if (paidValue.trim() !== "") {
-      filters.push(`paid=${paidValue === "Pagados" ? true : false}`);
+      arrayFilters.push(`paid=${paidValue === "Pagados" ? true : false}`);
     }
-    reloadData(filters.join("&"));
+    setFilters(arrayFilters.join("&"));
+    await reloadData(-1, -1, arrayFilters.join("&"));
   }
 
-  const reloadData = async (filters?: string[] | string) => {
-    if (isString(filters)) {
-      // setLoading(true);
-      const _guides = await getGuides(filters);
-      setGuides(_guides);
-      // setLoading(false);
-    } else {
-      const _guides = await getGuides();
-      setGuides(_guides);
-    }
+  const reloadData = async (newPage: number = -1, rowsPerPageSP: number = -1, queryFilters: string) => {
+    setLoadingItems(true);
+    const _guides = await getGuides(newPage !== -1 ? newPage : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, queryFilters);
+    setGuides(_guides);
+    const _guidesCount = await guidesCount(queryFilters);
+    setGuidesTotal(_guidesCount);
+    setLoadingItems(false);
   };
 
   const handleDelete = (id: number) => {
@@ -651,8 +651,8 @@ const ManifestTable = () => {
             )}
           </TableHeader>
           <TableBody
-            emptyContent={`${intl.formatMessage({ id: "no_results_found" })}`}
-            items={sortedItems}
+            emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
+            items={loadingItems ? [] : filteredItems}
           >
             {(item) => (
               <TableRow key={item.id}>
@@ -666,7 +666,7 @@ const ManifestTable = () => {
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
-        {visibleDialogTable && <ManifestTableDialog close={closeManifestTableDialog} content={manifestPaidData} />}
+        {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_paid" }, { MWB: manifestPaidData[0].waybill_id })} close={closeManifestTableDialog} content={manifestPaidData} />}
       </Loading>
     </>
   );
