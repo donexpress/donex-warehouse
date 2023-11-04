@@ -1,8 +1,9 @@
 import axios from "axios";
-import { guidePath } from "../backend";
+import { GuideCountPath, guidePath } from "../backend";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
 import { BASE_URL } from "@/configerege1992";
+import { Guide, GuidesCount } from "@/types/guideerege1992";
 
 const getBaseUrl = () => {
   if (process.env.WAREHOUSE_ENV && (process.env.WAREHOUSE_ENV === 'staging' || process.env.WAREHOUSE_ENV === 'prod')) {
@@ -11,9 +12,24 @@ const getBaseUrl = () => {
   return BASE_URL;
 }
 
-export const getGuides = async (filters?: string, context?: GetServerSidePropsContext): Promise<any[]> => {
-  const response = await axios.get(guidePath(filters), getHeaders(context))
-  return response.data
+export const getGuides = async (page: number | undefined = undefined, rowsPerPage: number | undefined = undefined, filters: string | undefined = undefined, context?: GetServerSidePropsContext): Promise<Guide[]> => {
+  const path = guidePath(page, rowsPerPage, filters);
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return [];
+  }
+}
+
+export const guidesCount = async (filters: string = "", context?: GetServerSidePropsContext): Promise<GuidesCount | null> => {
+  const path = GuideCountPath(filters);
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
 }
 
 export const createManifest = async (formData: FormData, carrier?: string): Promise<any> => {
