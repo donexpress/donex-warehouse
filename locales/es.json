@@ -393,6 +393,7 @@
   "accountStatus": "Estado de cuenta",
   "carrier": "Transportista",
   "paid": "Pagados",
+  "no_paid": "No pagados",
   "weigth": "Peso",
   "total_declare": "Total a declarar",
   "currency": "Moneda",
@@ -414,5 +415,6 @@
   "create_manifest_sucessfully": "Se adicionaron satisfactoriamente {manifest_count} productos del manifiesto {waybill_id}",
 	"update_customer_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_count} costos del cliente",
 	"update_supplier_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_paid_count} precio de venta del proveedor logistico",
-  "invoice_weight": "Peso de la factura"
+  "invoice_weight": "Peso de la factura",
+  "already_manifest_paid": "Productos ya pagados del manifiesto {MWB}"
 }
