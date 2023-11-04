@@ -1,5 +1,6 @@
 
 export type Guide = {
+    id: number;
     waybill_id: string;
     tracking_number: string;
     weigth: string;
@@ -16,3 +17,7 @@ export type GuideProps = {
     id: number;
     guide: Guide;
 }
+
+export type GuidesCount = {
+    count: number,
+};
