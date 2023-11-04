@@ -635,3 +635,8 @@ button:disabled {
   display: flex;
   flex-wrap: wrap;
 }
+
+.table-manifest-body {
+  max-height: 400px !important;
+  overflow-y: auto !important;
+}
