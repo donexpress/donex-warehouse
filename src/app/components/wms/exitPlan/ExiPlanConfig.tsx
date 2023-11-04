@@ -11,7 +11,7 @@ import ExitPlanAppendix from "./ExitPlanAppendix";
 import OperationInstructionTable from "../operationInstruction/OperationInstructionTable";
 import { isOMS } from "@/helperserege1992";
 
-const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
+const ExitPlanConfig = ({ id, exitPlan, user }: ExitPlanProps) => {
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
@@ -138,7 +138,7 @@ const ExitPlanConfig = ({ id, exitPlan }: ExitPlanProps) => {
         {exitPlan && exitPlan.user && exitPlan.id && (
           <>
             <ExitPlanBox exitPlan={exitPlan} />
-            <ExitPlanAppendix exitPlan={exitPlan} owner={exitPlan.user} />
+            <ExitPlanAppendix exitPlan={exitPlan} owner={user ? user: exitPlan.user} />
             <OperationInstructionTable
               exit_plan_id={exitPlan.id}
               exit_plan={exitPlan}

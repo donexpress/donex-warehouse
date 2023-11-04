@@ -1,5 +1,5 @@
 import axios from "axios";
-import { countStaffPath, removeStaffPath, staffPath, staffStatePath } from "../backend";
+import { countStaffPath, removeStaffPath, self, staffPath, staffStatePath } from "../backend";
 import { Staff } from "@/types/stafferege1992";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
@@ -64,6 +64,12 @@ export const updateStaff = async (id: number, data: any): Promise<Response> => {
 
 export const getStaffById = async(id:number, context?: GetServerSidePropsContext): Promise<Staff> => {
   const response = await axios.get(removeStaffPath(id), getHeaders(context))
+  return response.data
+}
+
+export const getSelf = async(context?: GetServerSidePropsContext): Promise<Staff> => {
+  console.log(getHeaders(context))
+  const response = await axios.get(self(), getHeaders(context))
   return response.data
 }
 

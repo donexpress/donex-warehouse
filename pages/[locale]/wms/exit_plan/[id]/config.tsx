@@ -10,8 +10,9 @@ import ExitPlanConfig from "../../../../../src/app/components/wms/exitPlan/ExiPl
 import { getExitPlanDestinationsAddresses, getExitPlansById } from "../../../../../src/services/api.exit_plan";
 import { ExitPlan, ExitPlanProps } from "@/types/exit_planerege1992";
 import { Loading } from '../../../../../src/app/components/common/Loading';
+import { getSelf } from "@/services/api.stafferege1992";
 
-const Config = ({ id, users, warehouses, addresses }: ExitPlanProps) => {
+const Config = ({ id, users, warehouses, addresses, user }: ExitPlanProps) => {
   const [exitPlan, setExitPlan] = useState<ExitPlan | null>(null)
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -40,6 +41,7 @@ const Config = ({ id, users, warehouses, addresses }: ExitPlanProps) => {
           users={users}
           warehouses={warehouses}
           countries={[]}
+          user={user}
         />
         </Loading>
       </Layout>
@@ -53,13 +55,15 @@ export async function getServerSideProps(context: any) {
   const warehouses = await getWhs(context);
   //const exitPlan = await getExitPlansById(id)
   const addresses = await getExitPlanDestinationsAddresses(context)
+  const user = await getSelf(context)
 
   return {
     props: {
       warehouses,
       users,
       id,
-      addresses
+      addresses,
+      user
     },
   };
 }

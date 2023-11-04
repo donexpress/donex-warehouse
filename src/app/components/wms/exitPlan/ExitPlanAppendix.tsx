@@ -13,11 +13,12 @@ import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { showMsg } from "@/helperserege1992";
 import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { useRouter } from "next/router";
+import { Staff } from "@/types/stafferege1992";
 
 interface Props {
   exitPlan?: ExitPlan;
   operationInstruction?: OperationInstruction;
-  owner: User;
+  owner: User | Staff;
 }
 const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
   const intl = useIntl();
@@ -170,7 +171,7 @@ const ExitPlanAppendix = ({ exitPlan, owner, operationInstruction }: Props) => {
               <span className="text-center" onClick={()=> handleVisualice(appendix.id ? appendix.id : -1)}>{appendix.name}</span>
             </div>
             <div className="elements-center">
-              <span className="text-center">{appendix.user?.nickname}</span>
+              <span className="text-center">{appendix.user?.username}</span>
             </div>
             <div className="elements-center">
               <span className="text-center">

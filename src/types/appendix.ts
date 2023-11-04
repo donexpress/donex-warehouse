@@ -13,4 +13,5 @@ export type Appendix = {
     url: string
     user_id: number
     user?: User
+    is_owner_admin: boolean
 }
