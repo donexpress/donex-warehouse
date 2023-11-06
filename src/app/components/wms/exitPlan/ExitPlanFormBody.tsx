@@ -113,6 +113,7 @@ const ExitPlanFormBody = ({
       user_id: values.user_id,
       destination: values.destination,
       reference_number: values.reference_number,
+      relabel: values.relabel ? values.relabel : false,
     };
     if(isOMS()) {
       delete body.user_id
