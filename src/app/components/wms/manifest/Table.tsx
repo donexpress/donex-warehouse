@@ -19,7 +19,6 @@ import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { SearchIcon } from "../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
-import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
 import PaginationTable from "../../common/Pagination";
 import { removeLine } from "@/services/api.lineserege1992";
@@ -632,7 +631,7 @@ const ManifestTable = () => {
             wrapper: "max-h-[auto]",
           }}
           selectedKeys={selectedKeys}
-          selectionMode="multiple"
+          selectionMode="none"
           sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
