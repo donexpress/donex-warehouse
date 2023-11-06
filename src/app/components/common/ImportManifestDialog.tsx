@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 import { Carrier, Response } from '../../../types';
 import '../../../styles/generic.dialog.scss';
 import { FaFileExcel, FaFileDownload } from 'react-icons/fa';
-import { showMsg, downloadTemplateManifest } from "../../../helpers";
+import { showMsg, downloadTemplateCreateManifest, downloadTemplateUpdateCustomer, downloadTemplateUpdateSupplier } from "../../../helpers";
 import { capitalize } from "@material-ui/core";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { indexCarriers } from "@/services/api.carrierserege1992";
@@ -111,7 +111,10 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
               <strong>{title}</strong>
               <div
                 className="upload_button_evidence"
-                onClick={() => { downloadTemplateManifest() }}
+                onClick={() => {
+                  where === undefined ? downloadTemplateCreateManifest() :
+                  where === "customer" ? downloadTemplateUpdateCustomer() : downloadTemplateUpdateSupplier()
+                }}
               >
                 <span>
                   {intl.formatMessage({ id: "template" })}
