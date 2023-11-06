@@ -15,7 +15,6 @@ import {
   SortDescriptor,
   Input,
 } from "@nextui-org/react";
-import { VerticalDotsIcon } from "../../common/VerticalDotsIcon";
 import { SearchIcon } from "../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
@@ -29,12 +28,14 @@ import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import { getGuides, guidesCount } from "@/services/api.manifesterege1992";
 import { Guide, GuidesCount } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
-import { Carrier } from "@/typeserege1992";
+import { Carrier, MWB } from "@/typeserege1992";
 import { PlusIcon } from "../../common/PlusIcon";
 import { FaFilter, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
 import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
+import { indexWaybillIDS } from "@/services/api.waybillerege1992";
+import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -53,6 +54,7 @@ const ManifestTable = () => {
   const intl = useIntl();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [carriers, setCarriers] = useState<Carrier[] | null>([]);
+  const [waybillIDS, setWaybillIDS] = useState<MWB[] | null>([]);
   const [guidesTotal, setGuidesTotal] = useState<GuidesCount | null>();
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
@@ -70,10 +72,10 @@ const ManifestTable = () => {
   const [visibleDialogTable, setVisibleDialogTable] = useState<boolean>(false);
   const [whereUpdate, setWhereUpdate] = useState<string>("");
 
-  const [aerealGuideNumberValue, setAerealGuideNumberValue] = React.useState("");
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
   const [carrierValue, setCarrierValue] = React.useState("");
+  const [waybillIDValue, setWaybillIDValue] = React.useState("");
   const [paidValue, setPaidValue] = React.useState("");
 
   const [manifestPaidData, setManifestPaidData] = React.useState<Guide[]>([]);
@@ -145,7 +147,7 @@ const ManifestTable = () => {
         uid: "client_reference",
         sortable: true,
       },
-      { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
+      // { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
 
     return columns;
@@ -173,22 +175,30 @@ const ManifestTable = () => {
           return (
             cellValue ? "Pagados" : "No pagados"
           );
-        case "actions":
+        // case "actions":
+        //   return (
+        //     <div className="relative flex justify-end items-center gap-2">
+        //       <Dropdown>
+        //         <DropdownTrigger>
+        //           <Button isIconOnly size="sm" variant="light">
+        //             <VerticalDotsIcon className="text-default-300" />
+        //           </Button>
+        //         </DropdownTrigger>
+        //         <DropdownMenu>
+        //           <DropdownItem onClick={() => handleDelete(guide["waybill_id"])}>
+        //             {intl.formatMessage({ id: "Delete" })}
+        //           </DropdownItem>
+        //         </DropdownMenu>
+        //       </Dropdown>
+        //     </div>
+        //   );
+        case "tracking_number":
           return (
-            <div className="relative flex justify-end items-center gap-2">
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button isIconOnly size="sm" variant="light">
-                    <VerticalDotsIcon className="text-default-300" />
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu>
-                  <DropdownItem onClick={() => handleDelete(guide["waybill_id"])}>
-                    {intl.formatMessage({ id: "Delete" })}
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </div>
+            <CopyColumnToClipboard
+              value={
+                cellValue
+              }
+            />
           );
         default:
           return cellValue;
@@ -211,10 +221,10 @@ const ManifestTable = () => {
   }, []);
 
   const handleClearAll = async () => {
-    setAerealGuideNumberValue("");
     setClientReferenceValue("");
     setTrackingNumberValue("");
     setCarrierValue("");
+    setWaybillIDValue("");
     setPaidValue("");
     await reloadData(-1, -1, "");
   };
@@ -234,15 +244,29 @@ const ManifestTable = () => {
       <div className="flex flex-col gap-4">
         <div className="flexbox-container">
           <div className="flexbox-item" style={{ paddingLeft: 0 }}>
-            <Input
-              isClearable
-              className="search-input"
-              placeholder={intl.formatMessage({ id: "waybill_id" })}
-              startContent={<SearchIcon />}
-              value={aerealGuideNumberValue}
-              onClear={() => onClear("AerealGuideNumberValue")}
-              onChange={(e) => setAerealGuideNumberValue(e.target.value)}
-            />
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  className="bnt-dropdown"
+                  style={{ width: "-webkit-fill-available" }}
+                  endContent={<ChevronDownIcon className="text-small" />}
+                >
+                  {waybillIDValue.trim() !== "" ? waybillIDValue : intl.formatMessage({ id: "waybill_id" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="MWB"
+                closeOnSelect={true}
+                selectionMode="single"
+              >
+                {waybillIDS ? waybillIDS.map((column) => (
+                  <DropdownItem onClick={(e) => setWaybillIDValue(column.waybill_id)} key={column.waybill_id} className="capitalize">
+                    {capitalize(column.waybill_id)}
+                  </DropdownItem>
+                )) : []}
+              </DropdownMenu>
+            </Dropdown>
           </div>
 
           <div className="flexbox-item">
@@ -451,7 +475,7 @@ const ManifestTable = () => {
     intl,
     trackingNumberValue,
     clientReferenceValue,
-    aerealGuideNumberValue,
+    waybillIDValue,
     carrierValue,
     paidValue
   ]);
@@ -526,9 +550,11 @@ const ManifestTable = () => {
     setLoading(true);
     const _guides = await getGuides(1, 25, filters);
     const _carriers = await indexCarriers();
+    const _waybillIDS = await indexWaybillIDS();
     const _guidesCount = await guidesCount(filters);
     setGuides(_guides);
     setCarriers(_carriers);
+    setWaybillIDS(_waybillIDS);
     setGuidesTotal(_guidesCount);
     setLoading(false);
   };
@@ -541,8 +567,8 @@ const ManifestTable = () => {
     if (clientReferenceValue.trim() !== "") {
       arrayFilters.push(`client_reference=${clientReferenceValue}`);
     }
-    if (aerealGuideNumberValue.trim() !== "") {
-      arrayFilters.push(`waybill_id=${aerealGuideNumberValue}`);
+    if (waybillIDValue.trim() !== "") {
+      arrayFilters.push(`waybill_id=${waybillIDValue}`);
     }
     if (carrierValue.trim() !== "") {
       arrayFilters.push(`carrier=${carrierValue}`);
@@ -563,10 +589,10 @@ const ManifestTable = () => {
     setLoadingItems(false);
   };
 
-  const handleDelete = (id: number) => {
-    setShowConfirm(true);
-    setDeleteElemtent(id);
-  };
+  // const handleDelete = (id: number) => {
+  //   setShowConfirm(true);
+  //   setDeleteElemtent(id);
+  // };
 
   const openImportManifestDialog = () => {
     setShowImportManifestDialog(true);
