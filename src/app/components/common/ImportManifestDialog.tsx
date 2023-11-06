@@ -58,7 +58,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         response = await updateSupplierManifest(data);
       }
 
-      if (response !== undefined && response.status >= 200 && response.status <= 299) {
+      if (response !== undefined && response.status >= 200 && response.status <= 299 && response.data.errors.length === 0) {
         setLoading(false);
         let message: string = "";
         if (where === undefined) {
@@ -113,7 +113,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                 className="upload_button_evidence"
                 onClick={() => {
                   where === undefined ? downloadTemplateCreateManifest() :
-                  where === "customer" ? downloadTemplateUpdateCustomer() : downloadTemplateUpdateSupplier()
+                    where === "customer" ? downloadTemplateUpdateCustomer() : downloadTemplateUpdateSupplier()
                 }}
               >
                 <span>
