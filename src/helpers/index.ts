@@ -180,12 +180,32 @@ export const downloadTemplateSP = () => {
   );
 }
 
-export const downloadTemplateManifest = () => {
+export const downloadTemplateCreateManifest = () => {
   const dataToExport: object[] = [
     {
-      MWB: '',
-      TRACKING: '',
-      TOTAL_DECLARE_VALUE: ''
+      "MWB": '',
+      "bag code": '',
+      "Bag ID": '',
+      "TRACKING NUMBER(AWB)": '',
+      "CLIENT REF.NO": '',
+      "Customer REF. NO": '',
+      "SHIPPER": '',
+      "CITY NAME SHIPPER": '',
+      "CITY CODE SHIPPER": '',
+      "COUNTRY NAME SHIPPER": '',
+      "COUNTRY CODE SHIPPER": '',
+      "CONSIGNEE": '',
+      "CONSIGNEE ADDRESS": '',
+      "ZIP CODE CONSIGNEE": '',
+      "CITY NAME CONSIGNEE": '',
+      "TEL CONSIGNEE": '',
+      "CITY CODE CONSIGNEE": '',
+      "COUNTRY NAME CONSIGNEE": '',
+      "WEIGHT": '',
+      "UNIT OF WEIGHT(kg)": '',
+      "CURRENCY(USD)": '',
+      "PRODUCT DESCRIPTION": '',
+      "TOTAL QTY": '',
     }
   ];
 
@@ -193,7 +213,45 @@ export const downloadTemplateManifest = () => {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
   const fileExtension = ".xlsx";
   const ws = XLSX.utils.json_to_sheet(dataToExport);
-  ws["!cols"] = [{ wch: 20 }, { wch: 20 }, { wch: 20 }];
+  ws["!cols"] = [{ wch: 20 }, { wch: 20 }, { wch: 20 }
+    , { wch: 24 }, { wch: 15 }, { wch: 20 }, { wch: 16 }, { wch: 20 }, { wch: 20 }, { wch: 24 }
+    , { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }
+    , { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }];
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: col });
+    ws[cell].s = {
+      border: {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } }
+      },
+    };
+  }
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `manifest` + fileExtension
+  );
+}
+
+export const downloadTemplateUpdateCustomer = () => {
+  const dataToExport: object[] = [
+    {
+      "MWB": '',
+      "TRACKING NUMBER(AWB)": '',
+      "TOTAL DECLARE VALUE": ''
+    }
+  ];
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  ws["!cols"] = [{ wch: 20 }, { wch: 24 }, { wch: 20 }];
   const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
   for (let col = range.s.c; col <= range.e.c; col++) {
     const cell = XLSX.utils.encode_cell({ r: 0, c: col });
@@ -212,6 +270,42 @@ export const downloadTemplateManifest = () => {
   FileSaver.saveAs(
     data,
     `manifest_client_cost` + fileExtension
+  );
+}
+
+export const downloadTemplateUpdateSupplier = () => {
+  const dataToExport: object[] = [
+    {
+      "Número de guía": '',
+      "Peso de facturación interna": '',
+      "Costo de envio": '',
+      "Costo total": ''
+    }
+  ];
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  ws["!cols"] = [{ wch: 20 }, { wch: 24 }, { wch: 20 }, { wch: 20 }];
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: col });
+    ws[cell].s = {
+      border: {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } }
+      }
+    };
+  }
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `manifest_supplier_price` + fileExtension
   );
 }
 
