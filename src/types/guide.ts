@@ -3,7 +3,7 @@ export type Guide = {
     id: number;
     waybill_id: string;
     tracking_number: string;
-    weigth: string;
+    weight: string;
     total_declare: number;
     currency: string;
     shipping_cost: number;

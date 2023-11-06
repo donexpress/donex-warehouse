@@ -20,7 +20,7 @@ import { manifestPaidDataToExcel } from "@/helperserege1992";
 const INITIAL_VISIBLE_COLUMNS = [
     "waybill_id",
     "tracking_number",
-    "weigth",
+    "weight",
     "total_declare",
     "currency",
     "shipping_cost",
@@ -66,8 +66,8 @@ const ManifestTableDialog = ({ title, close, content }: Params) => {
                 sortable: true,
             },
             {
-                name: intl.formatMessage({ id: "weigth" }),
-                uid: "weigth",
+                name: intl.formatMessage({ id: "weight" }),
+                uid: "weight",
                 sortable: true,
             },
             {

@@ -40,7 +40,7 @@ import SpinnerIconButton from "../../common/SpinnerIconButton";
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
   "tracking_number",
-  "weigth",
+  "weight",
   "total_declare",
   "currency",
   "shipping_cost",
@@ -102,8 +102,8 @@ const ManifestTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "weigth" }),
-        uid: "weigth",
+        name: intl.formatMessage({ id: "weight" }),
+        uid: "weight",
         sortable: true,
       },
       {

@@ -705,10 +705,10 @@ export const manifestPaidDataToExcel = (
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = guide.tracking_number;
           break;
-        case "weigth":
+        case "weight":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] =
-            guide.weigth;
+            guide.weight;
           break;
         case "total_declare":
           // @ts-ignore

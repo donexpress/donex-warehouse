@@ -394,7 +394,7 @@
   "carrier": "Transportista",
   "paid": "Pagados",
   "no_paid": "No pagados",
-  "weigth": "Peso",
+  "weight": "Peso",
   "total_declare": "Total a declarar",
   "currency": "Moneda",
   "shipping_cost": "Costo de envío",
