@@ -77,6 +77,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
           closeManifestDialog(response.data.manifest_paid);
         }
       } else {
+        setLoading(false);
         let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
         showMsg(message, { type: "error" });
       }
