@@ -102,7 +102,7 @@ const ExitPlanFormBody = ({
   };
 
   const formatBody = (values: ExitPlan): ExitPlan => {
-    return {
+    const body = {
       address: values.address,
       warehouse_id: values.warehouse_id,
       city: values.city,
@@ -115,6 +115,10 @@ const ExitPlanFormBody = ({
       reference_number: values.reference_number,
       relabel: values.relabel ? values.relabel : false,
     };
+    if(isOMS()) {
+      delete body.user_id
+    }
+    return body
   }
 
   const handleSubmit = async (values: ExitPlan) => {
