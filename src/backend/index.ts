@@ -135,6 +135,10 @@ export const carriersPath = () => {
   return getBaseUrl() + "/api/v1/carriers";
 };
 
+export const excelPath = () => {
+  return getBaseUrl() + "/api/v1/excel";
+};
+
 export const waybillPath = () => {
   return getBaseUrl() + "/api/v1/byWaybill";
 };
