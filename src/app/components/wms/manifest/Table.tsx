@@ -36,7 +36,7 @@ import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
-import ExportDialog from "../../common/ExportDialog";
+// import ExportDialog from "../../common/ExportDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
