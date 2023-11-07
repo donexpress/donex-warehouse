@@ -30,17 +30,18 @@ import { Guide, GuidesCount } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
 import { PlusIcon } from "../../common/PlusIcon";
-import { FaFilter, FaTimes } from "react-icons/fa";
+import { FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
 import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
+import ExportDialog from "../../common/ExportDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
   "tracking_number",
-  "weight",
+  "weigth",
   "total_declare",
   "currency",
   "shipping_cost",
@@ -67,6 +68,7 @@ const ManifestTable = () => {
   const [filters, setFilters] = React.useState<string>("");
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
+  const [showExportDialog, setShowExportDialog] = useState<boolean>(false);
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
   const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
   const [visibleDialogTable, setVisibleDialogTable] = useState<boolean>(false);
@@ -104,7 +106,7 @@ const ManifestTable = () => {
       },
       {
         name: intl.formatMessage({ id: "weight" }),
-        uid: "weight",
+        uid: "weigth",
         sortable: true,
       },
       {
@@ -441,6 +443,17 @@ const ManifestTable = () => {
               </DropdownMenu>
             </Dropdown>
 
+            {/* <Button
+              color="primary"
+              style={{ width: "140px" }}
+              endContent={
+                <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
+              }
+              onClick={() => openExportDialog()}
+            >
+              {intl.formatMessage({ id: "export_xlsx" })}
+            </Button> */}
+
             <Button
               color="primary"
               endContent={<PlusIcon />}
@@ -594,6 +607,14 @@ const ManifestTable = () => {
   //   setDeleteElemtent(id);
   // };
 
+  const openExportDialog = () => {
+    setShowExportDialog(true);
+  }
+
+  const closeExportDialog = () => {
+    setShowExportDialog(false);
+  }
+
   const openImportManifestDialog = () => {
     setShowImportManifestDialog(true);
   }
@@ -689,6 +710,7 @@ const ManifestTable = () => {
           </TableBody>
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
+        {/* {showExportDialog && <ExportDialog close={closeExportDialog} title={intl.formatMessage({ id: "export_manifests" })} />} */}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
         {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_paid" }, { MWB: manifestPaidData[0].waybill_id })} close={closeManifestTableDialog} content={manifestPaidData} />}
