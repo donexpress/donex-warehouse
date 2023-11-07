@@ -1,8 +1,13 @@
+import { getCookie } from "@/helpers/cookieUtilserege1992";
 import { RouteMenu } from "./../helpers/enums";
 import { IntlShape } from "react-intl";
 
 export const menuWMS = (intl: IntlShape) => {
-  return [
+  const role = getCookie("profileWMS").role.name;
+
+  console.log(role);
+
+  let menuWMS = [
     {
       id: 1,
       icon: "BiUser",
@@ -119,6 +124,14 @@ export const menuWMS = (intl: IntlShape) => {
       ],
     },
   ];
+
+  if (role === "Finanzas") {
+    menuWMS = menuWMS.filter((menu) => menu.id === 4)
+  } else {
+    menuWMS = menuWMS.filter((menu) => menu.id !== 4)
+  }
+
+  return menuWMS;
 };
 
 export const menuOMS = (intl: IntlShape) => {
