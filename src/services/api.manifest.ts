@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GuideCountPath, guidePath } from "../backend";
+import { GuideCountPath, excelPath, guidePath } from "../backend";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
 import { BASE_URL } from "@/configerege1992";
@@ -72,6 +72,24 @@ export const updateSupplierManifest = async (formData: FormData): Promise<any> =
       return { data: response.data, status: response.status };
     }
     return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const exportExcelManifest = async (waybill_id: string, carrier?: string, context?: GetServerSidePropsContext): Promise<any> => {
+  const path = carrier ? `${excelPath()}?waybill_id=${waybill_id}&carrier=${carrier}` : `${excelPath()}?waybill_id=${waybill_id}`;
+
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      const link = document.createElement('a');
+      link.href = response.data.url;
+      link.setAttribute('download', response.data.name);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   } catch (error: any) {
     return { status: error.response && error.response.status ? error.response.status : 0 };
   }
