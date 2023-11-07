@@ -36,7 +36,7 @@ import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
-// import ExportDialog from "../../common/ExportDialog";
+import ExportDialog from "../../common/ExportDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -443,7 +443,7 @@ const ManifestTable = () => {
               </DropdownMenu>
             </Dropdown>
 
-            {/* <Button
+            <Button
               color="primary"
               style={{ width: "140px" }}
               endContent={
@@ -452,7 +452,7 @@ const ManifestTable = () => {
               onClick={() => openExportDialog()}
             >
               {intl.formatMessage({ id: "export_xlsx" })}
-            </Button> */}
+            </Button>
 
             <Button
               color="primary"
@@ -710,7 +710,7 @@ const ManifestTable = () => {
           </TableBody>
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
-        {/* {showExportDialog && <ExportDialog close={closeExportDialog} title={intl.formatMessage({ id: "export_manifests" })} />} */}
+        {showExportDialog && <ExportDialog close={closeExportDialog} title={intl.formatMessage({ id: "export_manifests" })} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
         {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_paid" }, { MWB: manifestPaidData[0].waybill_id })} close={closeManifestTableDialog} content={manifestPaidData} />}
