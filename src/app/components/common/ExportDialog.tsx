@@ -26,6 +26,7 @@ const ExportDialog = ({ close, title }: Params) => {
   const [waybillIDValue, setWaybillIDValue] = React.useState("");
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [disableConfirm, setDisableConfirm] = useState<boolean>(false);
 
   useEffect(() => {
     loadCarriers();
@@ -44,7 +45,9 @@ const ExportDialog = ({ close, title }: Params) => {
 
   const handleSubmit = async () => {
     try {
+      setDisableConfirm(true);
       await exportExcelManifest(waybillIDValue, carrierValue);
+      setDisableConfirm(false);
     } catch (error) {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       showMsg(message, { type: "error" });
@@ -123,7 +126,7 @@ const ExportDialog = ({ close, title }: Params) => {
                   className="px-4"
                   style={{ marginRight: '15px' }}
                   onClick={handleSubmit}
-                  disabled={waybillIDValue === ""}
+                  disabled={waybillIDValue === "" || disableConfirm}
                 >
                   {intl.formatMessage({ id: "confirmation_header" })}
                 </Button>
