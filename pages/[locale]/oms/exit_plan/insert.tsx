@@ -19,7 +19,7 @@ const InsertExitPlan = ({
   destinations,
   addresses,
   userOwner
-}: ExitPlanProps) => {console.log(userOwner)
+}: ExitPlanProps) => {
   return (
     <Layout>
       <Head>

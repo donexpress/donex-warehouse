@@ -40,7 +40,14 @@ const ExitPlanAppendixFromOP = ({ owner, updateAppendix }: Props) => {
     let appdgs: AppendixFromOPBody[] = appendages.filter(element => element.id !== id);
     setAppendages(appdgs);
     updateAppendix(appdgs);
-  }
+  };
+
+  const handleVisualice = (id: number) => {
+    const appendix = appendages.find(el => el.id === id)
+    if( appendix ) {
+      window.open(appendix.url, appendix.name )
+    }
+  };
 
   return (
     <>
@@ -99,7 +106,7 @@ const ExitPlanAppendixFromOP = ({ owner, updateAppendix }: Props) => {
             }}
           >
             <div className="elements-center" style={{wordBreak: 'break-all', cursor: 'pointer'}}>
-              <span className="text-center">{appendix.name}</span>
+              <span className="text-center" onClick={()=> handleVisualice(appendix.id ? appendix.id : -1)}>{appendix.name}</span>
             </div>
             <div className="elements-center">
               <span className="text-center">{owner.username}</span>
@@ -115,6 +122,12 @@ const ExitPlanAppendixFromOP = ({ owner, updateAppendix }: Props) => {
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
+                  <DropdownItem
+                  aria-labelledby="visualice-button"
+                    onClick={() => handleVisualice(appendix.id ? appendix.id : -1)}
+                  >
+                    {intl.formatMessage({ id: "vizualice" })}
+                  </DropdownItem>
                   <DropdownItem
                     aria-labelledby="delete-button"
                     onClick={() => handleDelete(appendix.id ? appendix.id : -1)}
