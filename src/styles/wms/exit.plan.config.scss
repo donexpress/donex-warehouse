@@ -93,6 +93,13 @@
         grid-template-columns: 2fr 2fr 1fr 2fr 1fr;
         column-gap: 5px;
     }
+
+    &__table2 {
+        display: grid;
+        //margin-right: 16px;
+        grid-template-columns: 2fr 2fr 2fr 1fr;
+        column-gap: 5px;
+    }
 }
 
 .ExitPlanAppendix {
@@ -108,6 +115,13 @@
         display: grid;
         margin-right: 16px;
         grid-template-columns: 2fr 2fr 1fr 2fr 1fr;
+        column-gap: 5px;
+    }
+
+    &__table2 {
+        display: grid;
+        //margin-right: 16px;
+        grid-template-columns: 2fr 2fr 2fr 1fr;
         column-gap: 5px;
     }
 }

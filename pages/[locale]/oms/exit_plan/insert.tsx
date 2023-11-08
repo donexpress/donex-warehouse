@@ -10,13 +10,15 @@ import { getExitPlanDestinations, getExitPlanDestinationsAddresses } from "@/ser
 import { User } from "@/types/usererege1992";
 import { isOMS } from "@/helperserege1992";
 import { getCookie } from "@/helpers/cookieUtilserege1992";
+import { getSelf } from "@/services/api.stafferege1992";
 
 const InsertExitPlan = ({
   countries,
   users,
   warehouses,
   destinations,
-  addresses
+  addresses,
+  userOwner
 }: ExitPlanProps) => {
   return (
     <Layout>
@@ -31,6 +33,7 @@ const InsertExitPlan = ({
           warehouses={warehouses}
           destinations={destinations}
           addresses={addresses}
+          userOwner={userOwner}
         />
       </ProtectedRoute>
     </Layout>
@@ -38,7 +41,6 @@ const InsertExitPlan = ({
 };
 
 export async function getServerSideProps(context: any) {
-  const { id } = context.params;
   let users: User[] = [];
   if (isOMS(context) !== undefined) {
     const cookie = JSON.parse(context.req.cookies.profileOMS)
@@ -48,13 +50,15 @@ export async function getServerSideProps(context: any) {
   const warehouses = await getWhs(context);
   const destinations = await getExitPlanDestinations(context);
   const addresses = await getExitPlanDestinationsAddresses(context)
+  const userOwner = await getSelf(context)
   return {
     props: {
       users,
       countries,
       warehouses,
       destinations,
-      addresses
+      addresses,
+      userOwner
     },
   };
 }
