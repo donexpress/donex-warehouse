@@ -206,6 +206,7 @@ export const downloadTemplateCreateManifest = () => {
       "CURRENCY(USD)": '',
       "PRODUCT DESCRIPTION": '',
       "TOTAL QTY": '',
+      "SALE PRICE": '',
     }
   ];
 
@@ -243,7 +244,7 @@ export const downloadTemplateUpdateCustomer = () => {
     {
       "MWB": '',
       "TRACKING NUMBER(AWB)": '',
-      "TOTAL DECLARE VALUE": ''
+      "SALE PRICE": ''
     }
   ];
 
@@ -278,8 +279,7 @@ export const downloadTemplateUpdateSupplier = () => {
     {
       "Número de guía": '',
       "Peso de facturación interna": '',
-      "Costo de envio": '',
-      "Costo total": ''
+      "Costo de envio": ''
     }
   ];
 

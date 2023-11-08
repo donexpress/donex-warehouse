@@ -42,12 +42,10 @@ const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
   "tracking_number",
   "weigth",
-  "total_declare",
   "currency",
   "shipping_cost",
   "sale_price",
   "invoice_weight",
-  "paid",
   "carrier"
 ];
 
@@ -324,7 +322,7 @@ const ManifestTable = () => {
             </Dropdown> */}
           {/* </div> */}
 
-          <div className="flexbox-item">
+          <div className="flexbox-item" style={{ paddingRight: 0 }}>
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -350,7 +348,7 @@ const ManifestTable = () => {
             </Dropdown>
           </div>
 
-          <div className="flexbox-item" style={{ paddingRight: 0 }}>
+          {/* <div className="flexbox-item" style={{ paddingRight: 0 }}>
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -375,7 +373,7 @@ const ManifestTable = () => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-          </div>
+          </div> */}
         </div>
         <div className="flex justify-between">
           <div className="flex justify-start gap-3 items-start">
