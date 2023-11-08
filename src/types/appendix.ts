@@ -15,3 +15,10 @@ export type Appendix = {
     user?: User
     is_owner_admin: boolean
 }
+
+export type AppendixFromOPBody = {
+    id?: number;
+    name: string;
+    function: string;
+    url: string;
+};

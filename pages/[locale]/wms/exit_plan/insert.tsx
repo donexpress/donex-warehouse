@@ -7,13 +7,15 @@ import { getUsers } from "../../../../src/services/api.users";
 import { getWhs } from "../../../../src/services/api.wh";
 import { ExitPlanProps } from "../../../../src/types/exit_plan";
 import { getExitPlanDestinations, getExitPlanDestinationsAddresses } from "@/services/api.exit_planerege1992";
+import { getSelf } from "@/services/api.stafferege1992";
 
 const InsertExitPlan = ({
   countries,
   users,
   warehouses,
   destinations,
-  addresses
+  addresses,
+  userOwner
 }: ExitPlanProps) => {
   return (
     <Layout>
@@ -28,6 +30,7 @@ const InsertExitPlan = ({
           warehouses={warehouses}
           destinations={destinations}
           addresses={addresses}
+          userOwner={userOwner}
         />
       </ProtectedRoute>
     </Layout>
@@ -35,19 +38,20 @@ const InsertExitPlan = ({
 };
 
 export async function getServerSideProps(context: any) {
-  const { id } = context.params;
   const users = await getUsers(context);
   const countries = await indexCountries(context);
   const warehouses = await getWhs(context);
   const destinations = await getExitPlanDestinations(context);
   const addresses = await getExitPlanDestinationsAddresses(context)
+  const userOwner = await getSelf(context)
   return {
     props: {
       users,
       countries,
       warehouses,
       destinations,
-      addresses
+      addresses,
+      userOwner
     },
   };
 }
