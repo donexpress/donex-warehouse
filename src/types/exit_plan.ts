@@ -55,9 +55,10 @@ export type ExitPlanProps = {
   users: User[];
   countries: Country[];
   warehouses: Warehouse[];
-  destinations?: {destinations: State[]}
-  addresses: {addresses: {amazon:State[], meli:State[]}}
-  user?: User | Staff
+  destinations?: {destinations: State[]};
+  addresses: {addresses: {amazon:State[], meli:State[]}};
+  user?: User | Staff;
+  userOwner?: User | Staff;
 };
 
 export type ExitPlanState = {

@@ -15,10 +15,14 @@ import {
 import { Button } from "@nextui-org/react";
 import { ExitPlan, ExitPlanProps, State, AddBoxes } from "../../../../types/exit_plan";
 import { User } from "../../../../types/user";
+import { Staff } from "../../../../types/staff";
 import { Warehouse } from "../../../../types/warehouse";
 import { getHourFormat, getLanguage } from "@/helpers/utilserege1992";
 import ExitPlanBox from "./ExitPlanBox";
 import LocationTable from "../../common/LocationTable";
+import ExitPlanAppendixFromOP from './ExitPlanAppendixFromOP';
+import { AppendixFromOPBody, Appendix } from "../../../../types/appendix";
+import { createAppendix } from "@/services/api.appendixerege1992";
 
 const ExitPlanFormBody = ({
   id,
@@ -29,6 +33,7 @@ const ExitPlanFormBody = ({
   warehouses,
   destinations,
   addresses,
+  userOwner,
 }: ExitPlanProps) => {
   const router = useRouter();
   const { locale } = router.query;
@@ -70,6 +75,7 @@ const ExitPlanFormBody = ({
 
   const [disableButton, setDisableButton] = useState<boolean>(true);
   const [showAddPackages, setShowAddPackages] = useState<boolean>(getWarehouseOrderNumber() !== '');
+  const [appendixes, setAppendixes] = useState<AppendixFromOPBody[]>([]);
 
   let initialValues: ExitPlan = {
     address: id && exitPlan ? exitPlan.address : "",
@@ -117,6 +123,33 @@ const ExitPlanFormBody = ({
     };
   }
 
+  const createAppendixes = async (outputPlanId: number) => {
+    if (userOwner) {
+      try {
+        const promises = appendixes.map((el) => {
+          const appdx: Appendix = {
+            name: el.name,
+            user_id: userOwner.id,
+            output_plan_id: outputPlanId,
+            function: el.function,
+            url: el.url,
+            is_owner_admin: isWMS() ? true : false
+          };
+          return createAppendix(appdx);
+        }
+        );
+        await Promise.all(promises);
+        showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+          type: "success",
+        });
+      } catch (e) {
+        showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+          type: "error",
+        });
+      }
+    }
+  };
+
   const handleSubmit = async (values: ExitPlan) => {
     if (values.delivered_time === "") {
       values.delivered_time = null;
@@ -159,11 +192,17 @@ const ExitPlanFormBody = ({
           showMsg(intl.formatMessage({ id: "duplicatedMsg" }), {
             type: "warning",
           });
-        } else {
+        } else if (!(appendixes.length > 0 && userOwner)) {
           showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
             type: "success",
           });
         }
+
+        if (appendixes.length > 0 && userOwner) {
+          await createAppendixes(Number(responseEP.id));
+        }
+      } else if (responseEP && appendixes.length > 0 && userOwner) {
+        await createAppendixes(Number(responseEP.id));
       } else {
         const message = intl.formatMessage({ id: "successfullyMsg" });
         showMsg(message, { type: "success" });
@@ -610,6 +649,11 @@ const ExitPlanFormBody = ({
             </Form>
           )}
         </Formik>
+        {
+          !id && userOwner && (
+            <ExitPlanAppendixFromOP owner={userOwner} updateAppendix={setAppendixes}></ExitPlanAppendixFromOP>
+          )
+        }
       </div>
       {isFromDetails && exitPlan && (
         <LocationTable exitPlan={exitPlan} isDetail />
