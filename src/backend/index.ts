@@ -131,6 +131,18 @@ export const countriesPath = () => {
   return getBaseUrl() + "/api/v1/countries";
 };
 
+export const carriersPath = () => {
+  return getBaseUrl() + "/api/v1/carriers";
+};
+
+export const excelPath = () => {
+  return getBaseUrl() + "/api/v1/excel";
+};
+
+export const waybillPath = () => {
+  return getBaseUrl() + "/api/v1/byWaybill";
+};
+
 export const servicePath = () => {
   return getBaseUrl() + "/api/v1/service";
 };
@@ -224,6 +236,25 @@ export const countDivisionPath = () => {
 
 export const removeDivisionPath = (id: number) => {
   return `${getBaseUrl()}/api/v1/regional_division/${id}`;
+};
+
+export const guidePath = (page?: number, rowsPerPage?: number, filters?: string) => {
+  let params = "";
+  if (page && rowsPerPage) {
+    params += `${params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  if (filters && filters !== "") {
+    params += `${params === "" ? '?' : '&'}${filters}`;
+  }
+  return getBaseUrl() + "/api/v1/manifest" + params;
+};
+
+export const GuideCountPath = (filters: string = "") => {
+  let params = "";
+  if (filters && filters !== "") {
+    params += `?${filters}`;
+  }
+  return getBaseUrl() + "/api/v1/count" + params;
 };
 
 export const self = () => {

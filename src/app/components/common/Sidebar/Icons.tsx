@@ -6,6 +6,7 @@ import {
   BiHome,
   BiPlusCircle,
   BiSolidShip,
+  BiCoin,
 } from "react-icons/bi";
 
 interface Props {
@@ -22,6 +23,7 @@ const Icons = ({ icons }: Props) => {
       {icons === "BiHome" && <BiHome />}
       {icons === "BiPlusCircle" && <BiPlusCircle />}
       {icons === "BiSolidShip" && <BiSolidShip />}
+      {icons === "BiCoin" && <BiCoin />}
     </>
   );
 };
