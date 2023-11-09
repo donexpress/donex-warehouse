@@ -3,6 +3,12 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
+.dialog-table-background {
+    background: #080f25 !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+}
+
 .fields-shelf-dialog {
     display: grid;
     grid-template-columns: 1fr 1fr;

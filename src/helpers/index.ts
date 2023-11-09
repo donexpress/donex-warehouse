@@ -13,6 +13,7 @@ import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { Warehouse } from "@/types/warehouseerege1992";
+import { Guide } from "@/types/guideerege1992";
 
 const baseMessageOpts: Pick<
   MessageOpts,
@@ -150,7 +151,7 @@ export const downloadTemplateSP = () => {
       return: '',
       rejected_boxes: '',
       digits_box_number: ''
-    } : 
+    } :
     {
       customer_order_number: '',
       username: '',
@@ -176,6 +177,138 @@ export const downloadTemplateSP = () => {
   FileSaver.saveAs(
     data,
     `template_to_import_entry_plans` + fileExtension
+  );
+}
+
+export const downloadTemplateCreateManifest = () => {
+  const dataToExport: object[] = [
+    {
+      "MWB": '',
+      "bag code": '',
+      "Bag ID": '',
+      "TRACKING NUMBER(AWB)": '',
+      "CLIENT REF.NO": '',
+      "Customer REF. NO": '',
+      "SHIPPER": '',
+      "SHIPPER ADDRESS": '',
+      "CITY NAME SHIPPER": '',
+      "CITY CODE SHIPPER": '',
+      "COUNTRY NAME SHIPPER": '',
+      "COUNTRY CODE SHIPPER": '',
+      "CONSIGNEE": '',
+      "CONSIGNEE ADDRESS": '',
+      "ZIP CODE CONSIGNEE": '',
+      "CITY NAME CONSIGNEE": '',
+      "TEL CONSIGNEE": '',
+      "CITY CODE CONSIGNEE": '',
+      "COUNTRY NAME CONSIGNEE": '',
+      "COUNTRY CODE": '',
+      "WEIGHT": '',
+      "UNIT OF WEIGHT(kg)": '',
+      "TOTAL DECLARE": '',
+      "CURRENCY(USD)": '',
+      "PRODUCT DESCRIPTION": '',
+      "TOTAL QTY": '',
+      "SALE PRICE": '',
+    }
+  ];
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  ws["!cols"] = [{ wch: 20 }, { wch: 20 }, { wch: 20 }
+    , { wch: 24 }, { wch: 15 }, { wch: 20 }, { wch: 16 }, { wch: 20 }, { wch: 20 }, { wch: 24 }
+    , { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }
+    , { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }];
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: col });
+    ws[cell].s = {
+      border: {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } }
+      },
+    };
+  }
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `manifest` + fileExtension
+  );
+}
+
+export const downloadTemplateUpdateCustomer = () => {
+  const dataToExport: object[] = [
+    {
+      "MWB": '',
+      "TRACKING NUMBER(AWB)": '',
+      "SALE PRICE": ''
+    }
+  ];
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  ws["!cols"] = [{ wch: 20 }, { wch: 24 }, { wch: 20 }];
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: col });
+    ws[cell].s = {
+      border: {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } }
+      }
+    };
+  }
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `manifest_client_cost` + fileExtension
+  );
+}
+
+export const downloadTemplateUpdateSupplier = () => {
+  const dataToExport: object[] = [
+    {
+      "Número de guía": '',
+      "Peso de facturación interna": '',
+      "Costo de envio": ''
+    }
+  ];
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  ws["!cols"] = [{ wch: 20 }, { wch: 24 }, { wch: 20 }, { wch: 20 }];
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: col });
+    ws[cell].s = {
+      border: {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } }
+      }
+    };
+  }
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `manifest_supplier_price` + fileExtension
   );
 }
 
@@ -226,11 +359,11 @@ export const storagePlanDataToExcel = (
       sPlan[key6] =
         sp.packing_list && sp.packing_list.length > 0
           ? ((sp.packing_list
-              .filter(
-                (pl: PackingList) =>
-                  pl.package_shelf && pl.package_shelf.length > 0
-              )
-              .length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString()
+            .filter(
+              (pl: PackingList) =>
+                pl.package_shelf && pl.package_shelf.length > 0
+            )
+            .length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString()
           : "0";
     }
     if (selection === "all" || selection.has("outgoing_order")) {
@@ -261,26 +394,23 @@ export const storagePlanDataToExcel = (
       sPlan[key10] = sp.rejected_boxes
         ? intl.formatMessage({ id: "rejected_boxes" })
         : sp.return
-        ? intl.formatMessage({ id: "return" })
-        : intl.formatMessage({ id: "normal" });
+          ? intl.formatMessage({ id: "return" })
+          : intl.formatMessage({ id: "normal" });
     }
     if (selection === "all" || selection.has("delivered_time")) {
-      sPlan[key11] = `${
-        sp.delivered_time ? getDateFormat(sp.delivered_time) : ""
-      } ${sp.delivered_time ? getHourFormat(sp.delivered_time) : ""}`;
+      sPlan[key11] = `${sp.delivered_time ? getDateFormat(sp.delivered_time) : ""
+        } ${sp.delivered_time ? getHourFormat(sp.delivered_time) : ""}`;
     }
     if (selection === "all" || selection.has("observations")) {
       sPlan[key12] = sp.observations;
     }
     if (selection === "all" || selection.has("created_at")) {
-      sPlan[key13] = `${
-        sp.created_at ? getDateFormat(sp.created_at) : ""
-      } ${sp.created_at ? getHourFormat(sp.created_at) : ""}`;
+      sPlan[key13] = `${sp.created_at ? getDateFormat(sp.created_at) : ""
+        } ${sp.created_at ? getHourFormat(sp.created_at) : ""}`;
     }
     if (selection === "all" || selection.has("updated_at")) {
-      sPlan[key14] = `${
-        sp.updated_at ? getDateFormat(sp.updated_at) : ""
-      } ${sp.updated_at ? getHourFormat(sp.updated_at) : ""}`;
+      sPlan[key14] = `${sp.updated_at ? getDateFormat(sp.updated_at) : ""
+        } ${sp.updated_at ? getHourFormat(sp.updated_at) : ""}`;
     }
 
     dataToExport.push(sPlan);
@@ -298,13 +428,13 @@ export const storagePlanDataToExcel = (
   FileSaver.saveAs(
     data,
     `${intl.formatMessage({ id: "storage_plans" })}(` +
-      date.getDate() +
-      "-" +
-      (date.getMonth() + 1) +
-      "-" +
-      date.getFullYear() +
-      ")" +
-      fileExtension
+    date.getDate() +
+    "-" +
+    (date.getMonth() + 1) +
+    "-" +
+    date.getFullYear() +
+    ")" +
+    fileExtension
   );
 };
 
@@ -324,7 +454,7 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   const key11: string = intl.formatMessage({ id: "reference_number" });
   const key12: string = intl.formatMessage({ id: "dispatch_date" });
 
-  
+
   packingLists.forEach((pl: PackingList) => {
     const pList: { [key: string]: string } = {};
     const packageShelf: PackageShelf | null = !!Array.isArray(pl.package_shelf) ? (pl.package_shelf.length > 0 ? pl.package_shelf[0] : null) : (pl.package_shelf ? pl.package_shelf : null);
@@ -340,44 +470,40 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
     pList[key8] =
       packageShelf !== null
         ? (exitPlan.warehouse
-            ? `${exitPlan.warehouse.code}-${String(
-              packageShelf.shelf?.partition_table
-              ).padStart(2, "0")}-${String(
-                packageShelf.shelf?.number_of_shelves
-              ).padStart(2, "0")}-${String(
-                packageShelf.layer
-              ).padStart(2, "0")}-${String(
-                packageShelf.column
-              ).padStart(2, "0")} `
-            : "") +
-          `${intl.formatMessage({ id: "partition" })}: ${
-            packageShelf.shelf
-              ? packageShelf.shelf.partition_table
-              : ""
-          } ` +
-          `${intl.formatMessage({ id: "shelf" })}: ${
-            packageShelf.shelf
-              ? packageShelf.shelf.number_of_shelves
-              : ""
-          } ` +
-          `${intl.formatMessage({ id: "layer" })}: ${
+          ? `${exitPlan.warehouse.code}-${String(
+            packageShelf.shelf?.partition_table
+          ).padStart(2, "0")}-${String(
+            packageShelf.shelf?.number_of_shelves
+          ).padStart(2, "0")}-${String(
             packageShelf.layer
-          }  ` +
-          `${intl.formatMessage({ id: "column" })}: ${
+          ).padStart(2, "0")}-${String(
             packageShelf.column
-          } `
+          ).padStart(2, "0")} `
+          : "") +
+        `${intl.formatMessage({ id: "partition" })}: ${packageShelf.shelf
+          ? packageShelf.shelf.partition_table
+          : ""
+        } ` +
+        `${intl.formatMessage({ id: "shelf" })}: ${packageShelf.shelf
+          ? packageShelf.shelf.number_of_shelves
+          : ""
+        } ` +
+        `${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer
+        }  ` +
+        `${intl.formatMessage({ id: "column" })}: ${packageShelf.column
+        } `
         : "--";
-        // @ts-ignore
+    // @ts-ignore
     pList[key9] = `${pl.storage_time} ${intl.formatMessage({ id: "days" })}`;
     pList[key10] = exitPlan.delivered_time
       ? `${getDateFormat(exitPlan.delivered_time)}, ${getHourFormat(
         exitPlan.delivered_time
-        )}`
+      )}`
       : "--";
     pList[key12] = pl.dispatched_time
       ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
         pl.dispatched_time
-        )}`
+      )}`
       : "--";
 
     dataToExport.push(pList);
@@ -395,17 +521,17 @@ export const inventoryOfExitPlan = (exitPlan: ExitPlan, packingLists: PackingLis
   FileSaver.saveAs(
     data,
     `exit_plan_inventory_${exitPlan.output_number} (` +
-      date.getDate() +
-      "-" +
-      (date.getMonth() + 1) +
-      "-" +
-      date.getFullYear() +
-      ")" +
-      fileExtension
+    date.getDate() +
+    "-" +
+    (date.getMonth() + 1) +
+    "-" +
+    date.getFullYear() +
+    ")" +
+    fileExtension
   );
 }
 
-export const getLocationPackages = (sp: StoragePlan, intl?: IntlShape,  isFromDownload: boolean = false): string => {
+export const getLocationPackages = (sp: StoragePlan, intl?: IntlShape, isFromDownload: boolean = false): string => {
   const locations: string[] = [];
   if (sp.packing_list && sp.packing_list?.length == 0) {
     return "--";
@@ -423,31 +549,27 @@ export const getLocationPackages = (sp: StoragePlan, intl?: IntlShape,  isFromDo
       ).padStart(2, "0")}-${String(pl.package_shelf[0].layer).padStart(
         2,
         "0"
-      )}-${String(pl.package_shelf[0].column).padStart(2, "0")}` + 
-      ((isFromDownload && intl !== undefined) ? (` ${intl.formatMessage({ id: "partition" })}: ${
-        pl.package_shelf &&
-        pl.package_shelf.length > 0 &&
-        pl.package_shelf[0].shelf
+      )}-${String(pl.package_shelf[0].column).padStart(2, "0")}` +
+        ((isFromDownload && intl !== undefined) ? (` ${intl.formatMessage({ id: "partition" })}: ${pl.package_shelf &&
+          pl.package_shelf.length > 0 &&
+          pl.package_shelf[0].shelf
           ? pl.package_shelf[0].shelf.partition_table
           : ""
-      } ` +
-      `${intl.formatMessage({ id: "shelf" })}: ${
-        pl.package_shelf &&
-        pl.package_shelf.length > 0 &&
-        pl.package_shelf[0].shelf
-          ? pl.package_shelf[0].shelf.number_of_shelves
-          : ""
-      } ` +
-      `${intl.formatMessage({ id: "layer" })}: ${
-        pl.package_shelf && pl.package_shelf.length > 0
-          ? pl.package_shelf[0].layer
-          : ""
-      }  ` +
-      `${intl.formatMessage({ id: "column" })}: ${
-        pl.package_shelf && pl.package_shelf.length > 0
-          ? pl.package_shelf[0].column
-          : ""
-      } `) : '');
+          } ` +
+          `${intl.formatMessage({ id: "shelf" })}: ${pl.package_shelf &&
+            pl.package_shelf.length > 0 &&
+            pl.package_shelf[0].shelf
+            ? pl.package_shelf[0].shelf.number_of_shelves
+            : ""
+          } ` +
+          `${intl.formatMessage({ id: "layer" })}: ${pl.package_shelf && pl.package_shelf.length > 0
+            ? pl.package_shelf[0].layer
+            : ""
+          }  ` +
+          `${intl.formatMessage({ id: "column" })}: ${pl.package_shelf && pl.package_shelf.length > 0
+            ? pl.package_shelf[0].column
+            : ""
+          } `) : '');
       if (!locations.find((el) => el === tmpl)) {
         locations.push(tmpl);
       }
@@ -496,51 +618,47 @@ export const packingListDataToExcel = (
       pList[key8] =
         pl.package_shelf && pl.package_shelf.length > 0
           ? (storagePlan.warehouse
-              ? `${storagePlan.warehouse.code}-${String(
-                  pl.package_shelf[0].shelf?.partition_table
-                ).padStart(2, "0")}-${String(
-                  pl.package_shelf[0].shelf?.number_of_shelves
-                ).padStart(2, "0")}-${String(
-                  pl.package_shelf[0].layer
-                ).padStart(2, "0")}-${String(
-                  pl.package_shelf[0].column
-                ).padStart(2, "0")} `
-              : "") +
-            `${intl.formatMessage({ id: "partition" })}: ${
-              pl.package_shelf &&
-              pl.package_shelf.length > 0 &&
-              pl.package_shelf[0].shelf
-                ? pl.package_shelf[0].shelf.partition_table
-                : ""
-            } ` +
-            `${intl.formatMessage({ id: "shelf" })}: ${
-              pl.package_shelf &&
-              pl.package_shelf.length > 0 &&
-              pl.package_shelf[0].shelf
-                ? pl.package_shelf[0].shelf.number_of_shelves
-                : ""
-            } ` +
-            `${intl.formatMessage({ id: "layer" })}: ${
-              pl.package_shelf && pl.package_shelf.length > 0
-                ? pl.package_shelf[0].layer
-                : ""
-            }  ` +
-            `${intl.formatMessage({ id: "column" })}: ${
-              pl.package_shelf && pl.package_shelf.length > 0
-                ? pl.package_shelf[0].column
-                : ""
-            } `
+            ? `${storagePlan.warehouse.code}-${String(
+              pl.package_shelf[0].shelf?.partition_table
+            ).padStart(2, "0")}-${String(
+              pl.package_shelf[0].shelf?.number_of_shelves
+            ).padStart(2, "0")}-${String(
+              pl.package_shelf[0].layer
+            ).padStart(2, "0")}-${String(
+              pl.package_shelf[0].column
+            ).padStart(2, "0")} `
+            : "") +
+          `${intl.formatMessage({ id: "partition" })}: ${pl.package_shelf &&
+            pl.package_shelf.length > 0 &&
+            pl.package_shelf[0].shelf
+            ? pl.package_shelf[0].shelf.partition_table
+            : ""
+          } ` +
+          `${intl.formatMessage({ id: "shelf" })}: ${pl.package_shelf &&
+            pl.package_shelf.length > 0 &&
+            pl.package_shelf[0].shelf
+            ? pl.package_shelf[0].shelf.number_of_shelves
+            : ""
+          } ` +
+          `${intl.formatMessage({ id: "layer" })}: ${pl.package_shelf && pl.package_shelf.length > 0
+            ? pl.package_shelf[0].layer
+            : ""
+          }  ` +
+          `${intl.formatMessage({ id: "column" })}: ${pl.package_shelf && pl.package_shelf.length > 0
+            ? pl.package_shelf[0].column
+            : ""
+          } `
           : "--";
       pList[key9] = "--";
       pList[key10] = storagePlan.delivered_time
         ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(
-            storagePlan.delivered_time
-          )}`
+          storagePlan.delivered_time
+        )}`
         : "--";
       pList[key11] = pl.dispatched_time
         ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
           pl.dispatched_time
-          )}`
+        )}`
         : "--";
 
       dataToExport.push(pList);
@@ -579,54 +697,50 @@ export const packingListDataToExcel = (
         if (storagePlan.state === "stocked") {
           pList[key3_0] = pl.output_plan_delivered_number ? pl.output_plan_delivered_number : "--";
         }
-        pList[key3_1] = 
+        pList[key3_1] =
         pl.package_shelf && pl.package_shelf.length > 0
           ? (storagePlan.warehouse
               ? `${storagePlan.warehouse.code}-${String(
-                  pl.package_shelf[0].shelf?.partition_table
-                ).padStart(2, "0")}-${String(
-                  pl.package_shelf[0].shelf?.number_of_shelves
-                ).padStart(2, "0")}-${String(
-                  pl.package_shelf[0].layer
-                ).padStart(2, "0")}-${String(
-                  pl.package_shelf[0].column
-                ).padStart(2, "0")} `
+                pl.package_shelf[0].shelf?.partition_table
+              ).padStart(2, "0")}-${String(
+                pl.package_shelf[0].shelf?.number_of_shelves
+              ).padStart(2, "0")}-${String(
+                pl.package_shelf[0].layer
+              ).padStart(2, "0")}-${String(
+                pl.package_shelf[0].column
+              ).padStart(2, "0")} `
               : "") +
-            `${intl.formatMessage({ id: "partition" })}: ${
-              pl.package_shelf &&
+            `${intl.formatMessage({ id: "partition" })}: ${pl.package_shelf &&
               pl.package_shelf.length > 0 &&
               pl.package_shelf[0].shelf
-                ? pl.package_shelf[0].shelf.partition_table
-                : ""
+              ? pl.package_shelf[0].shelf.partition_table
+              : ""
             } ` +
-            `${intl.formatMessage({ id: "shelf" })}: ${
-              pl.package_shelf &&
+            `${intl.formatMessage({ id: "shelf" })}: ${pl.package_shelf &&
               pl.package_shelf.length > 0 &&
               pl.package_shelf[0].shelf
-                ? pl.package_shelf[0].shelf.number_of_shelves
-                : ""
+              ? pl.package_shelf[0].shelf.number_of_shelves
+              : ""
             } ` +
-            `${intl.formatMessage({ id: "layer" })}: ${
-              pl.package_shelf && pl.package_shelf.length > 0
-                ? pl.package_shelf[0].layer
-                : ""
+            `${intl.formatMessage({ id: "layer" })}: ${pl.package_shelf && pl.package_shelf.length > 0
+              ? pl.package_shelf[0].layer
+              : ""
             }  ` +
-            `${intl.formatMessage({ id: "column" })}: ${
-              pl.package_shelf && pl.package_shelf.length > 0
-                ? pl.package_shelf[0].column
-                : ""
+            `${intl.formatMessage({ id: "column" })}: ${pl.package_shelf && pl.package_shelf.length > 0
+              ? pl.package_shelf[0].column
+              : ""
             } `
-          : "--";
+            : "--";
         pList[key3_2] = "--";
         pList[key3_3] = storagePlan.delivered_time
           ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(
-              storagePlan.delivered_time
-            )}`
+            storagePlan.delivered_time
+          )}`
           : "--";
         pList[key3_6] = pl.dispatched_time
           ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
             pl.dispatched_time
-            )}`
+          )}`
           : "--";
         pList[key3_4] = storagePlan.pr_number ? storagePlan.pr_number : "--";
         pList[key3_5] = storagePlan.reference_number ? storagePlan.reference_number : "--";
@@ -635,7 +749,7 @@ export const packingListDataToExcel = (
         pList[key3_6] = pl.dispatched_time
           ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(
             pl.dispatched_time
-            )}`
+          )}`
           : "--";
       }
       pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
@@ -667,13 +781,105 @@ export const packingListDataToExcel = (
   FileSaver.saveAs(
     data,
     `storage_plan_inventory (` +
-      date.getDate() +
-      "-" +
-      (date.getMonth() + 1) +
-      "-" +
-      date.getFullYear() +
-      ")" +
-      fileExtension
+    date.getDate() +
+    "-" +
+    (date.getMonth() + 1) +
+    "-" +
+    date.getFullYear() +
+    ")" +
+    fileExtension
+  );
+};
+
+export const manifestPaidDataToExcel = (
+  manifest_paid: Guide[],
+  intl: IntlShape,
+  visibleColumn: string[]
+) => {
+  let dataToExport: object[] = [];
+
+  const fromBool = (data: boolean): string => {
+    return data ? "Pagados" : "No Pagados"
+  };
+
+  manifest_paid.forEach((guide: Guide) => {
+    const oInst: { [key: string]: string } = {};
+    visibleColumn.forEach((column) => {
+      switch (column) {
+        case "waybill_id":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide.waybill_id;
+        case "tracking_number":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide.tracking_number;
+          break;
+        case "weight":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] =
+            guide.weight;
+          break;
+        case "total_declare":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide.total_declare;
+          break;
+        case "currency":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide.currency;
+          break;
+        case "shipping_cost":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide.shipping_cost;
+          break;
+        case "sale_price":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide.sale_price;
+          break;
+        case "invoice_weight":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide.invoice_weight;
+          break;
+        case "paid":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = fromBool(guide.paid);
+          break;
+        case "carrier":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide.carrier;
+          break;
+        default: {
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = guide[column];
+        }
+      }
+    });
+    dataToExport.push(oInst);
+  });
+  const date = new Date();
+
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8";
+  const fileExtension = ".xlsx";
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  ws["!cols"] = [{ wch: 20 }, { wch: 22 }, { wch: 12 }, { wch: 15 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 17 }, { wch: 15 }, { wch: 15 }];
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: col });
+    ws[cell].s = {
+      border: {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } }
+      }
+    };
+  }
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: fileType });
+  FileSaver.saveAs(
+    data,
+    `${intl.formatMessage({ id: "manifest_paid" })}` +
+    fileExtension
   );
 };
 
@@ -689,7 +895,7 @@ export const operationInstructionDataToExcel = (
       ep.output_plan.packing_lists &&
       ep.output_plan.packing_lists.forEach((pl) => {
         const l = packageShelfFormat(pl.package_shelf)
-        if(locations.find(el => el === l) === undefined) {
+        if (locations.find(el => el === l) === undefined) {
           locations.push(l)
         }
       });
@@ -705,12 +911,10 @@ export const operationInstructionDataToExcel = (
         packageShelf = packageShelfs;
       }
       if (packageShelf) {
-        return `${intl.formatMessage({ id: "partition" })}: ${
-          packageShelf.shelf?.partition_table
-        }
-      ${intl.formatMessage({ id: "shelf" })}: ${
-          packageShelf.shelf?.number_of_shelves
-        }
+        return `${intl.formatMessage({ id: "partition" })}: ${packageShelf.shelf?.partition_table
+          }
+      ${intl.formatMessage({ id: "shelf" })}: ${packageShelf.shelf?.number_of_shelves
+          }
       ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
       ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}`;
       }
@@ -725,7 +929,7 @@ export const operationInstructionDataToExcel = (
     });
     return result;
   };
-  
+
   operationInstructions.forEach((oi: OperationInstruction) => {
     const oInst: { [key: string]: string } = {};
     visibleColumn.forEach((column) => {
@@ -787,32 +991,32 @@ export const operationInstructionDataToExcel = (
   FileSaver.saveAs(
     data,
     `${intl.formatMessage({ id: "operation_instruction" })}(` +
-      date.getDate() +
-      "-" +
-      (date.getMonth() + 1) +
-      "-" +
-      date.getFullYear() +
-      ")" +
-      fileExtension
+    date.getDate() +
+    "-" +
+    (date.getMonth() + 1) +
+    "-" +
+    date.getFullYear() +
+    ")" +
+    fileExtension
   );
 };
 
 export const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
   const pls = packingLists.filter((pl) => (pl.package_shelf && (pl.package_shelf.length > 0)));
-  
+
   const uniqueCombinationSet = new Set<string>();
   const uniqueArray: PackingList[] = [];
 
   for (const pl of pls) {
-      const combinationKey = `${Number((pl.package_shelf as PackageShelf[])[0].shelf?.partition_table)}_${Number((pl.package_shelf as PackageShelf[])[0].shelf?.number_of_shelves)}_${(pl.package_shelf as PackageShelf[])[0].layer}_${(pl.package_shelf as PackageShelf[])[0].column}`;
+    const combinationKey = `${Number((pl.package_shelf as PackageShelf[])[0].shelf?.partition_table)}_${Number((pl.package_shelf as PackageShelf[])[0].shelf?.number_of_shelves)}_${(pl.package_shelf as PackageShelf[])[0].layer}_${(pl.package_shelf as PackageShelf[])[0].column}`;
 
-      if (!uniqueCombinationSet.has(combinationKey)) {
-          uniqueCombinationSet.add(combinationKey);
+    if (!uniqueCombinationSet.has(combinationKey)) {
+      uniqueCombinationSet.add(combinationKey);
 
-          uniqueArray.push(pl);
-      }
+      uniqueArray.push(pl);
+    }
   }
-  
+
   return uniqueArray;
 };
 
@@ -841,13 +1045,11 @@ export const exitPlanDataToExcel = (
   ): string => {
     if (packageShelfs && packageShelfs.length > 0) {
       const packageShelf: PackageShelf = packageShelfs[0];
-      return `${(warehouse && warehouse.code) ? (warehouse.code + '-' + String(packageShelf.shelf?.partition_table).padStart(2, "0") + '-' + String(packageShelf.shelf?.number_of_shelves).padStart(2, "0") + '-' + String(packageShelf.layer).padStart(2, "0") + '-' + String(packageShelf.column).padStart(2, "0")) : ''} 
-${intl.formatMessage({ id: "partition" })}: ${
-  packageShelf.shelf?.partition_table
-} 
-${intl.formatMessage({ id: "shelf" })}: ${
-  packageShelf.shelf?.number_of_shelves
-} 
+      return `${(warehouse && warehouse.code) ? (warehouse.code + '-' + String(packageShelf.shelf?.partition_table).padStart(2, "0") + '-' + String(packageShelf.shelf?.number_of_shelves).padStart(2, "0") + '-' + String(packageShelf.layer).padStart(2, "0") + '-' + String(packageShelf.column).padStart(2, "0")) : ''}
+${intl.formatMessage({ id: "partition" })}: ${packageShelf.shelf?.partition_table
+        }
+${intl.formatMessage({ id: "shelf" })}: ${packageShelf.shelf?.number_of_shelves
+        } 
 ${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer} 
 ${intl.formatMessage({ id: "column" })}: ${packageShelf.column} 
 \n`;
@@ -937,12 +1139,12 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
   FileSaver.saveAs(
     data,
     `${intl.formatMessage({ id: "exitPlan" })}(` +
-      date.getDate() +
-      "-" +
-      (date.getMonth() + 1) +
-      "-" +
-      date.getFullYear() +
-      ")" +
-      fileExtension
+    date.getDate() +
+    "-" +
+    (date.getMonth() + 1) +
+    "-" +
+    date.getFullYear() +
+    ")" +
+    fileExtension
   );
 };
