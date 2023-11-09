@@ -13,6 +13,8 @@ import { OperationInstruction } from "@/types/operation_instructionerege1992";
 import { User } from "@/types/usererege1992";
 import { Warehouse } from "@/types/warehouseerege1992";
 import Head from "next/head";
+import { useEffect, useState } from 'react';
+import { Loading } from '../../../../../src/app/components/common/Loading';
 
 interface Props {
   types: State[];
@@ -26,11 +28,26 @@ interface Props {
 const Update = ({
   types,
   warehouses,
-  exitPlans,
   users,
   id,
-  operationInstruction,
 }: Props) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [exitPlans, setExitPlans] = useState<ExitPlan[]>([])
+  const [operationInstruction, setOperationInstruction] = useState<OperationInstruction | undefined>(undefined)
+
+  useEffect(() => {
+    setup()
+  },[])
+
+  const setup = async () => {
+    setLoading(true);
+    const ePlans = await getCleanExitPlans();
+    setExitPlans(ePlans ? ePlans : []);
+    const oi = await getOperationInstructionsById(Number(id));
+    setOperationInstruction(oi);
+    setLoading(false);
+  }
+
   return (
     <Layout>
       <Head>
@@ -38,15 +55,17 @@ const Update = ({
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
-        <OperationInstructionFormBody
-          exitPlans={exitPlans}
-          types={types}
-          users={users}
-          warehouses={warehouses}
-          isModify
-          id={id}
-          operationInstruction={operationInstruction}
-        />
+        <Loading loading={loading}>
+          <OperationInstructionFormBody
+            exitPlans={exitPlans}
+            types={types}
+            users={users}
+            warehouses={warehouses}
+            isModify
+            id={id}
+            operationInstruction={operationInstruction}
+          />
+        </Loading>
       </ProtectedRoute>
     </Layout>
   );
@@ -55,10 +74,10 @@ const Update = ({
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
   const operationInstructionTypes = await getOperationInstructionType(context);
-  const exitPlans = await getCleanExitPlans(context);
+  //const exitPlans = await getCleanExitPlans(context);
   const warehouses = await getWhs(context);
   const users = await getUsers(context);
-  const operationInstruction = await getOperationInstructionsById(id);
+  //const operationInstruction = await getOperationInstructionsById(id);
   const types: State[] = [];
   for (const [key, value] of Object.entries(operationInstructionTypes)) {
     if (key !== "status") {
@@ -70,10 +89,8 @@ export async function getServerSideProps(context: any) {
     props: {
       types,
       warehouses,
-      exitPlans,
       users,
       id,
-      operationInstruction,
     },
   };
 }
