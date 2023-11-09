@@ -158,6 +158,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         sortable: false,
       },
       {
+        name: intl.formatMessage({ id: "outgoing_order" }),
+        uid: "outgoing_order",
+        sortable: false,
+      },
+      {
         name: intl.formatMessage({ id: "dispatched_boxes" }),
         uid: "dispatched_boxes",
         sortable: false,
@@ -228,6 +233,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "number_of_boxes_stored" }),
         uid: "number_of_boxes_stored",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "outgoing_order" }),
+        uid: "outgoing_order",
         sortable: false,
       },
       {
@@ -486,6 +496,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         case "number_of_boxes_stored": return (
           storageP.packing_list && storageP.packing_list.length > 0 ? (storageP.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) : '0'
         ) - storageP.packing_list.filter((el: any) => el.dispatched).length;
+        case "outgoing_order":
+          return storageP.packing_list ? (storageP.packing_list.filter((el: any) => el.output_plan_delivered_number).length) : 0;
         case "dispatched_boxes":
           return storageP.packing_list.filter((el: any) => el.dispatched).length;
         case "location":
@@ -587,11 +599,21 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         if (tab === 'stocked') {
           if (!visibleColumns.has("dispatched_boxes")) {
             items.add("dispatched_boxes");
+          }
+          if (!visibleColumns.has("outgoing_order")) {
+            items.add("outgoing_order");
+          }
+          if (!visibleColumns.has("dispatched_boxes") || !visibleColumns.has("outgoing_order")) {
             setVisibleColumns(items);
           }
         } else {
           if (visibleColumns.has("dispatched_boxes")) {
             items.delete("dispatched_boxes");
+          }
+          if (visibleColumns.has("outgoing_order")) {
+            items.delete("outgoing_order");
+          }
+          if (visibleColumns.has("dispatched_boxes") || visibleColumns.has("outgoing_order")) {
             setVisibleColumns(items);
           }
         }
@@ -912,6 +934,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       if (tab === 'stocked') {
         let items: Set<React.Key> = new Set(visibleColumns);
         items.add("dispatched_boxes");
+        items.add("outgoing_order");
         setVisibleColumns(items);
       }
     }

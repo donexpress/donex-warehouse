@@ -324,6 +324,7 @@ export const storagePlanDataToExcel = (
   const key4: string = intl.formatMessage({ id: "storage" });
   const key5: string = intl.formatMessage({ id: "number_of_boxes_entered" });
   const key6: string = intl.formatMessage({ id: "number_of_boxes_stored" });
+  const key6_0: string = intl.formatMessage({ id: "outgoing_order" });
   const key6_1: string = intl.formatMessage({ id: "location" });
   const key7: string = intl.formatMessage({ id: "evidence" });
   const key8: string = intl.formatMessage({ id: "reference_number" });
@@ -363,6 +364,12 @@ export const storagePlanDataToExcel = (
                 pl.package_shelf && pl.package_shelf.length > 0
             )
             .length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString()
+          : "0";
+    }
+    if (selection === "all" || selection.has("outgoing_order")) {
+      sPlan[key6_0] =
+        sp.packing_list && sp.packing_list.length > 0
+          ? sp.packing_list.filter((pl: PackingList) => pl.output_plan_delivered_number).length.toString()
           : "0";
     }
     if (selection === "all" || selection.has("dispatched_boxes")) {
@@ -661,6 +668,7 @@ export const packingListDataToExcel = (
     const key2: string = intl.formatMessage({ id: "expansion_box_number" });
     const key3: string = intl.formatMessage({ id: "transfer_order_number" });
 
+    const key3_0: string = intl.formatMessage({ id: "outgoing_order" });
     const key3_1: string = intl.formatMessage({ id: "location" });
     const key3_2: string = intl.formatMessage({ id: "storage_time" });
     const key3_3: string = intl.formatMessage({ id: "delivery_time" });
@@ -686,9 +694,12 @@ export const packingListDataToExcel = (
       pList[key1] = pl.box_number ? pl.box_number : "--";
       pList[key2] = pl.case_number ? pl.case_number : "--";
       if (type === "fl") {
+        if (storagePlan.state === "stocked") {
+          pList[key3_0] = pl.output_plan_delivered_number ? pl.output_plan_delivered_number : "--";
+        }
         pList[key3_1] =
-          pl.package_shelf && pl.package_shelf.length > 0
-            ? (storagePlan.warehouse
+        pl.package_shelf && pl.package_shelf.length > 0
+          ? (storagePlan.warehouse
               ? `${storagePlan.warehouse.code}-${String(
                 pl.package_shelf[0].shelf?.partition_table
               ).padStart(2, "0")}-${String(

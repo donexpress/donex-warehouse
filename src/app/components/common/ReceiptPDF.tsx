@@ -150,6 +150,11 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
               <Text style={[styles.headerCell, styles.majorCell]}>{intl.formatMessage({ id: 'box_number' })}</Text>
               <Text style={[styles.headerCell, styles.majorCell]}>{intl.formatMessage({ id: 'expansion_box_number' })}</Text>
               <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'location' })}</Text>
+              {
+                storagePlan && storagePlan.state === 'stocked' && (
+                  <Text style={[styles.headerCell, styles.majorCell]}>{intl.formatMessage({ id: 'outgoing_order' })}</Text>
+                )
+              }
               <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'storage_time' })}</Text>
               <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'delivery_time' })}</Text>
               <Text style={[styles.headerCell, styles.minorCell]}>{intl.formatMessage({ id: 'dispatch_date' })}</Text>
@@ -160,6 +165,11 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
                   <Text style={[styles.tableCell, styles.majorCell]}>{ pl.box_number }</Text>
                   <Text style={[styles.tableCell, styles.majorCell]}>{ pl.case_number }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ packageShelfFormat(pl.package_shelf) }</Text>
+                  {
+                    storagePlan && storagePlan.state === 'stocked' && (
+                      <Text style={[styles.tableCell, styles.majorCell]}>{ pl.output_plan_delivered_number ? pl.output_plan_delivered_number : '--' }</Text>
+                    )
+                  }
                   <Text style={[styles.tableCell, styles.minorCell]}>{ '--' }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ storagePlan.delivered_time ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '' }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ pl.dispatched_time ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(pl.dispatched_time)}` : '' }</Text>

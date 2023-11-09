@@ -97,6 +97,7 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     const key4: string = intl.formatMessage({ id: 'storage' });
     const key5: string = intl.formatMessage({ id: 'number_of_boxes_entered' });
     const key6: string = intl.formatMessage({ id: 'number_of_boxes_stored' });
+    const key6_0: string = intl.formatMessage({ id: 'outgoing_order' });
     const key6_1: string = intl.formatMessage({ id: "location" });
     const key7: string = intl.formatMessage({ id: 'evidence' });
     const key8: string = intl.formatMessage({ id: 'reference_number' });
@@ -125,6 +126,9 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     }
     if (selection === "all" || selection.has("number_of_boxes_stored")) {
         titles.push(key6);
+    }
+    if (selection === "all" || selection.has("outgoing_order")) {
+        titles.push(key6_0);
     }
     if (selection === "all" || selection.has("dispatched_boxes")) {
         titles.push(key11_1);
@@ -214,6 +218,15 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
         if (selection === "all" || selection.has("number_of_boxes_stored")) {
           const keyWord: string = "number_of_boxes_stored";
           const value: string = sp.packing_list && sp.packing_list.length > 0 ? ((sp.packing_list.filter((pl: PackingList) => pl.package_shelf && pl.package_shelf.length > 0).length) - (sp.packing_list.filter((pl: PackingList) => pl.dispatched).length)).toString() : '0';
+          values[index][i] = {
+            keyWord,
+            value
+          };
+          i++;
+        }
+        if (selection === "all" || selection.has("outgoing_order")) {
+          const keyWord: string = "outgoing_order";
+          const value: string = sp.packing_list && sp.packing_list.length > 0 ? (sp.packing_list.filter((pl: PackingList) => pl.output_plan_delivered_number).length).toString() : '0';
           values[index][i] = {
             keyWord,
             value
