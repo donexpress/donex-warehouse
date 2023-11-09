@@ -10,6 +10,8 @@ import "../../../../../src/styles/wms/exit.plan.config.scss";
 import { isWMS } from "@/helperserege1992";
 import { getSelf, getStaffById } from "@/services/api.stafferege1992";
 import { Staff } from "@/types/stafferege1992";
+import { useEffect, useState } from 'react';
+import { Loading } from '../../../../../src/app/components/common/Loading';
 
 interface Props {
   operationInstruction: OperationInstruction;
@@ -17,7 +19,26 @@ interface Props {
   user: User
 }
 
-const Config = ({ id, operationInstruction, user }: Props) => {
+const Config = ({ id }: Props) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [operationInstruction, setOperationInstruction] = useState<OperationInstruction | undefined>(undefined);
+  const [user, setUser] = useState<User | Staff | null>(null);
+
+  useEffect(() => {
+    setup()
+  },[])
+
+  const setup = async () => {
+    setLoading(true);
+    const oi = await getOperationInstructionsById(Number(id));
+    setOperationInstruction(oi);
+    if (oi) {
+      const userData = await getSelf();
+      setUser(userData);
+    }
+    setLoading(false);
+  }
+
   return (
     <ProtectedRoute>
       <Layout>
@@ -25,10 +46,12 @@ const Config = ({ id, operationInstruction, user }: Props) => {
           <title>Don Express Warehouse</title>
           <link rel="icon" href="/icon_favicon.png" />
         </Head>
-        <ExitPlanAppendix
-          owner={user}
-          operationInstruction={operationInstruction}
-        />
+        <Loading loading={loading}>
+          <ExitPlanAppendix
+            owner={user as User | Staff}
+            operationInstruction={operationInstruction}
+          />
+        </Loading>
       </Layout>
     </ProtectedRoute>
   );
@@ -36,9 +59,9 @@ const Config = ({ id, operationInstruction, user }: Props) => {
 
 export async function getServerSideProps(context: any) {
   const { id } = context.params;
-  const operationInstruction: OperationInstruction = await getOperationInstructionsById(id, context);
-  let user: User | Staff | null = null
-  user = await getSelf(context)
+  //const operationInstruction: OperationInstruction = await getOperationInstructionsById(id, context);
+  //let user: User | Staff | null = null
+  //user = await getSelf(context)
 
   // if(isWMS()) {
   // } else {
@@ -47,8 +70,6 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      operationInstruction,
-      user,
       id,
     },
   };

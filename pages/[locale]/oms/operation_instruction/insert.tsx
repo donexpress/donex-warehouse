@@ -9,6 +9,8 @@ import { ExitPlan, State } from "@/types/exit_planerege1992";
 import { User } from "@/types/usererege1992";
 import { Warehouse } from "@/types/warehouseerege1992";
 import Head from "next/head";
+import { useEffect, useState } from 'react';
+import { Loading } from '../../../../src/app/components/common/Loading';
 
 interface Props {
     types: State[],
@@ -17,7 +19,21 @@ interface Props {
     users: User[]
 }
 
-const Insert = ({types, warehouses, exitPlans, users}: Props) => {
+const Insert = ({types, warehouses, users}: Props) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [exitPlans, setExitPlans] = useState<ExitPlan[]>([])
+
+  useEffect(() => {
+    setup()
+  },[])
+
+  const setup = async () => {
+    setLoading(true);
+    const ePlans = await getCleanExitPlans();
+    setExitPlans(ePlans ? ePlans : []);
+    setLoading(false);
+  }
+
   return (
     <Layout>
       <Head>
@@ -25,7 +41,9 @@ const Insert = ({types, warehouses, exitPlans, users}: Props) => {
         <link rel="icon" href="/icon_favicon.png" />
       </Head>
       <ProtectedRoute>
-        <OperationInstructionFormBody types={types} warehouses={warehouses} exitPlans={exitPlans} users={users}/>
+        <Loading loading={loading}>
+          <OperationInstructionFormBody types={types} warehouses={warehouses} exitPlans={exitPlans} users={users}/>
+        </Loading>
       </ProtectedRoute>
     </Layout>
   );
@@ -33,7 +51,6 @@ const Insert = ({types, warehouses, exitPlans, users}: Props) => {
 
 export async function getServerSideProps(context: any) {
   const operationInstructionTypes = await getOperationInstructionType(context);
-  const exitPlans = await getCleanExitPlans(context)
   const warehouses = await getWhs(context)
   const users = await getUsers(context)
   const types: State[] = [];
@@ -47,7 +64,6 @@ export async function getServerSideProps(context: any) {
     props: {
       types,
       warehouses,
-      exitPlans,
       users
     },
   };
