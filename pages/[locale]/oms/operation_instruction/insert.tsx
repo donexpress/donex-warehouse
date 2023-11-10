@@ -11,15 +11,18 @@ import { Warehouse } from "@/types/warehouseerege1992";
 import Head from "next/head";
 import { useEffect, useState } from 'react';
 import { Loading } from '../../../../src/app/components/common/Loading';
+import { getSelf } from "@/services/api.stafferege1992";
+import { isOMS } from "@/helperserege1992";
 
 interface Props {
     types: State[],
     warehouses: Warehouse[],
     exitPlans: ExitPlan[],
-    users: User[]
+    users: User[],
+    userOwner: User,
 }
 
-const Insert = ({types, warehouses, users}: Props) => {
+const Insert = ({types, warehouses, users, userOwner}: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [exitPlans, setExitPlans] = useState<ExitPlan[]>([])
 
@@ -42,7 +45,7 @@ const Insert = ({types, warehouses, users}: Props) => {
       </Head>
       <ProtectedRoute>
         <Loading loading={loading}>
-          <OperationInstructionFormBody types={types} warehouses={warehouses} exitPlans={exitPlans} users={users}/>
+          <OperationInstructionFormBody types={types} warehouses={warehouses} exitPlans={exitPlans} users={users} userOwner={userOwner}/>
         </Loading>
       </ProtectedRoute>
     </Layout>
@@ -52,7 +55,12 @@ const Insert = ({types, warehouses, users}: Props) => {
 export async function getServerSideProps(context: any) {
   const operationInstructionTypes = await getOperationInstructionType(context);
   const warehouses = await getWhs(context)
-  const users = await getUsers(context)
+  //const users = await getUsers(context)
+  let users: User[] = [];
+  if (isOMS(context)) {
+    const cookie = JSON.parse(context.req.cookies.profileOMS)
+    users.push(cookie)
+  }
   const types: State[] = [];
   for (const [key, value] of Object.entries(operationInstructionTypes)) {
     if (key !== "status") {
@@ -60,11 +68,13 @@ export async function getServerSideProps(context: any) {
       types.push(value);
     }
   }
+  const userOwner = await getSelf(context);
   return {
     props: {
       types,
       warehouses,
-      users
+      users,
+      userOwner,
     },
   };
 }

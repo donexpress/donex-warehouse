@@ -1,7 +1,7 @@
 import ProtectedRoute from "@/app/components/common/ProtectedRouteerege1992";
 import OperationInstructionFormBody from "@/app/components/wms/operationInstruction/OperationInstructionFormBodyerege1992";
 import Layout from "@/app/layouterege1992";
-import { getCleanExitPlans, getExitPlans } from "@/services/api.exit_planerege1992";
+import { getCleanExitPlans, getExitPlans, getExitPlansById } from "@/services/api.exit_planerege1992";
 import { getOperationInstructionType, getOperationInstructionsById } from "@/services/api.operation_instructionerege1992";
 import { getUsers } from "@/services/api.userserege1992";
 import { getWhs } from "@/services/api.wherege1992";
@@ -33,10 +33,12 @@ const Show = ({types, warehouses, users, id}: Props) => {
 
   const setup = async () => {
     setLoading(true);
-    const ePlans = await getCleanExitPlans();
-    setExitPlans(ePlans ? ePlans : []);
+    /* const ePlans = await getCleanExitPlans();
+    setExitPlans(ePlans ? ePlans : []); */
     const oi = await getOperationInstructionsById(Number(id));
     setOperationInstruction(oi);
+    const oPlan = await getExitPlansById(Number(oi.output_plan_id));
+    setExitPlans(oPlan ? [oPlan] : []);
     setLoading(false);
   }
 

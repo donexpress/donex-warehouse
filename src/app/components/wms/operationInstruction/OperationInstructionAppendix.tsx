@@ -172,7 +172,7 @@ const OperationInstructionAppendix = ({
               <span style={{cursor: 'pointer'}} className="text-center" onClick={() => handleVisualice(appendix.id ? appendix.id : 1)}>{appendix.name}</span>
             </div>
             <div className="elements-center">
-              <span className="text-center">{appendix.user?.nickname}</span>
+              <span className="text-center">{appendix.user?.username}</span>
             </div>
             <div className="elements-center">
               <span className="text-center">
