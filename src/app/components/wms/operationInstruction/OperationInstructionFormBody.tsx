@@ -16,11 +16,15 @@ import {
 import { useRouter } from "next/router";
 import { User } from "@/types/usererege1992";
 import ExitPlanAppendix from "../exitPlan/ExitPlanAppendix";
-import { isOMS } from "@/helperserege1992";
+import { showMsg, isWMS, isOMS } from "@/helperserege1992";
 import LocationTable from "../../common/LocationTable";
 import "../../../../styles/wms/user.form.scss";
 import OperationInstructionAppendix from "./OperationInstructionAppendix";
 import { ParsedUrlQueryInput } from 'querystring';
+import ExitPlanAppendixFromOP from '../exitPlan/ExitPlanAppendixFromOP';
+import { AppendixFromOPBody, Appendix } from "../../../../types/appendix";
+import { createAppendix } from "@/services/api.appendixerege1992";
+import { Staff } from "@/types/stafferege1992";
 
 interface Props {
   types: State[];
@@ -31,6 +35,7 @@ interface Props {
   exitPlans: ExitPlan[];
   operationInstruction?: OperationInstruction;
   users: User[];
+  userOwner?: User | Staff;
 }
 
 const OperationInstructionFormBody = ({
@@ -42,11 +47,12 @@ const OperationInstructionFormBody = ({
   exitPlans,
   operationInstruction,
   users,
+  userOwner,
 }: Props) => {
   const intl = useIntl();
   const router = useRouter();
   const { locale, exit_plan_id } = router.query;
-  const [user, setUser] = useState<User| undefined>(users.find(el => el.id === operationInstruction?.user_id))
+  const [user, setUser] = useState<User| undefined>((isOMS() && !id) ? users[0] : (users.find(el => el.id === operationInstruction?.user_id)))
   const [oI, setOI] = useState<OperationInstruction| undefined>(operationInstruction)
   const [filterType, setFilterType] = useState<{
     filter: ExitPlan | Warehouse | User | undefined;
@@ -55,6 +61,7 @@ const OperationInstructionFormBody = ({
   const [isFromEPConfig, setIsFromEPConfig] = useState<boolean>(false);
   const [stateEP, setStateEP] = useState<string>('');
   const [ePId, setEPId] = useState<string>('');
+  const [appendixes, setAppendixes] = useState<AppendixFromOPBody[]>([]);
 
   useEffect(() => {
     const exitPId = router.query.exit_plan_id;
@@ -83,14 +90,16 @@ const OperationInstructionFormBody = ({
       id && operationInstruction
         ? getPositions(operationInstruction.operation_instruction_type)
         : [],
+    // @ts-ignore
     output_plan_id:
       id || exit_plan_id
         ? id
           ? Number(operationInstruction?.output_plan_id)
           : Number(exit_plan_id)
-        : 0,
+        : null,
     remark: id && operationInstruction ? operationInstruction.remark : "",
     type: id ? "" : "",
+    // @ts-ignore
     user_id:
       id || exit_plan_id
         ? id
@@ -98,7 +107,8 @@ const OperationInstructionFormBody = ({
           : Number(
               exitPlans.find((el) => el.id === Number(exit_plan_id))?.user_id
             )
-        : 0,
+        : ((isOMS() && !id) ? users[0].id : null),
+    // @ts-ignore
     warehouse_id:
       id || exit_plan_id
         ? id
@@ -107,7 +117,34 @@ const OperationInstructionFormBody = ({
               exitPlans.find((el) => el.id === Number(exit_plan_id))
                 ?.warehouse_id
             )
-        : 0,
+        : null,
+  };
+
+  const createAppendixes = async (operationInstructionId: number) => {
+    if (userOwner) {
+      try {
+        const promises = appendixes.map((el) => {
+          const appdx: Appendix = {
+            name: el.name,
+            user_id: userOwner.id,
+            operation_instruction_id: operationInstructionId,
+            function: el.function,
+            url: el.url,
+            is_owner_admin: isWMS() ? true : false
+          };
+          return createAppendix(appdx);
+        }
+        );
+        await Promise.all(promises);
+        showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+          type: "success",
+        });
+      } catch (e) {
+        showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+          type: "error",
+        });
+      }
+    }
   };
 
   const handleSubmit = async (values: OperationInstruction) => {
@@ -123,11 +160,32 @@ const OperationInstructionFormBody = ({
     });
     values.operation_instruction_type = instruction_type;
     if (isModify) {
-      await updateOperationInstruction(id ? id : -1, values);
+      const r = await updateOperationInstruction(id ? id : -1, values);
+      if (r.status >= 200 && r.status <= 299) {
+        showMsg(intl.formatMessage({ id: "successfullyActionMsg" }), {
+          type: "success",
+        });
+      } else {
+        showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+          type: "error",
+        });
+      }
     } else {
       const r = await createOperationInstruction(values);
-      setOI(r)
-      setUser(users.find(el => el.id === values.user_id))
+      if (r.status >= 200 && r.status <= 299) {
+        setOI(r.data)
+        setUser(users.find(el => el.id === values.user_id))
+        if (appendixes.length > 0) {
+          await createAppendixes(r.data.id);
+        } else {
+          const message = intl.formatMessage({ id: "successfullyMsg" });
+          showMsg(message, { type: "success" });
+        }
+      } else {
+        showMsg(intl.formatMessage({ id: "unknownStatusErrorMsg" }), {
+          type: "error",
+        });
+      }
     }
     cancelSend();
   };
@@ -384,7 +442,7 @@ const OperationInstructionFormBody = ({
                     getValueChangeFn={changeValueUser}
                     isMulti={false}
                     disabled={
-                      isFromDetails || exit_plan_id !== undefined || isModify
+                      isFromDetails || exit_plan_id !== undefined || isModify || isOMS()
                     }
                     required
                   />
@@ -397,7 +455,7 @@ const OperationInstructionFormBody = ({
                       id: "number_delivery",
                     })}
                     customClass="custom-input"
-                    disabled={isFromDetails || isModify}
+                    disabled={isFromDetails}
                   />
                 </div>
                 <div className="w-full sm:w-[49%]">
@@ -456,8 +514,13 @@ const OperationInstructionFormBody = ({
         </Formik>
       </div>
       {
-        !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
+        !!id && !(isOMS() && isFromEPConfig && stateEP!== "pending") && (
           <OperationInstructionAppendix owner={user} operationInstruction={oI} />
+        )
+      }
+      {
+        !id && userOwner && (
+          <ExitPlanAppendixFromOP owner={userOwner} updateAppendix={setAppendixes}></ExitPlanAppendixFromOP>
         )
       }
       {isFromDetails && !(isOMS() && isFromEPConfig && stateEP!== "pending") && (

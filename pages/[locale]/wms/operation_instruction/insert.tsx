@@ -7,19 +7,22 @@ import { getUsers } from "@/services/api.userserege1992";
 import { getWhs } from "@/services/api.wherege1992";
 import { ExitPlan, State } from "@/types/exit_planerege1992";
 import { User } from "@/types/usererege1992";
+import { Staff } from "@/types/stafferege1992";
 import { Warehouse } from "@/types/warehouseerege1992";
 import Head from "next/head";
 import { useEffect, useState } from 'react';
 import { Loading } from '../../../../src/app/components/common/Loading';
+import { getSelf } from "@/services/api.stafferege1992";
 
 interface Props {
     types: State[],
     warehouses: Warehouse[],
     exitPlans: ExitPlan[],
-    users: User[]
+    users: User[],
+    userOwner: User | Staff,
 }
 
-const Insert = ({types, warehouses, users}: Props) => {
+const Insert = ({types, warehouses, users, userOwner}: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [exitPlans, setExitPlans] = useState<ExitPlan[]>([])
 
@@ -42,7 +45,7 @@ const Insert = ({types, warehouses, users}: Props) => {
       </Head>
       <ProtectedRoute>
         <Loading loading={loading}>
-          <OperationInstructionFormBody types={types} warehouses={warehouses} exitPlans={exitPlans} users={users}/>
+          <OperationInstructionFormBody types={types} warehouses={warehouses} exitPlans={exitPlans} users={users} userOwner={userOwner}/>
         </Loading>
       </ProtectedRoute>
     </Layout>
@@ -60,11 +63,13 @@ export async function getServerSideProps(context: any) {
       types.push(value);
     }
   }
+  const userOwner = await getSelf(context);
   return {
     props: {
       types,
       warehouses,
-      users
+      users,
+      userOwner,
     },
   };
 }
