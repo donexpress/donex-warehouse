@@ -2,6 +2,7 @@ import { getHeaders } from "@/helperserege1992";
 import { operationInstructionPath } from "../backend";
 import axios from "axios";
 import { GetServerSidePropsContext } from "next";
+import { Response } from '../types/index';
 
 export const getOperationInstructionStates = async () => {
     const path = operationInstructionPath() + `/states`;
@@ -57,12 +58,12 @@ export const countOperationInstruction = async (exit_plan_id?: number, query?: s
   }
 }
 
-export const createOperationInstruction = async (data: any, context?: GetServerSidePropsContext) => {
+export const createOperationInstruction = async (data: any, context?: GetServerSidePropsContext): Promise<Response> => {
   const path = operationInstructionPath()
   try {
     const response = await axios.post(path, data, getHeaders(context));
     if(response.status && response.status >=200 && response.status <= 299) {
-      return {...response.data, status: response.status}
+      return {data: response.data, status: response.status}
     }
     return {status: response.status ? response.status : 0}
   } catch(error: any) {
