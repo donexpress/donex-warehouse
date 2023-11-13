@@ -1102,7 +1102,7 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
           break;
         case "customer_order_number":
           // @ts-ignore
-          oInst[intl.formatMessage({ id: column })] = getCustomerOrderNumber(oi);
+          oInst[intl.formatMessage({ id: column })] = oi.client_box_number ? oi.client_box_number : "";
           break;
         case "updated_at":
         case "created_at":

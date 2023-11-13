@@ -40,6 +40,7 @@ export type ExitPlan = {
   }
   address_ref?: State;
   reference_number: string | null
+  client_box_number?: string;
   relabel?: boolean | null
 };
 
