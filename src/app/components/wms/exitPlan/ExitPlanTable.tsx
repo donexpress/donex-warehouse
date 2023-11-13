@@ -512,7 +512,10 @@ const ExitPlanTable = () => {
           <span>{cellValue}</span>
         );
       case "customer_order_number":
-        return <span>{getCustomerOrderNumber(user)}</span>;
+        return (user.client_box_number && (user.client_box_number !== "")) ? 
+        (<CopyColumnToClipboard value={user.client_box_number} />) 
+        : 
+        (<span></span>);
       case "location":
         return (
           <span
