@@ -205,7 +205,7 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                   case "customer_order_number":
                     return (
                       <Text key={index} style={styles.tableCell}>
-                        {getCustomerOrderNumber(oi)}
+                        {oi.client_box_number}
                       </Text>
                     );
                   case "destination": {
