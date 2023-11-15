@@ -15,6 +15,7 @@ import {
   getLanguage,
 } from "@/helpers/utilserege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
+import { PackingList } from "@/types/storage_planerege1992";
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
@@ -79,6 +80,9 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     marginBottom: 10,
   },
+  locationCell: {
+    marginBottom: 7,
+  },
 });
 
 interface Props {
@@ -129,6 +133,46 @@ const ExportTable = ({ intl, columns, data }: Props) => {
     }
     return "";
   };
+
+  const getPLUnique = (packingLists: PackingList[]): PackingList[] => {
+    const pls = packingLists.filter(
+      (pl) => pl.package_shelf
+    );
+
+    const uniqueCombinationSet = new Set<string>();
+    const uniqueArray: PackingList[] = [];
+
+    for (const pl of pls) {
+      if (pl.package_shelf) {
+        let packageShelf: PackageShelf | null = null;
+        if (pl.package_shelf.length > 0) {
+          packageShelf = pl.package_shelf[0];
+        } else {
+          // @ts-ignore
+          packageShelf = pl.package_shelf;
+        }
+
+        if (packageShelf) {
+          const combinationKey = `${Number(
+            packageShelf.shelf?.partition_table
+          )}_${Number(
+            packageShelf.shelf?.number_of_shelves
+          )}_${packageShelf.layer}_${
+            packageShelf.column
+          }`;
+    
+          if (!uniqueCombinationSet.has(combinationKey)) {
+            uniqueCombinationSet.add(combinationKey);
+    
+            uniqueArray.push(pl);
+          }
+        }
+      }
+    }
+
+    return uniqueArray;
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page} orientation="landscape">
@@ -175,9 +219,19 @@ const ExportTable = ({ intl, columns, data }: Props) => {
                     );
                   case "location":
                     return (
-                      <Text key={index} style={styles.tableCell}>
-                        {getLocation(oi)}
-                      </Text>
+                      <View key={index} style={styles.tableCell}>
+                        {getPLUnique(
+                          (oi.output_plan && oi.output_plan.packing_lists && (oi.output_plan.packing_lists.length > 0)) ? oi.output_plan.packing_lists : []
+                        ).map((pl, plIndex) =>
+                          pl.package_shelf ? (
+                            <Text key={plIndex} style={styles.locationCell}>
+                              {packageShelfFormat(pl.package_shelf)}
+                            </Text>
+                          ) : (
+                            ""
+                          )
+                        )}
+                      </View>
                     );
                   case "updated_at":
                   case "created_at":
