@@ -911,10 +911,10 @@ export const operationInstructionDataToExcel = (
         packageShelf = packageShelfs;
       }
       if (packageShelf) {
-        return `${intl.formatMessage({ id: "partition" })}: ${packageShelf.shelf?.partition_table}
-${intl.formatMessage({ id: "shelf" })}: ${packageShelf.shelf?.number_of_shelves}
-${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer}
-${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
+        return `${intl.formatMessage({ id: "partition" })}: ${packageShelf.shelf?.partition_table} 
+${intl.formatMessage({ id: "shelf" })}: ${packageShelf.shelf?.number_of_shelves} 
+${intl.formatMessage({ id: "layer" })}: ${packageShelf.layer} 
+${intl.formatMessage({ id: "column" })}: ${packageShelf.column} 
 `;
       }
     }
