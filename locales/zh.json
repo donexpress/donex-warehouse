@@ -195,6 +195,7 @@
   "stocked_state": "已入库",
   "cancelled_state": "已取消",
   "loading_items": "正在加載項目...",
+  "wait_please_loading_items": "請稍候，您的訂單正在加載中...",
 
   "box_number": "箱号",
   "case_number": "转单号",

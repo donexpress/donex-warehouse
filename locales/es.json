@@ -195,7 +195,8 @@
   "stocked_state": "Abastecido",
   "cancelled_state": "Cancelado",
   "loading_items": "Cargando elementos...",
-
+  "wait_please_loading_items": "Espere por favor, se esta cargando su pedido...",
+  
   "box_number": "Número de caja",
   "case_number": "Número de orden",
   "client_weight": "Peso del cliente",
