@@ -78,16 +78,13 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         }
       } else if (response !== undefined && (response.status === 0 || response.status === 503)) {
         setLoading(false);
-        console.log('dentro del if', response)
         let message = intl.formatMessage({ id: "wait_please_loading_items" });
         showMsg(message, { type: "success" });
       } else {
-        console.log('error', response)
         setLoading(false);
         let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
         showMsg(message, { type: "error" });
       }
-      console.log('fuera', response)
     }
   }
 
