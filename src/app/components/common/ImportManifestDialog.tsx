@@ -76,15 +76,18 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         } else if (where === "supplier" && response.data.manifest_paid.length > 0) {
           closeManifestDialog(response.data.manifest_paid);
         }
-      } else if (response !== undefined && (response.status === 0 || response.status === 0)) {
+      } else if (response !== undefined && (response.status === 0 || response.status === 503)) {
         setLoading(false);
+        console.log('dentro del if', response)
         let message = intl.formatMessage({ id: "wait_please_loading_items" });
         showMsg(message, { type: "success" });
       } else {
+        console.log('error', response)
         setLoading(false);
         let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
         showMsg(message, { type: "error" });
       }
+      console.log('fuera', response)
     }
   }
 
