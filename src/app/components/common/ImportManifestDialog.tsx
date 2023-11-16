@@ -76,7 +76,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         } else if (where === "supplier" && response.data.manifest_paid.length > 0) {
           closeManifestDialog(response.data.manifest_paid);
         }
-      } if (response !== undefined && (response.status === 0 || response.status === 0)) {
+      } else if (response !== undefined && (response.status === 0 || response.status === 0)) {
         setLoading(false);
         let message = intl.formatMessage({ id: "wait_please_loading_items" });
         showMsg(message, { type: "success" });
