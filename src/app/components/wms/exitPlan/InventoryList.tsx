@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   logo: {
-    width: 100,
+    width: 110,
     height: 100,
   },
   table: {
@@ -112,7 +112,7 @@ const InventoryList = ({ intl, exitPlan, boxes }: Props) => {
     <Document>
       <Page size="A4" style={styles.page} orientation="landscape">
         <Image
-          src="https://dc0-bucket.oss-us-west-1.aliyuncs.com/8Y2QlTD9eyFgyWt773lwMUJXGN0xDNHT.png"
+          src="https://warehouse-stg.oss-us-west-1.aliyuncs.com/JPb4ZMeIOa2ne88yRZM6kZHjqxQGH6Bb.png"
           style={styles.logo}
         />
         <Text style={styles.title}>

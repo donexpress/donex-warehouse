@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { MenuItem, IconButton, Popover } from "@material-ui/core";
 import logoDE from "../../../assets/icons/logo_desktop.svg";
+import logoA2A56 from "../../../assets/icons/logo_a2a56_int.png";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SelectLanguage from "./SelectLanguage";
 import { removeAllCookies, getCookie } from "../../../helpers/cookieUtils";
@@ -68,7 +69,7 @@ const Header = () => {
         <div className="flex flex-row justify-start section-left">
           <div className="container-header__image-content">
             <Image
-              src={logoDE}
+              src={logoA2A56}
               alt=""
               className="container-header__img"
               onClick={() => {

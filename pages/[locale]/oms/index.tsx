@@ -37,7 +37,7 @@ const RootOMS = () => {
     <Layout>
       <Head>
         <title>Don Express Warehouse</title>
-        <link rel="icon" href="/icon_favicon.png" />
+        <link rel="icon" href="/logo_a2a56_favicon.png" />
       </Head>
       <div className='card_section'>
           <DashboardCard ammount={storagePlan} text={intl.formatMessage({ id: 'storage_plans' })} Icon={FaTruckLoading} url={`/${locale}/oms/storage_plan`}/>

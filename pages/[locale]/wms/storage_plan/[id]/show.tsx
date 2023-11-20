@@ -14,7 +14,7 @@ const ShowStoragePlan = ({ warehouses, users, id, storagePlan, inWMS = true }: S
       <Layout>
         <Head>
           <title>Don Express Warehouse</title>
-          <link rel="icon" href="/icon_favicon.png" />
+          <link rel="icon" href="/logo_a2a56_favicon.png" />
         </Head>
         <StoragePlanFormBody inWMS={inWMS} warehouses={warehouses ? warehouses : []} users={users ? users : []} storagePlan={storagePlan} id={id} isFromDetails={true} />
       </Layout>

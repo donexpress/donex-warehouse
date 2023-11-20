@@ -13,7 +13,7 @@ const ConfigWarehouse = ({ shelf, warehouse, id, warehouse_id }: ShelfConfigProp
         <Layout>
           <Head>
             <title>Don Express Warehouse</title>
-            <link rel="icon" href="/icon_favicon.png" />
+            <link rel="icon" href="/logo_a2a56_favicon.png" />
           </Head>
           <ShelfBody shelf={shelf} id={id} warehouse={warehouse} warehouse_id={warehouse_id} />
         </Layout>

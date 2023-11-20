@@ -12,7 +12,7 @@ const ConfigWarehouse = ({ warehouse, id }: WarehouseConfigProps) => {
         <Layout>
           <Head>
             <title>Don Express Warehouse</title>
-            <link rel="icon" href="/icon_favicon.png" />
+            <link rel="icon" href="/logo_a2a56_favicon.png" />
           </Head>
           <WarehouseConfig warehouse={warehouse} id={id} />
         </Layout>

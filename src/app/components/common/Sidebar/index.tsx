@@ -5,7 +5,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import { isOMS, isWMS } from "../../../../helpers";
 import logoDE from "../../../../assets/icons/logo_desktop.svg";
-import logoA2A56 from "../../../../assets/icons/logo_a2a56.png";
+import logoA2A56 from "../../../../assets/icons/logo_a2a56_int.png";
 import logoMV from "../../../../assets/icons/logo_movil.svg";
 import { FaAngleLeft, FaList } from "react-icons/fa6";
 import { MenuOption } from "../../../../types";
@@ -106,7 +106,7 @@ const Index = () => {
         <div className="flex  px-4 items-center justify-between relative">
           <div className="flex">
             <Image
-              src={!toggleCollapse ? logoDE : !isCollapse ? logoMV : logoDE}
+              src={!toggleCollapse ? logoA2A56 : !isCollapse ? logoMV : logoA2A56}
               alt=""
               className="h-11  w-auto"
               width={100}

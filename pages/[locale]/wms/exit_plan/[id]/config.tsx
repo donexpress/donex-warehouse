@@ -31,7 +31,7 @@ const Config = ({ id, users, warehouses, addresses, user }: ExitPlanProps) => {
       <Layout>
         <Head>
           <title>Don Express Warehouse</title>
-          <link rel="icon" href="/icon_favicon.png" />
+          <link rel="icon" href="/logo_a2a56_favicon.png" />
         </Head>
         <Loading loading={loading}>
         <ExitPlanConfig
