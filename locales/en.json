@@ -413,5 +413,7 @@
 	"invoice_weight": "Invoice weight",
 	"already_manifest_paid": "Already paid products from the {MWB} manifest",
 	"copied_item": "Item copied to clipboard",
-	"export_manifests": "Export manifests"
+	"export_manifests": "Export manifests",
+	"profit": "Profit",
+	"calculate_profit": "Calculate profit"
 }

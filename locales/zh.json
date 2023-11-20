@@ -419,5 +419,7 @@
 	"invoice_weight": "發票重量",
 	"already_manifest_paid": "{MWB} 清單中已付款的產品",
   "copied_item": "項目已複製到剪貼簿",
-  "export_manifests": "出口艙單"
+  "export_manifests": "出口艙單",
+  "profit": "收入",
+  "calculate_profit": "計算利潤"
 }

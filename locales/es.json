@@ -419,5 +419,7 @@
   "invoice_weight": "Peso de la factura",
   "already_manifest_paid": "Productos ya pagados del manifiesto {MWB}",
   "copied_item": "Elemento copiado al portapapeles",
-  "export_manifests": "Exportar manifiestos"
+  "export_manifests": "Exportar manifiestos",
+  "profit": "Ganancia",
+  "calculate_profit": "Calcular la ganancia"
 }
