@@ -5,7 +5,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import { isOMS, isWMS } from "../../../../helpers";
 import logoDE from "../../../../assets/icons/logo_desktop.svg";
-import logoA2A56 from "../../../../assets/icons/logo_a2a56_int.png";
+import logoA2A56 from "../../../../assets/icons/logo_a2a56_x.png";
 import logoMV from "../../../../assets/icons/logo_movil.svg";
 import { FaAngleLeft, FaList } from "react-icons/fa6";
 import { MenuOption } from "../../../../types";

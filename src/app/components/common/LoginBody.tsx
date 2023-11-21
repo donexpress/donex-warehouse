@@ -2,7 +2,7 @@ import React from "react";
 import "../../../styles/login.scss";
 import Image from "next/image";
 import logoDE from "../../../assets/icons/logo_desktop.svg";
-import logoA2A56 from "../../../assets/icons/logo_a2a56_ext.png";
+import logoA2A56 from "../../../assets/icons/logo_a2a56_x.png";
 import { Formik, Form } from "formik";
 import GenericInput from "./GenericInput";
 import { useIntl } from "react-intl";

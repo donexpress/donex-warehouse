@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { MenuItem, IconButton, Popover } from "@material-ui/core";
 import logoDE from "../../../assets/icons/logo_desktop.svg";
-import logoA2A56 from "../../../assets/icons/logo_a2a56_int.png";
+import logoA2A56 from "../../../assets/icons/logo_a2a56_x.png";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SelectLanguage from "./SelectLanguage";
 import { removeAllCookies, getCookie } from "../../../helpers/cookieUtils";
