@@ -72,6 +72,7 @@ const Header = () => {
               src={logoA2A56}
               alt=""
               className="container-header__img"
+              style={{ marginLeft: '20px' }}
               onClick={() => {
                 goHome();
               }}
