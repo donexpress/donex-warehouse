@@ -87,7 +87,7 @@ const ExitPlanFormBody = ({
     country: id && exitPlan ? exitPlan.country : "Mexico",
     delivered_time:
       id && exitPlan && exitPlan.delivered_time
-        ? date.toISOString().slice(0, 16)
+        ? exitPlan.delivered_time.slice(0, 16)
         : "",
     observations: id && exitPlan ? exitPlan.observations : "",
     type: id && exitPlan ? exitPlan.type : -1,
