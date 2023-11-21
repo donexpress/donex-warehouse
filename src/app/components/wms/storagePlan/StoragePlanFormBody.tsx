@@ -196,6 +196,9 @@ const StoragePlanFormBody = ({ users, warehouses, id, storagePlan, isFromDetails
       }
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      if(response && response.status === 422) {
+        message = intl.formatMessage({ id: 'customer_order_exist' });
+      }
       showMsg(message, { type: "error" });
     }
   }
