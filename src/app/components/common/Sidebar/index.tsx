@@ -108,9 +108,9 @@ const Index = () => {
             <Image
               src={!toggleCollapse ? logoA2A56 : !isCollapse ? logoMV : logoA2A56}
               alt=""
-              className="h-11  w-auto"
+              className="w-auto"
               width={100}
-              height={43}
+              height={56}
               onClick={() => {
                 goHome();
               }}
