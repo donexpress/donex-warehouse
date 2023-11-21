@@ -194,6 +194,7 @@
 	"stocked_state": "Stocked",
 	"cancelled_state": "Cancelled",
 	"loading_items": "Loading items...",
+	"wait_please_loading_items": "Please wait, your order is being loaded...",
 	"box_number": "Box number",
 	"case_number": "Transfer order number",
 	"client_weight": "Client weight",
@@ -412,5 +413,6 @@
 	"invoice_weight": "Invoice weight",
 	"already_manifest_paid": "Already paid products from the {MWB} manifest",
 	"copied_item": "Item copied to clipboard",
-	"export_manifests": "Export manifests"
+	"export_manifests": "Export manifests",
+	"customer_order_exist": "Customer order number already exists"
 }

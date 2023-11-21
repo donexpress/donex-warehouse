@@ -195,7 +195,8 @@
   "stocked_state": "Abastecido",
   "cancelled_state": "Cancelado",
   "loading_items": "Cargando elementos...",
-
+  "wait_please_loading_items": "Espere por favor, se esta cargando su pedido...",
+  
   "box_number": "Número de caja",
   "case_number": "Número de orden",
   "client_weight": "Peso del cliente",
@@ -418,5 +419,6 @@
   "invoice_weight": "Peso de la factura",
   "already_manifest_paid": "Productos ya pagados del manifiesto {MWB}",
   "copied_item": "Elemento copiado al portapapeles",
-  "export_manifests": "Exportar manifiestos"
+  "export_manifests": "Exportar manifiestos",
+  "customer_order_exist": "El número de orden del cliente ya existe"
 }

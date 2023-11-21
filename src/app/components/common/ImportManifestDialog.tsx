@@ -76,6 +76,10 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         } else if (where === "supplier" && response.data.manifest_paid.length > 0) {
           closeManifestDialog(response.data.manifest_paid);
         }
+      } else if (response !== undefined && (response.status === 0 || response.status === 503)) {
+        setLoading(false);
+        let message = intl.formatMessage({ id: "wait_please_loading_items" });
+        showMsg(message, { type: "success" });
       } else {
         setLoading(false);
         let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
@@ -106,7 +110,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
     <div className="confirmation_container">
       <div className="confirmation_backdrop" onClick={close}></div>
       <div className="confirmation_card dialog-background">
-        <Loading loading={loading} content={intl.formatMessage({ id: "loading_items" })} >
+        <Loading loading={loading} content={intl.formatMessage({ id: "loading_items" })}>
           <div className="confirmation_card_header" style={{ color: 'white' }}>
             <div className="upload-batch-sp-header-dialog">
               <strong>{title}</strong>

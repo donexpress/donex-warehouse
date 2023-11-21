@@ -195,6 +195,7 @@
   "stocked_state": "已入库",
   "cancelled_state": "已取消",
   "loading_items": "正在加載項目...",
+  "wait_please_loading_items": "請稍候，您的訂單正在加載中...",
 
   "box_number": "箱号",
   "case_number": "转单号",
@@ -418,5 +419,6 @@
 	"invoice_weight": "發票重量",
 	"already_manifest_paid": "{MWB} 清單中已付款的產品",
   "copied_item": "項目已複製到剪貼簿",
-  "export_manifests": "出口艙單"
+  "export_manifests": "出口艙單",
+	"customer_order_exist": "客户订单号已存在"
 }
