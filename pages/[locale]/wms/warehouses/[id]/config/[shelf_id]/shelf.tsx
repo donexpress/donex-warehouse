@@ -12,7 +12,7 @@ const ConfigWarehouse = ({ shelf, warehouse, id, warehouse_id }: ShelfConfigProp
     <ProtectedRoute>
         <Layout>
           <Head>
-            <title>Don Express Warehouse</title>
+            <title>A2A56 Warehouse</title>
             <link rel="icon" href="/logo_a2a56_favicon.png" />
           </Head>
           <ShelfBody shelf={shelf} id={id} warehouse={warehouse} warehouse_id={warehouse_id} />

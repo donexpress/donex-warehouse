@@ -21,7 +21,7 @@ const UpdateWarehouseCargoStation = ({
   return (
     <Layout>
       <Head>
-        <title>Don Express Warehouse</title>
+        <title>A2A56 Warehouse</title>
         <link rel="icon" href="/logo_a2a56_favicon.png" />
       </Head>
       <ProtectedRoute>

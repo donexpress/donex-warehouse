@@ -83,7 +83,7 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
         <div className="elements-center">
           <Image src={logoA2A56} alt="" className="login-body__logo" />
           <div className="black-label login-body__enterprise-name">
-            Don Express Warehouse {inWMS && "WMS"}
+            A2A56 Warehouse {inWMS && "WMS"}
             {inOMS && "OMS"}
           </div>
         </div>
