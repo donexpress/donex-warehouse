@@ -139,6 +139,10 @@ export const excelPath = () => {
   return getBaseUrl() + "/api/v1/excel";
 };
 
+export const profitPath = () => {
+  return getBaseUrl() + "/api/v1/sum";
+};
+
 export const waybillPath = () => {
   return getBaseUrl() + "/api/v1/byWaybill";
 };

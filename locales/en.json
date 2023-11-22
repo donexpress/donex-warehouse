@@ -403,8 +403,8 @@
 	"import_manifest": "Import manifest",
 	"update_manifest_customer": "Update manifest customer",
 	"update_manifest_supplier": "Update manifest supplier",
-	"customer_manifest": "Customer manifest",
-	"supplier_manifest": "Supplier manifest",
+	"customer_invoice": "Customer invoice",
+	"supplier_invoice": "Supplier invoice",
 	"relabel": "Operation instruction",
 	"alreadyUsedmsg": "The box(es) you are trying to add are already in another output plan",
 	"create_manifest_sucessfully": "Successfully added {manifest_count} products from the manifest {waybill_id}",
@@ -414,5 +414,7 @@
 	"already_manifest_paid": "Already paid products from the {MWB} manifest",
 	"copied_item": "Item copied to clipboard",
 	"export_manifests": "Export manifests",
-	"customer_order_exist": "Customer order number already exists"
+	"customer_order_exist": "Customer order number already exists",
+	"profit": "Profit",
+	"calculate_profit": "Calculate profit"
 }
