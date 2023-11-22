@@ -447,7 +447,7 @@ const ExitPlanBox = ({ exitPlan }: Props) => {
                 <div className="">{"--"}</div>
                 <div className="">{"--"}</div>
                 <div className="">{row.packing_lists?.amount}</div>
-                <div>
+                <div style={{ overflowWrap: 'break-word' }}>
                   {row.packing_lists && row.packing_lists.package_shelf ? (
                     <>
                       {exitPlan.warehouse ? (
