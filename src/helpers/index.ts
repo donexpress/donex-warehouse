@@ -188,7 +188,6 @@ export const downloadTemplateCreateManifest = () => {
       "Bag ID": '',
       "TRACKING NUMBER(AWB)": '',
       "CLIENT REF.NO": '',
-      "Customer REF. NO": '',
       "SHIPPER": '',
       "SHIPPER ADDRESS": '',
       "CITY NAME SHIPPER": '',
@@ -218,7 +217,7 @@ export const downloadTemplateCreateManifest = () => {
   const fileExtension = ".xlsx";
   const ws = XLSX.utils.json_to_sheet(dataToExport);
   ws["!cols"] = [{ wch: 20 }, { wch: 20 }, { wch: 20 }
-    , { wch: 24 }, { wch: 15 }, { wch: 20 }, { wch: 16 }, { wch: 20 }, { wch: 20 }, { wch: 24 }
+    , { wch: 24 }, { wch: 15 }, { wch: 16 }, { wch: 20 }, { wch: 20 }, { wch: 24 }
     , { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }
     , { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }];
   const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
@@ -698,8 +697,8 @@ export const packingListDataToExcel = (
           pList[key3_0] = pl.output_plan_delivered_number ? pl.output_plan_delivered_number : "--";
         }
         pList[key3_1] =
-        pl.package_shelf && pl.package_shelf.length > 0
-          ? (storagePlan.warehouse
+          pl.package_shelf && pl.package_shelf.length > 0
+            ? (storagePlan.warehouse
               ? `${storagePlan.warehouse.code}-${String(
                 pl.package_shelf[0].shelf?.partition_table
               ).padStart(2, "0")}-${String(
