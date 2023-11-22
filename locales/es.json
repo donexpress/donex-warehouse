@@ -409,8 +409,8 @@
   "import_manifest": "Importar manifiesto",
   "update_manifest_customer": "Actualizar manifiesto cliente",
   "update_manifest_supplier": "Actualizar manifiesto proveedor",
-  "customer_manifest": "Manifiesto cliente",
-  "supplier_manifest": "Manifiesto proveedor",
+  "customer_invoice": "Factura del cliente",
+  "supplier_invoice": "Factura del proveedor",
   "relabel": "Instrucción de operación",
   "alreadyUsedmsg": "La(s) caja(s) que está intentando adicionar ya se encuentran en otro plan de salida",
   "create_manifest_sucessfully": "Se adicionaron satisfactoriamente {manifest_count} productos del manifiesto {waybill_id}",
@@ -419,5 +419,8 @@
   "invoice_weight": "Peso de la factura",
   "already_manifest_paid": "Productos ya pagados del manifiesto {MWB}",
   "copied_item": "Elemento copiado al portapapeles",
-  "export_manifests": "Exportar manifiestos"
+  "export_manifests": "Exportar manifiestos",
+  "customer_order_exist": "El número de orden del cliente ya existe",
+  "profit": "Ganancia",
+  "calculate_profit": "Calcular la ganancia"
 }
