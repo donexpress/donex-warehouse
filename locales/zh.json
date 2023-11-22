@@ -422,4 +422,5 @@
   "export_manifests": "出口艙單",
   "profit": "收入",
   "calculate_profit": "計算利潤"
+	"customer_order_exist": "客户订单号已存在"
 }

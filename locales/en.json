@@ -414,6 +414,7 @@
 	"already_manifest_paid": "Already paid products from the {MWB} manifest",
 	"copied_item": "Item copied to clipboard",
 	"export_manifests": "Export manifests",
+	"customer_order_exist": "Customer order number already exists",
 	"profit": "Profit",
-	"calculate_profit": "Calculate profit"
+	"calculate_profit": "Calculate profit",
 }
