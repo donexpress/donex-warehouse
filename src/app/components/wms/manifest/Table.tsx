@@ -237,8 +237,8 @@ const ManifestTable = () => {
   ]
 
   const arrayUpdateManifest = [
-    { value: intl.formatMessage({ id: "customer_manifest" }), id: 0 },
-    { value: intl.formatMessage({ id: "supplier_manifest" }), id: 1 }
+    { value: intl.formatMessage({ id: "customer_invoice" }), id: 0 },
+    { value: intl.formatMessage({ id: "supplier_invoice" }), id: 1 }
   ]
 
   const topContent = React.useMemo(() => {
