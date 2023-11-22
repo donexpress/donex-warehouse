@@ -420,7 +420,7 @@
   "already_manifest_paid": "Productos ya pagados del manifiesto {MWB}",
   "copied_item": "Elemento copiado al portapapeles",
   "export_manifests": "Exportar manifiestos",
-  "customer_order_exist": "El número de orden del cliente ya existe"
+  "customer_order_exist": "El número de orden del cliente ya existe",
   "profit": "Ganancia",
   "calculate_profit": "Calcular la ganancia"
 }
