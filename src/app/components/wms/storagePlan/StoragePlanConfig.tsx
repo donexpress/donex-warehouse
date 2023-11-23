@@ -592,9 +592,9 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
                           <div className='elements-center-start'>
                             <span className=''>{intl.formatMessage({ id: 'dispatch_date' })}</span>
                           </div>
-                          <div className='elements-center-start'>
+                          {/* <div className='elements-center-start'>
                             <span className=''>{intl.formatMessage({ id: 'transfer_order_number' })}</span>
-                          </div>
+                          </div> */}
                           <div className='elements-center-start'>
                             <span className=''>{intl.formatMessage({ id: 'bill_lading_number' })}</span>
                           </div>
@@ -632,13 +632,13 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
                             </div>
                             <div>{row.output_plan_delivered_number ? <CopyColumnToClipboard value={ row.output_plan_delivered_number }/> : '--'}</div>
                             <div>{row.dispatched_time ? `${getDateFormat(row.dispatched_time)}, ${getHourFormat(row.dispatched_time)}` : '--'}</div>
-                            <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div>
+                            {/* <div>{row.order_transfer_number ? row.order_transfer_number : '--'}</div> */}
                             <div>{(storagePlan && storagePlan.pr_number) ? (
                               <CopyColumnToClipboard value={ storagePlan.pr_number } />
                             ) : '--'}</div>
                             <div>{`${row.client_weight} / ${row.client_length}*${row.client_width}*${row.client_height}`}</div>
                             <div>{'--'}</div>
-                            <div>
+                            <div style={{ overflowWrap: 'break-word' }}>
                             {
                               (row.package_shelf && row.package_shelf.length > 0) ? (
                                 <>

@@ -110,12 +110,12 @@ const PackingListDialog = ({ close, historySP, title, users, warehouses }: Param
                                                         ${intl.formatMessage({ id: 'column' })}: ${((historySP.data) as PackageShelf).column}`}
                           </div>
                         </div>
-                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                        {/* <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
                           <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "transfer_order_number" })}:</div>
                           <div>
                             { ((historySP.data) as PackageShelf).package ? ((historySP.data) as PackageShelf).package?.order_transfer_number : '' }
                           </div>
-                        </div>
+                        </div> */}
                         <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
                           <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "amount" })}:</div>
                           <div>
@@ -168,12 +168,12 @@ const PackingListDialog = ({ close, historySP, title, users, warehouses }: Param
                             { ((historySP.data) as PackingList).case_number }
                           </div>
                         </div>
-                        <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
+                        {/* <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
                           <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "transfer_order_number" })}:</div>
                           <div>
                             { ((historySP.data) as PackingList).order_transfer_number }
                           </div>
-                        </div>
+                        </div> */}
                         <div className='w-full' style={{ marginBottom: '10px', display: 'grid', gridTemplateColumns:'1fr 1fr' }}>
                           <div style={{ color: 'white', fontWeight: '600' }}>{intl.formatMessage({ id: "amount" })}:</div>
                           <div>

@@ -30,13 +30,14 @@ import { Guide, GuidesCount } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
 import { PlusIcon } from "../../common/PlusIcon";
-import { FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
+import { FaCalculator, FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
 import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import ExportDialog from "../../common/ExportDialog";
+import ProfitDialog from "../../common/ProfitDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -67,6 +68,7 @@ const ManifestTable = () => {
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
   const [showExportDialog, setShowExportDialog] = useState<boolean>(false);
+  const [showProfitDialog, setShowProfitDialog] = useState<boolean>(false);
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
   const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
   const [visibleDialogTable, setVisibleDialogTable] = useState<boolean>(false);
@@ -235,8 +237,8 @@ const ManifestTable = () => {
   ]
 
   const arrayUpdateManifest = [
-    { value: intl.formatMessage({ id: "customer_manifest" }), id: 0 },
-    { value: intl.formatMessage({ id: "supplier_manifest" }), id: 1 }
+    { value: intl.formatMessage({ id: "customer_invoice" }), id: 0 },
+    { value: intl.formatMessage({ id: "supplier_invoice" }), id: 1 }
   ]
 
   const topContent = React.useMemo(() => {
@@ -445,6 +447,17 @@ const ManifestTable = () => {
               color="primary"
               style={{ width: "140px" }}
               endContent={
+                <FaCalculator style={{ fontSize: "22px", color: "white" }} />
+              }
+              onClick={() => openProfitDialog()}
+            >
+              {intl.formatMessage({ id: "profit" })}
+            </Button>
+
+            <Button
+              color="primary"
+              style={{ width: "140px" }}
+              endContent={
                 <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
               }
               onClick={() => openExportDialog()}
@@ -613,6 +626,14 @@ const ManifestTable = () => {
     setShowExportDialog(false);
   }
 
+  const openProfitDialog = () => {
+    setShowProfitDialog(true);
+  }
+
+  const closeProfitDialog = () => {
+    setShowProfitDialog(false);
+  }
+
   const openImportManifestDialog = () => {
     setShowImportManifestDialog(true);
   }
@@ -709,6 +730,7 @@ const ManifestTable = () => {
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showExportDialog && <ExportDialog close={closeExportDialog} title={intl.formatMessage({ id: "export_manifests" })} />}
+        {showProfitDialog && <ProfitDialog close={closeProfitDialog} title={intl.formatMessage({ id: "calculate_profit" })} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
         {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_paid" }, { MWB: manifestPaidData[0].waybill_id })} close={closeManifestTableDialog} content={manifestPaidData} />}

@@ -411,8 +411,8 @@
 	"import_manifest": "進口艙單",
 	"update_manifest_customer": "更新清單客戶",
 	"update_manifest_supplier": "更新清單供應商",
-	"customer_manifest": "客戶清單",
-	"supplier_manifest": "供應商清單",
+	"customer_invoice": "客戶清單",
+	"supplier_invoice": "供應商清單",
 	"create_manifest_sucessfully": "已成功從清單 {waybill_id} 新增 {manifest_count} 個產品",
 	"update_customer_manifest_sucessfully": "已成功更新 {manifest_count} 個客戶費用",
 	"update_supplier_manifest_sucessfully": "已成功更新物流供應商的 {manifest_paid_count} 個銷售價格",
@@ -420,5 +420,7 @@
 	"already_manifest_paid": "{MWB} 清單中已付款的產品",
   "copied_item": "項目已複製到剪貼簿",
   "export_manifests": "出口艙單",
+  "profit": "收入",
+  "calculate_profit": "計算利潤",
 	"customer_order_exist": "客户订单号已存在"
 }
