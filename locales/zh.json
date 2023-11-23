@@ -417,7 +417,7 @@
 	"update_customer_manifest_sucessfully": "已成功更新 {manifest_count} 個客戶費用",
 	"update_supplier_manifest_sucessfully": "已成功更新物流供應商的 {manifest_paid_count} 個銷售價格",
 	"invoice_weight": "發票重量",
-	"already_manifest_paid": "{MWB} 清單中已付款的產品",
+	"already_manifest_paid": "清單重複產品{MWB}",
   "copied_item": "項目已複製到剪貼簿",
   "export_manifests": "出口艙單",
   "profit": "收入",
