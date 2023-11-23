@@ -411,7 +411,7 @@
 	"update_customer_manifest_sucessfully": "Successfully updated {manifest_count} customer costs",
 	"update_supplier_manifest_sucessfully": "Successfully updated {manifest_paid_count} sales price of the logistics provider",
 	"invoice_weight": "Invoice weight",
-	"already_manifest_paid": "Already paid products from the {MWB} manifest",
+	"already_manifest_paid": "Manifest Repeat Products {MWB}",
 	"copied_item": "Item copied to clipboard",
 	"export_manifests": "Export manifests",
 	"customer_order_exist": "Customer order number already exists",
