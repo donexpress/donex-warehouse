@@ -608,7 +608,7 @@ export const packingListDataToExcel = (
       pList[key1] = pl.box_number;
       pList[key2] = pl.case_number;
       pList[key3] = pl.output_plan_delivered_number ? pl.output_plan_delivered_number : "--";
-      pList[key4] = pl.order_transfer_number ? pl.order_transfer_number : "--";
+      //pList[key4] = pl.order_transfer_number ? pl.order_transfer_number : "--";
       pList[key5] = storagePlan.pr_number ? storagePlan.pr_number : "--";
       pList[
         key6
@@ -751,7 +751,7 @@ export const packingListDataToExcel = (
           )}`
           : "--";
       }
-      pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
+      //pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
       pList[key4] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
       pList[key5] = (pl.client_weight || pl.client_weight === 0) ? pl.client_weight.toString() : "--";
       pList[key6] = (pl.client_length || pl.client_length === 0) ? pl.client_length.toString() : "--";

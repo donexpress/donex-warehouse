@@ -133,7 +133,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
           />
         )
       }
-      <GenericInput
+      {/* <GenericInput
         type="text"
         name="order_transfer_number"
         value={initialValues.order_transfer_number}
@@ -141,7 +141,7 @@ const RowStoragePlan: React.FC<RowStoragePlanProps> = ({ initialValues, onUpdate
         hideErrorContent={true}
         onChangeFunction={handleRowChange}
         disabled={onlyReadly}
-      />
+      /> */}
       <GenericInput
         type="number"
         name="amount"
