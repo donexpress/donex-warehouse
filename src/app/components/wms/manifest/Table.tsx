@@ -15,6 +15,7 @@ import {
   SortDescriptor,
   Input,
 } from "@nextui-org/react";
+import Select from 'react-select';
 import { SearchIcon } from "../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
@@ -246,6 +247,59 @@ const ManifestTable = () => {
       <div className="flex flex-col gap-4">
         <div className="flexbox-container">
           <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+            <Select
+              isSearchable
+              options={waybillIDS ? waybillIDS.map((column) => ({
+                value: column.waybill_id,
+                label: capitalize(column.waybill_id)
+              })) : []}
+              value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
+              onChange={(selectedOption) => {
+                if (selectedOption) {
+                  setWaybillIDValue(selectedOption.value);
+                } else {
+                  setWaybillIDValue("");
+                }
+              }}
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#212c4d !important",
+                  border: "1px solid #37446b !important",
+                  borderRadius: "4px !important",
+                  height: "40px",
+                }),
+                option: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  backgroundColor: "#212c4d !important",
+                }), placeholder: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  fontWeight: 400,
+                  fontSize: "var(--nextui-font-size-small)"
+                }), input: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  fontWeight: 400,
+                  fontSize: "var(--nextui-font-size-small)"
+                }), singleValue: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  fontWeight: 400,
+                  fontSize: "var(--nextui-font-size-small)"
+                }), menu: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  backgroundColor: "#212c4d !important",
+                  fontWeight: 400,
+                  fontSize: "var(--nextui-font-size-small)"
+                }),
+              }}
+              placeholder={intl.formatMessage({ id: "waybill_id" })}
+            />
+          </div>
+          {/* <div className="flexbox-item" style={{ paddingLeft: 0 }}>
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -269,7 +323,7 @@ const ManifestTable = () => {
                 )) : []}
               </DropdownMenu>
             </Dropdown>
-          </div>
+          </div> */}
 
           <div className="flexbox-item">
             <Input
