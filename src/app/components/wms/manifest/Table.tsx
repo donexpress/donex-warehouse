@@ -42,6 +42,7 @@ import ProfitDialog from "../../common/ProfitDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
+  "clientReference",
   "tracking_number",
   "weigth",
   "currency",
@@ -299,31 +300,6 @@ const ManifestTable = () => {
               placeholder={intl.formatMessage({ id: "waybill_id" })}
             />
           </div>
-          {/* <div className="flexbox-item" style={{ paddingLeft: 0 }}>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  className="bnt-dropdown"
-                  style={{ width: "-webkit-fill-available" }}
-                  endContent={<ChevronDownIcon className="text-small" />}
-                >
-                  {waybillIDValue.trim() !== "" ? waybillIDValue : intl.formatMessage({ id: "waybill_id" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="MWB"
-                closeOnSelect={true}
-                selectionMode="single"
-              >
-                {waybillIDS ? waybillIDS.map((column) => (
-                  <DropdownItem onClick={(e) => setWaybillIDValue(column.waybill_id)} key={column.waybill_id} className="capitalize">
-                    {capitalize(column.waybill_id)}
-                  </DropdownItem>
-                )) : []}
-              </DropdownMenu>
-            </Dropdown>
-          </div> */}
 
           <div className="flexbox-item">
             <Input
@@ -348,35 +324,6 @@ const ManifestTable = () => {
               onChange={(e) => setClientReferenceValue(e.target.value)}
             />
           </div>
-
-          {/* <div className="flexbox-item" style={{ paddingRight: 0 }}>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  className="bnt-dropdown"
-                  // isIconOnly
-                  style={{ width: "-webkit-fill-available" }}
-                  endContent={<ChevronDownIcon className="text-small" />}
-                >
-                  {intl.formatMessage({ id: "accountStatus" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Account Status"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
-              > */}
-          {/* {getColumns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))} */}
-          {/* </DropdownMenu>
-            </Dropdown> */}
-          {/* </div> */}
 
           <div className="flexbox-item" style={{ paddingRight: 0 }}>
             <Dropdown>
@@ -403,33 +350,6 @@ const ManifestTable = () => {
               </DropdownMenu>
             </Dropdown>
           </div>
-
-          {/* <div className="flexbox-item" style={{ paddingRight: 0 }}>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  className="bnt-dropdown"
-                  // isIconOnly
-                  style={{ width: "-webkit-fill-available" }}
-                  endContent={<ChevronDownIcon className="text-small" />}
-                >
-                  {paidValue.trim() !== "" ? paidValue : intl.formatMessage({ id: "paid" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Paid"
-                closeOnSelect={true}
-                selectionMode="single"
-              >
-                {arrayPaids.map((column) => (
-                  <DropdownItem onClick={(e) => setPaidValue(column.value)} key={column.id} className="capitalize">
-                    {capitalize(column.value)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-          </div> */}
         </div>
         <div className="flex justify-between">
           <div className="flex justify-start gap-3 items-start">
@@ -787,7 +707,7 @@ const ManifestTable = () => {
         {showProfitDialog && <ProfitDialog close={closeProfitDialog} title={intl.formatMessage({ id: "calculate_profit" })} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
-        {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_paid" }, { MWB: manifestPaidData[0].waybill_id })} close={closeManifestTableDialog} content={manifestPaidData} />}
+        {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_charged" }, { MWB: manifestPaidData[0].waybill_id })} close={closeManifestTableDialog} content={manifestPaidData} />}
       </Loading>
     </>
   );
