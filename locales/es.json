@@ -415,12 +415,16 @@
   "alreadyUsedmsg": "La(s) caja(s) que está intentando adicionar ya se encuentran en otro plan de salida",
   "create_manifest_sucessfully": "Se adicionaron satisfactoriamente {manifest_count} productos del manifiesto {waybill_id}",
 	"update_customer_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_count} costos del cliente",
-	"update_supplier_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_paid_count} precio de venta del proveedor logistico",
+	"update_supplier_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_charged_count} precio de venta del proveedor logistico",
   "invoice_weight": "Peso de la factura",
-  "already_manifest_paid": "Productos repetidos del manifiesto {MWB}",
+  "already_manifest_charged": "Productos repetidos del manifiesto {MWB}",
   "copied_item": "Elemento copiado al portapapeles",
   "export_manifests": "Exportar manifiestos",
   "customer_order_exist": "El número de orden del cliente ya existe",
   "profit": "Ganancia",
-  "calculate_profit": "Calcular la ganancia"
+  "calculate_profit": "Calcular la ganancia",
+  "manifest_exist": "El manifiesto que intenta subir ya se encuentra en el sistema",
+  "reupload": "Resubir",
+  "reupload_note": "Nota: si el manifiesto que intenta subir no tiene configurado el costo del cliente estos se actualizaran con valor 0.",
+  "number_of_shipments": "Cantidad de envíos"
 }

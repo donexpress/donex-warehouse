@@ -409,12 +409,16 @@
 	"alreadyUsedmsg": "The box(es) you are trying to add are already in another output plan",
 	"create_manifest_sucessfully": "Successfully added {manifest_count} products from the manifest {waybill_id}",
 	"update_customer_manifest_sucessfully": "Successfully updated {manifest_count} customer costs",
-	"update_supplier_manifest_sucessfully": "Successfully updated {manifest_paid_count} sales price of the logistics provider",
+	"update_supplier_manifest_sucessfully": "Successfully updated {manifest_charged_count} sales price of the logistics provider",
 	"invoice_weight": "Invoice weight",
-	"already_manifest_paid": "Manifest Repeat Products {MWB}",
+	"already_manifest_charged": "Manifest Repeat Products {MWB}",
 	"copied_item": "Item copied to clipboard",
 	"export_manifests": "Export manifests",
 	"customer_order_exist": "Customer order number already exists",
 	"profit": "Profit",
-	"calculate_profit": "Calculate profit"
+	"calculate_profit": "Calculate profit",
+	"manifest_exist": "The manifest you are trying to upload is already in the system",
+	"reupload": "Reupload",
+	"reupload_note": "Note: if the manifest you are trying to upload does not have the client cost configured, these will be updated with a value of 0.",
+	"number_of_shipments": "Number of shipments"
 }
