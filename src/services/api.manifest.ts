@@ -32,8 +32,13 @@ export const guidesCount = async (filters: string = "", context?: GetServerSideP
   }
 }
 
-export const createManifest = async (formData: FormData, carrier?: string): Promise<any> => {
-  const path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}`;
+export const createManifest = async (formData: FormData, carrier?: string, mwb?: string, customer_code?: string, force: boolean = false): Promise<any> => {
+  let path;
+  if (force) {
+    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}&force=${force}`;
+  } else {
+    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}`;
+  }
 
   try {
     const response = await axios.post(path, formData, getHeaders(null, true));

@@ -25,6 +25,7 @@ const ProfitDialog = ({ close, title }: Params) => {
   const [carrierValue, setCarrierValue] = React.useState("");
   const [differenceSumValue, setDifferenceSumValue] = React.useState("");
   const [salePriceValue, setSalePriceValue] = React.useState("");
+  const [numberShipmentsValue, setNumberShipmentsValue] = React.useState("");
   const [shippingCostValue, setShippingCostValue] = React.useState("");
   const [waybillIDValue, setWaybillIDValue] = React.useState("");
 
@@ -53,6 +54,7 @@ const ProfitDialog = ({ close, title }: Params) => {
       setDifferenceSumValue(profit.data.difference_sum);
       setSalePriceValue(profit.data.sale_price);
       setShippingCostValue(profit.data.shipping_cost);
+      setNumberShipmentsValue(profit.data.count_manifest);
       setDisableConfirm(false);
     } catch (error) {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
@@ -70,7 +72,7 @@ const ProfitDialog = ({ close, title }: Params) => {
               <strong>{title}</strong>
             </div>
           </div>
-          <div style={{ width: '500px', maxWidth: '90vw' }}>
+          <div style={{ width: '550px', maxWidth: '90vw' }}>
             <div className='flex flex-col gap-3'>
               <div className='flex mt-11 mb-2'>
                 <div className="mr-2" style={{ width: "100%" }}>
@@ -137,6 +139,7 @@ const ProfitDialog = ({ close, title }: Params) => {
                   <Table>
                     <TableHeader>
                       <TableColumn>{intl.formatMessage({ id: "waybill_id" })}</TableColumn>
+                      <TableColumn>{intl.formatMessage({ id: "number_of_shipments" })}</TableColumn>
                       <TableColumn>{intl.formatMessage({ id: "shipping_cost" })}</TableColumn>
                       <TableColumn>{intl.formatMessage({ id: "sale_price" })}</TableColumn>
                       <TableColumn>{intl.formatMessage({ id: "profit" })}</TableColumn>
@@ -144,6 +147,7 @@ const ProfitDialog = ({ close, title }: Params) => {
                     <TableBody>
                       <TableRow>
                         <TableCell>{waybillIDValue === "" ? "-" : waybillIDValue}</TableCell>
+                        <TableCell>{numberShipmentsValue === "" ? "-" : numberShipmentsValue}</TableCell>
                         <TableCell>{shippingCostValue === "" ? "-" : shippingCostValue}</TableCell>
                         <TableCell>{salePriceValue === "" ? "-" : salePriceValue}</TableCell>
                         <TableCell>{differenceSumValue === "" ? "-" : differenceSumValue}</TableCell>                        
