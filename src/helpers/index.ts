@@ -791,7 +791,7 @@ export const packingListDataToExcel = (
 };
 
 export const manifestPaidDataToExcel = (
-  manifest_paid: Guide[],
+  manifest_charged: Guide[],
   intl: IntlShape,
   visibleColumn: string[]
 ) => {
@@ -801,7 +801,7 @@ export const manifestPaidDataToExcel = (
     return data ? "Pagados" : "No Pagados"
   };
 
-  manifest_paid.forEach((guide: Guide) => {
+  manifest_charged.forEach((guide: Guide) => {
     const oInst: { [key: string]: string } = {};
     visibleColumn.forEach((column) => {
       switch (column) {
@@ -877,7 +877,7 @@ export const manifestPaidDataToExcel = (
   const data = new Blob([excelBuffer], { type: fileType });
   FileSaver.saveAs(
     data,
-    `${intl.formatMessage({ id: "manifest_paid" })}` +
+    `${intl.formatMessage({ id: "manifest_charged" })}` +
     fileExtension
   );
 };
