@@ -431,5 +431,6 @@
 	"ym_digits": "{dig} digits",
 	"repeated": "Repeated",
 	"guides_not_found": "Guides not found",
-	"not_found_manifest_charged": "Manifest Repeat Products"
+	"not_found_manifest_charged": "Manifest Repeat Products",
+	"close_modal": "Close"
 }

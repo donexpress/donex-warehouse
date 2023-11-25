@@ -437,5 +437,6 @@
   "ym_digits": "{dig} 位數",
   "repeated": "重複",
   "guides_not_found": "未找到指南",
-	"not_found_manifest_charged": "清單重複產品"
+	"not_found_manifest_charged": "清單重複產品",
+  "close_modal": "關閉"
 }

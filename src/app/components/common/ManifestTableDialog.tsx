@@ -247,7 +247,7 @@ const ManifestTableDialog = ({ title, close, content }: Params) => {
         return (
             <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: '5px' }}>
                 <Button onClick={close} type="button" className="bg-secundary px-4">
-                    {intl.formatMessage({ id: "cancel" })}
+                    {intl.formatMessage({ id: "close_modal" })}
                 </Button>
             </div>
         );
