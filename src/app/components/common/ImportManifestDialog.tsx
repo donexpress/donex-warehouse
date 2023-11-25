@@ -270,7 +270,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                             <div className="w-full">{intl.formatMessage({ id: "year" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '4'})}</div>
                             <div className="w-full">{intl.formatMessage({ id: "month" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '2'})}</div>
                             <div className="w-full">{intl.formatMessage({ id: "period" })}: {`{Q | M | T}`}</div>
-                            <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`AMPL | JT | RedPack | ...`}</div>
+                            <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`RedPack | OCA | AMPM`}</div>
                             <div className="w-full">{intl.formatMessage({ id: "bill_code_ex" }, {year: (new Date()).getFullYear(), month: (new Date()).getMonth().toString().padStart(2, '0')})}</div>
                           </div>
                         </div>
