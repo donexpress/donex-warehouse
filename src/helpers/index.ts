@@ -793,7 +793,8 @@ export const packingListDataToExcel = (
 export const manifestPaidDataToExcel = (
   manifest_charged: Guide[],
   intl: IntlShape,
-  visibleColumn: string[]
+  visibleColumn: string[],
+  isNotFound: boolean = false,
 ) => {
   let dataToExport: object[] = [];
 
@@ -877,7 +878,7 @@ export const manifestPaidDataToExcel = (
   const data = new Blob([excelBuffer], { type: fileType });
   FileSaver.saveAs(
     data,
-    `${intl.formatMessage({ id: "manifest_charged" })}` +
+    (!isNotFound ? `${intl.formatMessage({ id: "not_found_manifest_charged" })}` : `${intl.formatMessage({ id: "guides_not_found" })}`) +
     fileExtension
   );
 };

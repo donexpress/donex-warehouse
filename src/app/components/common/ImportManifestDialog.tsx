@@ -11,7 +11,7 @@ import { indexCarriers } from "@/services/api.carrierserege1992";
 import React from "react";
 import { createManifest, updateCustomerManifest, updateSupplierManifest } from "@/services/api.manifesterege1992";
 import { Loading } from "./Loading";
-import { Guide } from "@/types/guideerege1992";
+import { Guide, ManifestResponse } from "@/types/guideerege1992";
 import ConfirmationReuploadDialog from "./ConfirmationReuploadDialog";
 
 interface Params {
@@ -19,7 +19,7 @@ interface Params {
   confirm: () => any;
   title: string;
   where?: string;
-  onClose?: (content: Guide[]) => void;
+  onClose?: (content: ManifestResponse) => void;
 }
 
 const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params) => {
@@ -31,6 +31,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   const [carrierValue, setCarrierValue] = React.useState("");
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
+  const [billCodeValue, setBillCodeValue] = React.useState("");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [force, setForce] = useState<boolean>(false);
@@ -56,7 +57,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
     handleSubmit();
   };
 
-  const closeManifestDialog = (content: Guide[]) => {
+  const closeManifestDialog = (content: ManifestResponse) => {
     onClose && onClose(content);
   }
 
@@ -71,7 +72,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         response = await updateCustomerManifest(data);
       } else {
         setLoading(true);
-        response = await updateSupplierManifest(data);
+        response = await updateSupplierManifest(data, billCodeValue);
       }
 
       if (response !== undefined && response.status >= 200 && response.status <= 299 && response.data !== "" && response.data.errors.length === 0) {
@@ -85,12 +86,12 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
           message = intl.formatMessage({ id: "update_customer_manifest_sucessfully" }, { manifest_count: response.data.manifest_count });
           showMsg(message, { type: "success" });
           confirm();
+        } else if (where === "supplier") {
+          closeManifestDialog(response.data);
         } else if (response.data.manifest_charged.length === 0) {
           message = intl.formatMessage({ id: "update_supplier_manifest_sucessfully" }, { manifest_charged_count: response.data.manifest_charged_count });
           showMsg(message, { type: "success" });
           confirm();
-        } else if (where === "supplier" && response.data.manifest_charged.length > 0) {
-          closeManifestDialog(response.data.manifest_charged);
         }
       } else if (response !== undefined && response.status === 205) {
         setLoading(false);
@@ -110,6 +111,12 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   const onClear = React.useCallback((filter: string) => {
     eval(`set${filter}("")`);
   }, []);
+  
+  const validateBillCode = (cadena: string): boolean => {
+    const regex = /^\d{4}_\d{2}_[QMT]_[a-zA-Z\d]+$/;
+  
+    return regex.test(cadena);
+  };
 
   const handleInputExcel = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -188,7 +195,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
             <div className='flex flex-col gap-3'>
               <div className='upload-evidence-body-dialog scrollable-hidden pl-1 pr-1 mt-10 mb-10'>
                 {
-                  where === undefined ?
+                  where === undefined ? (
                     <div>
                       <div className='flex flex-col gap-3'>
                         <div className='flex mb-5'>
@@ -238,15 +245,36 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                           </DropdownMenu>
                         </Dropdown>
                       </div>
-                    </div>
-                    : data === undefined ?
+                    </div>)
+                    : (where === "customer" ? (data === undefined ?
                       <div className="elements-center w-full" style={{ height: '80px' }}>
                         <span>{intl.formatMessage({ id: "please_upload_excel" })}</span>
                       </div>
                       :
                       <div className="elements-center w-full" style={{ height: '80px' }}>
                         <span>{intl.formatMessage({ id: "available_item_to_be_imported" }, { in: 1 })}</span>
-                      </div>
+                      </div>) : (
+                        <div>
+                          <div className='flex flex-col gap-1 mb-5'>
+                            <div className='flex mb-2'>
+                              <div className="mr-2" style={{ width: "100%" }}>
+                                <Input
+                                  className="search-input"
+                                  placeholder={intl.formatMessage({ id: "bill_code" })}
+                                  value={billCodeValue}
+                                  onChange={(e) => setBillCodeValue(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            <div className="w-full">{intl.formatMessage({ id: "format" })}: {intl.formatMessage({ id: "year" })}_{intl.formatMessage({ id: "month" })}_{intl.formatMessage({ id: "period" })}_{intl.formatMessage({ id: "carrier" })}</div>
+                            <div className="w-full">{intl.formatMessage({ id: "year" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '4'})}</div>
+                            <div className="w-full">{intl.formatMessage({ id: "month" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '2'})}</div>
+                            <div className="w-full">{intl.formatMessage({ id: "period" })}: {`{Q | M | T}`}</div>
+                            <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`RedPack | OCA | AMPM`}</div>
+                            <div className="w-full">{intl.formatMessage({ id: "bill_code_ex" }, {year: (new Date()).getFullYear(), month: (new Date()).getMonth().toString().padStart(2, '0')})}</div>
+                          </div>
+                        </div>
+                      ))
                 }
               </div>
               <div className="elements-row-end w-full">
@@ -256,7 +284,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                   className="px-4"
                   style={{ marginRight: '15px' }}
                   onClick={handleSubmit}
-                  disabled={carrierValue.trim() === "" && where === undefined || data === undefined}
+                  disabled={((carrierValue.trim() === "" || trackingNumberValue.trim() === "" || clientReferenceValue.trim() === "") && where === undefined) || (where === "supplier" && !validateBillCode(billCodeValue)) || data === undefined}
                 >
                   {intl.formatMessage({ id: "confirmation_header" })}
                 </Button>

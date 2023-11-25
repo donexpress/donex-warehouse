@@ -67,8 +67,8 @@ export const updateCustomerManifest = async (formData: FormData): Promise<any> =
   }
 };
 
-export const updateSupplierManifest = async (formData: FormData): Promise<any> => {
-  const path = getBaseUrl() + `/api/v1/manifest_supplier`;
+export const updateSupplierManifest = async (formData: FormData, billCode: String): Promise<any> => {
+  const path = getBaseUrl() + `/api/v1/manifest_supplier?bill_code=${billCode}`;
 
   try {
     const response = await axios.patch(path, formData, getHeaders(null, true));
