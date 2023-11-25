@@ -27,7 +27,7 @@ import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import { getGuides, guidesCount } from "@/services/api.manifesterege1992";
-import { Guide, GuidesCount } from "@/types/guideerege1992";
+import { Guide, GuidesCount, ManifestResponse } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
 import { PlusIcon } from "../../common/PlusIcon";
@@ -82,7 +82,7 @@ const ManifestTable = () => {
   const [waybillIDValue, setWaybillIDValue] = React.useState("");
   const [paidValue, setPaidValue] = React.useState("");
 
-  const [manifestPaidData, setManifestPaidData] = React.useState<Guide[]>([]);
+  const [manifestPaidData, setManifestPaidData] = React.useState<ManifestResponse | null>(null);
 
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -239,6 +239,7 @@ const ManifestTable = () => {
   ]
 
   const arrayUpdateManifest = [
+    { value: intl.formatMessage({ id: "manifest" }), id: 2 },
     { value: intl.formatMessage({ id: "customer_invoice" }), id: 0 },
     { value: intl.formatMessage({ id: "supplier_invoice" }), id: 1 }
   ]
@@ -397,10 +398,10 @@ const ManifestTable = () => {
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
-                  className="bnt-select"
+                  color="primary"
                   endContent={<ChevronDownIcon className="text-small" />}
                 >
-                  {intl.formatMessage({ id: "update" })}
+                  {intl.formatMessage({ id: "create" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -410,7 +411,7 @@ const ManifestTable = () => {
                 selectionMode="single"
               >
                 {arrayUpdateManifest.map((column) => (
-                  <DropdownItem key={column.id} onClick={(e) => openUpdateManifestDialog(column.id)} className="capitalize">
+                  <DropdownItem key={column.id} onClick={(e) => (column.id !== 2) ? openUpdateManifestDialog(column.id) : openImportManifestDialog()} className="capitalize">
                     {capitalize(column.value)}
                   </DropdownItem>
                 ))}
@@ -439,13 +440,13 @@ const ManifestTable = () => {
               {intl.formatMessage({ id: "export_xlsx" })}
             </Button>
 
-            <Button
+            {/* <Button
               color="primary"
               endContent={<PlusIcon />}
               onClick={() => openImportManifestDialog()}
             >
               {intl.formatMessage({ id: "create" })}
-            </Button>
+            </Button> */}
           </div>
         </div>
         <div className="flex justify-between items-center">
@@ -644,7 +645,7 @@ const ManifestTable = () => {
     setVisibleDialogTable(false);
   }
 
-  const handleManifestTableDialog = (content: Guide[]) => {
+  const handleManifestTableDialog = (content: ManifestResponse) => {
     setShowUpdateManifestDialog(false);
     if (whereUpdate === "supplier") {
       setManifestPaidData(content);
@@ -707,7 +708,7 @@ const ManifestTable = () => {
         {showProfitDialog && <ProfitDialog close={closeProfitDialog} title={intl.formatMessage({ id: "calculate_profit" })} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
-        {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_charged" }, { MWB: manifestPaidData[0].waybill_id })} close={closeManifestTableDialog} content={manifestPaidData} />}
+        {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_charged" }, { MWB: (manifestPaidData?.manifest_charged && (manifestPaidData.manifest_charged.length > 0) && manifestPaidData.manifest_charged[0].waybill_id) ? manifestPaidData.manifest_charged[0].waybill_id : '' })} close={closeManifestTableDialog} content={manifestPaidData as ManifestResponse} />}
       </Loading>
     </>
   );
