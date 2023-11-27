@@ -432,5 +432,7 @@
 	"repeated": "Repeated",
 	"guides_not_found": "Guides not found",
 	"not_found_manifest_charged": "Manifest Repeat Products",
-	"close_modal": "Close"
+	"close_modal": "Close",
+	"paid_guide": "Paid",
+	"pay": "Pay"
 }

@@ -32,6 +32,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
   const [billCodeValue, setBillCodeValue] = React.useState("");
+  const [willPaid, setWillPaid] = React.useState(false);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [force, setForce] = useState<boolean>(false);
@@ -72,7 +73,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         response = await updateCustomerManifest(data);
       } else {
         setLoading(true);
-        response = await updateSupplierManifest(data, billCodeValue);
+        response = await updateSupplierManifest(data, billCodeValue, willPaid);
       }
 
       if (response !== undefined && response.status >= 200 && response.status <= 299 && response.data !== "" && response.data.errors.length === 0) {
@@ -180,12 +181,15 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                 />
                 <label htmlFor="file-input" className="file-upload-button-text">
                   <div
-                    className="upload_button_evidence"
+                    className="upload_button_evidence" style={{ position: 'relative' }}
                   >
                     <span>
                       {intl.formatMessage({ id: "upload" })}
                     </span>
                     <FaFileExcel style={{ fontSize: '16px', color: 'white' }} />
+                    {(data !== undefined) && (
+                      <div style={{ background: 'red', color: 'white', borderRadius: '50%', fontSize: '10px', padding: '3px', minWidth: '16px', position: 'absolute', 'right': '3px', top: '1px', lineHeight: '1' }}>1</div>
+                    )}
                   </div>
                 </label>
               </div>
@@ -272,6 +276,14 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                             <div className="w-full">{intl.formatMessage({ id: "period" })}: {`{Q | M | T}`}</div>
                             <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`RedPack | OCA | AMPM`}</div>
                             <div className="w-full">{intl.formatMessage({ id: "bill_code_ex" }, {year: (new Date()).getFullYear(), month: (new Date()).getMonth().toString().padStart(2, '0')})}</div>
+                            <div className='flex mt-2'>
+                              <div className="mr-2" style={{ width: "100%" }}>
+                                <div className='elements-row-start'>
+                                  <input type="checkbox" name="willPaid" style={{ marginRight: '10px' }} checked={willPaid} onChange={() => { setWillPaid(!willPaid) }} />
+                                  <span style={{ fontSize: '13px' }}>{intl.formatMessage({ id: "paid_guide" })}</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))

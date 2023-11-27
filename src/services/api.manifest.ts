@@ -4,6 +4,7 @@ import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
 import { BASE_URL } from "@/configerege1992";
 import { Guide, GuidesCount } from "@/types/guideerege1992";
+import { Response } from "@/types/indexerege1992";
 
 const getBaseUrl = () => {
   if (process.env.WAREHOUSE_ENV && (process.env.WAREHOUSE_ENV === 'staging' || process.env.WAREHOUSE_ENV === 'prod')) {
@@ -67,8 +68,9 @@ export const updateCustomerManifest = async (formData: FormData): Promise<any> =
   }
 };
 
-export const updateSupplierManifest = async (formData: FormData, billCode: String): Promise<any> => {
-  const path = getBaseUrl() + `/api/v1/manifest_supplier?bill_code=${billCode}`;
+export const updateSupplierManifest = async (formData: FormData, billCode: String, willPaid: boolean): Promise<any> => {
+  let params = willPaid ? `&paid=true` : '';
+  const path = getBaseUrl() + `/api/v1/manifest_supplier?bill_code=${billCode}${params}`;
 
   try {
     const response = await axios.patch(path, formData, getHeaders(null, true));
@@ -105,6 +107,36 @@ export const calculateProfit = async (waybill_id: string, carrier?: string, cont
 
   try {
     const response = await axios.get(path, getHeaders(context));
+
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return { data: response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const paidBill = async (billCode: string): Promise<Response> => {
+  const path = getBaseUrl() + `/api/v1/paid?bill_code=${billCode}`;
+
+  try {
+    const response = await axios.patch(path, {}, getHeaders(null));
+
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return { data: response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const exportBill = async (billCode: string): Promise<Response> => {
+  const path = getBaseUrl() + `/api/v1/supplier_invoice?bill_code=${billCode}`;
+
+  try {
+    const response = await axios.get(path, getHeaders());
 
     if (response.status && (response.status >= 200 && response.status <= 299)) {
       return { data: response.data, status: response.status };
