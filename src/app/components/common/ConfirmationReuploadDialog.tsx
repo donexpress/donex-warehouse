@@ -20,14 +20,14 @@ const ConfirmationReuploadDialog = ({ close, confirm, content }: Params) => {
           {content}
         </div>
         <div className="flex justify-between gap-3">
-          {/* <Button
+          <Button
             color="primary"
             type="button"
             className="px-4"
             onClick={confirm}
           >
             {intl.formatMessage({ id: "reupload" })}
-          </Button> */}
+          </Button>
           <Button onClick={close} type="button" className="bg-secundary px-4">
             {intl.formatMessage({ id: "cancel" })}
           </Button>

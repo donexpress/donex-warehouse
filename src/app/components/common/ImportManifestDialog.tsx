@@ -51,22 +51,22 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
     setShowConfirm(false);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async() => {
     setShowConfirm(false);
-    setForce(true);
-    handleSubmit();
+    await setForce(true);
+    await handleSubmit(null, true);
   };
 
   const closeManifestDialog = (content: ManifestResponse) => {
     onClose && onClose(content);
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, forceUpload: boolean = false) => {
     if (data !== undefined) {
       let response: Response | undefined = undefined;
       if (where === undefined) {
         setLoading(true);
-        response = await createManifest(data, carrierValue, trackingNumberValue, clientReferenceValue, force);
+        response = await createManifest(data, carrierValue, trackingNumberValue, clientReferenceValue, forceUpload);
       } else if (where === "customer") {
         setLoading(true);
         response = await updateCustomerManifest(data);
@@ -283,7 +283,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                   type="submit"
                   className="px-4"
                   style={{ marginRight: '15px' }}
-                  onClick={handleSubmit}
+                  onClick={(e) => handleSubmit(e)}
                   disabled={((carrierValue.trim() === "" || trackingNumberValue.trim() === "" || clientReferenceValue.trim() === "") && where === undefined) || (where === "supplier" && !validateBillCode(billCodeValue)) || data === undefined}
                 >
                   {intl.formatMessage({ id: "confirmation_header" })}
