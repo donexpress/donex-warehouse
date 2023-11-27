@@ -264,3 +264,7 @@ export const GuideCountPath = (filters: string = "") => {
 export const self = () => {
   return getBaseUrl() + "/api/v1/self";
 };
+
+export const autoAssignLocationPath = (id: number) => {
+  return getBaseUrl() + `/api/v1/storage_plan/${id}/auto_assign`;
+}
