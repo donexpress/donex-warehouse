@@ -426,7 +426,7 @@
 	"customer_order_exist": "客户订单号已存在",
   "manifest_exist": "您嘗試上傳的清單已在系統中",
   "reupload": "重新上傳",
-  "reupload_note": "注意：如果您嘗試上傳的清單未配置客戶端成本，則這些成本將更新為 0。",
+  "reupload_note": "注意：如果您想更新清單，請點選更新按鈕。",
   "number_of_shipments": "出貨數量",
 	"bill_code": "帳單代碼",
   "bill_code_ex": "例子: {year}_{month}_Q_RedPack",

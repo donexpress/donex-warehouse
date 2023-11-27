@@ -420,7 +420,7 @@
 	"calculate_profit": "Calculate profit",
 	"manifest_exist": "The manifest you are trying to upload is already in the system",
 	"reupload": "Reupload",
-	"reupload_note": "Note: if the manifest you are trying to upload does not have the client cost configured, these will be updated with a value of 0.",
+	"reupload_note": "Note: If you want to update the manifest, click on the Update button.",
 	"number_of_shipments": "Number of shipments",
 	"bill_code": "Bill code",
 	"bill_code_ex": "Ex: {year}_{month}_Q_RedPack",
