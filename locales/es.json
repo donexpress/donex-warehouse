@@ -426,7 +426,7 @@
   "calculate_profit": "Calcular la ganancia",
   "manifest_exist": "El manifiesto que intenta subir ya se encuentra en el sistema",
   "reupload": "Resubir",
-  "reupload_note": "Nota: si el manifiesto que intenta subir no tiene configurado el costo del cliente estos se actualizaran con valor 0.",
+  "reupload_note": "Nota: Si desea actualizar el manifiesto, de click en el botón Actualizar.",
   "number_of_shipments": "Cantidad de envíos",
   "bill_code": "Código de factura",
   "bill_code_ex": "Ej: {year}_{month}_Q_RedPack",

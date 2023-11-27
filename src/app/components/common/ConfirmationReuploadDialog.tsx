@@ -26,7 +26,7 @@ const ConfirmationReuploadDialog = ({ close, confirm, content }: Params) => {
             className="px-4"
             onClick={confirm}
           >
-            {intl.formatMessage({ id: "reupload" })}
+            {intl.formatMessage({ id: "update" })}
           </Button>
           <Button onClick={close} type="button" className="bg-secundary px-4">
             {intl.formatMessage({ id: "cancel" })}
