@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from "@nextui-org/react";
 import { useIntl } from "react-intl";
 import { Carrier, MWB } from '../../../types';
 import '../../../styles/generic.dialog.scss';
@@ -7,10 +7,11 @@ import { capitalize } from "@material-ui/core";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import React from "react";
-import { exportExcelManifest } from "@/services/api.manifesterege1992";
+import { exportExcelManifest, exportExcelManifestBillCode } from "@/services/api.manifesterege1992";
 import { Loading } from "./Loading";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import { showMsg } from "@/helperserege1992";
+import Select from 'react-select';
 
 interface Params {
   close: () => any;
@@ -27,6 +28,8 @@ const ExportDialog = ({ close, title }: Params) => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [disableConfirm, setDisableConfirm] = useState<boolean>(false);
+  const [selectedOption, setSelectedOption] = useState('mwb');
+  const [billCodeValue, setBillCodeValue] = React.useState("");
 
   useEffect(() => {
     loadCarriers();
@@ -46,13 +49,76 @@ const ExportDialog = ({ close, title }: Params) => {
   const handleSubmit = async () => {
     try {
       setDisableConfirm(true);
-      await exportExcelManifest(waybillIDValue, carrierValue);
+      if (selectedOption === 'bill_code') {
+        await exportExcelManifestBillCode(billCodeValue);
+      } else {
+        await exportExcelManifest(waybillIDValue, carrierValue);
+      }
       setDisableConfirm(false);
     } catch (error) {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       showMsg(message, { type: "error" });
     }
   }
+
+  const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedOption(event.target.value);
+  };
+  
+  const validateBillCode = (cadena: string): boolean => {
+    const regex = /^\d{4}_\d{2}_[QMT]_[a-zA-Z\d]+$/;
+  
+    return regex.test(cadena);
+  };
+  
+  const validateBillCodeIncomplete = (cadena: string): boolean => {
+    const regex = /^\d{4}\d{2}[QMT][a-zA-Z\d]+$/;
+  
+    return regex.test(cadena);
+  };
+
+  const formatBillCode = (input: string): string => {console.log("entro")
+    if (!input) {
+      return "";
+    }
+    
+    const cleanedInput = input.replace(/[^a-zA-Z0-9_]/g, '');
+
+    if (validateBillCodeIncomplete(cleanedInput)) {
+      const formattedInput = cleanedInput.replace(/^(\d{4})(\d{2})([QMT])([a-zA-Z\d]+)$/, '$1_$2_$3_$4');
+      return formattedInput;
+    }
+
+    const regex = /^(\d{4})(_?(\d{2}))?_?([QMT])?_?([a-zA-Z\d]*)$/;
+    const match = cleanedInput.match(regex);console.log(match)
+    if (match) {
+      const completeParam = cleanedInput.replace(/_/g, '');
+      const param1 = match[1];
+      const param2 = match[3] || null;
+      const param3 = match[4] || null;
+      const param4 = match[5] || null;
+
+      let response = param1 + '_';
+      if (param2) {
+        response += param2 + '_';
+        if (param3) {
+          response += param3 + '_';
+          if (param4) {
+            response += param4;
+          } else if (completeParam.length > 7) {
+            response += completeParam.substring(7);
+          }
+        } else if (completeParam.length > 6) {
+          response += completeParam.substring(6);
+        }
+      } else if (completeParam.length > 4) {
+        response += completeParam.substring(4);
+      }
+
+      return response;
+    }
+    return cleanedInput;
+  };
 
   return (
     <div className="confirmation_container">
@@ -66,31 +132,82 @@ const ExportDialog = ({ close, title }: Params) => {
           </div>
           <div style={{ width: '500px', maxWidth: '90vw' }}>
             <div className='flex flex-col gap-3'>
-              <div className='flex mt-10 mb-10'>
+              <div className="elements-row-start w-full mt-2" style={{ gap: '20px' }}>
+                <label>
+                  <input
+                    type="radio"
+                    value="mwb"
+                    checked={selectedOption === 'mwb'}
+                    onChange={(e) => handleOptionChange(e)}
+                  />
+                  {"  "}
+                  {intl.formatMessage({ id: "waybill_id" })}
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="bill_code"
+                    checked={selectedOption === 'bill_code'}
+                    onChange={handleOptionChange}
+                  />
+                  {"  "}
+                  {intl.formatMessage({ id: "bill_code" })}
+                </label>
+              </div>
+              {selectedOption === 'mwb' && (
+              <div className='flex mt-5 mb-10'>
                 <div className="mr-2" style={{ width: "100%" }}>
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button
-                        className="bnt-dropdown"
-                        style={{ width: "-webkit-fill-available" }}
-                        endContent={<ChevronDownIcon className="text-small" />}
-                      >
-                        {waybillIDValue.trim() !== "" ? waybillIDValue : intl.formatMessage({ id: "waybill_id" })}
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                      disallowEmptySelection
-                      aria-label="MWB"
-                      closeOnSelect={true}
-                      selectionMode="single"
-                    >
-                      {waybillIDS ? waybillIDS.map((column) => (
-                        <DropdownItem onClick={(e) => setWaybillIDValue(column.waybill_id)} key={column.waybill_id} className="capitalize">
-                          {capitalize(column.waybill_id)}
-                        </DropdownItem>
-                      )) : []}
-                    </DropdownMenu>
-                  </Dropdown>
+                  <Select
+                    isSearchable
+                    options={waybillIDS ? waybillIDS.map((column) => ({
+                      value: column.waybill_id,
+                      label: capitalize(column.waybill_id)
+                    })) : []}
+                    value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
+                    onChange={(selectedOption) => {
+                      if (selectedOption) {
+                        setWaybillIDValue(selectedOption.value);
+                      } else {
+                        setWaybillIDValue("");
+                      }
+                    }}
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        backgroundColor: "#212c4d !important",
+                        border: "1px solid #37446b !important",
+                        borderRadius: "4px !important",
+                        height: "40px",
+                      }),
+                      option: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        backgroundColor: "#212c4d !important",
+                      }), placeholder: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), input: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), singleValue: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), menu: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        backgroundColor: "#212c4d !important",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }),
+                    }}
+                    placeholder={intl.formatMessage({ id: "waybill_id" })}
+                  />
                 </div>
                 <div className="ml-2" style={{ width: "100%" }}>
                   <Dropdown>
@@ -118,7 +235,27 @@ const ExportDialog = ({ close, title }: Params) => {
                     </DropdownMenu>
                   </Dropdown>
                 </div>
-              </div>
+              </div>)}
+              {selectedOption === 'bill_code' && (
+                <div className='flex flex-col mt-5 mb-10'>
+                  <div className='flex mb-2'>
+                    <div className="mr-2" style={{ width: "100%" }}>
+                      <Input
+                        className="search-input"
+                        placeholder={intl.formatMessage({ id: "bill_code" })}
+                        value={billCodeValue}
+                        onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-full">{intl.formatMessage({ id: "format" })}: {intl.formatMessage({ id: "year" })}_{intl.formatMessage({ id: "month" })}_{intl.formatMessage({ id: "period" })}_{intl.formatMessage({ id: "carrier" })}</div>
+                  <div className="w-full">{intl.formatMessage({ id: "year" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '4'})}</div>
+                  <div className="w-full">{intl.formatMessage({ id: "month" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '2'})}</div>
+                  <div className="w-full">{intl.formatMessage({ id: "period" })}: {`{Q | M | T}`}</div>
+                  <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`RedPack | OCA | AMPM | ...`}</div>
+                  <div className="w-full">{intl.formatMessage({ id: "bill_code_ex" }, {year: (new Date()).getFullYear(), month: ((new Date()).getMonth() + 1).toString().padStart(2, '0')})}</div>
+                </div>
+              )}
               <div className="elements-row-end w-full">
                 <Button
                   color="primary"
@@ -126,7 +263,7 @@ const ExportDialog = ({ close, title }: Params) => {
                   className="px-4"
                   style={{ marginRight: '15px' }}
                   onClick={handleSubmit}
-                  disabled={waybillIDValue === "" || disableConfirm}
+                  disabled={(selectedOption === 'mwb' && waybillIDValue === "") || (selectedOption === 'bill_code' && !validateBillCode(billCodeValue)) || disableConfirm }
                 >
                   {intl.formatMessage({ id: "confirmation_header" })}
                 </Button>

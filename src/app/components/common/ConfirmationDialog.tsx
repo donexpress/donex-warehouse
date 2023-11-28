@@ -1,17 +1,21 @@
 import { Button } from "@nextui-org/react";
 import { useIntl } from "react-intl";
+import { Loading } from "./Loading";
 
 interface Params {
   close: () => any;
   confirm: () => any;
+  loading?: boolean;
 }
 
-const ConfirmationDialog = ({ close, confirm }: Params) => {
+const ConfirmationDialog = ({ close, confirm, loading }: Params) => {
   const intl = useIntl();
+  
   return (
     <div className="confirmation_container">
       <div className="confirmation_backdrop" onClick={close}></div>
-      <div className="confirmation_card">
+      <div className={loading ? "confirmation_card dialog-background" : "confirmation_card"}>
+        <Loading loading={ loading } content={intl.formatMessage({ id: "processing" })}>
         <div className="confirmation_card_header black-label">
           <strong>{intl.formatMessage({ id: "confirmation_header" })}</strong>
         </div>
@@ -31,6 +35,7 @@ const ConfirmationDialog = ({ close, confirm }: Params) => {
             {intl.formatMessage({ id: "cancel" })}
           </Button>
         </div>
+        </Loading>
       </div>
     </div>
   );

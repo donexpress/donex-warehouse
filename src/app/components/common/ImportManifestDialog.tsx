@@ -118,6 +118,55 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   
     return regex.test(cadena);
   };
+  
+  const validateBillCodeIncomplete = (cadena: string): boolean => {
+    const regex = /^\d{4}\d{2}[QMT][a-zA-Z\d]+$/;
+  
+    return regex.test(cadena);
+  };
+
+  const formatBillCode = (input: string): string => {
+    if (!input) {
+      return "";
+    }
+    
+    const cleanedInput = input.replace(/[^a-zA-Z0-9_]/g, '');
+
+    if (validateBillCodeIncomplete(cleanedInput)) {
+      const formattedInput = cleanedInput.replace(/^(\d{4})(\d{2})([QMT])([a-zA-Z\d]+)$/, '$1_$2_$3_$4');
+      return formattedInput;
+    }
+
+    const regex = /^(\d{4})(_?(\d{2}))?_?([QMT])?_?([a-zA-Z\d]*)$/;
+    const match = cleanedInput.match(regex);console.log(match)
+    if (match) {
+      const completeParam = cleanedInput.replace(/_/g, '');
+      const param1 = match[1];
+      const param2 = match[3] || null;
+      const param3 = match[4] || null;
+      const param4 = match[5] || null;
+
+      let response = param1 + '_';
+      if (param2) {
+        response += param2 + '_';
+        if (param3) {
+          response += param3 + '_';
+          if (param4) {
+            response += param4;
+          } else if (completeParam.length > 7) {
+            response += completeParam.substring(7);
+          }
+        } else if (completeParam.length > 6) {
+          response += completeParam.substring(6);
+        }
+      } else if (completeParam.length > 4) {
+        response += completeParam.substring(4);
+      }
+
+      return response;
+    }
+    return cleanedInput;
+  };
 
   const handleInputExcel = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -266,7 +315,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                                   className="search-input"
                                   placeholder={intl.formatMessage({ id: "bill_code" })}
                                   value={billCodeValue}
-                                  onChange={(e) => setBillCodeValue(e.target.value)}
+                                  onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
                                 />
                               </div>
                             </div>
@@ -274,8 +323,8 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                             <div className="w-full">{intl.formatMessage({ id: "year" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '4'})}</div>
                             <div className="w-full">{intl.formatMessage({ id: "month" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '2'})}</div>
                             <div className="w-full">{intl.formatMessage({ id: "period" })}: {`{Q | M | T}`}</div>
-                            <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`RedPack | OCA | AMPM`}</div>
-                            <div className="w-full">{intl.formatMessage({ id: "bill_code_ex" }, {year: (new Date()).getFullYear(), month: (new Date()).getMonth().toString().padStart(2, '0')})}</div>
+                            <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`RedPack | OCA | AMPM | ...`}</div>
+                            <div className="w-full">{intl.formatMessage({ id: "bill_code_ex" }, {year: (new Date()).getFullYear(), month: ((new Date()).getMonth() + 1).toString().padStart(2, '0')})}</div>
                             <div className='flex mt-2'>
                               <div className="mr-2" style={{ width: "100%" }}>
                                 <div className='elements-row-start'>

@@ -97,7 +97,7 @@ const ManifestTable = () => {
     direction: "descending",
   });
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
-
+  const [processingInfo, setProcessingInfo] = useState<boolean>(false);
 
   const [page, setPage] = useState(1);
 
@@ -258,7 +258,7 @@ const ManifestTable = () => {
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flexbox-container">
+        <div className="flexbox-container search-container-manifest">
           <div className="flexbox-item" style={{ paddingLeft: 0 }}>
             <Select
               isSearchable
@@ -337,7 +337,7 @@ const ManifestTable = () => {
             />
           </div>
 
-          <div className="flexbox-item">
+          <div className="flexbox-item" style={{ paddingRight: 0 }}>
             <Input
               isClearable
               className="search-input"
@@ -349,7 +349,7 @@ const ManifestTable = () => {
             />
           </div>
 
-          <div className="flexbox-item" style={{ paddingRight: 0 }}>
+          <div className="flexbox-item" style={{ paddingLeft: 0 }}>
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -653,7 +653,12 @@ const ManifestTable = () => {
       const response = await exportBill(currentBillCodeRequest);
       if (response.status >= 200 && response.status <= 299) {
         if (response.data && response.data.url) {
-          window.open(response.data.url, '_blank');
+          const link = document.createElement('a');
+          link.href = response.data.url;
+          link.setAttribute('download', response.data.name);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         }
       } else {
         let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
@@ -665,7 +670,9 @@ const ManifestTable = () => {
   }
 
   const paidBillAction = async() => {
+    setProcessingInfo(true);
     const response = await paidBill(currentBillCodeRequest);
+    setProcessingInfo(false);
     if (response.status >= 200 && response.status <= 299) {
       showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
     } else {
@@ -800,7 +807,7 @@ const ManifestTable = () => {
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
         {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_charged" }, { MWB: (manifestPaidData?.manifest_charged && (manifestPaidData.manifest_charged.length > 0) && manifestPaidData.manifest_charged[0].waybill_id) ? manifestPaidData.manifest_charged[0].waybill_id : '' })} close={closeManifestTableDialog} content={manifestPaidData as ManifestResponse} />}
-        {showPaidBillDialog && <ConfirmationDialog close={closePaidBillDialog} confirm={paidBillAction} />}
+        {showPaidBillDialog && <ConfirmationDialog close={closePaidBillDialog} confirm={paidBillAction} loading={processingInfo} />}
       </Loading>
     </>
   );

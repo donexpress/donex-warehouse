@@ -86,7 +86,17 @@ export const updateSupplierManifest = async (formData: FormData, billCode: Strin
 
 export const exportExcelManifest = async (waybill_id: string, carrier?: string, context?: GetServerSidePropsContext): Promise<any> => {
   const path = carrier ? `${excelPath()}?waybill_id=${waybill_id}&carrier=${carrier}` : `${excelPath()}?waybill_id=${waybill_id}`;
+  const response = await exportExcelManifestFn(path, context);
+  return response;
+}
 
+export const exportExcelManifestBillCode = async (billCode: string): Promise<any> => {
+  const path = `${excelPath()}?bill_code=${billCode}`;
+  const response = await exportExcelManifestFn(path);
+  return response;
+}
+
+export const exportExcelManifestFn = async (path: string, context?: GetServerSidePropsContext): Promise<any> => {
   try {
     const response = await axios.get(path, getHeaders(context));
     if (response.status && (response.status >= 200 && response.status <= 299)) {
@@ -96,7 +106,9 @@ export const exportExcelManifest = async (waybill_id: string, carrier?: string, 
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      return { data: response.data, status: response.status };
     }
+    return { status: response.status ? response.status : 0 };
   } catch (error: any) {
     return { status: error.response && error.response.status ? error.response.status : 0 };
   }
