@@ -337,6 +337,8 @@
 	"processed": "Processed",
 	"cancelled": "Cancelled",
 	"operation_instruction": "Operation instruction",
+	"barcode": "Barcode",
+	"generated_barcodes": "Generated barcodes",
 	"area_code": "Area code",
 	"area_name": "Area Name",
 	"contain_country": "Contains country",

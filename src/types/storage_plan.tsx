@@ -137,3 +137,9 @@ export type StoragePlanCount = {
   returns: number,
   stocked: number
 };
+
+export type BarCode = {
+  number: string;
+  boxes_amount: number;
+  customer_code: string;
+};
