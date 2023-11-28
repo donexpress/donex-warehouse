@@ -49,12 +49,22 @@ const ExportDialog = ({ close, title }: Params) => {
   const handleSubmit = async () => {
     try {
       setDisableConfirm(true);
+      let response: any = null;
       if (selectedOption === 'bill_code') {
-        await exportExcelManifestBillCode(billCodeValue);
+        response = await exportExcelManifestBillCode(billCodeValue);
       } else {
-        await exportExcelManifest(waybillIDValue, carrierValue);
+        response = await exportExcelManifest(waybillIDValue, carrierValue);
       }
       setDisableConfirm(false);
+      if (response.status && response.status >= 200 && response.status <= 299) {
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        if (response.status && (response.status === 404)) {
+          message = intl.formatMessage({ id: 'billNotFoundMsg' });
+        }
+        showMsg(message, { type: "error" });
+      }
     } catch (error) {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       showMsg(message, { type: "error" });
