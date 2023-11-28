@@ -254,6 +254,55 @@ const ManifestTable = () => {
     { value: intl.formatMessage({ id: "export_xlsx" }), id: 1 },
     { value: intl.formatMessage({ id: "pay" }), id: 2 }
   ]
+  
+  const validateBillCodeIncomplete = (cadena: string): boolean => {
+    const regex = /^\d{4}\d{2}[QMT][a-zA-Z\d]+$/;
+  
+    return regex.test(cadena);
+  };
+
+  const formatBillCode = (input: string): string => {
+    if (!input) {
+      return "";
+    }
+    
+    const cleanedInput = input.replace(/[^a-zA-Z0-9_]/g, '');
+
+    if (validateBillCodeIncomplete(cleanedInput)) {
+      const formattedInput = cleanedInput.replace(/^(\d{4})(\d{2})([QMT])([a-zA-Z\d]+)$/, '$1_$2_$3_$4');
+      return formattedInput;
+    }
+
+    const regex = /^(\d{4})(_?(\d{2}))?_?([QMT])?_?([a-zA-Z\d]*)$/;
+    const match = cleanedInput.match(regex);console.log(match)
+    if (match) {
+      const completeParam = cleanedInput.replace(/_/g, '');
+      const param1 = match[1];
+      const param2 = match[3] || null;
+      const param3 = match[4] || null;
+      const param4 = match[5] || null;
+
+      let response = param1 + '_';
+      if (param2) {
+        response += param2 + '_';
+        if (param3) {
+          response += param3 + '_';
+          if (param4) {
+            response += param4;
+          } else if (completeParam.length > 7) {
+            response += completeParam.substring(7);
+          }
+        } else if (completeParam.length > 6) {
+          response += completeParam.substring(6);
+        }
+      } else if (completeParam.length > 4) {
+        response += completeParam.substring(4);
+      }
+
+      return response;
+    }
+    return cleanedInput;
+  };
 
   const topContent = React.useMemo(() => {
     return (
@@ -345,7 +394,7 @@ const ManifestTable = () => {
               startContent={<SearchIcon />}
               value={billCodeValue}
               onClear={() => onClear("BillCodeValue")}
-              onChange={(e) => setBillCodeValue(e.target.value)}
+              onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
             />
           </div>
 
