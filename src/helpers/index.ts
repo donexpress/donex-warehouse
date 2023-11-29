@@ -87,12 +87,31 @@ export const isOMS = (context?: any): boolean => {
   return false;
 };
 
-export const getHeaders = (context?: any, isFile = false) => {
+export const getHeaders = (context?: any, isFile = false, accept?: string) => {
   let configs: AxiosRequestConfig = {
     headers: {
       "Content-Type": isFile ? "multipart/form-data" : "application/json",
     },
   };
+
+  if (accept) {
+    if (accept === 'application/pdf') {
+      configs = {
+        headers: {
+          ...configs.headers,
+          "Accept": accept,
+        },
+        responseType: 'blob'
+      };
+    } else {
+      configs = {
+        headers: {
+          ...configs.headers,
+          "Accept": accept,
+        },
+      };
+    }
+  }
   let tokenWMS = getCookie("tokenWMS");
   let tokenOMS = getCookie("tokenOMS");
   if (context) {

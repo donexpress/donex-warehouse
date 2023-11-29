@@ -83,6 +83,10 @@ export const countUserLevelPath = () => {
   return getBaseUrl() + "/api/v1/user_level/count";
 };
 
+export const barCodePath = () => {
+  return getBaseUrl() + "/api/v1/barcode";
+};
+
 export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number, query?: string) => {
   let params = status !== '' ? `?state=${status}` : "";
   if (page && rowsPerPage) {
