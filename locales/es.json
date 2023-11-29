@@ -231,6 +231,7 @@
   "client_image": "Imagen cliente",
   "staff_image": "Imagen operario",
   "upload": "Subir",
+  "download": "Descargar",
 
   "batch_on_shelves": "Asignar locación",
   "partition": "Zona",

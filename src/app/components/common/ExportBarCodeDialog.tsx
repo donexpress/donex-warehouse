@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/react";
 import { useIntl } from "react-intl";
 import '../../../styles/generic.dialog.scss';
+import { saveAs } from 'file-saver';
 
 interface Params {
   close: () => any;
@@ -11,9 +11,12 @@ interface Params {
 const ExportBarCodeDialog = ({ close, file }: Params) => {
   const intl = useIntl();
 
-  useEffect(() => {
-
-  }, []);
+  const downloadPdf = () => {
+    const time = (new Date()).getTime();
+    const blob = new Blob([file], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    saveAs(url, `barcode_${time}.pdf`);
+  }
   
   return (
     <div className="confirmation_container">
@@ -37,6 +40,15 @@ const ExportBarCodeDialog = ({ close, file }: Params) => {
                   </div>
                 </div>
                 <div className="elements-row-end w-full">
+                  <Button
+                    color="primary"
+                    type="submit"
+                    className="px-4"
+                    style={{ marginRight: '15px' }}
+                    onClick={downloadPdf}
+                  >
+                    {intl.formatMessage({ id: "download" })}
+                  </Button>
                   <Button onClick={close} type="button" className="bg-secundary px-4">
                     {intl.formatMessage({ id: "cancel" })}
                   </Button>
