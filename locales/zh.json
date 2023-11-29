@@ -232,6 +232,7 @@
   "client_image": "客戶形象",
   "staff_image": "員工形象",
   "upload": "增加",
+  "download": "釋放",
 
   "batch_on_shelves": "批量上架",
   "partition": "分区",
@@ -343,6 +344,8 @@
   "processed": "处理",
   "cancelled": "取消",
   "operation_instruction": "操作指令",
+  "barcode": "條碼",
+  "generated_barcodes": "產生的條碼",
 
   "area_code": "區號",
   "area_name": "區域名稱",
