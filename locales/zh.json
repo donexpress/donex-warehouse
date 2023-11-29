@@ -16,8 +16,9 @@
   "successLoginMsg": "歡迎您！您已成功登錄",
   "hello": "你好",
   "unknownStatusErrorMsg": "嘗試執行操作時發生錯誤，請重試",
-  "successivelyMsg": "項目創建成功",
-  "changedsuccessivelyMsg": "項目更改成功",
+  "billNotFoundMsg": "未找到包含所提供資訊的發票。",
+  "successfullyMsg": "項目創建成功",
+  "changedsuccessfullyMsg": "項目更改成功",
   "successfullyActionMsg": "操作已成功執行",
   "dontExistUserPasswordMsg": "用戶名或密碼錯誤，請重試",
   "item_has_been_canceled": "該商品已被取消",
@@ -440,5 +441,7 @@
   "repeated": "重複",
   "guides_not_found": "未找到指南",
 	"not_found_manifest_charged": "清單重複產品",
-  "close_modal": "關閉"
+  "close_modal": "關閉",
+  "paid_guide": "有薪資的",
+  "pay": "支付"
 }

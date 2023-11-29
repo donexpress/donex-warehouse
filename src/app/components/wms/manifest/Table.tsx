@@ -18,6 +18,7 @@ import {
 import Select from 'react-select';
 import { SearchIcon } from "../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
+import { showMsg } from "../../../../helpers";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
 import PaginationTable from "../../common/Pagination";
@@ -26,7 +27,7 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
-import { getGuides, guidesCount } from "@/services/api.manifesterege1992";
+import { getGuides, guidesCount, paidBill, exportBill } from "@/services/api.manifesterege1992";
 import { Guide, GuidesCount, ManifestResponse } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
@@ -73,11 +74,14 @@ const ManifestTable = () => {
   const [showProfitDialog, setShowProfitDialog] = useState<boolean>(false);
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
   const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
+  const [showPaidBillDialog, setShowPaidBillDialog] = useState<boolean>(false);
   const [visibleDialogTable, setVisibleDialogTable] = useState<boolean>(false);
   const [whereUpdate, setWhereUpdate] = useState<string>("");
 
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
+  const [billCodeValue, setBillCodeValue] = React.useState("");
+  const [currentBillCodeRequest, setCurrentBillCodeRequest] = React.useState("");
   const [carrierValue, setCarrierValue] = React.useState("");
   const [waybillIDValue, setWaybillIDValue] = React.useState("");
   const [paidValue, setPaidValue] = React.useState("");
@@ -93,7 +97,7 @@ const ManifestTable = () => {
     direction: "descending",
   });
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
-
+  const [processingInfo, setProcessingInfo] = useState<boolean>(false);
 
   const [page, setPage] = useState(1);
 
@@ -226,6 +230,8 @@ const ManifestTable = () => {
 
   const handleClearAll = async () => {
     setClientReferenceValue("");
+    setBillCodeValue("");
+    setCurrentBillCodeRequest("");
     setTrackingNumberValue("");
     setCarrierValue("");
     setWaybillIDValue("");
@@ -244,10 +250,64 @@ const ManifestTable = () => {
     { value: intl.formatMessage({ id: "supplier_invoice" }), id: 1 }
   ]
 
+  const arrayBillCode = [
+    { value: intl.formatMessage({ id: "export_xlsx" }), id: 1 },
+    { value: intl.formatMessage({ id: "pay" }), id: 2 }
+  ]
+  
+  const validateBillCodeIncomplete = (cadena: string): boolean => {
+    const regex = /^\d{4}\d{2}[QMT][a-zA-Z\d]+$/;
+  
+    return regex.test(cadena);
+  };
+
+  const formatBillCode = (input: string): string => {
+    if (!input) {
+      return "";
+    }
+    
+    const cleanedInput = input.replace(/[^a-zA-Z0-9_]/g, '');
+
+    if (validateBillCodeIncomplete(cleanedInput)) {
+      const formattedInput = cleanedInput.replace(/^(\d{4})(\d{2})([QMT])([a-zA-Z\d]+)$/, '$1_$2_$3_$4');
+      return formattedInput;
+    }
+
+    const regex = /^(\d{4})(_?(\d{2}))?_?([QMT])?_?([a-zA-Z\d]*)$/;
+    const match = cleanedInput.match(regex);console.log(match)
+    if (match) {
+      const completeParam = cleanedInput.replace(/_/g, '');
+      const param1 = match[1];
+      const param2 = match[3] || null;
+      const param3 = match[4] || null;
+      const param4 = match[5] || null;
+
+      let response = param1 + '_';
+      if (param2) {
+        response += param2 + '_';
+        if (param3) {
+          response += param3 + '_';
+          if (param4) {
+            response += param4;
+          } else if (completeParam.length > 7) {
+            response += completeParam.substring(7);
+          }
+        } else if (completeParam.length > 6) {
+          response += completeParam.substring(6);
+        }
+      } else if (completeParam.length > 4) {
+        response += completeParam.substring(4);
+      }
+
+      return response;
+    }
+    return cleanedInput;
+  };
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flexbox-container">
+        <div className="flexbox-container search-container-manifest">
           <div className="flexbox-item" style={{ paddingLeft: 0 }}>
             <Select
               isSearchable
@@ -327,6 +387,18 @@ const ManifestTable = () => {
           </div>
 
           <div className="flexbox-item" style={{ paddingRight: 0 }}>
+            <Input
+              isClearable
+              className="search-input"
+              placeholder={intl.formatMessage({ id: "bill_code" })}
+              startContent={<SearchIcon />}
+              value={billCodeValue}
+              onClear={() => onClear("BillCodeValue")}
+              onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
+            />
+          </div>
+
+          <div className="flexbox-item" style={{ paddingLeft: 0 }}>
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -394,6 +466,30 @@ const ManifestTable = () => {
                 ))}
               </DropdownMenu>
             </Dropdown>
+
+            {(currentBillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  color="primary"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                >
+                  {intl.formatMessage({ id: "bill_code" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Bill Code"
+                closeOnSelect={true}
+                selectionMode="single"
+              >
+                {arrayBillCode.map((column) => (
+                  <DropdownItem key={column.id} onClick={(e) => handleActionBillCode(column.id)} className="capitalize">
+                    {capitalize(column.value)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            )}
 
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
@@ -474,9 +570,11 @@ const ManifestTable = () => {
     intl,
     trackingNumberValue,
     clientReferenceValue,
+    billCodeValue,
     waybillIDValue,
     carrierValue,
-    paidValue
+    paidValue,
+    guidesTotal
   ]);
 
   const changePage = async (newPage: number) => {
@@ -566,6 +664,12 @@ const ManifestTable = () => {
     if (clientReferenceValue.trim() !== "") {
       arrayFilters.push(`client_reference=${clientReferenceValue}`);
     }
+    if (billCodeValue.trim() !== "") {
+      arrayFilters.push(`bill_code=${billCodeValue}`);
+      setCurrentBillCodeRequest(billCodeValue);
+    } else if (currentBillCodeRequest !== "") {
+      setCurrentBillCodeRequest("");
+    }
     if (waybillIDValue.trim() !== "") {
       arrayFilters.push(`waybill_id=${waybillIDValue}`);
     }
@@ -592,6 +696,49 @@ const ManifestTable = () => {
   //   setShowConfirm(true);
   //   setDeleteElemtent(id);
   // };
+
+  const handleActionBillCode = async(action: number) => {
+    if (action === 1) {
+      const response = await exportBill(currentBillCodeRequest);
+      if (response.status >= 200 && response.status <= 299) {
+        if (response.data && response.data.url) {
+          const link = document.createElement('a');
+          link.href = response.data.url;
+          link.setAttribute('download', response.data.name);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      } else {
+        let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+        showMsg(message, { type: "error" });
+      }
+    } else if (action === 2) {
+      openPaidBillDialog();
+    }
+  }
+
+  const paidBillAction = async() => {
+    setProcessingInfo(true);
+    const response = await paidBill(currentBillCodeRequest);
+    setProcessingInfo(false);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
+    closePaidBillDialog();
+    await reloadData(page, rowsPerPage, filters);
+  }
+
+  const openPaidBillDialog = () => {
+    setShowPaidBillDialog(true);
+  }
+
+  const closePaidBillDialog = () => {
+    setShowPaidBillDialog(false);
+  }
 
   const openExportDialog = () => {
     setShowExportDialog(true);
@@ -709,6 +856,7 @@ const ManifestTable = () => {
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
         {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_charged" }, { MWB: (manifestPaidData?.manifest_charged && (manifestPaidData.manifest_charged.length > 0) && manifestPaidData.manifest_charged[0].waybill_id) ? manifestPaidData.manifest_charged[0].waybill_id : '' })} close={closeManifestTableDialog} content={manifestPaidData as ManifestResponse} />}
+        {showPaidBillDialog && <ConfirmationDialog close={closePaidBillDialog} confirm={paidBillAction} loading={processingInfo} />}
       </Loading>
     </>
   );
