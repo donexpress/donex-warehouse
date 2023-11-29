@@ -21,9 +21,9 @@ const RowStoragePlanHeader: React.FC<RowStoragePlanHeaderProps> = ({ onlyReadly 
           </div>
         )
       }
-        <div className='elements-center'>
+        {/* <div className='elements-center'>
           <span className='text-center'>{intl.formatMessage({ id: 'transfer_order_number' })}</span>
-        </div>
+        </div> */}
         <div className='elements-center'>
           <span className='text-center'>{intl.formatMessage({ id: 'amount' })} {!onlyReadly ? '*' : ''}</span>
         </div>

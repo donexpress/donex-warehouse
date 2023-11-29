@@ -188,7 +188,6 @@ export const downloadTemplateCreateManifest = () => {
       "Bag ID": '',
       "TRACKING NUMBER(AWB)": '',
       "CLIENT REF.NO": '',
-      "Customer REF. NO": '',
       "SHIPPER": '',
       "SHIPPER ADDRESS": '',
       "CITY NAME SHIPPER": '',
@@ -218,7 +217,7 @@ export const downloadTemplateCreateManifest = () => {
   const fileExtension = ".xlsx";
   const ws = XLSX.utils.json_to_sheet(dataToExport);
   ws["!cols"] = [{ wch: 20 }, { wch: 20 }, { wch: 20 }
-    , { wch: 24 }, { wch: 15 }, { wch: 20 }, { wch: 16 }, { wch: 20 }, { wch: 20 }, { wch: 24 }
+    , { wch: 24 }, { wch: 15 }, { wch: 16 }, { wch: 20 }, { wch: 20 }, { wch: 24 }
     , { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }
     , { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 24 }];
   const range = XLSX.utils.decode_range(ws["!ref"] || "A1:A1"); // Add a default range if "!ref" is undefined
@@ -609,7 +608,7 @@ export const packingListDataToExcel = (
       pList[key1] = pl.box_number;
       pList[key2] = pl.case_number;
       pList[key3] = pl.output_plan_delivered_number ? pl.output_plan_delivered_number : "--";
-      pList[key4] = pl.order_transfer_number ? pl.order_transfer_number : "--";
+      //pList[key4] = pl.order_transfer_number ? pl.order_transfer_number : "--";
       pList[key5] = storagePlan.pr_number ? storagePlan.pr_number : "--";
       pList[
         key6
@@ -698,8 +697,8 @@ export const packingListDataToExcel = (
           pList[key3_0] = pl.output_plan_delivered_number ? pl.output_plan_delivered_number : "--";
         }
         pList[key3_1] =
-        pl.package_shelf && pl.package_shelf.length > 0
-          ? (storagePlan.warehouse
+          pl.package_shelf && pl.package_shelf.length > 0
+            ? (storagePlan.warehouse
               ? `${storagePlan.warehouse.code}-${String(
                 pl.package_shelf[0].shelf?.partition_table
               ).padStart(2, "0")}-${String(
@@ -752,7 +751,7 @@ export const packingListDataToExcel = (
           )}`
           : "--";
       }
-      pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
+      //pList[key3] = pl.order_transfer_number ? pl.order_transfer_number : "--";
       pList[key4] = (pl.amount || pl.amount === 0) ? pl.amount.toString() : "--";
       pList[key5] = (pl.client_weight || pl.client_weight === 0) ? pl.client_weight.toString() : "--";
       pList[key6] = (pl.client_length || pl.client_length === 0) ? pl.client_length.toString() : "--";
@@ -792,9 +791,10 @@ export const packingListDataToExcel = (
 };
 
 export const manifestPaidDataToExcel = (
-  manifest_paid: Guide[],
+  manifest_charged: Guide[],
   intl: IntlShape,
-  visibleColumn: string[]
+  visibleColumn: string[],
+  isNotFound: boolean = false,
 ) => {
   let dataToExport: object[] = [];
 
@@ -802,7 +802,7 @@ export const manifestPaidDataToExcel = (
     return data ? "Pagados" : "No Pagados"
   };
 
-  manifest_paid.forEach((guide: Guide) => {
+  manifest_charged.forEach((guide: Guide) => {
     const oInst: { [key: string]: string } = {};
     visibleColumn.forEach((column) => {
       switch (column) {
@@ -878,7 +878,7 @@ export const manifestPaidDataToExcel = (
   const data = new Blob([excelBuffer], { type: fileType });
   FileSaver.saveAs(
     data,
-    `${intl.formatMessage({ id: "manifest_paid" })}` +
+    (!isNotFound ? `${intl.formatMessage({ id: "not_found_manifest_charged" })}` : `${intl.formatMessage({ id: "guides_not_found" })}`) +
     fileExtension
   );
 };

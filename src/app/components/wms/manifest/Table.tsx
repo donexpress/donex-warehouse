@@ -15,8 +15,10 @@ import {
   SortDescriptor,
   Input,
 } from "@nextui-org/react";
+import Select from 'react-select';
 import { SearchIcon } from "../../common/SearchIcon";
 import { capitalize } from "../../../../helpers/utils";
+import { showMsg } from "../../../../helpers";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
 import PaginationTable from "../../common/Pagination";
@@ -25,21 +27,23 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
-import { getGuides, guidesCount } from "@/services/api.manifesterege1992";
-import { Guide, GuidesCount } from "@/types/guideerege1992";
+import { getGuides, guidesCount, paidBill, exportBill } from "@/services/api.manifesterege1992";
+import { Guide, GuidesCount, ManifestResponse } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
 import { PlusIcon } from "../../common/PlusIcon";
-import { FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
+import { FaCalculator, FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
 import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import ExportDialog from "../../common/ExportDialog";
+import ProfitDialog from "../../common/ProfitDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
+  "clientReference",
   "tracking_number",
   "weigth",
   "currency",
@@ -67,18 +71,22 @@ const ManifestTable = () => {
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
   const [showExportDialog, setShowExportDialog] = useState<boolean>(false);
+  const [showProfitDialog, setShowProfitDialog] = useState<boolean>(false);
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
   const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
+  const [showPaidBillDialog, setShowPaidBillDialog] = useState<boolean>(false);
   const [visibleDialogTable, setVisibleDialogTable] = useState<boolean>(false);
   const [whereUpdate, setWhereUpdate] = useState<string>("");
 
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
+  const [billCodeValue, setBillCodeValue] = React.useState("");
+  const [currentBillCodeRequest, setCurrentBillCodeRequest] = React.useState("");
   const [carrierValue, setCarrierValue] = React.useState("");
   const [waybillIDValue, setWaybillIDValue] = React.useState("");
   const [paidValue, setPaidValue] = React.useState("");
 
-  const [manifestPaidData, setManifestPaidData] = React.useState<Guide[]>([]);
+  const [manifestPaidData, setManifestPaidData] = React.useState<ManifestResponse | null>(null);
 
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -89,7 +97,7 @@ const ManifestTable = () => {
     direction: "descending",
   });
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
-
+  const [processingInfo, setProcessingInfo] = useState<boolean>(false);
 
   const [page, setPage] = useState(1);
 
@@ -222,6 +230,8 @@ const ManifestTable = () => {
 
   const handleClearAll = async () => {
     setClientReferenceValue("");
+    setBillCodeValue("");
+    setCurrentBillCodeRequest("");
     setTrackingNumberValue("");
     setCarrierValue("");
     setWaybillIDValue("");
@@ -235,38 +245,121 @@ const ManifestTable = () => {
   ]
 
   const arrayUpdateManifest = [
-    { value: intl.formatMessage({ id: "customer_manifest" }), id: 0 },
-    { value: intl.formatMessage({ id: "supplier_manifest" }), id: 1 }
+    { value: intl.formatMessage({ id: "manifest" }), id: 2 },
+    { value: intl.formatMessage({ id: "customer_invoice" }), id: 0 },
+    { value: intl.formatMessage({ id: "supplier_invoice" }), id: 1 }
   ]
+
+  const arrayBillCode = [
+    { value: intl.formatMessage({ id: "export_xlsx" }), id: 1 },
+    { value: intl.formatMessage({ id: "pay" }), id: 2 }
+  ]
+  
+  const validateBillCodeIncomplete = (cadena: string): boolean => {
+    const regex = /^\d{4}\d{2}[QMT][a-zA-Z\d]+$/;
+  
+    return regex.test(cadena);
+  };
+
+  const formatBillCode = (input: string): string => {
+    if (!input) {
+      return "";
+    }
+    
+    const cleanedInput = input.replace(/[^a-zA-Z0-9_]/g, '');
+
+    if (validateBillCodeIncomplete(cleanedInput)) {
+      const formattedInput = cleanedInput.replace(/^(\d{4})(\d{2})([QMT])([a-zA-Z\d]+)$/, '$1_$2_$3_$4');
+      return formattedInput;
+    }
+
+    const regex = /^(\d{4})(_?(\d{2}))?_?([QMT])?_?([a-zA-Z\d]*)$/;
+    const match = cleanedInput.match(regex);console.log(match)
+    if (match) {
+      const completeParam = cleanedInput.replace(/_/g, '');
+      const param1 = match[1];
+      const param2 = match[3] || null;
+      const param3 = match[4] || null;
+      const param4 = match[5] || null;
+
+      let response = param1 + '_';
+      if (param2) {
+        response += param2 + '_';
+        if (param3) {
+          response += param3 + '_';
+          if (param4) {
+            response += param4;
+          } else if (completeParam.length > 7) {
+            response += completeParam.substring(7);
+          }
+        } else if (completeParam.length > 6) {
+          response += completeParam.substring(6);
+        }
+      } else if (completeParam.length > 4) {
+        response += completeParam.substring(4);
+      }
+
+      return response;
+    }
+    return cleanedInput;
+  };
 
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flexbox-container">
+        <div className="flexbox-container search-container-manifest">
           <div className="flexbox-item" style={{ paddingLeft: 0 }}>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  className="bnt-dropdown"
-                  style={{ width: "-webkit-fill-available" }}
-                  endContent={<ChevronDownIcon className="text-small" />}
-                >
-                  {waybillIDValue.trim() !== "" ? waybillIDValue : intl.formatMessage({ id: "waybill_id" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="MWB"
-                closeOnSelect={true}
-                selectionMode="single"
-              >
-                {waybillIDS ? waybillIDS.map((column) => (
-                  <DropdownItem onClick={(e) => setWaybillIDValue(column.waybill_id)} key={column.waybill_id} className="capitalize">
-                    {capitalize(column.waybill_id)}
-                  </DropdownItem>
-                )) : []}
-              </DropdownMenu>
-            </Dropdown>
+            <Select
+              isSearchable
+              options={waybillIDS ? waybillIDS.map((column) => ({
+                value: column.waybill_id,
+                label: capitalize(column.waybill_id)
+              })) : []}
+              value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
+              onChange={(selectedOption) => {
+                if (selectedOption) {
+                  setWaybillIDValue(selectedOption.value);
+                } else {
+                  setWaybillIDValue("");
+                }
+              }}
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#212c4d !important",
+                  border: "1px solid #37446b !important",
+                  borderRadius: "4px !important",
+                  height: "40px",
+                }),
+                option: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  backgroundColor: "#212c4d !important",
+                }), placeholder: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  fontWeight: 400,
+                  fontSize: "var(--nextui-font-size-small)"
+                }), input: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  fontWeight: 400,
+                  fontSize: "var(--nextui-font-size-small)"
+                }), singleValue: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  fontWeight: 400,
+                  fontSize: "var(--nextui-font-size-small)"
+                }), menu: (provided) => ({
+                  ...provided,
+                  color: "#aeb9e1",
+                  backgroundColor: "#212c4d !important",
+                  fontWeight: 400,
+                  fontSize: "var(--nextui-font-size-small)"
+                }),
+              }}
+              placeholder={intl.formatMessage({ id: "waybill_id" })}
+            />
           </div>
 
           <div className="flexbox-item">
@@ -293,36 +386,19 @@ const ManifestTable = () => {
             />
           </div>
 
-          {/* <div className="flexbox-item" style={{ paddingRight: 0 }}>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  className="bnt-dropdown"
-                  // isIconOnly
-                  style={{ width: "-webkit-fill-available" }}
-                  endContent={<ChevronDownIcon className="text-small" />}
-                >
-                  {intl.formatMessage({ id: "accountStatus" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Account Status"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
-              > */}
-          {/* {getColumns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))} */}
-          {/* </DropdownMenu>
-            </Dropdown> */}
-          {/* </div> */}
-
           <div className="flexbox-item" style={{ paddingRight: 0 }}>
+            <Input
+              isClearable
+              className="search-input"
+              placeholder={intl.formatMessage({ id: "bill_code" })}
+              startContent={<SearchIcon />}
+              value={billCodeValue}
+              onClear={() => onClear("BillCodeValue")}
+              onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
+            />
+          </div>
+
+          <div className="flexbox-item" style={{ paddingLeft: 0 }}>
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -347,33 +423,6 @@ const ManifestTable = () => {
               </DropdownMenu>
             </Dropdown>
           </div>
-
-          {/* <div className="flexbox-item" style={{ paddingRight: 0 }}>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  className="bnt-dropdown"
-                  // isIconOnly
-                  style={{ width: "-webkit-fill-available" }}
-                  endContent={<ChevronDownIcon className="text-small" />}
-                >
-                  {paidValue.trim() !== "" ? paidValue : intl.formatMessage({ id: "paid" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Paid"
-                closeOnSelect={true}
-                selectionMode="single"
-              >
-                {arrayPaids.map((column) => (
-                  <DropdownItem onClick={(e) => setPaidValue(column.value)} key={column.id} className="capitalize">
-                    {capitalize(column.value)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-          </div> */}
         </div>
         <div className="flex justify-between">
           <div className="flex justify-start gap-3 items-start">
@@ -418,13 +467,37 @@ const ManifestTable = () => {
               </DropdownMenu>
             </Dropdown>
 
+            {(currentBillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  color="primary"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                >
+                  {intl.formatMessage({ id: "bill_code" })}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Bill Code"
+                closeOnSelect={true}
+                selectionMode="single"
+              >
+                {arrayBillCode.map((column) => (
+                  <DropdownItem key={column.id} onClick={(e) => handleActionBillCode(column.id)} className="capitalize">
+                    {capitalize(column.value)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            )}
+
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
-                  className="bnt-select"
+                  color="primary"
                   endContent={<ChevronDownIcon className="text-small" />}
                 >
-                  {intl.formatMessage({ id: "update" })}
+                  {intl.formatMessage({ id: "create" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -434,12 +507,23 @@ const ManifestTable = () => {
                 selectionMode="single"
               >
                 {arrayUpdateManifest.map((column) => (
-                  <DropdownItem key={column.id} onClick={(e) => openUpdateManifestDialog(column.id)} className="capitalize">
+                  <DropdownItem key={column.id} onClick={(e) => (column.id !== 2) ? openUpdateManifestDialog(column.id) : openImportManifestDialog()} className="capitalize">
                     {capitalize(column.value)}
                   </DropdownItem>
                 ))}
               </DropdownMenu>
             </Dropdown>
+
+            <Button
+              color="primary"
+              style={{ width: "140px" }}
+              endContent={
+                <FaCalculator style={{ fontSize: "22px", color: "white" }} />
+              }
+              onClick={() => openProfitDialog()}
+            >
+              {intl.formatMessage({ id: "profit" })}
+            </Button>
 
             <Button
               color="primary"
@@ -452,13 +536,13 @@ const ManifestTable = () => {
               {intl.formatMessage({ id: "export_xlsx" })}
             </Button>
 
-            <Button
+            {/* <Button
               color="primary"
               endContent={<PlusIcon />}
               onClick={() => openImportManifestDialog()}
             >
               {intl.formatMessage({ id: "create" })}
-            </Button>
+            </Button> */}
           </div>
         </div>
         <div className="flex justify-between items-center">
@@ -486,9 +570,11 @@ const ManifestTable = () => {
     intl,
     trackingNumberValue,
     clientReferenceValue,
+    billCodeValue,
     waybillIDValue,
     carrierValue,
-    paidValue
+    paidValue,
+    guidesTotal
   ]);
 
   const changePage = async (newPage: number) => {
@@ -578,6 +664,12 @@ const ManifestTable = () => {
     if (clientReferenceValue.trim() !== "") {
       arrayFilters.push(`client_reference=${clientReferenceValue}`);
     }
+    if (billCodeValue.trim() !== "") {
+      arrayFilters.push(`bill_code=${billCodeValue}`);
+      setCurrentBillCodeRequest(billCodeValue);
+    } else if (currentBillCodeRequest !== "") {
+      setCurrentBillCodeRequest("");
+    }
     if (waybillIDValue.trim() !== "") {
       arrayFilters.push(`waybill_id=${waybillIDValue}`);
     }
@@ -605,12 +697,63 @@ const ManifestTable = () => {
   //   setDeleteElemtent(id);
   // };
 
+  const handleActionBillCode = async(action: number) => {
+    if (action === 1) {
+      const response = await exportBill(currentBillCodeRequest);
+      if (response.status >= 200 && response.status <= 299) {
+        if (response.data && response.data.url) {
+          const link = document.createElement('a');
+          link.href = response.data.url;
+          link.setAttribute('download', response.data.name);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      } else {
+        let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+        showMsg(message, { type: "error" });
+      }
+    } else if (action === 2) {
+      openPaidBillDialog();
+    }
+  }
+
+  const paidBillAction = async() => {
+    setProcessingInfo(true);
+    const response = await paidBill(currentBillCodeRequest);
+    setProcessingInfo(false);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
+    closePaidBillDialog();
+    await reloadData(page, rowsPerPage, filters);
+  }
+
+  const openPaidBillDialog = () => {
+    setShowPaidBillDialog(true);
+  }
+
+  const closePaidBillDialog = () => {
+    setShowPaidBillDialog(false);
+  }
+
   const openExportDialog = () => {
     setShowExportDialog(true);
   }
 
   const closeExportDialog = () => {
     setShowExportDialog(false);
+  }
+
+  const openProfitDialog = () => {
+    setShowProfitDialog(true);
+  }
+
+  const closeProfitDialog = () => {
+    setShowProfitDialog(false);
   }
 
   const openImportManifestDialog = () => {
@@ -649,11 +792,21 @@ const ManifestTable = () => {
     setVisibleDialogTable(false);
   }
 
-  const handleManifestTableDialog = (content: Guide[]) => {
+  const handleManifestTableDialog = (content: ManifestResponse) => {
     setShowUpdateManifestDialog(false);
     if (whereUpdate === "supplier") {
-      setManifestPaidData(content);
-      setVisibleDialogTable(true);
+      const message = intl.formatMessage({ id: "manifest_success" });
+      showMsg(message, { type: "success" });
+      if (content.manifests_bill_code && (content.manifests_bill_code.length > 0)) {
+        const link = document.createElement('a');
+        link.href = content.manifests_bill_code[0].url;
+        link.setAttribute('download', content.manifests_bill_code[0].name);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      /* setManifestPaidData(content);
+      setVisibleDialogTable(true); */
     }
   }
 
@@ -709,9 +862,11 @@ const ManifestTable = () => {
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showExportDialog && <ExportDialog close={closeExportDialog} title={intl.formatMessage({ id: "export_manifests" })} />}
+        {showProfitDialog && <ProfitDialog close={closeProfitDialog} title={intl.formatMessage({ id: "calculate_profit" })} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
-        {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_paid" }, { MWB: manifestPaidData[0].waybill_id })} close={closeManifestTableDialog} content={manifestPaidData} />}
+        {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_charged" }, { MWB: (manifestPaidData?.manifest_charged && (manifestPaidData.manifest_charged.length > 0) && manifestPaidData.manifest_charged[0].waybill_id) ? manifestPaidData.manifest_charged[0].waybill_id : '' })} close={closeManifestTableDialog} content={manifestPaidData as ManifestResponse} />}
+        {showPaidBillDialog && <ConfirmationDialog close={closePaidBillDialog} confirm={paidBillAction} loading={processingInfo} />}
       </Loading>
     </>
   );
