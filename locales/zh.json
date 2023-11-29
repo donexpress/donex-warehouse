@@ -31,6 +31,7 @@
   "warehouse_name_already_exists": "倉庫名稱已存在",
   "warehouse_code_already_exists": "倉庫代碼已存在",
   "user_with_problem": "我們對該用戶有疑問。 請聯絡管理員尋求解決方案。",
+  "manifest_success": "清單已成功添加，將下載發票摘要",
   "returns": "返回",
   "decline": "衰退",
   "normal": "普通的",

@@ -795,7 +795,7 @@ const ManifestTable = () => {
   const handleManifestTableDialog = (content: ManifestResponse) => {
     setShowUpdateManifestDialog(false);
     if (whereUpdate === "supplier") {
-      const message = intl.formatMessage({ id: "successfullyActionMsg" });
+      const message = intl.formatMessage({ id: "manifest_success" });
       showMsg(message, { type: "success" });
       if (content.manifests_bill_code && (content.manifests_bill_code.length > 0)) {
         const link = document.createElement('a');
