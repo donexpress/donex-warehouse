@@ -11,6 +11,7 @@ import { calculateProfit, exportExcelManifest } from "@/services/api.manifestere
 import { Loading } from "./Loading";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import { showMsg } from "@/helperserege1992";
+import Select from 'react-select';
 
 interface Params {
   close: () => any;
@@ -76,29 +77,63 @@ const ProfitDialog = ({ close, title }: Params) => {
             <div className='flex flex-col gap-3'>
               <div className='flex mt-11 mb-2'>
                 <div className="mr-2" style={{ width: "100%" }}>
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button
-                        className="bnt-dropdown"
-                        style={{ width: "-webkit-fill-available" }}
-                        endContent={<ChevronDownIcon className="text-small" />}
-                      >
-                        {waybillIDValue.trim() !== "" ? waybillIDValue : intl.formatMessage({ id: "waybill_id" })}
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                      disallowEmptySelection
-                      aria-label="MWB"
-                      closeOnSelect={true}
-                      selectionMode="single"
-                    >
-                      {waybillIDS ? waybillIDS.map((column) => (
-                        <DropdownItem onClick={(e) => setWaybillIDValue(column.waybill_id)} key={column.waybill_id} className="capitalize">
-                          {capitalize(column.waybill_id)}
-                        </DropdownItem>
-                      )) : []}
-                    </DropdownMenu>
-                  </Dropdown>
+                  <Select
+                    isSearchable
+                    options={waybillIDS ? waybillIDS.map((column) => ({
+                      value: column.waybill_id,
+                      label: capitalize(column.waybill_id)
+                    })) : []}
+                    value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
+                    onChange={(selectedOption) => {
+                      if (selectedOption) {
+                        if (waybillIDValue !== selectedOption.value) {
+                          setWaybillIDValue(selectedOption.value);
+                          setDifferenceSumValue("");
+                          setSalePriceValue("");
+                          setShippingCostValue("");
+                          setNumberShipmentsValue("");
+                        }
+                      } else {
+                        setWaybillIDValue("");
+                      }
+                    }}
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        backgroundColor: "#212c4d !important",
+                        border: "1px solid #37446b !important",
+                        borderRadius: "4px !important",
+                        height: "40px",
+                      }),
+                      option: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        backgroundColor: "#212c4d !important",
+                      }), placeholder: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), input: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), singleValue: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), menu: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        backgroundColor: "#212c4d !important",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }),
+                    }}
+                    placeholder={intl.formatMessage({ id: "waybill_id" })}
+                  />
                 </div>
                 <div className="ml-2" style={{ width: "100%" }}>
                   <Dropdown>

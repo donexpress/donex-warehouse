@@ -16,7 +16,8 @@
 	"successLoginMsg": "Welcome! You have successfully logged in",
 	"hello": "Hello",
 	"unknownStatusErrorMsg": "An error occurred while trying to execute the action, please try again",
-	"successfullyMsg": "Item created successfully",
+	"billNotFoundMsg": "An invoice with the information provided has not been found.",
+  	"successfullyMsg": "Item created successfully",
 	"changedsuccessfullyMsg": "Item changed successfully",
 	"successfullyActionMsg": "The action was executed successfully",
 	"dontExistUserPasswordMsg": "User or password incorrect, please try again",
@@ -432,5 +433,7 @@
 	"repeated": "Repeated",
 	"guides_not_found": "Guides not found",
 	"not_found_manifest_charged": "Manifest Repeat Products",
-	"close_modal": "Close"
+	"close_modal": "Close",
+	"paid_guide": "Paid",
+	"pay": "Pay"
 }
