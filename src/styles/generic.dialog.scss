@@ -9,6 +9,12 @@
     padding: 40px;
 }
 
+.dialog-table-background-manifest {
+    background: #080f25 !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    padding: 15px 20px;
+}
+
 .fields-shelf-dialog {
     display: grid;
     grid-template-columns: 1fr 1fr;

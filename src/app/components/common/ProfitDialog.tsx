@@ -11,6 +11,7 @@ import { calculateProfit, exportExcelManifest } from "@/services/api.manifestere
 import { Loading } from "./Loading";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import { showMsg } from "@/helperserege1992";
+import Select from 'react-select';
 
 interface Params {
   close: () => any;
@@ -25,6 +26,7 @@ const ProfitDialog = ({ close, title }: Params) => {
   const [carrierValue, setCarrierValue] = React.useState("");
   const [differenceSumValue, setDifferenceSumValue] = React.useState("");
   const [salePriceValue, setSalePriceValue] = React.useState("");
+  const [numberShipmentsValue, setNumberShipmentsValue] = React.useState("");
   const [shippingCostValue, setShippingCostValue] = React.useState("");
   const [waybillIDValue, setWaybillIDValue] = React.useState("");
 
@@ -53,6 +55,7 @@ const ProfitDialog = ({ close, title }: Params) => {
       setDifferenceSumValue(profit.data.difference_sum);
       setSalePriceValue(profit.data.sale_price);
       setShippingCostValue(profit.data.shipping_cost);
+      setNumberShipmentsValue(profit.data.count_manifest);
       setDisableConfirm(false);
     } catch (error) {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
@@ -70,33 +73,67 @@ const ProfitDialog = ({ close, title }: Params) => {
               <strong>{title}</strong>
             </div>
           </div>
-          <div style={{ width: '500px', maxWidth: '90vw' }}>
+          <div style={{ width: '550px', maxWidth: '90vw' }}>
             <div className='flex flex-col gap-3'>
               <div className='flex mt-11 mb-2'>
                 <div className="mr-2" style={{ width: "100%" }}>
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button
-                        className="bnt-dropdown"
-                        style={{ width: "-webkit-fill-available" }}
-                        endContent={<ChevronDownIcon className="text-small" />}
-                      >
-                        {waybillIDValue.trim() !== "" ? waybillIDValue : intl.formatMessage({ id: "waybill_id" })}
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                      disallowEmptySelection
-                      aria-label="MWB"
-                      closeOnSelect={true}
-                      selectionMode="single"
-                    >
-                      {waybillIDS ? waybillIDS.map((column) => (
-                        <DropdownItem onClick={(e) => setWaybillIDValue(column.waybill_id)} key={column.waybill_id} className="capitalize">
-                          {capitalize(column.waybill_id)}
-                        </DropdownItem>
-                      )) : []}
-                    </DropdownMenu>
-                  </Dropdown>
+                  <Select
+                    isSearchable
+                    options={waybillIDS ? waybillIDS.map((column) => ({
+                      value: column.waybill_id,
+                      label: capitalize(column.waybill_id)
+                    })) : []}
+                    value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
+                    onChange={(selectedOption) => {
+                      if (selectedOption) {
+                        if (waybillIDValue !== selectedOption.value) {
+                          setWaybillIDValue(selectedOption.value);
+                          setDifferenceSumValue("");
+                          setSalePriceValue("");
+                          setShippingCostValue("");
+                          setNumberShipmentsValue("");
+                        }
+                      } else {
+                        setWaybillIDValue("");
+                      }
+                    }}
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        backgroundColor: "#212c4d !important",
+                        border: "1px solid #37446b !important",
+                        borderRadius: "4px !important",
+                        height: "40px",
+                      }),
+                      option: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        backgroundColor: "#212c4d !important",
+                      }), placeholder: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), input: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), singleValue: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }), menu: (provided) => ({
+                        ...provided,
+                        color: "#aeb9e1",
+                        backgroundColor: "#212c4d !important",
+                        fontWeight: 400,
+                        fontSize: "var(--nextui-font-size-small)"
+                      }),
+                    }}
+                    placeholder={intl.formatMessage({ id: "waybill_id" })}
+                  />
                 </div>
                 <div className="ml-2" style={{ width: "100%" }}>
                   <Dropdown>
@@ -137,6 +174,7 @@ const ProfitDialog = ({ close, title }: Params) => {
                   <Table>
                     <TableHeader>
                       <TableColumn>{intl.formatMessage({ id: "waybill_id" })}</TableColumn>
+                      <TableColumn>{intl.formatMessage({ id: "number_of_shipments" })}</TableColumn>
                       <TableColumn>{intl.formatMessage({ id: "shipping_cost" })}</TableColumn>
                       <TableColumn>{intl.formatMessage({ id: "sale_price" })}</TableColumn>
                       <TableColumn>{intl.formatMessage({ id: "profit" })}</TableColumn>
@@ -144,6 +182,7 @@ const ProfitDialog = ({ close, title }: Params) => {
                     <TableBody>
                       <TableRow>
                         <TableCell>{waybillIDValue === "" ? "-" : waybillIDValue}</TableCell>
+                        <TableCell>{numberShipmentsValue === "" ? "-" : numberShipmentsValue}</TableCell>
                         <TableCell>{shippingCostValue === "" ? "-" : shippingCostValue}</TableCell>
                         <TableCell>{salePriceValue === "" ? "-" : salePriceValue}</TableCell>
                         <TableCell>{differenceSumValue === "" ? "-" : differenceSumValue}</TableCell>                        

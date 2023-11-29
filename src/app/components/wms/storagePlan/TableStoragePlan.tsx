@@ -30,12 +30,13 @@ import { showMsg, storagePlanDataToExcel, packingListDataToExcel, getLocationPac
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount } from '../../../../services/api.storage_plan';
-import { PackingList, StoragePlan, StoragePlanListProps } from "../../../../types/storage_plan";
+import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount, barCodePdf } from '../../../../services/api.storage_plan';
+import { PackingList, StoragePlan, StoragePlanListProps, BarCode } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import UploadEvidenceDialog from "../../common/UploadEvidenceDialog";
 import BatchOnStoragePlansDialog from "../../common/BatchOnStoragePlansDialog";
+import ExportBarCodeDialog from "../../common/ExportBarCodeDialog";
 import PaginationTable from "../../common/Pagination";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
@@ -47,6 +48,7 @@ import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import { FaFileExcel, FaFilePdf, FaTrashAlt } from 'react-icons/fa';
+import { FaBarcode } from 'react-icons/fa6';
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
@@ -101,6 +103,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const [uploadEvidenceElement, setUploadEvidenceElement] = useState<StoragePlan | null>(null);
   
   const [showBatchStoragePlansDialog, setShowBatchStoragePlansDialog] = useState<boolean>(false);
+
+  const [showBarCodeDialog, setShowBarCodeDialog] = useState<boolean>(false);
+  const [barCodeValue, setBarCodeValue] = useState<any>("");
 
   /** start*/
   const [filterValue, setFilterValue] = React.useState("");
@@ -314,33 +319,6 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const filteredItems = React.useMemo(() => {
     let filteredStoragePlans = [...storagePlans];
 
-    /* if (hasSearchFilter) {
-        filteredStoragePlans = filteredStoragePlans.filter(
-        (storageP) =>
-          storageP.order_number
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          storageP.customer_order_number
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          (storageP.user ? storageP.user.username : '')
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          (storageP.warehouse ? `${storageP.warehouse.name} (${storageP.warehouse.code})` : '')
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          storageP.reference_number
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase()) ||
-          storageP.pr_number
-            ?.toString()
-            ?.toLowerCase()
-            ?.includes(filterValue.toLowerCase())
-      );
-    } */
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
@@ -353,13 +331,6 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
     return filteredStoragePlans;
   }, [storagePlans, filterValue, statusFilter]);
-
-  /* const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]); */
 
   const somePLWithoutOutputPlanDeliveredNumber = (pls: PackingList[] | undefined): boolean => {
     return !!pls && (pls.length > 0) && pls.some((pl: PackingList) => !pl.output_plan_delivered_number);
@@ -433,6 +404,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                         intl.formatMessage({ id: "export_pdf" })
                       }
                     </PDFDownloadLink>
+                  </DropdownItem>
+                  <DropdownItem onClick={() => generateBarCode(storageP)}>
+                    {intl.formatMessage({ id: "barcode" })}
                   </DropdownItem>
                   <DropdownItem onClick={() => packingListDataToExcel(storageP, storageP.packing_list ? storageP.packing_list : [], intl, 'fl' )}>
                     {intl.formatMessage({ id: "generate_xlsx_inventory" })}
@@ -631,6 +605,47 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     }
   }
 
+  const openBarCodeDialog = async(value: any) => {
+    await setBarCodeValue(value);
+    setShowBarCodeDialog(true);
+  }
+
+  const closeBarCodeDialog = () => {
+    setBarCodeValue("");
+    setShowBarCodeDialog(false);
+  }
+
+  const generateBarCode = async(sp?: StoragePlan) => {
+    let sPlans: StoragePlan[] = [];
+    if (sp) {
+      sPlans.push(sp);
+    } else {
+      for (let i = 0; i < selectedItems.length; i++) {
+        const index = selectedItems[i];
+        const item = storagePlans.filter((sp: StoragePlan) => sp.id === index);
+        if (item && item.length > 0) {
+          sPlans.push(item[0]);
+        }
+      }
+    }
+
+    const code: BarCode[] = sPlans.map((sPlan: StoragePlan) => {
+      return {
+        number: sPlan.order_number ? sPlan.order_number : '',
+        boxes_amount: sPlan.packing_list ? sPlan.packing_list.length : 0,
+        customer_code: sPlan.user ? sPlan.user.username : ''
+      }
+    });
+
+    const response = await barCodePdf(code);
+    if (response.status >= 200 && response.status <= 299) {
+      openBarCodeDialog(response.data);
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
+  }
+
   const getSelectedStoragePlans = (): StoragePlan[] => {
     let its: StoragePlan[] = [];
     for (let i = 0; i < selectedItems.length; i++) {
@@ -638,36 +653,6 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       const item = storagePlans.filter((sp: StoragePlan) => sp.id === index);
       
       its.push(item[0]);
-      /* if (filterValue && (filterValue !== "")) {
-        const isSearchable = item[0].order_number
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase()) ||
-        item[0].customer_order_number
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase()) ||
-        item[0].user_id
-        ?.toString()
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase()) ||
-        item[0].warehouse_id
-        ?.toString()
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase()) ||
-        item[0].reference_number
-        ?.toString()
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase()) ||
-        item[0].pr_number
-        ?.toString()
-        ?.toLowerCase()
-        ?.includes(filterValue.toLowerCase());
-
-        if (isSearchable) {
-          its.push(item[0]);
-        }
-      } else {
-        its.push(item[0]);
-      } */
     }
     return its;
   }
@@ -765,6 +750,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                 </Button>
               )
             }
+
+            <Button
+              color="primary"
+              style={{ width: '160px', marginLeft: '10px' }}
+              endContent={<FaBarcode style={{ fontSize: '22px', color: 'white' }} />}
+              onClick={() => generateBarCode()}
+              isDisabled={selectedItems.length === 0}
+            >
+              {intl.formatMessage({ id: "barcode" })}
+            </Button>
 
             <Button
               color="primary"
@@ -1290,6 +1285,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         {showForceEntryDialog && <ConfirmationDialog close={closeForceEntryStoragePlanDialog} confirm={handleForceEntry} />}
         {showUploadEvidenceDialog && <UploadEvidenceDialog close={closeUploadEvidenceStoragePlanDialog} confirm={handleUploadEvidence} storagePlan={(uploadEvidenceElement as StoragePlan)} title={intl.formatMessage({ id: "upload_evidence" })} />}
         {showBatchStoragePlansDialog && <BatchOnStoragePlansDialog close={closeBatchOnStoragePlansDialog} confirm={confirmBatchOnStoragePlansDialog} title={intl.formatMessage({ id: "import_entry_plans" })} />}
+        {showBarCodeDialog && <ExportBarCodeDialog close={closeBarCodeDialog} file={barCodeValue as Blob} />}
       </Loading>
     </>
   );

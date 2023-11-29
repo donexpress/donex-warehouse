@@ -186,6 +186,11 @@
     width: calc(100% - 35px) !important;
 }
 
+.search-container-manifest button.bnt-dropdown {
+    z-index: 0 !important;
+    width: 100%;
+}
+
 @media only screen and (max-width: 990px) {
     .tab-system-table {
         width: calc(100vw - 25px);

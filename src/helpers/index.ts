@@ -87,12 +87,31 @@ export const isOMS = (context?: any): boolean => {
   return false;
 };
 
-export const getHeaders = (context?: any, isFile = false) => {
+export const getHeaders = (context?: any, isFile = false, accept?: string) => {
   let configs: AxiosRequestConfig = {
     headers: {
       "Content-Type": isFile ? "multipart/form-data" : "application/json",
     },
   };
+
+  if (accept) {
+    if (accept === 'application/pdf') {
+      configs = {
+        headers: {
+          ...configs.headers,
+          "Accept": accept,
+        },
+        responseType: 'blob'
+      };
+    } else {
+      configs = {
+        headers: {
+          ...configs.headers,
+          "Accept": accept,
+        },
+      };
+    }
+  }
   let tokenWMS = getCookie("tokenWMS");
   let tokenOMS = getCookie("tokenOMS");
   if (context) {
@@ -791,9 +810,10 @@ export const packingListDataToExcel = (
 };
 
 export const manifestPaidDataToExcel = (
-  manifest_paid: Guide[],
+  manifest_charged: Guide[],
   intl: IntlShape,
-  visibleColumn: string[]
+  visibleColumn: string[],
+  isNotFound: boolean = false,
 ) => {
   let dataToExport: object[] = [];
 
@@ -801,7 +821,7 @@ export const manifestPaidDataToExcel = (
     return data ? "Pagados" : "No Pagados"
   };
 
-  manifest_paid.forEach((guide: Guide) => {
+  manifest_charged.forEach((guide: Guide) => {
     const oInst: { [key: string]: string } = {};
     visibleColumn.forEach((column) => {
       switch (column) {
@@ -877,7 +897,7 @@ export const manifestPaidDataToExcel = (
   const data = new Blob([excelBuffer], { type: fileType });
   FileSaver.saveAs(
     data,
-    `${intl.formatMessage({ id: "manifest_paid" })}` +
+    (!isNotFound ? `${intl.formatMessage({ id: "not_found_manifest_charged" })}` : `${intl.formatMessage({ id: "guides_not_found" })}`) +
     fileExtension
   );
 };
