@@ -24,7 +24,7 @@ const ExportBarCodeDialog = ({ close, file }: Params) => {
                 <strong>{intl.formatMessage({ id: "generated_barcodes" })}</strong>
             </div>
         </div>
-        <div style={{ width: '700px', maxWidth: '90vw' }}>
+        <div style={{ width: '850px', maxWidth: '90vw' }}>
               <div className='flex flex-col gap-3'>
                 <div className='upload-evidence-body-dialog scrollable-hidden'>
                   <div className="w-full">

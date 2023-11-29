@@ -123,20 +123,6 @@ export const getStoragePlansState = async (context?: GetServerSidePropsContext):
   }
 }
 
-/* export const barCodePdf = async (code: BarCode[]): Promise<Response> => {
-  const path = barCodePath();
-  try {
-    const response = await axios.post(path, { code }, getHeaders());
-    
-    if (response.status && (response.status >= 200 && response.status <= 299)) {
-      return {data: response.data, status: response.status};
-    }
-    return { status: response.status ? response.status : 0 };
-  } catch (error: any) {
-    return { status: error.response && error.response.status ? error.response.status : 0 };
-  }
-}; */
-
 export const barCodePdf = async (code: BarCode[]): Promise<Response> => {
   const path = barCodePath();
   const headers = getHeaders(null, undefined, 'application/pdf');
@@ -144,7 +130,7 @@ export const barCodePdf = async (code: BarCode[]): Promise<Response> => {
     const response = await fetch(path, {
       method: 'POST',
       headers: headers.headers as any,
-      body: JSON.stringify({code}),
+      body: JSON.stringify(code),
     });
 
     const blob = await response.blob();

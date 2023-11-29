@@ -638,7 +638,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     });
 
     const response = await barCodePdf(code);
-    if (response.status >= 200 && response.status <= 299) {console.log(response.data)
+    if (response.status >= 200 && response.status <= 299) {
       openBarCodeDialog(response.data);
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
