@@ -795,8 +795,18 @@ const ManifestTable = () => {
   const handleManifestTableDialog = (content: ManifestResponse) => {
     setShowUpdateManifestDialog(false);
     if (whereUpdate === "supplier") {
-      setManifestPaidData(content);
-      setVisibleDialogTable(true);
+      const message = intl.formatMessage({ id: "successfullyActionMsg" });
+      showMsg(message, { type: "success" });
+      if (content.manifests_bill_code && (content.manifests_bill_code.length > 0)) {
+        const link = document.createElement('a');
+        link.href = content.manifests_bill_code[0].url;
+        link.setAttribute('download', content.manifests_bill_code[0].name);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      /* setManifestPaidData(content);
+      setVisibleDialogTable(true); */
     }
   }
 
