@@ -89,13 +89,13 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
           closeAssignAutoDialog();
           let restElements = rows.filter(row => !selectedRows.some(sr => sr.id === row.id));
           const allHavePS = allHavePackageShelf(restElements);
-          console.log(restElements)
-          console.log(allHavePS)
+          
           if (storagePlan && stateStoragePlan && stateStoragePlan !== 'stocked' && (selectedRows.length === 0 || restElements.length === 0 || allHavePS)) {
             await updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'stocked'));
           } else if (storagePlan && stateStoragePlan && stateStoragePlan !== 'into warehouse' && stateStoragePlan !== 'stocked') {
             await updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'into warehouse'));
           }
+          setSelectedRows([]);
           showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
           await getStoragePlan(id);
         } else {
