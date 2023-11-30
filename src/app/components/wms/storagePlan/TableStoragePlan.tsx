@@ -423,7 +423,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                     </PDFDownloadLink>
                   </DropdownItem>
                   <DropdownItem className={(statusSelected !== 'stocked' || !somePLWithoutOutputPlanDeliveredNumber(storageP.packing_list)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleCreateExitPlan(storageP["customer_order_number"])}>
-                    {intl.formatMessage({ id: intl.formatMessage({ id: "insertOutputPlan" }) })}
+                    {intl.formatMessage({ id: "insertOutputPlan" })}
                   </DropdownItem>
                   <DropdownItem className={(statusSelected !== 'stocked' && statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''}>
                     <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={storageP["packing_list"] ? storageP["packing_list"] : []} warehouseCode={String(storageP["warehouse"]?.code)} orderNumber={String(storageP["order_number"])} intl={intl} />} fileName="entry_plan_labels.pdf">
@@ -1329,7 +1329,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         {showUploadEvidenceDialog && <UploadEvidenceDialog close={closeUploadEvidenceStoragePlanDialog} confirm={handleUploadEvidence} storagePlan={(uploadEvidenceElement as StoragePlan)} title={intl.formatMessage({ id: "upload_evidence" })} />}
         {showBatchStoragePlansDialog && <BatchOnStoragePlansDialog close={closeBatchOnStoragePlansDialog} confirm={confirmBatchOnStoragePlansDialog} title={intl.formatMessage({ id: "import_entry_plans" })} />}
         {showBarCodeDialog && <ExportBarCodeDialog close={closeBarCodeDialog} file={barCodeValue as Blob} />}
-        {showAssignAutoDialog && <ConfirmationDialog close={closeAssignAutoDialog} confirm={autoAssignLocationAction} />}
+        {showAssignAutoDialog && <ConfirmationDialog close={closeAssignAutoDialog} confirm={autoAssignLocationAction} content={intl.formatMessage({ id: "confirmation_location_text" })} />}
       </Loading>
     </>
   );

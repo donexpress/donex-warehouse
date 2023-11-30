@@ -88,6 +88,8 @@
 	"actions": "Actions",
 	"confirmation_header": "Confirm",
 	"confirmation_text": "Do you want to proceed with the action?",
+	"confirmation_location_text": "All the boxes that make up the entry plan will be assigned to a single compartment. Do you want to continue the action?",
+	"confirmation_partial_location_text": "Selected boxes will be assigned to a single compartment. Do you want to continue the action?",
 	"cancel": "Cancel",
 	"user_info": "User Info",
 	"contact": "Contact",

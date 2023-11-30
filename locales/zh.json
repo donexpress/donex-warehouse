@@ -88,6 +88,8 @@
   "actions": "行動",
   "confirmation_header": "確認",
   "confirmation_text": "您想繼續該操作嗎？",
+	"confirmation_location_text": "組成入口計畫的所有盒子將被分配到一個隔間。 您想繼續該操作嗎？",
+  "confirmation_partial_location_text": "選定的箱子將被分配到一個隔間。 您想繼續該操作嗎？",
   "cancel": "取消",
   "user_info": "用戶信息",
   "contact": "聯繫人",
