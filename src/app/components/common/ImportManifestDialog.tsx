@@ -33,6 +33,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
   const [billCodeValue, setBillCodeValue] = React.useState("");
   const [willPaid, setWillPaid] = React.useState(false);
+  const [willCharge, setWillCharge] = React.useState(false);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [force, setForce] = useState<boolean>(false);
@@ -52,7 +53,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
     setShowConfirm(false);
   };
 
-  const handleConfirm = async() => {
+  const handleConfirm = async () => {
     setShowConfirm(false);
     await setForce(true);
     await handleSubmit(null, true);
@@ -70,7 +71,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         response = await createManifest(data, carrierValue, trackingNumberValue, clientReferenceValue, forceUpload);
       } else if (where === "customer") {
         setLoading(true);
-        response = await updateCustomerManifest(data);
+        response = await updateCustomerManifest(data, willCharge);
       } else {
         setLoading(true);
         response = await updateSupplierManifest(data, billCodeValue, willPaid);
@@ -112,16 +113,16 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   const onClear = React.useCallback((filter: string) => {
     eval(`set${filter}("")`);
   }, []);
-  
+
   const validateBillCode = (cadena: string): boolean => {
     const regex = /^\d{4}_\d{2}_[QMT]_[a-zA-Z\d]+$/;
-  
+
     return regex.test(cadena);
   };
-  
+
   const validateBillCodeIncomplete = (cadena: string): boolean => {
     const regex = /^\d{4}\d{2}[QMT][a-zA-Z\d]+$/;
-  
+
     return regex.test(cadena);
   };
 
@@ -129,7 +130,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
     if (!input) {
       return "";
     }
-    
+
     const cleanedInput = input.replace(/[^a-zA-Z0-9_]/g, '');
 
     if (validateBillCodeIncomplete(cleanedInput)) {
@@ -138,7 +139,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
     }
 
     const regex = /^(\d{4})(_?(\d{2}))?_?([QMT])?_?([a-zA-Z\d]*)$/;
-    const match = cleanedInput.match(regex);console.log(match)
+    const match = cleanedInput.match(regex); console.log(match)
     if (match) {
       const completeParam = cleanedInput.replace(/_/g, '');
       const param1 = match[1];
@@ -299,43 +300,47 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                         </Dropdown>
                       </div>
                     </div>)
-                    : (where === "customer" ? (data === undefined ?
-                      <div className="elements-center w-full" style={{ height: '80px' }}>
-                        <span>{intl.formatMessage({ id: "please_upload_excel" })}</span>
-                      </div>
-                      :
-                      <div className="elements-center w-full" style={{ height: '80px' }}>
-                        <span>{intl.formatMessage({ id: "available_item_to_be_imported" }, { in: 1 })}</span>
-                      </div>) : (
-                        <div>
-                          <div className='flex flex-col gap-1 mb-5'>
-                            <div className='flex mb-2'>
-                              <div className="mr-2" style={{ width: "100%" }}>
-                                <Input
-                                  className="search-input"
-                                  placeholder={intl.formatMessage({ id: "bill_code" })}
-                                  value={billCodeValue}
-                                  onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
-                                />
-                              </div>
+                    : (where === "customer" ? (
+                      <>
+                        <div className='flex'>
+                          <div className="mr-2" style={{ width: "100%" }}>
+                            <div className='elements-row-start'>
+                              <input type="checkbox" name="willCharge" style={{ marginRight: '10px' }} checked={willCharge} onChange={() => { setWillCharge(!willCharge); }} />
+                              <span style={{ fontSize: '13px' }}>{intl.formatMessage({ id: "charged_guide" })}</span>
                             </div>
-                            <div className="w-full">{intl.formatMessage({ id: "format" })}: {intl.formatMessage({ id: "year" })}_{intl.formatMessage({ id: "month" })}_{intl.formatMessage({ id: "period" })}_{intl.formatMessage({ id: "carrier" })}</div>
-                            <div className="w-full">{intl.formatMessage({ id: "year" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '4'})}</div>
-                            <div className="w-full">{intl.formatMessage({ id: "month" })}: {intl.formatMessage({ id: "ym_digits" }, {dig: '2'})}</div>
-                            <div className="w-full">{intl.formatMessage({ id: "period" })}: {`{Q | M | T}`}</div>
-                            <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`RedPack | OCA | AMPM | ...`}</div>
-                            <div className="w-full">{intl.formatMessage({ id: "bill_code_ex" }, {year: (new Date()).getFullYear(), month: ((new Date()).getMonth() + 1).toString().padStart(2, '0')})}</div>
-                            <div className='flex mt-2'>
-                              <div className="mr-2" style={{ width: "100%" }}>
-                                <div className='elements-row-start'>
-                                  <input type="checkbox" name="willPaid" style={{ marginRight: '10px' }} checked={willPaid} onChange={() => { setWillPaid(!willPaid) }} />
-                                  <span style={{ fontSize: '13px' }}>{intl.formatMessage({ id: "paid_guide" })}</span>
-                                </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div>
+                        <div className='flex flex-col gap-1 mb-5'>
+                          <div className='flex mb-2'>
+                            <div className="mr-2" style={{ width: "100%" }}>
+                              <Input
+                                className="search-input"
+                                placeholder={intl.formatMessage({ id: "bill_code" })}
+                                value={billCodeValue}
+                                onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
+                              />
+                            </div>
+                          </div>
+                          <div className="w-full">{intl.formatMessage({ id: "format" })}: {intl.formatMessage({ id: "year" })}_{intl.formatMessage({ id: "month" })}_{intl.formatMessage({ id: "period" })}_{intl.formatMessage({ id: "carrier" })}</div>
+                          <div className="w-full">{intl.formatMessage({ id: "year" })}: {intl.formatMessage({ id: "ym_digits" }, { dig: '4' })}</div>
+                          <div className="w-full">{intl.formatMessage({ id: "month" })}: {intl.formatMessage({ id: "ym_digits" }, { dig: '2' })}</div>
+                          <div className="w-full">{intl.formatMessage({ id: "period" })}: {`{Q | M | T}`}</div>
+                          <div className="w-full">{intl.formatMessage({ id: "carrier" })}: {`RedPack | OCA | AMPM | ...`}</div>
+                          <div className="w-full">{intl.formatMessage({ id: "bill_code_ex" }, { year: (new Date()).getFullYear(), month: ((new Date()).getMonth() + 1).toString().padStart(2, '0') })}</div>
+                          <div className='flex mt-2'>
+                            <div className="mr-2" style={{ width: "100%" }}>
+                              <div className='elements-row-start'>
+                                <input type="checkbox" name="willPaid" style={{ marginRight: '10px' }} checked={willPaid} onChange={() => { setWillPaid(!willPaid) }} />
+                                <span style={{ fontSize: '13px' }}>{intl.formatMessage({ id: "paid_guide" })}</span>
                               </div>
                             </div>
                           </div>
                         </div>
-                      ))
+                      </div>
+                    ))
                 }
               </div>
               <div className="elements-row-end w-full">
