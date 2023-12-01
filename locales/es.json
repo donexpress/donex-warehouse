@@ -422,7 +422,7 @@
   "create_manifest_sucessfully": "Se adicionaron satisfactoriamente {manifest_count} productos del manifiesto {waybill_id}",
 	"update_customer_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_count} costos del cliente",
 	"update_supplier_manifest_sucessfully": "Se actualizaron satisfactoriamente {manifest_charged_count} precio de venta del proveedor logistico",
-  "invoice_weight": "Peso de la factura",
+  "invoice_weight": "Peso en factura",
   "already_manifest_charged": "Productos repetidos del manifiesto {MWB}",
   "copied_item": "Elemento copiado al portapapeles",
   "export_manifests": "Exportar manifiestos",
@@ -446,5 +446,8 @@
   "close_modal": "Cerrar",
   "paid_guide": "Pagado",
   "charged_guide": "Cobrado",
-  "pay": "Pagar"
+  "pay": "Pagar",
+  "unit_weigth": "Peso en manifiesto",
+  "invoice_status": "Estado de la factura",
+  "order_status": "Estado del pedido"
 }

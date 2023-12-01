@@ -440,5 +440,8 @@
 	"close_modal": "Close",
 	"paid_guide": "Paid",
 	"charged_guide": "Charged",
-	"pay": "Pay"
+	"pay": "Pay",
+	"unit_weigth": "Manifest weight",
+	"invoice_status": "Invoice status",
+	"order_status": "Order status"
 }

@@ -446,5 +446,9 @@
   "close_modal": "關閉",
   "paid_guide": "有薪資的",
   "charged_guide": "帶電",
-  "pay": "支付"
+  "pay": "支付",
+  "unit_weigth": "艙單重量",
+  "invoice_status": "發票狀態",
+  "order_status": "訂單狀態"
+
 }
