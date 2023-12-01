@@ -232,6 +232,7 @@
   "client_image": "Imagen cliente",
   "staff_image": "Imagen operario",
   "upload": "Subir",
+  "download": "Descargar",
 
   "batch_on_shelves": "Asignar locación",
   "partition": "Zona",
@@ -343,6 +344,8 @@
   "processed": "Procesada",
   "cancelled": "Cancelada",
   "operation_instruction": "Instrucción de operación",
+  "barcode": "Código de barra",
+  "generated_barcodes": "Códigos de barra generados",
 
   "area_code": "Código de Área",
   "area_name": "Nombre del Área",
