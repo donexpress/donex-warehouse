@@ -88,6 +88,8 @@
   "actions": "行動",
   "confirmation_header": "確認",
   "confirmation_text": "您想繼續該操作嗎？",
+	"confirmation_location_text": "組成入口計畫的所有盒子將被分配到一個隔間。 您想繼續該操作嗎？",
+  "confirmation_partial_location_text": "選定的箱子將被分配到一個隔間。 您想繼續該操作嗎？",
   "cancel": "取消",
   "user_info": "用戶信息",
   "contact": "聯繫人",
@@ -234,7 +236,9 @@
   "upload": "增加",
   "download": "釋放",
 
-  "batch_on_shelves": "批量上架",
+  "batch_on_shelves": "指定手動位置",
+  "batch_on_shelves_auto": "分配自動位置",
+  "no_space_auto_location": "行中沒有空間用於自動分配位置",
   "partition": "分区",
   "shelf": "货架",
   "select_partition": "選擇分区",
@@ -406,8 +410,8 @@
 	"weight": "重量",
 	"total_declare": "申報總數",
 	"currency": "貨幣",
-	"shipping_cost": "運輸費",
-	"sale_price": "銷售價格",
+	"shipping_cost": "運輸費 (USD)",
+	"sale_price": "銷售價格 (USD)",
 	"bag_code": "行李編碼",
 	"filter": "篩選",
 	"clear": "清除",
@@ -422,7 +426,7 @@
 	"create_manifest_sucessfully": "已成功從清單 {waybill_id} 新增 {manifest_count} 個產品",
 	"update_customer_manifest_sucessfully": "已成功更新 {manifest_count} 個客戶費用",
 	"update_supplier_manifest_sucessfully": "已成功更新物流供應商的 {manifest_charged_count} 個銷售價格",
-	"invoice_weight": "發票重量",
+	"invoice_weight": "發票重量 (Kg)",
 	"already_manifest_charged": "清單重複產品{MWB}",
   "copied_item": "項目已複製到剪貼簿",
   "export_manifests": "出口艙單",
@@ -445,5 +449,12 @@
 	"not_found_manifest_charged": "清單重複產品",
   "close_modal": "關閉",
   "paid_guide": "有薪資的",
-  "pay": "支付"
+  "charged_guide": "帶電",
+  "pay": "支付",
+  "collect_money": "籌集資金",
+  "unit_weigth": "艙單重量 (Kg)",
+  "invoice_status": "發票狀態",
+  "order_status": "訂單狀態",
+  "current_change": "目前的變化"
+
 }

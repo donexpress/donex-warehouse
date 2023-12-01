@@ -11,6 +11,7 @@ import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
 import { updatePackingListById, removePackingListById } from '../../../../services/api.packing_list';
 import { updateStoragePlanById, createStoragePlan, getStoragePlanById } from '../../../../services/api.storage_plan';
+import { autoAssignLocation } from '../../../../services/api.package_shelf';
 import { StoragePlanConfigProps, PackingList, StoragePlan } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
 import { Response } from '../../../../types/index';
@@ -49,6 +50,7 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
     const [showSplitBillDialog, setShowSplitBillDialog] = useState<boolean>(false);
     const [showBatchOnShelvesDialog, setShowBatchOnShelvesDialog] = useState<boolean>(false);
     const [showForceEntryDialog, setShowForceEntryDialog] = useState<boolean>(false);
+    const [showAssignAutoDialog, setShowAssignAutoDialog] = useState<boolean>(false);
     const [boxNumber, setBoxNumber] = useState<number | null>(null);
     const [stateStoragePlan, setStateStoragePlan] = useState<string>('to be storage')
     const [storagePlan, setStoragePlan] = useState<StoragePlan | null>(null);
@@ -68,6 +70,44 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
         setStateStoragePlan(sPlan.state ? sPlan.state : 'to be storage');
       }
       setLoading(false);
+    }
+
+    const autoAssignLocationAction = async() => {
+      setLoading(true);
+      let values: object = {};
+      if (selectedRows.length > 0) {
+        const boxIds: number[] = selectedRows.map((pl: PackingList) => {
+          return Number(pl.id);
+        });
+        values = {
+          box_ids: boxIds
+        };
+      }
+      let response = await autoAssignLocation(id, values);
+      if (response.status >= 200 && response.status <= 299) {
+        if (response.data.success) {
+          closeAssignAutoDialog();
+          let restElements = rows.filter(row => !selectedRows.some(sr => sr.id === row.id));
+          const allHavePS = allHavePackageShelf(restElements);
+          
+          if (storagePlan && stateStoragePlan && stateStoragePlan !== 'stocked' && (selectedRows.length === 0 || restElements.length === 0 || allHavePS)) {
+            await updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'stocked'));
+          } else if (storagePlan && stateStoragePlan && stateStoragePlan !== 'into warehouse' && stateStoragePlan !== 'stocked') {
+            await updateStoragePlanById(Number(id), formatBody(storagePlan, false, 'into warehouse'));
+          }
+          setSelectedRows([]);
+          showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+          await getStoragePlan(id);
+        } else {
+          closeAssignAutoDialog();
+          setLoading(false);
+          showMsg(intl.formatMessage({ id: 'no_space_auto_location' }), { type: "warning" })
+        }
+      } else {
+        closeAssignAutoDialog();
+        setLoading(false);
+        showMsg(intl.formatMessage({ id: 'unknownStatusErrorMsg' }), { type: "error" })
+      }
     }
 
     const initialValues = {
@@ -312,6 +352,14 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
         }
       }
 
+      const openAssignAutoDialog = () => {
+        setShowAssignAutoDialog(true);
+      }
+
+      const closeAssignAutoDialog = () => {
+        setShowAssignAutoDialog(false);
+      }
+
       const openForceEntryStoragePlanDialog = () => {
         setShowForceEntryDialog(true);
       }
@@ -547,6 +595,9 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
                           <DropdownItem className={(selectedRows.length === 0 || !inWMS || (storagePlan && (stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
                           </DropdownItem>
+                          <DropdownItem className={(!inWMS || (storagePlan && (stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => openAssignAutoDialog()}>
+                            {intl.formatMessage({ id: "batch_on_shelves_auto" })}
+                          </DropdownItem>
                           <DropdownItem className={(selectedRows.length === 0 || (selectedRows.length === rows.length) || (storagePlan && ((inWMS && (stateStoragePlan === 'stocked' || stateStoragePlan === 'cancelled')) || (!inWMS && stateStoragePlan !== 'to be storage')))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(4)}>
                             {intl.formatMessage({ id: "split_bill" })}
                           </DropdownItem>
@@ -695,6 +746,7 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
             { showSplitBillDialog && <PackingListDialog close={closeSplitBillDialog} confirm={splitBill} title={intl.formatMessage({ id: 'split_bill' })} packingLists={selectedRows} /> }
             { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows} warehouse={storagePlan?.warehouse} /> }
             {showForceEntryDialog && <ConfirmationDialog close={closeForceEntryStoragePlanDialog} confirm={handleForceEntry} />}
+            {showAssignAutoDialog && <ConfirmationDialog close={closeAssignAutoDialog} confirm={autoAssignLocationAction} content={selectedRows.length > 0 ? intl.formatMessage({ id: "confirmation_partial_location_text" }) : intl.formatMessage({ id: "confirmation_location_text" })} />}
         </div>
     );
 };

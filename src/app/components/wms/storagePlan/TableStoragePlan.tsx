@@ -31,6 +31,7 @@ import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
 import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount, barCodePdf } from '../../../../services/api.storage_plan';
+import { autoAssignLocation } from '../../../../services/api.package_shelf';
 import { PackingList, StoragePlan, StoragePlanListProps, BarCode } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
@@ -101,6 +102,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
   const [showUploadEvidenceDialog, setShowUploadEvidenceDialog] = useState<boolean>(false);
   const [uploadEvidenceElement, setUploadEvidenceElement] = useState<StoragePlan | null>(null);
+
+  const [showAssignAutoDialog, setShowAssignAutoDialog] = useState<boolean>(false);
+  const [autoAssignElement, setAutoAssignElement] = useState<StoragePlan | null>(null);
   
   const [showBatchStoragePlansDialog, setShowBatchStoragePlansDialog] = useState<boolean>(false);
 
@@ -419,7 +423,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                     </PDFDownloadLink>
                   </DropdownItem>
                   <DropdownItem className={(statusSelected !== 'stocked' || !somePLWithoutOutputPlanDeliveredNumber(storageP.packing_list)) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleCreateExitPlan(storageP["customer_order_number"])}>
-                    {intl.formatMessage({ id: intl.formatMessage({ id: "insertOutputPlan" }) })}
+                    {intl.formatMessage({ id: "insertOutputPlan" })}
                   </DropdownItem>
                   <DropdownItem className={(statusSelected !== 'stocked' && statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''}>
                     <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={storageP["packing_list"] ? storageP["packing_list"] : []} warehouseCode={String(storageP["warehouse"]?.code)} orderNumber={String(storageP["order_number"])} intl={intl} />} fileName="entry_plan_labels.pdf">
@@ -427,6 +431,9 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                         intl.formatMessage({ id: "generate_labels" })
                       }
                     </PDFDownloadLink>
+                  </DropdownItem>
+                  <DropdownItem className={(!inWMS || (statusSelected === 'cancelled')) ? 'do-not-show-dropdown-item' : ''} onClick={() => openAssignAutoDialog(storageP)}>
+                    {intl.formatMessage({ id: "batch_on_shelves_auto" })}
                   </DropdownItem>
                   <DropdownItem className={(!inWMS && statusSelected !== 'to be storage' && statusSelected !== 'cancelled') ? 'do-not-show-dropdown-item' : ''} onClick={() => handleDelete(storageP["id"])}>
                     {intl.formatMessage({ id: "Delete" })}
@@ -643,6 +650,44 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
       showMsg(message, { type: "error" });
+    }
+  }
+
+  const openAssignAutoDialog = async(sp: StoragePlan) => {
+    await setAutoAssignElement(sp);
+    setShowAssignAutoDialog(true);
+  }
+
+  const closeAssignAutoDialog = () => {
+    setAutoAssignElement(null);
+    setShowAssignAutoDialog(false);
+  }
+
+  const autoAssignLocationAction = async() => {
+    if (autoAssignElement !== null) {
+      setLoading(true);
+      let response = await autoAssignLocation(Number(autoAssignElement.id));
+      if (response.status >= 200 && response.status <= 299) {
+        if (response.data.success) {
+          closeAssignAutoDialog();
+          if (autoAssignElement.state !== 'stocked') {
+            await updateStoragePlanById(Number(autoAssignElement.id), formatBodyToCancel(autoAssignElement, 'stocked'));
+          }
+          showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+          await setLoading(false);
+          await setSelectedItems([]);
+          await setSelectedKeys(new Set([]));
+          loadStoragePlans(statusSelected, page, rowsPerPage, queryFilter, true, true);
+        } else {
+          closeAssignAutoDialog();
+          setLoading(false);
+          showMsg(intl.formatMessage({ id: 'no_space_auto_location' }), { type: "warning" })
+        }
+      } else {
+        closeAssignAutoDialog();
+        setLoading(false);
+        showMsg(intl.formatMessage({ id: 'unknownStatusErrorMsg' }), { type: "error" })
+      }
     }
   }
 
@@ -1286,6 +1331,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         {showUploadEvidenceDialog && <UploadEvidenceDialog close={closeUploadEvidenceStoragePlanDialog} confirm={handleUploadEvidence} storagePlan={(uploadEvidenceElement as StoragePlan)} title={intl.formatMessage({ id: "upload_evidence" })} />}
         {showBatchStoragePlansDialog && <BatchOnStoragePlansDialog close={closeBatchOnStoragePlansDialog} confirm={confirmBatchOnStoragePlansDialog} title={intl.formatMessage({ id: "import_entry_plans" })} />}
         {showBarCodeDialog && <ExportBarCodeDialog close={closeBarCodeDialog} file={barCodeValue as Blob} />}
+        {showAssignAutoDialog && <ConfirmationDialog close={closeAssignAutoDialog} confirm={autoAssignLocationAction} content={intl.formatMessage({ id: "confirmation_location_text" })} />}
       </Loading>
     </>
   );
