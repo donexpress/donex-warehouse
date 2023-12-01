@@ -1220,6 +1220,9 @@ const ExitPlanTable = () => {
       case "return-to_be_chosen":
         state = "pending";
         break;
+      case "return-to_be_processed":
+        state = "pending";
+        break;
       case "return-dispatched":
         state = "processing";
         break;
