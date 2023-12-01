@@ -447,8 +447,10 @@
   "paid_guide": "有薪資的",
   "charged_guide": "帶電",
   "pay": "支付",
+  "collect_money": "籌集資金",
   "unit_weigth": "艙單重量",
   "invoice_status": "發票狀態",
-  "order_status": "訂單狀態"
+  "order_status": "訂單狀態",
+  "current_change": "目前的變化"
 
 }

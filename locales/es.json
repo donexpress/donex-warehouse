@@ -447,7 +447,9 @@
   "paid_guide": "Pagado",
   "charged_guide": "Cobrado",
   "pay": "Pagar",
+  "collect_money": "Cobrar",
   "unit_weigth": "Peso en manifiesto",
   "invoice_status": "Estado de la factura",
-  "order_status": "Estado del pedido"
+  "order_status": "Estado del pedido",
+  "current_change": "Cambio actual"
 }

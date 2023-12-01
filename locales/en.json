@@ -439,9 +439,11 @@
 	"not_found_manifest_charged": "Manifest Repeat Products",
 	"close_modal": "Close",
 	"paid_guide": "Paid",
-	"charged_guide": "Charged",
+	"charged_guide": "Collected",
 	"pay": "Pay",
+	"collect_money": "Collect money",
 	"unit_weigth": "Manifest weight",
 	"invoice_status": "Invoice status",
-	"order_status": "Order status"
+	"order_status": "Order status",
+  	"current_change": "Current change"
 }
