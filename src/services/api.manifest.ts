@@ -53,8 +53,9 @@ export const createManifest = async (formData: FormData, carrier?: string, mwb?:
   }
 };
 
-export const updateCustomerManifest = async (formData: FormData): Promise<any> => {
-  const path = getBaseUrl() + `/api/v1/manifest_customer`;
+export const updateCustomerManifest = async (formData: FormData, willCharge: boolean): Promise<any> => {
+  let params = willCharge ? `?collected=true` : '';
+  const path = getBaseUrl() + `/api/v1/manifest_customer${params}`;
 
   try {
     const response = await axios.patch(path, formData, getHeaders(null, true));
