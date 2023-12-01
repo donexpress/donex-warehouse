@@ -53,8 +53,9 @@ export const createManifest = async (formData: FormData, carrier?: string, mwb?:
   }
 };
 
-export const updateCustomerManifest = async (formData: FormData): Promise<any> => {
-  const path = getBaseUrl() + `/api/v1/manifest_customer`;
+export const updateCustomerManifest = async (formData: FormData, willCharge: boolean): Promise<any> => {
+  let params = willCharge ? `?collected=true` : '';
+  const path = getBaseUrl() + `/api/v1/manifest_customer${params}`;
 
   try {
     const response = await axios.patch(path, formData, getHeaders(null, true));
@@ -68,9 +69,9 @@ export const updateCustomerManifest = async (formData: FormData): Promise<any> =
   }
 };
 
-export const updateSupplierManifest = async (formData: FormData, billCode: String, willPaid: boolean): Promise<any> => {
+export const updateSupplierManifest = async (formData: FormData, currentChange: string, billCode: String, willPaid: boolean): Promise<any> => {
   let params = willPaid ? `&paid=true` : '';
-  const path = getBaseUrl() + `/api/v1/manifest_supplier?bill_code=${billCode}${params}`;
+  const path = getBaseUrl() + `/api/v1/manifest_supplier?currency_exchange=${currentChange}&bill_code=${billCode}${params}`;
 
   try {
     const response = await axios.patch(path, formData, getHeaders(null, true));
@@ -131,6 +132,21 @@ export const calculateProfit = async (waybill_id: string, carrier?: string, cont
 
 export const paidBill = async (billCode: string): Promise<Response> => {
   const path = getBaseUrl() + `/api/v1/paid?bill_code=${billCode}`;
+
+  try {
+    const response = await axios.patch(path, {}, getHeaders(null));
+
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return { data: response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
+export const chargeWaybill = async (waybillCode: string): Promise<Response> => {
+  const path = getBaseUrl() + `/api/v1/paid?client=customer&waybill_id=${waybillCode}`;
 
   try {
     const response = await axios.patch(path, {}, getHeaders(null));
