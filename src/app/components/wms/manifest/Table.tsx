@@ -183,23 +183,6 @@ const ManifestTable = () => {
           return (
             cellValue ? "Pagados" : "No pagados"
           );
-        // case "actions":
-        //   return (
-        //     <div className="relative flex justify-end items-center gap-2">
-        //       <Dropdown>
-        //         <DropdownTrigger>
-        //           <Button isIconOnly size="sm" variant="light">
-        //             <VerticalDotsIcon className="text-default-300" />
-        //           </Button>
-        //         </DropdownTrigger>
-        //         <DropdownMenu>
-        //           <DropdownItem onClick={() => handleDelete(guide["waybill_id"])}>
-        //             {intl.formatMessage({ id: "Delete" })}
-        //           </DropdownItem>
-        //         </DropdownMenu>
-        //       </Dropdown>
-        //     </div>
-        //   );
         case "tracking_number":
           return (
             <CopyColumnToClipboard
