@@ -17,7 +17,7 @@ import {
 } from "@nextui-org/react";
 import Select from 'react-select';
 import { SearchIcon } from "../../common/SearchIcon";
-import { capitalize } from "../../../../helpers/utils";
+import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
 import { showMsg } from "../../../../helpers";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
@@ -43,14 +43,13 @@ import ProfitDialog from "../../common/ProfitDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
-  "clientReference",
   "tracking_number",
-  "weigth",
-  "currency",
   "shipping_cost",
   "sale_price",
+  "unit_weigth",
   "invoice_weight",
-  "carrier"
+  "state",
+  "paid",
 ];
 
 const ManifestTable = () => {
@@ -111,6 +110,46 @@ const ManifestTable = () => {
         sortable: true,
       },
       {
+        name: intl.formatMessage({ id: "shipping_cost" }),
+        uid: "shipping_cost",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "sale_price" }),
+        uid: "sale_price",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "unit_weigth" }),
+        uid: "unit_weigth",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "invoice_weight" }),
+        uid: "invoice_weight",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "order_status" }),
+        uid: "state",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "clientReference" }),
+        uid: "client_reference",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "invoice_status" }),
+        uid: "paid",
+        sortable: true,
+      },
+      {
+        name: intl.formatMessage({ id: "created_at" }),
+        uid: "created_at",
+        sortable: true,
+      },
+      {
         name: intl.formatMessage({ id: "weight" }),
         uid: "weigth",
         sortable: true,
@@ -126,21 +165,6 @@ const ManifestTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "shipping_cost" }),
-        uid: "shipping_cost",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "sale_price" }),
-        uid: "sale_price",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "paid" }),
-        uid: "paid",
-        sortable: true,
-      },
-      {
         name: intl.formatMessage({ id: "carrier" }),
         uid: "carrier",
         sortable: true,
@@ -148,11 +172,6 @@ const ManifestTable = () => {
       {
         name: intl.formatMessage({ id: "bag_code" }),
         uid: "bag_code",
-        sortable: true,
-      },
-      {
-        name: intl.formatMessage({ id: "clientReference" }),
-        uid: "client_reference",
         sortable: true,
       },
       // { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -183,6 +202,12 @@ const ManifestTable = () => {
           return (
             cellValue ? "Pagados" : "No pagados"
           );
+        case "state":
+          return (
+            cellValue === "collected" ? "Cobrado" : "Pendiente"
+          );
+        case "created_at":
+          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         case "tracking_number":
           return (
             <CopyColumnToClipboard
@@ -237,10 +262,10 @@ const ManifestTable = () => {
     { value: intl.formatMessage({ id: "export_xlsx" }), id: 1 },
     { value: intl.formatMessage({ id: "pay" }), id: 2 }
   ]
-  
+
   const validateBillCodeIncomplete = (cadena: string): boolean => {
     const regex = /^\d{4}\d{2}[QMT][a-zA-Z\d]+$/;
-  
+
     return regex.test(cadena);
   };
 
@@ -248,7 +273,7 @@ const ManifestTable = () => {
     if (!input) {
       return "";
     }
-    
+
     const cleanedInput = input.replace(/[^a-zA-Z0-9_]/g, '');
 
     if (validateBillCodeIncomplete(cleanedInput)) {
@@ -257,7 +282,7 @@ const ManifestTable = () => {
     }
 
     const regex = /^(\d{4})(_?(\d{2}))?_?([QMT])?_?([a-zA-Z\d]*)$/;
-    const match = cleanedInput.match(regex);console.log(match)
+    const match = cleanedInput.match(regex); console.log(match)
     if (match) {
       const completeParam = cleanedInput.replace(/_/g, '');
       const param1 = match[1];
@@ -680,7 +705,7 @@ const ManifestTable = () => {
   //   setDeleteElemtent(id);
   // };
 
-  const handleActionBillCode = async(action: number) => {
+  const handleActionBillCode = async (action: number) => {
     if (action === 1) {
       const response = await exportBill(currentBillCodeRequest);
       if (response.status >= 200 && response.status <= 299) {
@@ -701,7 +726,7 @@ const ManifestTable = () => {
     }
   }
 
-  const paidBillAction = async() => {
+  const paidBillAction = async () => {
     setProcessingInfo(true);
     const response = await paidBill(currentBillCodeRequest);
     setProcessingInfo(false);
