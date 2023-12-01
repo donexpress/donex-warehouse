@@ -32,6 +32,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
   const [billCodeValue, setBillCodeValue] = React.useState("");
+  const [currentChangeValue, setCurrentChangeValue] = React.useState("");
   const [willPaid, setWillPaid] = React.useState(false);
   const [willCharge, setWillCharge] = React.useState(false);
 
@@ -74,7 +75,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         response = await updateCustomerManifest(data, willCharge);
       } else {
         setLoading(true);
-        response = await updateSupplierManifest(data, billCodeValue, willPaid);
+        response = await updateSupplierManifest(data, currentChangeValue, billCodeValue, willPaid);
       }
 
       if (response !== undefined && response.status >= 200 && response.status <= 299 && response.data !== "" && response.data.errors.length === 0) {
@@ -318,8 +319,18 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                             <div className="mr-2" style={{ width: "100%" }}>
                               <Input
                                 className="search-input"
+                                placeholder={intl.formatMessage({ id: "current_change" })}
+                                value={currentChangeValue}
+                                required
+                                onChange={(e) => setCurrentChangeValue(e.target.value)}
+                              />
+                            </div>
+                            <div className="mr-2" style={{ width: "100%" }}>
+                              <Input
+                                className="search-input"
                                 placeholder={intl.formatMessage({ id: "bill_code" })}
                                 value={billCodeValue}
+                                required
                                 onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
                               />
                             </div>
@@ -350,7 +361,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                   className="px-4"
                   style={{ marginRight: '15px' }}
                   onClick={(e) => handleSubmit(e)}
-                  disabled={((carrierValue.trim() === "" || trackingNumberValue.trim() === "" || clientReferenceValue.trim() === "") && where === undefined) || (where === "supplier" && !validateBillCode(billCodeValue)) || data === undefined}
+                  disabled={((carrierValue.trim() === "" || trackingNumberValue.trim() === "" || clientReferenceValue.trim() === "") && where === undefined) || (where === "supplier" && !validateBillCode(billCodeValue) && currentChangeValue.trim() !== "") || data === undefined}
                 >
                   {intl.formatMessage({ id: "confirmation_header" })}
                 </Button>
