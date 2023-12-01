@@ -24,15 +24,15 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
 
     useEffect(() => {
         if (shelf) {
+            console.log(shelf)
             let items: string[][][] = [];
             for (let i = 0; i < layers; i++) {
                 items[i] = [];
                 for (let j = 0; j < columns; j++) {
                     let elements: string[] = [''];
                     const shelfPackages: PackageShelf[] = shelf.packages.filter((ps: PackageShelf) => ((ps.layer === (i+1)) && (ps.column === (j+1))))
-                    
                     if (shelfPackages.length !== 0) {
-                        elements = shelf.packages.map((ps: PackageShelf) => {return (ps.package as PackingList).case_number});
+                        elements = shelfPackages.map((ps: PackageShelf) => {return (ps.package as PackingList).case_number});
                     }
                     
                     items[i][j] = elements;
