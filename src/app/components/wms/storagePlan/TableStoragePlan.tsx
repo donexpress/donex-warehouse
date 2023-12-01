@@ -675,6 +675,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
           }
           showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
           await setLoading(false);
+          await setSelectedItems([]);
+          await setSelectedKeys(new Set([]));
           loadStoragePlans(statusSelected, page, rowsPerPage, queryFilter, true, true);
         } else {
           closeAssignAutoDialog();
