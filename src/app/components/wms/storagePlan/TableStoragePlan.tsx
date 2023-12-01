@@ -33,6 +33,7 @@ import "../../../../styles/wms/user.table.scss";
 import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount, barCodePdf } from '../../../../services/api.storage_plan';
 import { PackingList, StoragePlan, StoragePlanListProps, BarCode } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
+import { InputData } from "../../../../types/general_search";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import UploadEvidenceDialog from "../../common/UploadEvidenceDialog";
 import BatchOnStoragePlansDialog from "../../common/BatchOnStoragePlansDialog";
@@ -47,6 +48,7 @@ import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
+import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
 import { FaFileExcel, FaFilePdf, FaTrashAlt } from 'react-icons/fa';
 import { FaBarcode } from 'react-icons/fa6';
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
@@ -108,6 +110,29 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const [barCodeValue, setBarCodeValue] = useState<any>("");
 
   /** start*/
+  const [searchInputs, setSearchInputs] = useState<InputData[]>([
+    {
+      key: 'customer_order_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "customer_order_number" }),
+      type: 'text'
+    },{
+      key: 'order_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "warehouse_order_number" }),
+      type: 'text'
+    },{
+      key: 'pr_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "pr_number" }),
+      type: 'text'
+    },{
+      key: 'reference_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "reference_number" }),
+      type: 'text'
+    }
+  ]);
   const [filterValue, setFilterValue] = React.useState("");
   const [queryFilter, setQueryFilter] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
@@ -657,9 +682,14 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     return its;
   }
 
+  const getQuery = (q: string) => {
+    console.log(q);
+  };
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-2 mb-2">
+        <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery}></GeneralSearchCmpt>
         <div className="flex justify-between gap-3 items-end">
           <div className="w-full sm:max-w-[33%]" style={{ position: 'relative' }}>
             <Input
