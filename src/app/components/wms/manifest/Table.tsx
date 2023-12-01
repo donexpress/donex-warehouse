@@ -27,7 +27,7 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
-import { getGuides, guidesCount, paidBill, exportBill } from "@/services/api.manifesterege1992";
+import { getGuides, guidesCount, paidBill, exportBill, chargeWaybill } from "@/services/api.manifesterege1992";
 import { Guide, GuidesCount, ManifestResponse } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
@@ -74,6 +74,7 @@ const ManifestTable = () => {
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
   const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
   const [showPaidBillDialog, setShowPaidBillDialog] = useState<boolean>(false);
+  const [showChargeWaybillDialog, setShowChargeWaybillDialog] = useState<boolean>(false);
   const [visibleDialogTable, setVisibleDialogTable] = useState<boolean>(false);
   const [whereUpdate, setWhereUpdate] = useState<string>("");
 
@@ -81,6 +82,7 @@ const ManifestTable = () => {
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
   const [billCodeValue, setBillCodeValue] = React.useState("");
   const [currentBillCodeRequest, setCurrentBillCodeRequest] = React.useState("");
+  const [currentWaybillCodeRequest, setCurrentWaybillCodeRequest] = React.useState("");
   const [carrierValue, setCarrierValue] = React.useState("");
   const [waybillIDValue, setWaybillIDValue] = React.useState("");
   const [paidValue, setPaidValue] = React.useState("");
@@ -240,6 +242,7 @@ const ManifestTable = () => {
     setClientReferenceValue("");
     setBillCodeValue("");
     setCurrentBillCodeRequest("");
+    setCurrentWaybillCodeRequest("");
     setTrackingNumberValue("");
     setCarrierValue("");
     setWaybillIDValue("");
@@ -475,6 +478,14 @@ const ManifestTable = () => {
               </DropdownMenu>
             </Dropdown>
 
+            {(currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
+              color="primary"
+              onClick={() => openChargeWaybillDialog()}
+            >
+              {intl.formatMessage({ id: "collect_money" })}
+            </Button>
+            )}
+
             {(currentBillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -680,6 +691,9 @@ const ManifestTable = () => {
     }
     if (waybillIDValue.trim() !== "") {
       arrayFilters.push(`waybill_id=${waybillIDValue}`);
+      setCurrentWaybillCodeRequest(waybillIDValue);
+    } else if (currentWaybillCodeRequest !== "") {
+      setCurrentWaybillCodeRequest("");
     }
     if (carrierValue.trim() !== "") {
       arrayFilters.push(`carrier=${carrierValue}`);
@@ -740,12 +754,34 @@ const ManifestTable = () => {
     await reloadData(page, rowsPerPage, filters);
   }
 
+  const chargeWaybillAction = async () => {
+    setProcessingInfo(true);
+    const response = await chargeWaybill(currentWaybillCodeRequest);
+    setProcessingInfo(false);
+    if (response.status >= 200 && response.status <= 299) {
+      showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+    } else {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
+    closeChargeWaybillDialog();
+    await reloadData(page, rowsPerPage, filters);
+  }
+
   const openPaidBillDialog = () => {
     setShowPaidBillDialog(true);
   }
 
   const closePaidBillDialog = () => {
     setShowPaidBillDialog(false);
+  }
+
+  const openChargeWaybillDialog = () => {
+    setShowChargeWaybillDialog(true);
+  }
+
+  const closeChargeWaybillDialog = () => {
+    setShowChargeWaybillDialog(false);
   }
 
   const openExportDialog = () => {
@@ -875,6 +911,7 @@ const ManifestTable = () => {
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
         {visibleDialogTable && <ManifestTableDialog title={intl.formatMessage({ id: "already_manifest_charged" }, { MWB: (manifestPaidData?.manifest_charged && (manifestPaidData.manifest_charged.length > 0) && manifestPaidData.manifest_charged[0].waybill_id) ? manifestPaidData.manifest_charged[0].waybill_id : '' })} close={closeManifestTableDialog} content={manifestPaidData as ManifestResponse} />}
         {showPaidBillDialog && <ConfirmationDialog close={closePaidBillDialog} confirm={paidBillAction} loading={processingInfo} />}
+        {showChargeWaybillDialog && <ConfirmationDialog close={closeChargeWaybillDialog} confirm={chargeWaybillAction} loading={processingInfo} />}
       </Loading>
     </>
   );
