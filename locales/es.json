@@ -239,6 +239,7 @@
   "batch_on_shelves": "Asignar locación manual",
   "batch_on_shelves_auto": "Asignar locación automática",
   "no_space_auto_location": "No hay espacio en las filas para la asignación de locación automática",
+	"want_package_location_manual": "Desea emplear la locación de paquetes de manera manual?",
   "partition": "Zona",
   "shelf": "Fila",
   "select_partition": "Seleccione la zona",

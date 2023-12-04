@@ -49,6 +49,7 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
     const [showRemoveBoxDialog, setShowRemoveBoxDialog] = useState<boolean>(false);
     const [showSplitBillDialog, setShowSplitBillDialog] = useState<boolean>(false);
     const [showBatchOnShelvesDialog, setShowBatchOnShelvesDialog] = useState<boolean>(false);
+    const [confirmationBatchOnShelvesDialog, setConfirmationBatchOnShelvesDialog] = useState<boolean>(false);
     const [showForceEntryDialog, setShowForceEntryDialog] = useState<boolean>(false);
     const [showAssignAutoDialog, setShowAssignAutoDialog] = useState<boolean>(false);
     const [boxNumber, setBoxNumber] = useState<number | null>(null);
@@ -102,6 +103,7 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
           closeAssignAutoDialog();
           setLoading(false);
           showMsg(intl.formatMessage({ id: 'no_space_auto_location' }), { type: "warning" })
+          openConfirmationBatchOnShelvesDialog();
         }
       } else {
         closeAssignAutoDialog();
@@ -319,6 +321,19 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
 
       const closeBatchOnShelvesDialog = () => {
         setShowBatchOnShelvesDialog(false);
+      }
+
+      const openConfirmationBatchOnShelvesDialog = () => {
+        setConfirmationBatchOnShelvesDialog(true);
+      }
+
+      const handleConfirmationBatchOnShelvesDialog = async() => {
+        await closeConfirmationBatchOnShelvesDialog();
+        setShowBatchOnShelvesDialog(true);
+      }
+
+      const closeConfirmationBatchOnShelvesDialog = async() => {
+        await setConfirmationBatchOnShelvesDialog(false);
       }
 
       const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, index: number = -1) => {
@@ -744,9 +759,10 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
             </Loading>
             { showRemoveBoxDialog && <PackingListDialog close={closeRemoveBoxesDialog} confirm={removeBoxes} title={intl.formatMessage({ id: 'remove_box' })} packingLists={selectedRows} /> }
             { showSplitBillDialog && <PackingListDialog close={closeSplitBillDialog} confirm={splitBill} title={intl.formatMessage({ id: 'split_bill' })} packingLists={selectedRows} /> }
-            { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows} warehouse={storagePlan?.warehouse} /> }
-            {showForceEntryDialog && <ConfirmationDialog close={closeForceEntryStoragePlanDialog} confirm={handleForceEntry} />}
-            {showAssignAutoDialog && <ConfirmationDialog close={closeAssignAutoDialog} confirm={autoAssignLocationAction} content={selectedRows.length > 0 ? intl.formatMessage({ id: "confirmation_partial_location_text" }) : intl.formatMessage({ id: "confirmation_location_text" })} />}
+            { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows.length > 0 ? selectedRows : rows} warehouse={storagePlan?.warehouse} /> }
+            { showForceEntryDialog && <ConfirmationDialog close={closeForceEntryStoragePlanDialog} confirm={handleForceEntry} />}
+            { showAssignAutoDialog && <ConfirmationDialog close={closeAssignAutoDialog} confirm={autoAssignLocationAction} content={selectedRows.length > 0 ? intl.formatMessage({ id: "confirmation_partial_location_text" }) : intl.formatMessage({ id: "confirmation_location_text" })} />}
+            { confirmationBatchOnShelvesDialog && <ConfirmationDialog close={closeConfirmationBatchOnShelvesDialog} confirm={handleConfirmationBatchOnShelvesDialog} content={intl.formatMessage({ id: "want_package_location_manual" })} />}
         </div>
     );
 };
