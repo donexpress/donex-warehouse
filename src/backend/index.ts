@@ -84,7 +84,7 @@ export const countUserLevelPath = () => {
 };
 
 export const barCodePath = () => {
-  return getBaseUrl() + "/api/v1/barcode";
+  return getBaseUrl() + "/api/v1/generate_label";
 };
 
 export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number, query?: string) => {

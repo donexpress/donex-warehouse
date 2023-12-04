@@ -299,6 +299,7 @@
   "remove_column": "Quitar nivel/columna",
   "levels": "Niveles",
   "generate_labels": "Generar etiquetas",
+  "generate_location_tag": "Generar etiqueta locación",
 
   "Delete": "Eliminar",
   "Edit": "Editar",
@@ -349,7 +350,7 @@
   "cancelled": "Cancelada",
   "operation_instruction": "Instrucción de operación",
   "barcode": "Código de barra",
-  "generated_barcodes": "Códigos de barra generados",
+  "generated_barcodes": "Etiquetas generadas",
 
   "area_code": "Código de Área",
   "area_name": "Nombre del Área",
