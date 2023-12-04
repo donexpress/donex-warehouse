@@ -236,6 +236,7 @@
 	"batch_on_shelves": "Assign manual location",
 	"batch_on_shelves_auto": "Assign automatic location",
 	"no_space_auto_location": "There is no space in the lines for automatic location assignment",
+	"want_package_location_manual": "Do you want to use package location manually?",
 	"partition": "Partition",
 	"shelf": "Shelf",
 	"select_partition": "Select partition",
