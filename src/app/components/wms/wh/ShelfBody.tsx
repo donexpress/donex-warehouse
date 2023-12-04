@@ -14,7 +14,7 @@ import LocationLabelsPDF from '../../common/LocationLabelsPDF';
 
 const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => {
     const router = useRouter();
-    const { locale } = router.query;
+    const { locale, partitionParam } = router.query;
     const intl = useIntl();
     const [sendRequest, setSendRequest] = useState<boolean>(false);
     const [layers, setLayers] = useState<number>(shelf.layers);
@@ -24,7 +24,6 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
 
     useEffect(() => {
         if (shelf) {
-            console.log(shelf)
             let items: string[][][] = [];
             for (let i = 0; i < layers; i++) {
                 items[i] = [];
@@ -43,7 +42,7 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
       }, [shelf, columns, layers]);
 
     const cancelSend = () => {
-        router.push(`/${locale}/wms/warehouses/${warehouse_id}/config`);
+        router.push(`/${locale}/wms/warehouses/${warehouse_id}/config?partitionParam=${partitionParam ? partitionParam : 1}`);
     };
 
     const formatBody = (layersValue: number, columnsValue: number): Shelf => {
