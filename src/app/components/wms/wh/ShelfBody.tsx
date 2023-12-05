@@ -152,7 +152,7 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
                     >
                         <PDFDownloadLink document={<LocationLabelsPDF warehouse={warehouse} shelfs={[shelfConfig]} intl={intl} />} fileName="location_labels.pdf">
                           {({ blob, url, loading, error }) =>
-                            intl.formatMessage({ id: "generate_labels" })
+                            intl.formatMessage({ id: "generate_location_tag" })
                           }
                         </PDFDownloadLink>
                     </Button>

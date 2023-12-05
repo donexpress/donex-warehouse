@@ -532,7 +532,7 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                           >
                             <PDFDownloadLink document={<LocationLabelsPDF warehouse={warehouse} shelfs={shelvesToShowSelected} intl={intl} />} fileName="location_labels.pdf">
                               {({ blob, url, loading, error }) =>
-                                intl.formatMessage({ id: "generate_labels" })
+                                intl.formatMessage({ id: "generate_location_tag" })
                               }
                             </PDFDownloadLink>
                           </Button>
