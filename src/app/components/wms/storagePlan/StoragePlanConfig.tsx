@@ -603,7 +603,7 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
                           <DropdownItem className={(!inWMS || (storagePlan && (stateStoragePlan !== 'stocked' && stateStoragePlan !== 'into warehouse'))) ? 'do-not-show-dropdown-item' : ''}>
                             <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={rows} warehouseCode={String((storagePlan as StoragePlan).warehouse?.code)} orderNumber={String((storagePlan as StoragePlan).order_number)} intl={intl} />} fileName="entry_plan_labels.pdf">
                               {({ blob, url, loading, error }) =>
-                                intl.formatMessage({ id: "generate_labels" })
+                                intl.formatMessage({ id: "generate_location_tag" })
                               }
                             </PDFDownloadLink>
                           </DropdownItem>

@@ -300,6 +300,7 @@
   "remove_column": "刪除等級/列",
   "levels": "等級",
   "generate_labels": "產生標籤",
+  "generate_location_tag": "產生的標籤",
 
   "Delete": "刪除",
   "Edit": "編輯",
