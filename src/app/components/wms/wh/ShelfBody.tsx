@@ -14,7 +14,7 @@ import LocationLabelsPDF from '../../common/LocationLabelsPDF';
 
 const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => {
     const router = useRouter();
-    const { locale } = router.query;
+    const { locale, partitionParam } = router.query;
     const intl = useIntl();
     const [sendRequest, setSendRequest] = useState<boolean>(false);
     const [layers, setLayers] = useState<number>(shelf.layers);
@@ -30,9 +30,8 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
                 for (let j = 0; j < columns; j++) {
                     let elements: string[] = [''];
                     const shelfPackages: PackageShelf[] = shelf.packages.filter((ps: PackageShelf) => ((ps.layer === (i+1)) && (ps.column === (j+1))))
-                    
                     if (shelfPackages.length !== 0) {
-                        elements = shelf.packages.map((ps: PackageShelf) => {return (ps.package as PackingList).case_number});
+                        elements = shelfPackages.map((ps: PackageShelf) => {return (ps.package as PackingList).case_number});
                     }
                     
                     items[i][j] = elements;
@@ -43,7 +42,7 @@ const ShelfBody = ({ id, warehouse, shelf, warehouse_id }: ShelfConfigProps) => 
       }, [shelf, columns, layers]);
 
     const cancelSend = () => {
-        router.push(`/${locale}/wms/warehouses/${warehouse_id}/config`);
+        router.push(`/${locale}/wms/warehouses/${warehouse_id}/config?partitionParam=${partitionParam ? partitionParam : 1}`);
     };
 
     const formatBody = (layersValue: number, columnsValue: number): Shelf => {

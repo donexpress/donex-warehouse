@@ -38,18 +38,18 @@ const changeAllCheckedShelves = (shelves: Shelf[], checked: boolean = true): She
 
 const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
     const router = useRouter();
-    const { locale } = router.query;
+    const { locale, partitionParam } = router.query;
     const intl = useIntl();
     const [partition, setPartition] = useState<number>(warehouse.patition_amount ? warehouse.patition_amount : 0);
     const [shelves, setShelves] = useState<Shelf[]>(warehouse.shelfs ? changeAllCheckedShelves(warehouse.shelfs, false) : []);
+    const [partitionSelected, setPartitionSelected] = useState<number>(warehouse.patition_amount && warehouse.patition_amount > 0 ? ((partitionParam && (Number(partitionParam) <= partition)) ? Number(partitionParam) : 1) : 0);
     const [shelvesToShow, setShelvesToShow] = useState<Shelf[]>((warehouse.patition_amount && warehouse.shelfs && (warehouse.patition_amount > 0) && (warehouse.shelfs.length > 0)) ? 
-    (changeAllCheckedShelves(warehouse.shelfs, false).filter((shelf: Shelf) => shelf.partition_table === 1)) 
+    (changeAllCheckedShelves(warehouse.shelfs, false).filter((shelf: Shelf) => shelf.partition_table === partitionSelected)) 
     : 
     []
     );
     const [shelvesToShowSelected, setShelvesToShowSelected] = useState<Shelf[]>([]);
     const [selectAllShelvesItems, setSelectAllShelvesItems] = useState<boolean>(false);
-    const [partitionSelected, setPartitionSelected] = useState<number>(warehouse.patition_amount && warehouse.patition_amount > 0 ? 1 : 0);
     const [partitionItems, setPartitionItems] = useState<PartitionsItem[]>([]);
 
     const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -577,7 +577,7 @@ const WarehouseConfig = ({ warehouse, id }: WarehouseConfigProps) => {
                             </div>
                             <div className='elements-row-start container-shelf-number'>
                               <a
-                                href={`/${locale}/wms/warehouses/${id}/config/${row.id}/shelf`}
+                                href={`/${locale}/wms/warehouses/${id}/config/${row.id}/shelf?partitionParam=${partitionSelected}`}
                               >
                                 {`${warehouse.code}${String(row.partition_table).padStart(2, '0')}${String(row.number_of_shelves).padStart(2, '0')}`}
                               </a>
