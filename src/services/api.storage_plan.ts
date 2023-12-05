@@ -123,14 +123,14 @@ export const getStoragePlansState = async (context?: GetServerSidePropsContext):
   }
 }
 
-export const barCodePdf = async (code: BarCode[]): Promise<Response> => {
+export const barCodePdf = async (code: string[]): Promise<Response> => {
   const path = barCodePath();
   const headers = getHeaders(null, undefined, 'application/pdf');
   try {
     const response = await fetch(path, {
       method: 'POST',
       headers: headers.headers as any,
-      body: JSON.stringify(code),
+      body: JSON.stringify({ order_numbers: code}),
     });
 
     const blob = await response.blob();

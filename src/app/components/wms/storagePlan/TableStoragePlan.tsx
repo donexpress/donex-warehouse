@@ -636,12 +636,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       }
     }
 
-    const code: BarCode[] = sPlans.map((sPlan: StoragePlan) => {
-      return {
-        order_number: sPlan.order_number ? sPlan.order_number : '',
-        //boxes_amount: sPlan.packing_list ? sPlan.packing_list.length : 0,
-        //customer_code: sPlan.user ? sPlan.user.username : ''
-      }
+    const code: string[] = sPlans.map((sPlan: StoragePlan) => {
+      return sPlan.order_number ? sPlan.order_number : ''
     });
 
     const response = await barCodePdf(code);
