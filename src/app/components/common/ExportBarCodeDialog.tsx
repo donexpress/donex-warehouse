@@ -15,7 +15,7 @@ const ExportBarCodeDialog = ({ close, file }: Params) => {
     const time = (new Date()).getTime();
     const blob = new Blob([file], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
-    saveAs(url, `barcode_${time}.pdf`);
+    saveAs(url, `plan_label_${time}.pdf`);
   }
   
   return (
