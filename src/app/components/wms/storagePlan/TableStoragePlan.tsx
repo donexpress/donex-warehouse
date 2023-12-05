@@ -435,7 +435,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                     </PDFDownloadLink>
                   </DropdownItem>
                   <DropdownItem onClick={() => generateBarCode(storageP)}>
-                    {intl.formatMessage({ id: "barcode" })}
+                    {intl.formatMessage({ id: "generate_labels" })}
                   </DropdownItem>
                   <DropdownItem onClick={() => packingListDataToExcel(storageP, storageP.packing_list ? storageP.packing_list : [], intl, 'fl' )}>
                     {intl.formatMessage({ id: "generate_xlsx_inventory" })}
@@ -453,7 +453,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                   <DropdownItem className={(statusSelected !== 'stocked' && statusSelected !== 'into warehouse') ? 'do-not-show-dropdown-item' : ''}>
                     <PDFDownloadLink document={<LocationSPLabelsPDF packingLists={storageP["packing_list"] ? storageP["packing_list"] : []} warehouseCode={String(storageP["warehouse"]?.code)} orderNumber={String(storageP["order_number"])} intl={intl} />} fileName="entry_plan_labels.pdf">
                       {({ blob, url, loading, error }) =>
-                        intl.formatMessage({ id: "generate_labels" })
+                        intl.formatMessage({ id: "generate_location_tag" })
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
@@ -661,12 +661,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       }
     }
 
-    const code: BarCode[] = sPlans.map((sPlan: StoragePlan) => {
-      return {
-        number: sPlan.order_number ? sPlan.order_number : '',
-        boxes_amount: sPlan.packing_list ? sPlan.packing_list.length : 0,
-        customer_code: sPlan.user ? sPlan.user.username : ''
-      }
+    const code: string[] = sPlans.map((sPlan: StoragePlan) => {
+      return sPlan.order_number ? sPlan.order_number : ''
     });
 
     const response = await barCodePdf(code);
@@ -828,12 +824,12 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
             <Button
               color="primary"
-              style={{ width: '160px', marginLeft: '10px' }}
+              style={{ width: '170px', marginLeft: '10px' }}
               endContent={<FaBarcode style={{ fontSize: '22px', color: 'white' }} />}
               onClick={() => generateBarCode()}
               isDisabled={selectedItems.length === 0}
             >
-              {intl.formatMessage({ id: "barcode" })}
+              {intl.formatMessage({ id: "generate_labels" })}
             </Button>
 
             <Button
