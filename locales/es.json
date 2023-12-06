@@ -457,5 +457,7 @@
   "unit_weigth": "Peso en manifiesto (Kg)",
   "invoice_status": "Estado de la factura",
   "order_status": "Estado del pedido",
-  "current_change": "Cambio actual"
+  "current_change": "Cambio actual",
+  "shipping_invoice": "Factura de envío",
+  "generate_shipping_invoice": "Generar factura de envío"
 }
