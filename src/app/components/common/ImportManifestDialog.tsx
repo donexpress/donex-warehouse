@@ -323,7 +323,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                                 value={currentChangeValue}
                                 required
                                 onChange={(e) => setCurrentChangeValue(e.target.value)}
-                              />
+                              />  
                             </div>
                             <div className="mr-2" style={{ width: "100%" }}>
                               <Input
@@ -361,7 +361,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                   className="px-4"
                   style={{ marginRight: '15px' }}
                   onClick={(e) => handleSubmit(e)}
-                  disabled={((carrierValue.trim() === "" || trackingNumberValue.trim() === "" || clientReferenceValue.trim() === "") && where === undefined) || (where === "supplier" && !validateBillCode(billCodeValue) && currentChangeValue.trim() !== "") || data === undefined}
+                  disabled={((carrierValue.trim() === "" || trackingNumberValue.trim() === "" || clientReferenceValue.trim() === "") && where === undefined) || (where === "supplier" && !validateBillCode(billCodeValue) && currentChangeValue.trim() !== "") || data === undefined || currentChangeValue === "" || billCodeValue === ""}
                 >
                   {intl.formatMessage({ id: "confirmation_header" })}
                 </Button>

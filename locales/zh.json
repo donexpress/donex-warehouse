@@ -457,6 +457,8 @@
   "unit_weigth": "预报重量",
   "invoice_status": "发票状态",
   "order_status": "订单状态",
-  "current_change": "目前的變化"
+  "current_change": "目前的變化",
+  "shipping_invoice": "運輸發票",
+  "generate_shipping_invoice": "產生運輸發票"
 
 }
