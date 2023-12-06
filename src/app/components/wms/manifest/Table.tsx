@@ -31,8 +31,7 @@ import { getGuides, guidesCount, paidBill, exportBill, chargeWaybill } from "@/s
 import { Guide, GuidesCount, ManifestResponse } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
-import { PlusIcon } from "../../common/PlusIcon";
-import { FaCalculator, FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
+import { FaCalculator, FaFile, FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
 import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
@@ -40,6 +39,7 @@ import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import ExportDialog from "../../common/ExportDialog";
 import ProfitDialog from "../../common/ProfitDialog";
+import GenerateDialog from "../../common/GenerateDialog";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -70,6 +70,7 @@ const ManifestTable = () => {
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
   const [showExportDialog, setShowExportDialog] = useState<boolean>(false);
+  const [showGenerateShippingInvoice, setShowGenerateShippingInvoiceDialog] = useState<boolean>(false);
   const [showProfitDialog, setShowProfitDialog] = useState<boolean>(false);
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
   const [showUpdateManifestDialog, setShowUpdateManifestDialog] = useState<boolean>(false);
@@ -535,13 +536,24 @@ const ManifestTable = () => {
 
             <Button
               color="primary"
-              style={{ width: "140px" }}
+              style={{ width: "120px" }}
               endContent={
                 <FaCalculator style={{ fontSize: "22px", color: "white" }} />
               }
               onClick={() => openProfitDialog()}
             >
               {intl.formatMessage({ id: "profit" })}
+            </Button>
+
+            <Button
+              color="primary"
+              style={{ width: "160px" }}
+              endContent={
+                <FaFile style={{ fontSize: "22px", color: "white" }} />
+              }
+              onClick={() => openGenerateShippingInvoiceDialog()}
+            >
+              {intl.formatMessage({ id: "shipping_invoice" })}
             </Button>
 
             <Button
@@ -784,6 +796,14 @@ const ManifestTable = () => {
     setShowChargeWaybillDialog(false);
   }
 
+  const openGenerateShippingInvoiceDialog = () => {
+    setShowGenerateShippingInvoiceDialog(true);
+  }
+
+  const closeGenerateShippingInvoiceDialog = () => {
+    setShowGenerateShippingInvoiceDialog(false);
+  }
+
   const openExportDialog = () => {
     setShowExportDialog(true);
   }
@@ -906,6 +926,7 @@ const ManifestTable = () => {
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showExportDialog && <ExportDialog close={closeExportDialog} title={intl.formatMessage({ id: "export_manifests" })} />}
+        {showGenerateShippingInvoice && <GenerateDialog close={closeGenerateShippingInvoiceDialog} title={intl.formatMessage({ id: "generate_shipping_invoice" })} />}
         {showProfitDialog && <ProfitDialog close={closeProfitDialog} title={intl.formatMessage({ id: "calculate_profit" })} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}
         {showUpdateManifestDialog && <ImportManifestDialog close={closeUpdateManifestDialog} confirm={confirmUpdateDialog} title={intl.formatMessage({ id: `update_manifest_${whereUpdate}` })} where={whereUpdate} onClose={handleManifestTableDialog} />}
