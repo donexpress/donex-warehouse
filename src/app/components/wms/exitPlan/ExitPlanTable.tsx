@@ -56,7 +56,7 @@ import {
 } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import FilterExitPlan from "./FilterExitPlan";
-import { FaFileExcel, FaFilePdf } from "react-icons/fa";
+import { FaFileExcel, FaFilePdf, FaFilter, FaTimes } from "react-icons/fa";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "../operationInstruction/ExportTable";
 import ExportExitPlanTable from "./ExportExitPlanTable";
@@ -66,6 +66,8 @@ import { CancelIcon } from "../../common/CancelIcon";
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 import { getAppendagesByExitPlanId } from "@/services/api.appendixerege1992";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
+import { InputData } from "../../../../types/general_search";
+import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "output_number",
@@ -96,6 +98,30 @@ const ExitPlanTable = () => {
     null
   );
 
+  const [searchInputs, setSearchInputs] = useState<InputData[]>([
+    {
+      key: 'output_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "delivery_number" }),
+      type: 'text'
+    },{
+      key: 'case_numbers',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "case_numbers" }),
+      type: 'text'
+    },{
+      key: 'reference_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "reference_number" }),
+      type: 'text'
+    },{
+      key: 'client_box_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "customer_order_number" }),
+      type: 'text'
+    }
+  ]);
+  const [shouldResetFields, setShouldResetFields] = React.useState(false);
   const [filterValue, setFilterValue] = useState("");
   const [queryFilter, setQueryFilter] = React.useState("");
   const [showPagination, setShowPagination] = useState<boolean>(true);
@@ -798,13 +824,23 @@ const ExitPlanTable = () => {
     }
   };
 
+  const getQuery = (q: string) => {
+    setFilterValue(q);
+  };
+
+  const handleClearAll = async() => {
+    setShouldResetFields(!shouldResetFields);
+    await onClear();
+  }
+
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4 mb-2">
+      <div className="flex flex-col gap-3 mb-2">
+        <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery} shouldResetFields={shouldResetFields} />
         <div className="flex justify-between gap-3">
           <div>
-            <div className="w-full" style={{ position: "relative" }}>
-              <Input
+            <div className="w-full flex justify-start gap-3 items-start" style={{ position: "relative" }}>
+              {/* <Input
                 isClearable
                 className="w-full search-input input-search-list"
                 placeholder=""
@@ -828,7 +864,20 @@ const ExitPlanTable = () => {
                 onClick={() => searchValues()}
               >
                 <SearchIcon />
-              </div>
+              </div> */}
+              <Button
+                color="primary"
+                onClick={(e) => searchValues()}
+              >
+                <FaFilter />
+              </Button>
+
+              <Button
+                color="primary"
+                onClick={handleClearAll}
+              >
+                <FaTimes />
+              </Button>
             </div>
             <FilterExitPlan
               onFinish={onFinishFilter}
@@ -1001,6 +1050,8 @@ const ExitPlanTable = () => {
     intl,
     currentStatePosition,
     selectedItems,
+    shouldResetFields,
+    searchInputs
   ]);
 
   const changePage = async (newPage: number) => {

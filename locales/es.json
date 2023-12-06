@@ -203,6 +203,7 @@
   
   "box_number": "Número de caja",
   "case_number": "Número de orden",
+  "case_numbers": "Números de casos",
   "client_weight": "Peso del cliente",
   "client_length": "Longitud del cliente",
   "client_width": "Ancho del cliente",

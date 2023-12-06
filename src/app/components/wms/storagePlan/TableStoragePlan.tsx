@@ -50,7 +50,7 @@ import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
-import { FaFileExcel, FaFilePdf, FaTrashAlt } from 'react-icons/fa';
+import { FaFileExcel, FaFilePdf, FaTrashAlt, FaFilter, FaTimes } from 'react-icons/fa';
 import { FaBarcode } from 'react-icons/fa6';
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
@@ -137,6 +137,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       type: 'text'
     }
   ]);
+  const [shouldResetFields, setShouldResetFields] = React.useState(false);
   const [filterValue, setFilterValue] = React.useState("");
   const [queryFilter, setQueryFilter] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
@@ -724,16 +725,21 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   }
 
   const getQuery = (q: string) => {
-    console.log(q);
+    setFilterValue(q);
   };
+
+  const handleClearAll = async() => {
+    setShouldResetFields(!shouldResetFields);
+    await onClear();
+  }
 
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-2 mb-2">
-        <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery}></GeneralSearchCmpt>
+        <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery} shouldResetFields={shouldResetFields} />
         <div className="flex justify-between gap-3 items-end">
-          <div className="w-full sm:max-w-[33%]" style={{ position: 'relative' }}>
-            <Input
+          <div className="w-full sm:max-w-[33%] flex justify-start gap-3 items-start" style={{ position: 'relative' }}>
+            {/* <Input
               isClearable
               className="search-input input-search-list"
               placeholder=""
@@ -744,7 +750,20 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             />
             <div style={{ position: 'absolute', top: '0px', right: '0px', bottom: '0px', width: '40px', background: '#37446b', borderRadius: '0 5px 5px 0', cursor: 'pointer' }} className="elements-center" onClick={() => searchValues()}>
               <SearchIcon />
-            </div>
+            </div> */}
+            <Button
+              color="primary"
+              onClick={(e) => searchValues()}
+            >
+              <FaFilter />
+            </Button>
+
+            <Button
+              color="primary"
+              onClick={handleClearAll}
+            >
+              <FaTimes />
+            </Button>
           </div>
           <div className="flex gap-3">
             <Dropdown>
@@ -937,6 +956,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     statusSelected,
     selectedItems,
     stgPCount,
+    shouldResetFields,
+    searchInputs
   ]);
 
   const changePage = async(newPage: number) => {

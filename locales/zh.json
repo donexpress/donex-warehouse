@@ -203,6 +203,7 @@
 
   "box_number": "箱号",
   "case_number": "转单号",
+	"case_numbers": "案件編號",
   "client_weight": "客户重量",
   "client_length": "客户长度",
   "client_width": "客户宽度",

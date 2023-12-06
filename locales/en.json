@@ -201,6 +201,7 @@
 	"wait_please_loading_items": "Please wait, your order is being loaded...",
 	"box_number": "Box number",
 	"case_number": "Transfer order number",
+	"case_numbers": "Case numbers",
 	"client_weight": "Client weight",
 	"client_length": "Client length",
 	"client_width": "Client width",

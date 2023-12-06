@@ -14,19 +14,39 @@ import { SearchIcon } from "./SearchIcon";
 interface Params {
     data: InputData[];
     getQueryFn: (urlParams: string) => void;
+    shouldResetFields: boolean;
 };
 
 interface SearchFields {
     [key: string]: string;
 };
 
-const GeneralSearchCmpt = ({ data, getQueryFn }: Params) => {
+const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields }: Params) => {
     const [searchFields, setSearchFields] = useState<SearchFields>({});
     const [inputs, setInputs] = useState<InputData[]>([]);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect(() => {
         setInputs(data);
     }, [data]);
+
+    useEffect(() => {
+        if (!firstLoad) {
+          setSearchFields(resetParams());
+        } else {
+          setFirstLoad(false);
+        }
+    }, [shouldResetFields]);
+
+    const resetParams = () => {
+      const resetFields: SearchFields = {};
+    
+      Object.keys(searchFields).forEach((key) => {
+        resetFields[key] = "";
+      });
+    
+      return resetFields;
+    }
 
     const handleFieldChange = (key: string, value: string) => {
         const response: SearchFields = {
@@ -51,7 +71,6 @@ const GeneralSearchCmpt = ({ data, getQueryFn }: Params) => {
             .map(([key, value]) => (value && value.trim() !== "") ? `${key}=${encodeURIComponent(value)}` : '');
 
         const queryString = queryArrString.length > 0 ? queryArrString.filter((qs: string) => qs !== '').join('&') : "";
-        console.log(queryString);
         getQueryFn(queryString);
     };
 
