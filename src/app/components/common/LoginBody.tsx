@@ -12,7 +12,7 @@ import "../../../styles/common.scss";
 import SelectLanguage from "./SelectLanguage";
 import generateValidationSchema from "../../../validation/generateValidationSchema";
 import { login, indexProfile } from "../../../services/api.users";
-import { setCookie } from "../../../helpers/cookieUtils";
+import { setCookie, removeCookie } from "../../../helpers/cookieUtils";
 import { showMsg } from "../../../helpers";
 import { useRouter } from "next/router";
 import { Button } from "@nextui-org/react";
@@ -34,9 +34,19 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
       response.status <= 299 &&
       response.token !== undefined
     ) {
+      if (response.expiration) {
+        //options.expires = new Date(response.expiration * 1000);
+        //options.expires = new Date((new Date()).getTime() + 10000);
+      }
       if (inWMS) {
+        if (response.expiration) {
+          setCookie("expireWMS", response.expiration * 1000);
+        }
         setCookie("tokenWMS", response.token);
       } else {
+        if (response.expiration) {
+          setCookie("expireOMS", response.expiration * 1000);
+        }
         setCookie("tokenOMS", response.token);
       }
 

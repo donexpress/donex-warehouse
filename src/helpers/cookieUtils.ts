@@ -9,7 +9,7 @@ export const getCookie = (name: string): any | undefined => {
 
 // Función para establecer una cookie
 export const setCookie = (name: string, value: any, options: any = {}): void => {
-  cookies.set(name, value, {...{ path: '/'}, ...options});
+  cookies.set(name, value, {...{ path: '/', sameSite: 'strict'}, ...options});
 };
 
 // Función para eliminar una cookie
@@ -26,6 +26,22 @@ export const verifySessionWMS = () => {
 export const verifySessionOMS = () => {
   const token = getCookie('tokenOMS');
   return !!token;
+};
+
+export const sessionWMSIsExpires = () => {
+  const expires = getCookie('expireWMS');
+  if (!!expires && (Number(expires) <= (new Date()).getTime())) {
+    return true;
+  }
+  return false;
+};
+
+export const sessionOMSIsExpires = () => {
+  const expires = getCookie('expireOMS');
+  if (!!expires && (Number(expires) <= (new Date()).getTime())) {
+    return true;
+  }
+  return false;
 };
 
 // Función para eliminar todas las cookies
