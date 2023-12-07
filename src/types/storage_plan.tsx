@@ -138,6 +138,12 @@ export type StoragePlanCount = {
   stocked: number
 };
 
+export type EmptyLocation = {
+  column: number;
+  layer: number;
+  shelf_id: number;
+};
+
 export type BarCode = {
   order_number: string;
   //boxes_amount: number;
