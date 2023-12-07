@@ -101,7 +101,7 @@ export const generateShippingInvoice = async (data: ShippingInvoice): Promise<an
   const path = shippingInvoicePath();
 
   try {
-    const response = await axios.post(path, data, getHeaders(null, true));
+    const response = await axios.post(path, data, getHeaders());
 
     if (response.status && (response.status >= 200 && response.status <= 299)) {
       const link = document.createElement('a');
