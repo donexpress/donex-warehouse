@@ -237,8 +237,10 @@
   "download": "釋放",
 
   "batch_on_shelves": "指定手動位置",
+  "batch_on_shelves_semiauto": "分配半自動位置",
   "batch_on_shelves_auto": "分配自動位置",
   "no_space_auto_location": "行中沒有空間用於自動分配位置",
+  "no_suggestions_to_show_sl": "沒有顯示半自動位置分配的建議。",
 	"want_package_location_manual": "您想手動使用包包位置嗎？",
   "partition": "分区",
   "shelf": "货架",
