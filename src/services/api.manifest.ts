@@ -104,6 +104,12 @@ export const generateShippingInvoice = async (data: ShippingInvoice): Promise<an
     const response = await axios.post(path, data, getHeaders(null, true));
 
     if (response.status && (response.status >= 200 && response.status <= 299)) {
+      const link = document.createElement('a');
+      link.href = response.data.url;
+      link.setAttribute('download', response.data.name);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       return { data: response.data, status: response.status };
     }
     return { status: response.status ? response.status : 0 };
