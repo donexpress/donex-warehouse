@@ -453,5 +453,6 @@
 	"order_status": "Order status",
   	"current_change": "Current change",
 	"shipping_invoice": "Shipping invoice",
-	"generate_shipping_invoice": "Generate shipping invoice"
+	"generate_shipping_invoice": "Generate shipping invoice",
+	"arrival_date": "Arrival date"
 }
