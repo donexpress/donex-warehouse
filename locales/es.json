@@ -237,8 +237,10 @@
   "download": "Descargar",
 
   "batch_on_shelves": "Asignar locación manual",
+  "batch_on_shelves_semiauto": "Asignar locación semiautomática",
   "batch_on_shelves_auto": "Asignar locación automática",
   "no_space_auto_location": "No hay espacio en las filas para la asignación de locación automática",
+  "no_suggestions_to_show_sl": "No hay sugerencias a mostrar para la asignación de locación semiautomática.",
 	"want_package_location_manual": "Desea emplear la locación de paquetes de manera manual?",
   "partition": "Zona",
   "shelf": "Fila",
@@ -457,5 +459,8 @@
   "unit_weigth": "Peso en manifiesto (Kg)",
   "invoice_status": "Estado de la factura",
   "order_status": "Estado del pedido",
-  "current_change": "Cambio actual"
+  "current_change": "Cambio actual",
+  "shipping_invoice": "Factura de envío",
+  "generate_shipping_invoice": "Generar factura de envío",
+  "arrival_date": "Fecha de llegada"
 }

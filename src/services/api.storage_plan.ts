@@ -73,6 +73,20 @@ export const getStoragePlanByIdNoDependencies = async (storagePlanId: number, co
   }
 }
 
+export const getEmptyLocationsPlan = async (storagePlanId: number): Promise<Response> => {
+  const path = storagePlanPath() + `/${storagePlanId}/suggest_asign`;
+  try {
+    const response = await axios.post(path, {}, getHeaders());
+    
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      return {data: response.data, status: response.status};
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
+
 export const storagePlanCount = async (query: string = "", context?: GetServerSidePropsContext):Promise<StoragePlanCount | null> => {
   const path = storagePlanCountPath(query);
   try {
