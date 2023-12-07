@@ -29,8 +29,8 @@ const Config = ({ id, users, warehouses,addresses }: ExitPlanProps) => {
     <ProtectedRoute>
       <Layout>
         <Head>
-          <title>Don Express Warehouse</title>
-          <link rel="icon" href="/icon_favicon.png" />
+          <title>A2A56 Warehouse</title>
+          <link rel="icon" href="/logo_a2a56_favicon.png" />
         </Head>
         <Loading loading={loading}>
         <ExitPlanConfig

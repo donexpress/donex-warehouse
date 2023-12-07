@@ -2,7 +2,7 @@ import React from "react";
 import "../../../styles/login.scss";
 import Image from "next/image";
 import logoDE from "../../../assets/icons/logo_desktop.svg";
-import logoA2A56 from "../../../assets/icons/logo_a2a56.png";
+import logoA2A56 from "../../../assets/icons/logo_a2a56_x.png";
 import { Formik, Form } from "formik";
 import GenericInput from "./GenericInput";
 import { useIntl } from "react-intl";
@@ -81,9 +81,9 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
       </div>
       <div className="login-body__container">
         <div className="elements-center">
-          <Image src={logoDE} alt="" className="login-body__logo" />
+          <Image src={logoA2A56} alt="" className="login-body__logo" />
           <div className="black-label login-body__enterprise-name">
-            Don Express Warehouse {inWMS && "WMS"}
+            A2A56 Warehouse {inWMS && "WMS"}
             {inOMS && "OMS"}
           </div>
         </div>

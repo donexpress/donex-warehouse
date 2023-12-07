@@ -84,8 +84,8 @@ const RootWMS = () => {
   <ProtectedRoute>
       <Layout>
         <Head>
-          <title>Don Express Warehouse</title>
-          <link rel="icon" href="/icon_favicon.png" />
+          <title>A2A56 Warehouse</title>
+          <link rel="icon" href="/logo_a2a56_favicon.png" />
         </Head>
         <div className='card_section'>
           <DashboardCard ammount={user} text={intl.formatMessage({ id: 'users' })} Icon={FaUser} url={`/${locale}/wms/users`}/>

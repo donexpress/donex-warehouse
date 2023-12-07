@@ -24,8 +24,8 @@ const HistoryStoragePlan = ({ id, warehouses, users, inWMS = false }: HistorySto
   <ProtectedRoute>
       <Layout>
         <Head>
-          <title>Don Express Warehouse</title>
-          <link rel="icon" href="/icon_favicon.png" />
+          <title>A2A56 Warehouse</title>
+          <link rel="icon" href="/logo_a2a56_favicon.png" />
         </Head>
         <StoragePlanHistory inWMS={ inWMS } storagePlan={storagePlan} id={id} warehouses={warehouses ? warehouses : []} users={users ? users : []} />
       </Layout>
