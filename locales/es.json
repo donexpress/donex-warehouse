@@ -240,7 +240,7 @@
   "batch_on_shelves_semiauto": "Asignar locación semiautomática",
   "batch_on_shelves_auto": "Asignar locación automática",
   "no_space_auto_location": "No hay espacio en las filas para la asignación de locación automática",
-  "no_suggestions_to_show_sl": "No hay sugerencias a mostrar para la asignación de locación semiatomática.",
+  "no_suggestions_to_show_sl": "No hay sugerencias a mostrar para la asignación de locación semiautomática.",
 	"want_package_location_manual": "Desea emplear la locación de paquetes de manera manual?",
   "partition": "Zona",
   "shelf": "Fila",
