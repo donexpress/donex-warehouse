@@ -12,7 +12,9 @@ import { Loading } from "./Loading";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import { showMsg } from "@/helperserege1992";
 import Select from 'react-select';
-import { FaClock } from "react-icons/fa";
+import { Form, Formik } from "formik";
+import GenericInput from "./GenericInput";
+import { ShippingInvoice } from "@/types/guideerege1992";
 
 interface Params {
   close: () => any;
@@ -92,6 +94,12 @@ const GenerateDialog = ({ close, title }: Params) => {
     return regex.test(cadena);
   };
 
+  let initialValues: ShippingInvoice = {
+    waybill_id: "",
+    carrier: "",
+    eta: "",
+  };
+
   const formatBillCode = (input: string): string => {
     console.log("entro")
     if (!input) {
@@ -148,7 +156,10 @@ const GenerateDialog = ({ close, title }: Params) => {
           </div>
           <div style={{ width: '500px', maxWidth: '90vw' }}>
             <div className='flex flex-col gap-3'>
-              {/* <div className="elements-row-start w-full mt-2" style={{ gap: '20px' }}>
+              <Formik initialValues={initialValues} onSubmit={() => { }}>
+                <Form>
+
+                  {/* <div className="elements-row-start w-full mt-2" style={{ gap: '20px' }}>
                 <label>
                   <input
                     type="radio"
@@ -170,100 +181,101 @@ const GenerateDialog = ({ close, title }: Params) => {
                   {intl.formatMessage({ id: "bill_code" })}
                 </label>
               </div> */}
-              {selectedOption === 'mwb' && (
-                <div className='flex mt-8 mb-3'>
-                  <div className="mr-2" style={{ width: "100%" }}>
-                    <Select
-                      isSearchable
-                      options={waybillIDS ? waybillIDS.map((column) => ({
-                        value: column.waybill_id,
-                        label: capitalize(column.waybill_id)
-                      })) : []}
-                      value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
-                      onChange={(selectedOption) => {
-                        if (selectedOption) {
-                          setWaybillIDValue(selectedOption.value);
-                        } else {
-                          setWaybillIDValue("");
-                        }
-                      }}
-                      styles={{
-                        control: (provided) => ({
-                          ...provided,
-                          backgroundColor: "#212c4d !important",
-                          border: "1px solid #37446b !important",
-                          borderRadius: "4px !important",
-                          height: "40px",
-                        }),
-                        option: (provided) => ({
-                          ...provided,
-                          color: "#aeb9e1",
-                          backgroundColor: "#212c4d !important",
-                        }), placeholder: (provided) => ({
-                          ...provided,
-                          color: "#aeb9e1",
-                          fontWeight: 400,
-                          fontSize: "var(--nextui-font-size-small)"
-                        }), input: (provided) => ({
-                          ...provided,
-                          color: "#aeb9e1",
-                          fontWeight: 400,
-                          fontSize: "var(--nextui-font-size-small)"
-                        }), singleValue: (provided) => ({
-                          ...provided,
-                          color: "#aeb9e1",
-                          fontWeight: 400,
-                          fontSize: "var(--nextui-font-size-small)"
-                        }), menu: (provided) => ({
-                          ...provided,
-                          color: "#aeb9e1",
-                          backgroundColor: "#212c4d !important",
-                          fontWeight: 400,
-                          fontSize: "var(--nextui-font-size-small)"
-                        }),
-                      }}
-                      placeholder={intl.formatMessage({ id: "waybill_id" })}
+                  {selectedOption === 'mwb' && (
+                    <div className='flex mt-8 mb-1'>
+                      <div className="mr-2" style={{ width: "100%" }}>
+                        <Select
+                          isSearchable
+                          options={waybillIDS ? waybillIDS.map((column) => ({
+                            value: column.waybill_id,
+                            label: capitalize(column.waybill_id)
+                          })) : []}
+                          value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
+                          onChange={(selectedOption) => {
+                            if (selectedOption) {
+                              setWaybillIDValue(selectedOption.value);
+                            } else {
+                              setWaybillIDValue("");
+                            }
+                          }}
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              backgroundColor: "#212c4d !important",
+                              border: "1px solid #37446b !important",
+                              borderRadius: "4px !important",
+                              height: "40px",
+                            }),
+                            option: (provided) => ({
+                              ...provided,
+                              color: "#aeb9e1",
+                              backgroundColor: "#212c4d !important",
+                            }), placeholder: (provided) => ({
+                              ...provided,
+                              color: "#aeb9e1",
+                              fontWeight: 400,
+                              fontSize: "var(--nextui-font-size-small)"
+                            }), input: (provided) => ({
+                              ...provided,
+                              color: "#aeb9e1",
+                              fontWeight: 400,
+                              fontSize: "var(--nextui-font-size-small)"
+                            }), singleValue: (provided) => ({
+                              ...provided,
+                              color: "#aeb9e1",
+                              fontWeight: 400,
+                              fontSize: "var(--nextui-font-size-small)"
+                            }), menu: (provided) => ({
+                              ...provided,
+                              color: "#aeb9e1",
+                              backgroundColor: "#212c4d !important",
+                              fontWeight: 400,
+                              fontSize: "var(--nextui-font-size-small)"
+                            }),
+                          }}
+                          placeholder={intl.formatMessage({ id: "waybill_id" })}
+                        />
+                      </div>
+                      <div className="ml-2" style={{ width: "100%" }}>
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button
+                              className="bnt-dropdown"
+                              style={{ width: "-webkit-fill-available" }}
+                              endContent={<ChevronDownIcon className="text-small" />}
+                            >
+                              {carrierValue.trim() !== "" ? carrierValue : intl.formatMessage({ id: "carrier" })}
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu
+                            style={{ width: "100%" }}
+                            disallowEmptySelection
+                            aria-label="Carrier"
+                            closeOnSelect={true}
+                            selectionMode="single"
+                          >
+                            {carriers ? carriers.map((column) => (
+                              <DropdownItem style={{ width: "100%" }} onClick={(e) => setCarrierValue(column.name)} key={column.position} className="capitalize">
+                                {capitalize(column.name)}
+                              </DropdownItem>
+                            )) : []}
+                          </DropdownMenu>
+                        </Dropdown>
+                      </div>
+                    </div>)}
+                  <div className="w-full mt-5">
+                    <GenericInput
+                      onChangeFunction={(event) => setDate(event?.target.value)}
+                      type="date"
+                      name="arrival_date"
+                      placeholder={intl.formatMessage({
+                        id: "arrival_date",
+                      })}
+                      customClass="custom-input"
                     />
                   </div>
-                  <div className="ml-2" style={{ width: "100%" }}>
-                    <Dropdown>
-                      <DropdownTrigger>
-                        <Button
-                          className="bnt-dropdown"
-                          style={{ width: "-webkit-fill-available" }}
-                          endContent={<ChevronDownIcon className="text-small" />}
-                        >
-                          {carrierValue.trim() !== "" ? carrierValue : intl.formatMessage({ id: "carrier" })}
-                        </Button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        style={{ width: "100%" }}
-                        disallowEmptySelection
-                        aria-label="Carrier"
-                        closeOnSelect={true}
-                        selectionMode="single"
-                      >
-                        {carriers ? carriers.map((column) => (
-                          <DropdownItem style={{ width: "100%" }} onClick={(e) => setCarrierValue(column.name)} key={column.position} className="capitalize">
-                            {capitalize(column.name)}
-                          </DropdownItem>
-                        )) : []}
-                      </DropdownMenu>
-                    </Dropdown>
-                  </div>
-                </div>)}
-              <div className="w-full mb-5">
-                <Input
-                  style={{ border: "none" }}
-                  type="date"
-                  className="search-input"
-                  startContent={<FaClock />}
-                  value={date}
-                  onValueChange={(value: string) => {
-                    setDate(value)
-                  }}
-                />
-              </div>
+                </Form>
+              </Formik>
               {/* {selectedOption === 'bill_code' && (
                 <div className='flex flex-col mt-5 mb-10'>
                   <div className='flex mb-2'>
