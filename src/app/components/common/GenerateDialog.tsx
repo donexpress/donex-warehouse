@@ -64,7 +64,8 @@ const GenerateDialog = ({ close, title }: Params) => {
 
       setDisableConfirm(false);
       if (response.status && response.status >= 200 && response.status <= 299) {
-        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+        clearInputs();
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });        
       } else {
         let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
         if (response.status && (response.status === 404)) {
@@ -143,6 +144,12 @@ const GenerateDialog = ({ close, title }: Params) => {
     }
     return cleanedInput;
   };
+
+  const clearInputs = () => {
+    setCarrierValue("");
+    setDate("");
+    setWaybillIDValue("");
+  }
 
   return (
     <div className="confirmation_container">
@@ -268,6 +275,7 @@ const GenerateDialog = ({ close, title }: Params) => {
                       onChangeFunction={(event) => setDate(event?.target.value)}
                       type="date"
                       name="arrival_date"
+                      value={date}
                       placeholder={intl.formatMessage({
                         id: "arrival_date",
                       })}
