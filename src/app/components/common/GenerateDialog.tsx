@@ -303,7 +303,7 @@ const GenerateDialog = ({ close, title }: Params) => {
                   className="px-4"
                   style={{ marginRight: '15px' }}
                   onClick={handleSubmit}
-                  disabled={waybillIDValue === "" || date === "" || carrierValue === ""}
+                  disabled={waybillIDValue === "" || date === "" || carrierValue === "" || disableConfirm}
                 >
                   {intl.formatMessage({ id: "confirmation_header" })}
                 </Button>
