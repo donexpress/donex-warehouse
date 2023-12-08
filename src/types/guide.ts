@@ -13,6 +13,12 @@ export type Guide = {
     carrier: string;
 }
 
+export type ShippingInvoice = {
+    waybill_id: string;
+    carrier: string;
+    eta: string;
+}
+
 export type GuideProps = {
     id: number;
     guide: Guide;

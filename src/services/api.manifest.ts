@@ -1,9 +1,9 @@
 import axios from "axios";
-import { GuideCountPath, excelPath, guidePath, profitPath } from "../backend";
+import { GuideCountPath, excelPath, guidePath, profitPath, shippingInvoicePath } from "../backend";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
 import { BASE_URL } from "@/configerege1992";
-import { Guide, GuidesCount } from "@/types/guideerege1992";
+import { Guide, GuidesCount, ShippingInvoice } from "@/types/guideerege1992";
 import { Response } from "@/types/indexerege1992";
 
 const getBaseUrl = () => {
@@ -96,6 +96,27 @@ export const exportExcelManifestBillCode = async (billCode: string): Promise<any
   const response = await exportExcelManifestFn(path);
   return response;
 }
+
+export const generateShippingInvoice = async (data: ShippingInvoice): Promise<any> => {
+  const path = shippingInvoicePath();
+
+  try {
+    const response = await axios.post(path, data, getHeaders());
+
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      const link = document.createElement('a');
+      link.href = response.data.url;
+      link.setAttribute('download', response.data.name);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return { data: response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
 
 export const exportExcelManifestFn = async (path: string, context?: GetServerSidePropsContext): Promise<any> => {
   try {

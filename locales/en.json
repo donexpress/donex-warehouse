@@ -235,8 +235,10 @@
 	"upload": "Upload",
 	"download": "Download",
 	"batch_on_shelves": "Assign manual location",
+	"batch_on_shelves_semiauto": "Assign semi-automatic location",
 	"batch_on_shelves_auto": "Assign automatic location",
 	"no_space_auto_location": "There is no space in the lines for automatic location assignment",
+	"no_suggestions_to_show_sl": "There are no suggestions to show for semi-automatic location assignment.",
 	"want_package_location_manual": "Do you want to use package location manually?",
 	"partition": "Partition",
 	"shelf": "Shelf",
@@ -452,5 +454,8 @@
 	"unit_weigth": "Manifest weight (Kg)",
 	"invoice_status": "Invoice status",
 	"order_status": "Order status",
-  	"current_change": "Current change"
+  	"current_change": "Current change",
+	"shipping_invoice": "Shipping invoice",
+	"generate_shipping_invoice": "Generate shipping invoice",
+	"arrival_date": "Arrival date"
 }

@@ -143,6 +143,10 @@ export const excelPath = () => {
   return getBaseUrl() + "/api/v1/excel";
 };
 
+export const shippingInvoicePath = () => {
+  return getBaseUrl() + "/api/v1/shipping_invoice";
+};
+
 export const profitPath = () => {
   return getBaseUrl() + "/api/v1/sum";
 };
