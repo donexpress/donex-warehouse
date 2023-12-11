@@ -33,12 +33,13 @@ export const guidesCount = async (filters: string = "", context?: GetServerSideP
   }
 }
 
-export const createManifest = async (formData: FormData, carrier?: string, mwb?: string, customer_code?: string, force: boolean = false): Promise<any> => {
+export const createManifest = async (formData: FormData, carrier?: string, mwb?: string, customer_code?: string, force: boolean = false, willCharge?: boolean): Promise<any> => {
   let path;
+  let params = willCharge ? `&collected=true` : '';
   if (force) {
-    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}&force=${force}`;
+    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}&force=${force}${params}`;
   } else {
-    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}`;
+    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}${params}`;
   }
 
   try {
