@@ -62,7 +62,7 @@ const ManifestTable = () => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filtered, setFiltered] = useState<boolean>(false);
+  const [filtered, setFiltered] = useState<boolean>(true);
 
   /** start*/
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
@@ -262,7 +262,7 @@ const ManifestTable = () => {
     setPaidValue("");
     setStartDate("");
     setEndDate("");
-    setFiltered(false);
+    setFiltered(true);
     await reloadData(-1, -1, "");
   };
 
@@ -348,7 +348,7 @@ const ManifestTable = () => {
       let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
       showMsg(message, { type: "error" });
     }
-    setFiltered(false);
+    setFiltered(true);
   }
 
   const topContent = React.useMemo(() => {
@@ -473,7 +473,7 @@ const ManifestTable = () => {
                 </Dropdown>
               </div>
 
-              <div className="flexbox-item">
+              <div className="flexbox-item" style={{ flex: "0 0 12.5%" }}>
                 <GenericInput
                   onChangeFunction={(event) => setStartDate(event?.target.value)}
                   type="date"
@@ -486,7 +486,7 @@ const ManifestTable = () => {
                 />
               </div>
 
-              <div className="flexbox-item">
+              <div className="flexbox-item" style={{ flex: "0 0 12.5%" }}>
                 <GenericInput
                   onChangeFunction={(event) => setEndDate(event?.target.value)}
                   type="date"
@@ -626,7 +626,7 @@ const ManifestTable = () => {
                   endContent={
                     <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
                   }
-                  disabled={!filtered}
+                  disabled={filtered || filteredItems.length === 0}
                   onClick={() => handleExport()}
                 >
                   {intl.formatMessage({ id: "export_xlsx" })}
@@ -757,7 +757,7 @@ const ManifestTable = () => {
   };
 
   const handleSelectedFilters = async (event: any) => {
-    setFiltered(true);
+    setFiltered(false);
     let arrayFilters = [];
     if (trackingNumberValue.trim() !== "") {
       arrayFilters.push(`tracking_number=${trackingNumberValue}`);
@@ -801,11 +801,6 @@ const ManifestTable = () => {
     setGuidesTotal(_guidesCount);
     setLoadingItems(false);
   };
-
-  // const handleDelete = (id: number) => {
-  //   setShowConfirm(true);
-  //   setDeleteElemtent(id);
-  // };
 
   const handleActionBillCode = async (action: number) => {
     if (action === 1) {
