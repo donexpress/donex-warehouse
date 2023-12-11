@@ -640,6 +640,8 @@ const ExitPlanTable = () => {
   };
 
   const searchValues = async () => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
     if (filterValue && filterValue !== "") {
       await setQueryFilter(filterValue);
     } else {
@@ -829,6 +831,8 @@ const ExitPlanTable = () => {
   };
 
   const handleClearAll = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
     setShouldResetFields(!shouldResetFields);
     await onClear();
   }

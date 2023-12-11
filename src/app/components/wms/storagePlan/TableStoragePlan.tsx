@@ -574,6 +574,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   }
 
   const searchValues = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
     if (filterValue && filterValue !== "") {
       await setQueryFilter(filterValue);
     } else {
@@ -729,6 +731,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   };
 
   const handleClearAll = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
     setShouldResetFields(!shouldResetFields);
     await onClear();
   }

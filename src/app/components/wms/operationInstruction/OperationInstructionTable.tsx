@@ -753,6 +753,8 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   }
 
   const searchValues = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
     if (filterValue && filterValue !== "") {
       await setQueryFilter(filterValue);
     } else {
@@ -962,6 +964,8 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   };
 
   const handleClearAll = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
     setShouldResetFields(!shouldResetFields);
     await onClear();
   }
