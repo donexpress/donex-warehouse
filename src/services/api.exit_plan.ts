@@ -149,7 +149,7 @@ export const getExitPlansByState = async (
     params += `&current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
   if (query && query !== "") {
-    params += `&${query}`;
+    params += `&filter=${query}`;
   }
   if(initialDate && initialDate !== "") {
     params += `&initialDate=${initialDate}`
@@ -177,7 +177,7 @@ export const countExitPlans = async (
 ): Promise<StateCount> => {
   let params = "?api=back";
   if (query && query !== "") {
-    params += `&${query}`;
+    params += `&filter=${query}`;
   }
   if(initialDate && initialDate !== "") {
     params += `&initialDate=${initialDate}`

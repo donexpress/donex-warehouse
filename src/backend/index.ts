@@ -93,7 +93,7 @@ export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?
     params += `${ params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
   if (query && query !== '') {
-    params += `${ params === "" ? '?' : '&'}${query}`;
+    params += `${ params === "" ? '?' : '&'}filter=${query}`;
   }
   return getBaseUrl() + "/api/v1/storage_plan" + params;
 };
@@ -105,7 +105,7 @@ export const storagePlanStatePath = () => {
 export const storagePlanCountPath = (query: string = "") => {
   let params = "";
   if (query && query !== "") {
-    params += `?${query}`;
+    params += `?filter=${query}`;
   }
   return getBaseUrl() + "/api/v1/storage_plan/count" + params;
 };

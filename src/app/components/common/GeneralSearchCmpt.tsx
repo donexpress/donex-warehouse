@@ -67,10 +67,22 @@ const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields }: Params) => {
     };
 
     const getQuery = (sf: SearchFields) => {
-        const queryArrString = Object.entries(sf)
-            .map(([key, value]) => (value && value.trim() !== "") ? `${key}=${encodeURIComponent(value)}` : '');
+      const nonEmptyValues = Object.values(sf).filter((value) => value && value !== "");
+      let queryString = "";
+      if (nonEmptyValues.length > 0) {
+        const resultObject: SearchFields = {};
+  
+        Object.entries(sf).forEach(([key, value]) => {
+          if (value && value !== "") {
+            resultObject[key] = value;
+          }
+        });
+        queryString = encodeURI(JSON.stringify(resultObject));
+      }console.log(queryString)
+      //const queryArrString = Object.entries(sf)
+      //  .map(([key, value]) => (value && value.trim() !== "") ? `${key}=${encodeURIComponent(value)}` : '');
 
-        const queryString = queryArrString.length > 0 ? queryArrString.filter((qs: string) => qs !== '').join('&') : "";
+      //const queryString = queryArrString.length > 0 ? queryArrString.filter((qs: string) => qs !== '').join('&') : "";
         getQueryFn(queryString);
     };
 
