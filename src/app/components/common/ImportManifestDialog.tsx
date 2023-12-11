@@ -69,7 +69,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
       let response: Response | undefined = undefined;
       if (where === undefined) {
         setLoading(true);
-        response = await createManifest(data, carrierValue, trackingNumberValue, clientReferenceValue, forceUpload);
+        response = await createManifest(data, carrierValue, trackingNumberValue, clientReferenceValue, forceUpload, willCharge);
       } else if (where === "customer") {
         setLoading(true);
         response = await updateCustomerManifest(data, willCharge);
@@ -248,10 +248,18 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
           </div>
           <div style={{ width: '500px', maxWidth: '90vw' }}>
             <div className='flex flex-col gap-3'>
-              <div className='upload-evidence-body-dialog scrollable-hidden pl-1 pr-1 mt-10 mb-10'>
+              <div className='upload-evidence-body-dialog scrollable-hidden pl-1 pr-1 mt-8 mb-8'>
                 {
                   where === undefined ? (
                     <div>
+                      <div className='flex'>
+                        <div className="mr-2 mb-5" style={{ width: "100%" }}>
+                          <div className='elements-row-start'>
+                            <input type="checkbox" name="willCharge" style={{ marginRight: '10px' }} checked={willCharge} onChange={() => { setWillCharge(!willCharge); }} />
+                            <span style={{ fontSize: '13px' }}>{intl.formatMessage({ id: "charged_guide" })}</span>
+                          </div>
+                        </div>
+                      </div>
                       <div className='flex flex-col gap-3'>
                         <div className='flex mb-5'>
                           <div className="mr-2" style={{ width: "100%" }}>
