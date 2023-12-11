@@ -85,8 +85,8 @@ export const updateSupplierManifest = async (formData: FormData, currentChange: 
   }
 };
 
-export const exportExcelManifest = async (waybill_id: string, carrier?: string, context?: GetServerSidePropsContext): Promise<any> => {
-  const path = carrier ? `${excelPath()}?waybill_id=${waybill_id}&carrier=${carrier}` : `${excelPath()}?waybill_id=${waybill_id}`;
+export const exportExcelManifest = async (queryFilters: string, context?: GetServerSidePropsContext): Promise<any> => {
+  const path = `${excelPath()}?${queryFilters}`;
   const response = await exportExcelManifestFn(path, context);
   return response;
 }
