@@ -33,7 +33,7 @@ export const guidesCount = async (filters: string = "", context?: GetServerSideP
   }
 }
 
-export const createManifest = async (formData: FormData, carrier?: string, mwb?: string, customer_code?: string, force: boolean = false, willCharge: boolean): Promise<any> => {
+export const createManifest = async (formData: FormData, carrier?: string, mwb?: string, customer_code?: string, force: boolean = false, willCharge?: boolean): Promise<any> => {
   let path;
   let params = willCharge ? `&collected=true` : '';
   if (force) {

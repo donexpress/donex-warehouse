@@ -37,7 +37,6 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   const [willCharge, setWillCharge] = React.useState(false);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [force, setForce] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
 
@@ -56,7 +55,6 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
 
   const handleConfirm = async () => {
     setShowConfirm(false);
-    await setForce(true);
     await handleSubmit(null, true);
   };
 
