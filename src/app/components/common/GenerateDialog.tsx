@@ -65,7 +65,7 @@ const GenerateDialog = ({ close, title }: Params) => {
       setDisableConfirm(false);
       if (response.status && response.status >= 200 && response.status <= 299) {
         clearInputs();
-        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });        
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
       } else {
         let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
         if (response.status && (response.status === 404)) {
