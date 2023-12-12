@@ -107,7 +107,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     {
       key: 'number_delivery',
       initialValue: '',
-      placeholder: intl.formatMessage({ id: "number_delivery" }),
+      placeholder: intl.formatMessage({ id: "number_delivery_search" }),
       type: 'text'
     },
   ]);

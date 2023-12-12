@@ -117,7 +117,7 @@ const ExitPlanTable = () => {
     },{
       key: 'client_box_number',
       initialValue: '',
-      placeholder: intl.formatMessage({ id: "customer_order_number" }),
+      placeholder: intl.formatMessage({ id: "customer_order_number_search" }),
       type: 'text'
     }
   ]);

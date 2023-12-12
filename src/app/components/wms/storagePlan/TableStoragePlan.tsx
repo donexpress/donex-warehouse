@@ -118,12 +118,12 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     {
       key: 'customer_order_number',
       initialValue: '',
-      placeholder: intl.formatMessage({ id: "customer_order_number" }),
+      placeholder: intl.formatMessage({ id: "customer_order_number_search" }),
       type: 'text'
     },{
       key: 'order_number',
       initialValue: '',
-      placeholder: intl.formatMessage({ id: "warehouse_order_number" }),
+      placeholder: intl.formatMessage({ id: "warehouse_order_number_search" }),
       type: 'text'
     },{
       key: 'pr_number',
