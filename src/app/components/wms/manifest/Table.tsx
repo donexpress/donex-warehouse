@@ -47,7 +47,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "tracking_number",
   "shipping_cost",
   "sale_price",
-  "unit_weigth",
+  "weigth",
   "invoice_weight",
   "state",
   "paid",
@@ -126,8 +126,8 @@ const ManifestTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "unit_weigth" }),
-        uid: "unit_weigth",
+        name: intl.formatMessage({ id: "manifest_weight" }),
+        uid: "weigth",
         sortable: true,
       },
       {
@@ -156,8 +156,8 @@ const ManifestTable = () => {
         sortable: true,
       },
       {
-        name: intl.formatMessage({ id: "weight" }),
-        uid: "weigth",
+        name: intl.formatMessage({ id: "unit_weight" }),
+        uid: "unit_weigth",
         sortable: true,
       },
       {
