@@ -19,6 +19,15 @@ export type ShippingInvoice = {
     eta: string;
 }
 
+export type ManifestFilters = {
+    waybill_id: string;
+    carrier: string;
+    tracking_number: string;
+    clientReference: string;
+    bill_code: string;
+    date_rage: string;
+}
+
 export type GuideProps = {
     id: number;
     guide: Guide;

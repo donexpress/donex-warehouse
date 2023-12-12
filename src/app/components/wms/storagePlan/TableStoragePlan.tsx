@@ -34,6 +34,7 @@ import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storageP
 import { autoAssignLocation } from '../../../../services/api.package_shelf';
 import { PackingList, StoragePlan, StoragePlanListProps, BarCode } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
+import { InputData } from "../../../../types/general_search";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
 import UploadEvidenceDialog from "../../common/UploadEvidenceDialog";
 import BatchOnStoragePlansDialog from "../../common/BatchOnStoragePlansDialog";
@@ -48,7 +49,8 @@ import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import ExportStoragePlansPDF from '../../common/ExportStoragePlansPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
-import { FaFileExcel, FaFilePdf, FaTrashAlt } from 'react-icons/fa';
+import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
+import { FaFileExcel, FaFilePdf, FaTrashAlt, FaFilter, FaTimes } from 'react-icons/fa';
 import { FaBarcode } from 'react-icons/fa6';
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
@@ -112,6 +114,30 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const [barCodeValue, setBarCodeValue] = useState<any>("");
 
   /** start*/
+  const [searchInputs, setSearchInputs] = useState<InputData[]>([
+    {
+      key: 'customer_order_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "customer_order_number_search" }),
+      type: 'text'
+    },{
+      key: 'order_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "warehouse_order_number_search" }),
+      type: 'text'
+    },{
+      key: 'pr_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "pr_number" }),
+      type: 'text'
+    },{
+      key: 'reference_number',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "reference_number" }),
+      type: 'text'
+    }
+  ]);
+  const [shouldResetFields, setShouldResetFields] = React.useState(false);
   const [filterValue, setFilterValue] = React.useState("");
   const [queryFilter, setQueryFilter] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
@@ -169,6 +195,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "outgoing_order" }),
         uid: "outgoing_order",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "output_number" }),
+        uid: "output_number",
         sortable: false,
       },
       {
@@ -247,6 +278,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "outgoing_order" }),
         uid: "outgoing_order",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "output_number" }),
+        uid: "output_number",
         sortable: false,
       },
       {
@@ -339,6 +375,20 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const somePLWithoutOutputPlanDeliveredNumber = (pls: PackingList[] | undefined): boolean => {
     return !!pls && (pls.length > 0) && pls.some((pl: PackingList) => !pl.output_plan_delivered_number);
   }
+
+  const getOutputNumbers = (sp: StoragePlan): string => {
+    const numbers: string[] = [];
+    if (sp.packing_list && sp.packing_list.length > 0) {
+      sp.packing_list?.forEach((pl, index) => {
+        if (pl.output_plan_delivered_number) {
+          if (!numbers.find((el) => el === pl.output_plan_delivered_number)) {
+            numbers.push(pl.output_plan_delivered_number);
+          }
+        }
+      });
+    }
+    return numbers.length > 0 ? numbers.join(", ") : "";
+  };
 
   const renderCell = React.useCallback(
     (storageP: any, columnKey: React.Key) => {
@@ -479,6 +529,13 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         ) - storageP.packing_list.filter((el: any) => el.dispatched).length;
         case "outgoing_order":
           return storageP.packing_list ? (storageP.packing_list.filter((el: any) => el.output_plan_delivered_number).length) : 0;
+        case "output_number":return (
+          <CopyColumnToClipboard
+            value={
+              <span>{getOutputNumbers(storageP)}</span>
+            }
+          />
+        );
         case "dispatched_boxes":
           return storageP.packing_list.filter((el: any) => el.dispatched).length;
         case "location":
@@ -548,6 +605,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   }
 
   const searchValues = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
     if (filterValue && filterValue !== "") {
       await setQueryFilter(filterValue);
     } else {
@@ -698,12 +757,24 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     return its;
   }
 
+  const getQuery = (q: string) => {
+    setFilterValue(q);
+  };
+
+  const handleClearAll = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
+    setShouldResetFields(!shouldResetFields);
+    await onClear();
+  }
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-2 mb-2">
+        <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery} shouldResetFields={shouldResetFields} />
         <div className="flex justify-between gap-3 items-end">
-          <div className="w-full sm:max-w-[33%]" style={{ position: 'relative' }}>
-            <Input
+          <div className="w-full sm:max-w-[33%] flex justify-start gap-3 items-start" style={{ position: 'relative' }}>
+            {/* <Input
               isClearable
               className="search-input input-search-list"
               placeholder=""
@@ -714,7 +785,20 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             />
             <div style={{ position: 'absolute', top: '0px', right: '0px', bottom: '0px', width: '40px', background: '#37446b', borderRadius: '0 5px 5px 0', cursor: 'pointer' }} className="elements-center" onClick={() => searchValues()}>
               <SearchIcon />
-            </div>
+            </div> */}
+            <Button
+              color="primary"
+              onClick={(e) => searchValues()}
+            >
+              <FaFilter />
+            </Button>
+
+            <Button
+              color="primary"
+              onClick={handleClearAll}
+            >
+              <FaTimes />
+            </Button>
           </div>
           <div className="flex gap-3">
             <Dropdown>
@@ -907,6 +991,8 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     statusSelected,
     selectedItems,
     stgPCount,
+    shouldResetFields,
+    searchInputs
   ]);
 
   const changePage = async(newPage: number) => {

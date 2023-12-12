@@ -330,6 +330,20 @@ export const downloadTemplateUpdateSupplier = () => {
   );
 }
 
+export const getOutputNumbers = (sp: StoragePlan): string => {
+  const numbers: string[] = [];
+  if (sp.packing_list && sp.packing_list.length > 0) {
+    sp.packing_list?.forEach((pl, index) => {
+      if (pl.output_plan_delivered_number) {
+        if (!numbers.find((el) => el === pl.output_plan_delivered_number)) {
+          numbers.push(pl.output_plan_delivered_number);
+        }
+      }
+    });
+  }
+  return numbers.length > 0 ? numbers.join(", ") : "";
+};
+
 export const storagePlanDataToExcel = (
   storagePlans: StoragePlan[],
   intl: IntlShape,
@@ -343,6 +357,7 @@ export const storagePlanDataToExcel = (
   const key5: string = intl.formatMessage({ id: "number_of_boxes_entered" });
   const key6: string = intl.formatMessage({ id: "number_of_boxes_stored" });
   const key6_0: string = intl.formatMessage({ id: "outgoing_order" });
+  const key6_2: string = intl.formatMessage({ id: "output_number" });
   const key6_1: string = intl.formatMessage({ id: "location" });
   const key7: string = intl.formatMessage({ id: "evidence" });
   const key8: string = intl.formatMessage({ id: "reference_number" });
@@ -389,6 +404,9 @@ export const storagePlanDataToExcel = (
         sp.packing_list && sp.packing_list.length > 0
           ? sp.packing_list.filter((pl: PackingList) => pl.output_plan_delivered_number).length.toString()
           : "0";
+    }
+    if (selection === "all" || selection.has("output_number")) {
+      sPlan[key6_2] = getOutputNumbers(sp);
     }
     if (selection === "all" || selection.has("dispatched_boxes")) {
       sPlan[key11_1] =

@@ -42,7 +42,7 @@ export const countOperationInstruction = async (exit_plan_id?: number, query?: s
     path += `?output_plan_id=${exit_plan_id}`
   }
   if (query && (query !== '')) {
-    path += `${ exit_plan_id ? '&' : '?'}query=${query}`;
+    path += `${ exit_plan_id ? '&' : '?'}filter=${query}`;
   }
   try {
     const response = await axios.get(path, getHeaders(context));
@@ -98,7 +98,7 @@ export const getOperationInstructions = async (state:string = 'pending', page?: 
     params += `&current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
   if (query && query !== '') {
-    params += `&query=${query}`;
+    params += `&filter=${query}`;
   }
   const path = `${operationInstructionPath()}?state=${state}${params}`
   try {
@@ -137,7 +137,7 @@ export const getOperationInstructionsByOutputPlan = async (outputPlan: number, s
     params += `&current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
   if (query && query !== '') {
-    params += `&query=${query}`;
+    params += `&filter=${query}`;
   }
   const path = `${operationInstructionPath()}/output_plan/${outputPlan}?state=${state}${params}`
   try {
