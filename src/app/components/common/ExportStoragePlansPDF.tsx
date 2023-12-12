@@ -3,7 +3,7 @@ import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/render
 import { StoragePlan, PackingList } from "../../../types/storage_plan";
 import { PackageShelf } from "../../../types/package_shelf";
 import { IntlShape } from 'react-intl';
-import { getDateFromStr, getHourFromStr, getLocationPackages } from '../../../helpers'
+import { getDateFromStr, getHourFromStr, getLocationPackages, getOutputNumbers } from '../../../helpers'
 import { getDateFormat, getHourFormat } from '../../../helpers/utils'
 import { Selection } from "@nextui-org/react";
 
@@ -98,6 +98,7 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     const key5: string = intl.formatMessage({ id: 'number_of_boxes_entered' });
     const key6: string = intl.formatMessage({ id: 'number_of_boxes_stored' });
     const key6_0: string = intl.formatMessage({ id: 'outgoing_order' });
+    const key6_2: string = intl.formatMessage({ id: "output_number" });
     const key6_1: string = intl.formatMessage({ id: "location" });
     const key7: string = intl.formatMessage({ id: 'evidence' });
     const key8: string = intl.formatMessage({ id: 'reference_number' });
@@ -129,6 +130,9 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     }
     if (selection === "all" || selection.has("outgoing_order")) {
         titles.push(key6_0);
+    }
+    if (selection === "all" || selection.has("output_number")) {
+        titles.push(key6_2);
     }
     if (selection === "all" || selection.has("dispatched_boxes")) {
         titles.push(key11_1);
@@ -227,6 +231,15 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
         if (selection === "all" || selection.has("outgoing_order")) {
           const keyWord: string = "outgoing_order";
           const value: string = sp.packing_list && sp.packing_list.length > 0 ? (sp.packing_list.filter((pl: PackingList) => pl.output_plan_delivered_number).length).toString() : '0';
+          values[index][i] = {
+            keyWord,
+            value
+          };
+          i++;
+        }
+        if (selection === "all" || selection.has("output_number")) {
+          const keyWord: string = "output_number";
+          const value: string = getOutputNumbers(sp);
           values[index][i] = {
             keyWord,
             value
