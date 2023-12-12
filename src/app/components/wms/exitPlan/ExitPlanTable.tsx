@@ -105,11 +105,6 @@ const ExitPlanTable = () => {
       placeholder: intl.formatMessage({ id: "delivery_number" }),
       type: 'text'
     },{
-      key: 'case_numbers',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "case_numbers" }),
-      type: 'text'
-    },{
       key: 'reference_number',
       initialValue: '',
       placeholder: intl.formatMessage({ id: "reference_number" }),
