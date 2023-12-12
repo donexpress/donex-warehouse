@@ -33,12 +33,13 @@ export const guidesCount = async (filters: string = "", context?: GetServerSideP
   }
 }
 
-export const createManifest = async (formData: FormData, carrier?: string, mwb?: string, customer_code?: string, force: boolean = false): Promise<any> => {
+export const createManifest = async (formData: FormData, carrier?: string, mwb?: string, customer_code?: string, force: boolean = false, willCharge?: boolean): Promise<any> => {
   let path;
+  let params = willCharge ? `&collected=true` : '';
   if (force) {
-    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}&force=${force}`;
+    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}&force=${force}${params}`;
   } else {
-    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}`;
+    path = getBaseUrl() + `/api/v1/manifest?carrier=${carrier}&mwb=${mwb}&customer_code=${customer_code}${params}`;
   }
 
   try {
@@ -85,8 +86,8 @@ export const updateSupplierManifest = async (formData: FormData, currentChange: 
   }
 };
 
-export const exportExcelManifest = async (waybill_id: string, carrier?: string, context?: GetServerSidePropsContext): Promise<any> => {
-  const path = carrier ? `${excelPath()}?waybill_id=${waybill_id}&carrier=${carrier}` : `${excelPath()}?waybill_id=${waybill_id}`;
+export const exportExcelManifest = async (queryFilters: string, context?: GetServerSidePropsContext): Promise<any> => {
+  const path = `${excelPath()}?${queryFilters}`;
   const response = await exportExcelManifestFn(path, context);
   return response;
 }

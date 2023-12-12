@@ -27,8 +27,8 @@ import ConfirmationDialog from "../../common/ConfirmationDialog";
 import "./../../../../styles/generic.input.scss";
 import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
-import { getGuides, guidesCount, paidBill, exportBill, chargeWaybill } from "@/services/api.manifesterege1992";
-import { Guide, GuidesCount, ManifestResponse } from "@/types/guideerege1992";
+import { getGuides, guidesCount, paidBill, exportBill, chargeWaybill, exportExcelManifest } from "@/services/api.manifesterege1992";
+import { Guide, GuidesCount, ManifestFilters, ManifestResponse } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
 import { FaCalculator, FaFile, FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
@@ -37,9 +37,10 @@ import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 import { indexWaybillIDS } from "@/services/api.waybillerege1992";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
-import ExportDialog from "../../common/ExportDialog";
 import ProfitDialog from "../../common/ProfitDialog";
 import GenerateDialog from "../../common/GenerateDialog";
+import GenericInput from "../../common/GenericInput";
+import { Form, Formik } from "formik";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -61,6 +62,7 @@ const ManifestTable = () => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [deleteElement, setDeleteElemtent] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
+  const [filtered, setFiltered] = useState<boolean>(true);
 
   /** start*/
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
@@ -69,7 +71,6 @@ const ManifestTable = () => {
   const [filters, setFilters] = React.useState<string>("");
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
-  const [showExportDialog, setShowExportDialog] = useState<boolean>(false);
   const [showGenerateShippingInvoice, setShowGenerateShippingInvoiceDialog] = useState<boolean>(false);
   const [showProfitDialog, setShowProfitDialog] = useState<boolean>(false);
   const [showImportManifestDialog, setShowImportManifestDialog] = useState<boolean>(false);
@@ -87,6 +88,8 @@ const ManifestTable = () => {
   const [carrierValue, setCarrierValue] = React.useState("");
   const [waybillIDValue, setWaybillIDValue] = React.useState("");
   const [paidValue, setPaidValue] = React.useState("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   const [manifestPaidData, setManifestPaidData] = React.useState<ManifestResponse | null>(null);
 
@@ -183,6 +186,15 @@ const ManifestTable = () => {
     return columns;
   }, [intl]);
 
+  let initialValues: ManifestFilters = {
+    waybill_id: "",
+    carrier: "",
+    tracking_number: "",
+    clientReference: "",
+    bill_code: "",
+    date_rage: "",
+  };
+
   const headerColumns = React.useMemo(() => {
     const columns = getColumns;
     if (visibleColumns === "all") return columns;
@@ -248,6 +260,9 @@ const ManifestTable = () => {
     setCarrierValue("");
     setWaybillIDValue("");
     setPaidValue("");
+    setStartDate("");
+    setEndDate("");
+    setFiltered(true);
     await reloadData(-1, -1, "");
   };
 
@@ -316,283 +331,335 @@ const ManifestTable = () => {
     return cleanedInput;
   };
 
+  const handleExport = async () => {
+    try {
+      let response: any = null;
+      response = await exportExcelManifest(filters);
+      if (response.status && response.status >= 200 && response.status <= 299) {
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        if (response.status && (response.status === 404)) {
+          message = intl.formatMessage({ id: 'billNotFoundMsg' });
+        }
+        showMsg(message, { type: "error" });
+      }
+    } catch (error) {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
+    setFiltered(true);
+  }
+
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
-        <div className="flexbox-container search-container-manifest">
-          <div className="flexbox-item" style={{ paddingLeft: 0 }}>
-            <Select
-              isSearchable
-              options={waybillIDS ? waybillIDS.map((column) => ({
-                value: column.waybill_id,
-                label: capitalize(column.waybill_id)
-              })) : []}
-              value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
-              onChange={(selectedOption) => {
-                if (selectedOption) {
-                  setWaybillIDValue(selectedOption.value);
-                } else {
-                  setWaybillIDValue("");
-                }
-              }}
-              styles={{
-                control: (provided) => ({
-                  ...provided,
-                  backgroundColor: "#212c4d !important",
-                  border: "1px solid #37446b !important",
-                  borderRadius: "4px !important",
-                  height: "40px",
-                }),
-                option: (provided) => ({
-                  ...provided,
-                  color: "#aeb9e1",
-                  backgroundColor: "#212c4d !important",
-                }), placeholder: (provided) => ({
-                  ...provided,
-                  color: "#aeb9e1",
-                  fontWeight: 400,
-                  fontSize: "var(--nextui-font-size-small)"
-                }), input: (provided) => ({
-                  ...provided,
-                  color: "#aeb9e1",
-                  fontWeight: 400,
-                  fontSize: "var(--nextui-font-size-small)"
-                }), singleValue: (provided) => ({
-                  ...provided,
-                  color: "#aeb9e1",
-                  fontWeight: 400,
-                  fontSize: "var(--nextui-font-size-small)"
-                }), menu: (provided) => ({
-                  ...provided,
-                  color: "#aeb9e1",
-                  backgroundColor: "#212c4d !important",
-                  fontWeight: 400,
-                  fontSize: "var(--nextui-font-size-small)"
-                }),
-              }}
-              placeholder={intl.formatMessage({ id: "waybill_id" })}
-            />
-          </div>
+      <Formik initialValues={initialValues} onSubmit={() => { }}>
+        <Form>
+          <div className="flex flex-col gap-4">
+            <div className="flexbox-container search-container-manifest">
+              <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+                <Select
+                  isSearchable
+                  options={waybillIDS ? waybillIDS.map((column) => ({
+                    value: column.waybill_id,
+                    label: capitalize(column.waybill_id)
+                  })) : []}
+                  value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
+                  onChange={(selectedOption) => {
+                    if (selectedOption) {
+                      setWaybillIDValue(selectedOption.value);
+                    } else {
+                      setWaybillIDValue("");
+                    }
+                  }}
+                  styles={{
+                    control: (provided) => ({
+                      ...provided,
+                      backgroundColor: "#212c4d !important",
+                      border: "1px solid #37446b !important",
+                      borderRadius: "4px !important",
+                      height: "40px",
+                    }),
+                    option: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      backgroundColor: "#212c4d !important",
+                    }), placeholder: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      fontWeight: 400,
+                      fontSize: "var(--nextui-font-size-small)"
+                    }), input: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      fontWeight: 400,
+                      fontSize: "var(--nextui-font-size-small)"
+                    }), singleValue: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      fontWeight: 400,
+                      fontSize: "var(--nextui-font-size-small)"
+                    }), menu: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      backgroundColor: "#212c4d !important",
+                      fontWeight: 400,
+                      fontSize: "var(--nextui-font-size-small)"
+                    }),
+                  }}
+                  placeholder={intl.formatMessage({ id: "waybill_id" })}
+                />
+              </div>
 
-          <div className="flexbox-item">
-            <Input
-              isClearable
-              className="search-input"
-              placeholder={intl.formatMessage({ id: "tracking_number" })}
-              startContent={<SearchIcon />}
-              value={trackingNumberValue}
-              onClear={() => onClear("TrackingNumberValue")}
-              onChange={(e) => setTrackingNumberValue(e.target.value)}
-            />
-          </div>
+              <div className="flexbox-item">
+                <Input
+                  isClearable
+                  className="search-input"
+                  placeholder={intl.formatMessage({ id: "tracking_number" })}
+                  startContent={<SearchIcon />}
+                  value={trackingNumberValue}
+                  onClear={() => onClear("TrackingNumberValue")}
+                  onChange={(e) => setTrackingNumberValue(e.target.value)}
+                />
+              </div>
 
-          <div className="flexbox-item">
-            <Input
-              isClearable
-              className="search-input"
-              placeholder={intl.formatMessage({ id: "clientReference" })}
-              startContent={<SearchIcon />}
-              value={clientReferenceValue}
-              onClear={() => onClear("ClientReferenceValue")}
-              onChange={(e) => setClientReferenceValue(e.target.value)}
-            />
-          </div>
+              <div className="flexbox-item">
+                <Input
+                  isClearable
+                  className="search-input"
+                  placeholder={intl.formatMessage({ id: "clientReference" })}
+                  startContent={<SearchIcon />}
+                  value={clientReferenceValue}
+                  onClear={() => onClear("ClientReferenceValue")}
+                  onChange={(e) => setClientReferenceValue(e.target.value)}
+                />
+              </div>
 
-          <div className="flexbox-item" style={{ paddingRight: 0 }}>
-            <Input
-              isClearable
-              className="search-input"
-              placeholder={intl.formatMessage({ id: "bill_code" })}
-              startContent={<SearchIcon />}
-              value={billCodeValue}
-              onClear={() => onClear("BillCodeValue")}
-              onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
-            />
-          </div>
+              <div className="flexbox-item" style={{ paddingRight: 0 }}>
+                <Input
+                  isClearable
+                  className="search-input"
+                  placeholder={intl.formatMessage({ id: "bill_code" })}
+                  startContent={<SearchIcon />}
+                  value={billCodeValue}
+                  onClear={() => onClear("BillCodeValue")}
+                  onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
+                />
+              </div>
 
-          <div className="flexbox-item" style={{ paddingLeft: 0 }}>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  className="bnt-dropdown"
-                  style={{ width: "-webkit-fill-available" }}
-                  endContent={<ChevronDownIcon className="text-small" />}
-                >
-                  {carrierValue.trim() !== "" ? carrierValue : intl.formatMessage({ id: "carrier" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Carrier"
-                closeOnSelect={true}
-                selectionMode="single"
-              >
-                {carriers ? carriers.map((column) => (
-                  <DropdownItem onClick={(e) => setCarrierValue(column.name)} key={column.position} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                )) : []}
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-        </div>
-        <div className="flex justify-between">
-          <div className="flex justify-start gap-3 items-start">
-            <Button
-              color="primary"
-              onClick={(e) => handleSelectedFilters(e)}
-            >
-              <FaFilter />
-            </Button>
+              <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button
+                      className="bnt-dropdown"
+                      style={{ width: "-webkit-fill-available" }}
+                      endContent={<ChevronDownIcon className="text-small" />}
+                    >
+                      {carrierValue.trim() !== "" ? carrierValue : intl.formatMessage({ id: "carrier" })}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    disallowEmptySelection
+                    aria-label="Carrier"
+                    closeOnSelect={true}
+                    selectionMode="single"
+                  >
+                    {carriers ? carriers.map((column) => (
+                      <DropdownItem onClick={(e) => setCarrierValue(column.name)} key={column.position} className="capitalize">
+                        {capitalize(column.name)}
+                      </DropdownItem>
+                    )) : []}
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
 
-            <Button
-              color="primary"
-              onClick={handleClearAll}
-            >
-              <FaTimes />
-            </Button>
-          </div>
+              <div className="flexbox-item" style={{ flex: "0 0 12.5%" }}>
+                <GenericInput
+                  onChangeFunction={(event) => setStartDate(event?.target.value)}
+                  type="date"
+                  name="start_date"
+                  value={startDate}
+                  placeholder={intl.formatMessage({
+                    id: "start_date",
+                  })}
+                  customClass="custom-input"
+                />
+              </div>
 
-          <div className="flex justify-end gap-3 items-end">
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  className="bnt-select"
-                  endContent={<ChevronDownIcon className="text-small" />}
-                >
-                  {intl.formatMessage({ id: "columns" })}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
-              >
-                {getColumns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-
-            {(currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
-              color="primary"
-              onClick={() => openChargeWaybillDialog()}
-            >
-              {intl.formatMessage({ id: "collect_money" })}
-            </Button>
-            )}
-
-            {(currentBillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
+              <div className="flexbox-item" style={{ flex: "0 0 12.5%" }}>
+                <GenericInput
+                  onChangeFunction={(event) => setEndDate(event?.target.value)}
+                  type="date"
+                  name="end_date"
+                  value={endDate}
+                  placeholder={intl.formatMessage({
+                    id: "end_date",
+                  })}
+                  disabled={startDate === ""}
+                  customClass="custom-input"
+                />
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <div className="flex justify-start gap-3 items-start">
                 <Button
                   color="primary"
-                  endContent={<ChevronDownIcon className="text-small" />}
+                  onClick={(e) => handleSelectedFilters(e)}
                 >
-                  {intl.formatMessage({ id: "bill_code" })}
+                  <FaFilter />
                 </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Bill Code"
-                closeOnSelect={true}
-                selectionMode="single"
-              >
-                {arrayBillCode.map((column) => (
-                  <DropdownItem key={column.id} onClick={(e) => handleActionBillCode(column.id)} className="capitalize">
-                    {capitalize(column.value)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-            )}
 
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
                 <Button
                   color="primary"
-                  endContent={<ChevronDownIcon className="text-small" />}
+                  onClick={handleClearAll}
                 >
-                  {intl.formatMessage({ id: "create" })}
+                  <FaTimes />
                 </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Carrier"
-                closeOnSelect={true}
-                selectionMode="single"
-              >
-                {arrayUpdateManifest.map((column) => (
-                  <DropdownItem key={column.id} onClick={(e) => (column.id !== 2) ? openUpdateManifestDialog(column.id) : openImportManifestDialog()} className="capitalize">
-                    {capitalize(column.value)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
+              </div>
 
-            <Button
-              color="primary"
-              style={{ width: "120px" }}
-              endContent={
-                <FaCalculator style={{ fontSize: "22px", color: "white" }} />
-              }
-              onClick={() => openProfitDialog()}
-            >
-              {intl.formatMessage({ id: "profit" })}
-            </Button>
+              <div className="flex justify-end gap-3 items-end">
+                <Dropdown>
+                  <DropdownTrigger className="hidden sm:flex">
+                    <Button
+                      className="bnt-select"
+                      endContent={<ChevronDownIcon className="text-small" />}
+                    >
+                      {intl.formatMessage({ id: "columns" })}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    disallowEmptySelection
+                    aria-label="Table Columns"
+                    closeOnSelect={false}
+                    selectedKeys={visibleColumns}
+                    selectionMode="multiple"
+                    onSelectionChange={setVisibleColumns}
+                  >
+                    {getColumns.map((column) => (
+                      <DropdownItem key={column.uid} className="capitalize">
+                        {capitalize(column.name)}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
 
-            <Button
-              color="primary"
-              style={{ width: "160px" }}
-              endContent={
-                <FaFile style={{ fontSize: "22px", color: "white" }} />
-              }
-              onClick={() => openGenerateShippingInvoiceDialog()}
-            >
-              {intl.formatMessage({ id: "shipping_invoice" })}
-            </Button>
+                {(currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
+                  color="primary"
+                  onClick={() => openChargeWaybillDialog()}
+                >
+                  {intl.formatMessage({ id: "collect_money" })}
+                </Button>
+                )}
 
-            <Button
-              color="primary"
-              style={{ width: "140px" }}
-              endContent={
-                <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
-              }
-              onClick={() => openExportDialog()}
-            >
-              {intl.formatMessage({ id: "export_xlsx" })}
-            </Button>
+                {(currentBillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Dropdown>
+                  <DropdownTrigger className="hidden sm:flex">
+                    <Button
+                      color="primary"
+                      endContent={<ChevronDownIcon className="text-small" />}
+                    >
+                      {intl.formatMessage({ id: "bill_code" })}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    disallowEmptySelection
+                    aria-label="Bill Code"
+                    closeOnSelect={true}
+                    selectionMode="single"
+                  >
+                    {arrayBillCode.map((column) => (
+                      <DropdownItem key={column.id} onClick={(e) => handleActionBillCode(column.id)} className="capitalize">
+                        {capitalize(column.value)}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
+                )}
 
-            {/* <Button
+                <Dropdown>
+                  <DropdownTrigger className="hidden sm:flex">
+                    <Button
+                      color="primary"
+                      endContent={<ChevronDownIcon className="text-small" />}
+                    >
+                      {intl.formatMessage({ id: "create" })}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    disallowEmptySelection
+                    aria-label="Carrier"
+                    closeOnSelect={true}
+                    selectionMode="single"
+                  >
+                    {arrayUpdateManifest.map((column) => (
+                      <DropdownItem key={column.id} onClick={(e) => (column.id !== 2) ? openUpdateManifestDialog(column.id) : openImportManifestDialog()} className="capitalize">
+                        {capitalize(column.value)}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
+
+                <Button
+                  color="primary"
+                  style={{ width: "120px" }}
+                  endContent={
+                    <FaCalculator style={{ fontSize: "22px", color: "white" }} />
+                  }
+                  onClick={() => openProfitDialog()}
+                >
+                  {intl.formatMessage({ id: "profit" })}
+                </Button>
+
+                <Button
+                  color="primary"
+                  style={{ width: "160px" }}
+                  endContent={
+                    <FaFile style={{ fontSize: "22px", color: "white" }} />
+                  }
+                  onClick={() => openGenerateShippingInvoiceDialog()}
+                >
+                  {intl.formatMessage({ id: "shipping_invoice" })}
+                </Button>
+
+                <Button
+                  color="primary"
+                  style={{ width: "140px" }}
+                  endContent={
+                    <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
+                  }
+                  disabled={filtered || filteredItems.length === 0}
+                  onClick={() => handleExport()}
+                >
+                  {intl.formatMessage({ id: "export_xlsx" })}
+                </Button>
+
+                {/* <Button
               color="primary"
               endContent={<PlusIcon />}
               onClick={() => openImportManifestDialog()}
             >
               {intl.formatMessage({ id: "create" })}
             </Button> */}
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-default-400 text-small">
+                {intl.formatMessage({ id: "total_results" }, { in: guides.length })}
+              </span>
+              <label className="flex items-center text-default-400 text-small">
+                {intl.formatMessage({ id: "rows_page" })}
+                <select
+                  className="outline-none text-default-400 text-small m-1"
+                  onChange={onRowsPerPageChange}
+                >
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+            </div>
           </div>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">
-            {intl.formatMessage({ id: "total_results" }, { in: guides.length })}
-          </span>
-          <label className="flex items-center text-default-400 text-small">
-            {intl.formatMessage({ id: "rows_page" })}
-            <select
-              className="outline-none text-default-400 text-small m-1"
-              onChange={onRowsPerPageChange}
-            >
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </label>
-        </div>
-      </div >
+        </Form>
+      </Formik >
     );
   }, [
     visibleColumns,
@@ -605,6 +672,8 @@ const ManifestTable = () => {
     waybillIDValue,
     carrierValue,
     paidValue,
+    startDate,
+    endDate,
     guidesTotal
   ]);
 
@@ -688,6 +757,7 @@ const ManifestTable = () => {
   };
 
   const handleSelectedFilters = async (event: any) => {
+    setFiltered(false);
     let arrayFilters = [];
     if (trackingNumberValue.trim() !== "") {
       arrayFilters.push(`tracking_number=${trackingNumberValue}`);
@@ -713,6 +783,12 @@ const ManifestTable = () => {
     if (paidValue.trim() !== "") {
       arrayFilters.push(`paid=${paidValue === "Pagados" ? true : false}`);
     }
+    if (startDate.trim() !== "") {
+      arrayFilters.push(`start_date=${startDate}`);
+    }
+    if (endDate.trim() !== "") {
+      arrayFilters.push(`end_date=${endDate}`);
+    }
     setFilters(arrayFilters.join("&"));
     await reloadData(-1, -1, arrayFilters.join("&"));
   }
@@ -725,11 +801,6 @@ const ManifestTable = () => {
     setGuidesTotal(_guidesCount);
     setLoadingItems(false);
   };
-
-  // const handleDelete = (id: number) => {
-  //   setShowConfirm(true);
-  //   setDeleteElemtent(id);
-  // };
 
   const handleActionBillCode = async (action: number) => {
     if (action === 1) {
@@ -802,14 +873,6 @@ const ManifestTable = () => {
 
   const closeGenerateShippingInvoiceDialog = () => {
     setShowGenerateShippingInvoiceDialog(false);
-  }
-
-  const openExportDialog = () => {
-    setShowExportDialog(true);
-  }
-
-  const closeExportDialog = () => {
-    setShowExportDialog(false);
   }
 
   const openProfitDialog = () => {
@@ -925,7 +988,6 @@ const ManifestTable = () => {
           </TableBody>
         </Table>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
-        {showExportDialog && <ExportDialog close={closeExportDialog} title={intl.formatMessage({ id: "export_manifests" })} />}
         {showGenerateShippingInvoice && <GenerateDialog close={closeGenerateShippingInvoiceDialog} title={intl.formatMessage({ id: "generate_shipping_invoice" })} />}
         {showProfitDialog && <ProfitDialog close={closeProfitDialog} title={intl.formatMessage({ id: "calculate_profit" })} />}
         {showImportManifestDialog && <ImportManifestDialog close={closeImportManifestDialog} confirm={confirmImportDialog} title={intl.formatMessage({ id: "import_manifest" })} />}

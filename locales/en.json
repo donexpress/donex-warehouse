@@ -460,5 +460,7 @@
   	"current_change": "Current change",
 	"shipping_invoice": "Shipping invoice",
 	"generate_shipping_invoice": "Generate shipping invoice",
-	"arrival_date": "Arrival date"
+	"arrival_date": "Arrival date",
+	"start_date": "Start date",
+	"end_date": "End date"
 }

@@ -466,5 +466,7 @@
   "current_change": "Cambio actual",
   "shipping_invoice": "Factura de envío",
   "generate_shipping_invoice": "Generar factura de envío",
-  "arrival_date": "Fecha de llegada"
+  "arrival_date": "Fecha de llegada",
+  "start_date": "Fecha de inicio",
+	"end_date": "Fecha fin"
 }
