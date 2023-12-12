@@ -516,6 +516,9 @@ const ExitPlanTable = () => {
         (<CopyColumnToClipboard value={user.client_box_number} />) 
         : 
         (<span></span>);
+      case 'reference_number': return (
+        <CopyColumnToClipboard value={user.reference_number} />
+      );
       case "location":
         return (
           <span

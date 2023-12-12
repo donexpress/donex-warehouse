@@ -172,6 +172,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         sortable: false,
       },
       {
+        name: intl.formatMessage({ id: "output_number" }),
+        uid: "output_number",
+        sortable: false,
+      },
+      {
         name: intl.formatMessage({ id: "dispatched_boxes" }),
         uid: "dispatched_boxes",
         sortable: false,
@@ -247,6 +252,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "outgoing_order" }),
         uid: "outgoing_order",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "output_number" }),
+        uid: "output_number",
         sortable: false,
       },
       {
@@ -339,6 +349,20 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const somePLWithoutOutputPlanDeliveredNumber = (pls: PackingList[] | undefined): boolean => {
     return !!pls && (pls.length > 0) && pls.some((pl: PackingList) => !pl.output_plan_delivered_number);
   }
+
+  const getOutputNumbers = (sp: StoragePlan): string => {
+    const numbers: string[] = [];
+    if (sp.packing_list && sp.packing_list.length > 0) {
+      sp.packing_list?.forEach((pl, index) => {
+        if (pl.output_plan_delivered_number) {
+          if (!numbers.find((el) => el === pl.output_plan_delivered_number)) {
+            numbers.push(pl.output_plan_delivered_number);
+          }
+        }
+      });
+    }
+    return numbers.length > 0 ? numbers.join(", ") : "";
+  };
 
   const renderCell = React.useCallback(
     (storageP: any, columnKey: React.Key) => {
@@ -479,6 +503,13 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         ) - storageP.packing_list.filter((el: any) => el.dispatched).length;
         case "outgoing_order":
           return storageP.packing_list ? (storageP.packing_list.filter((el: any) => el.output_plan_delivered_number).length) : 0;
+        case "output_number":return (
+          <CopyColumnToClipboard
+            value={
+              <span>{getOutputNumbers(storageP)}</span>
+            }
+          />
+        );
         case "dispatched_boxes":
           return storageP.packing_list.filter((el: any) => el.dispatched).length;
         case "location":
