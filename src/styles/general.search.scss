@@ -5,7 +5,14 @@
     width: 100%;
 }
 
-@media only screen and (min-width: 1500px) {
+.container-search-inputs-major {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+}
+
+@media only screen and (min-width: 1900px) {
     .container-search-inputs {
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     }
@@ -14,6 +21,10 @@
 @media only screen and (max-width: 1150px) {
     .container-search-inputs {
         grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .container-search-inputs-major {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
@@ -25,6 +36,10 @@
 
 @media only screen and (max-width: 300px) {
     .container-search-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .container-search-inputs-major {
         grid-template-columns: 1fr;
     }
 }

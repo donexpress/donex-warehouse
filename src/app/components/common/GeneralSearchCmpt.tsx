@@ -15,13 +15,14 @@ interface Params {
     data: InputData[];
     getQueryFn: (urlParams: string) => void;
     shouldResetFields: boolean;
+    isMajorFields?: boolean;
 };
 
 interface SearchFields {
     [key: string]: string;
 };
 
-const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields }: Params) => {
+const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields, isMajorFields = false }: Params) => {
     const [searchFields, setSearchFields] = useState<SearchFields>({});
     const [inputs, setInputs] = useState<InputData[]>([]);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
@@ -92,7 +93,7 @@ const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields }: Params) => {
     };
 
     return inputs.length > 0 ? (
-        <div className="container-search-inputs">
+        <div className={isMajorFields ? "container-search-inputs-major" : "container-search-inputs"}>
             {inputs.map((inputData: InputData) => (
                 <div key={inputData.key}>
                     {inputData.type === "text" && (

@@ -975,7 +975,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
       <div className="bg-gray-200 pt-1">
         {exit_plan_id === undefined && (
           <div className="mb-3">
-            <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery} shouldResetFields={shouldResetFields} />
+            <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery} shouldResetFields={shouldResetFields} isMajorFields={true} />
           </div>
         )}
         <div
