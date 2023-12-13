@@ -947,6 +947,7 @@ const ManifestTable = () => {
   return (
     <>
       <Loading loading={loading}>
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="GUIDE"
           isHeaderSticky
@@ -987,6 +988,7 @@ const ManifestTable = () => {
             )}
           </TableBody>
         </Table>
+        </div>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showGenerateShippingInvoice && <GenerateDialog close={closeGenerateShippingInvoiceDialog} title={intl.formatMessage({ id: "generate_shipping_invoice" })} />}
         {showProfitDialog && <ProfitDialog close={closeProfitDialog} title={intl.formatMessage({ id: "calculate_profit" })} />}
