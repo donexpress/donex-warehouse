@@ -21,6 +21,7 @@ import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/ut
 import { showMsg } from "../../../../helpers";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
+import "../../../../styles/general.search.scss";
 import PaginationTable from "../../common/Pagination";
 import { removeLine } from "@/services/api.lineserege1992";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
@@ -351,13 +352,35 @@ const ManifestTable = () => {
     setFiltered(true);
   }
 
+  const setDateMaxToday = (value: string, type: 'start_date' | 'end_date') => {
+    let newValue = value;
+    const selectedDate = new Date(value);
+    const currentDate = new Date();
+
+    const startDateDef = (startDate && startDate !== '') ? new Date(startDate) : new Date();
+
+    if ((selectedDate > currentDate) || (type === 'end_date' && (startDateDef > selectedDate))) {
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      
+      newValue = `${year}-${month}-${day}`;
+    }
+    
+    if (type === 'end_date') {
+      setEndDate(newValue)
+    } else if (type === 'start_date') {
+      setStartDate(newValue)
+    }
+  }
+
   const topContent = React.useMemo(() => {
     return (
       <Formik initialValues={initialValues} onSubmit={() => { }}>
         <Form>
-          <div className="flex flex-col gap-4">
-            <div className="flexbox-container search-container-manifest">
-              <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+          <div className="flex flex-col gap-3">
+            <div className="container-search-inputs">
+              <div>
                 <Select
                   isSearchable
                   options={waybillIDS ? waybillIDS.map((column) => ({
@@ -411,7 +434,7 @@ const ManifestTable = () => {
                 />
               </div>
 
-              <div className="flexbox-item">
+              <div>
                 <Input
                   isClearable
                   className="search-input"
@@ -423,7 +446,7 @@ const ManifestTable = () => {
                 />
               </div>
 
-              <div className="flexbox-item">
+              <div>
                 <Input
                   isClearable
                   className="search-input"
@@ -435,7 +458,7 @@ const ManifestTable = () => {
                 />
               </div>
 
-              <div className="flexbox-item" style={{ paddingRight: 0 }}>
+              <div>
                 <Input
                   isClearable
                   className="search-input"
@@ -447,12 +470,12 @@ const ManifestTable = () => {
                 />
               </div>
 
-              <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+              <div>
                 <Dropdown>
                   <DropdownTrigger>
                     <Button
                       className="bnt-dropdown"
-                      style={{ width: "-webkit-fill-available" }}
+                      style={{ width: "100%" }}
                       endContent={<ChevronDownIcon className="text-small" />}
                     >
                       {carrierValue.trim() !== "" ? carrierValue : intl.formatMessage({ id: "carrier" })}
@@ -472,32 +495,37 @@ const ManifestTable = () => {
                   </DropdownMenu>
                 </Dropdown>
               </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '10px' }}>
+                <div>
+                  <GenericInput
+                    onChangeFunction={(event) => setDateMaxToday(event?.target.value, "start_date")}
+                    selectDateMaxToday={true}
+                    type="date"
+                    name="start_date"
+                    value={startDate}
+                    placeholder={intl.formatMessage({
+                      id: "start_date",
+                    })}
+                    customClass="custom-input"
+                    hideErrorContent={true}
+                  />
+                </div>
 
-              <div className="flexbox-item" style={{ flex: "0 0 12.5%" }}>
-                <GenericInput
-                  onChangeFunction={(event) => setStartDate(event?.target.value)}
-                  type="date"
-                  name="start_date"
-                  value={startDate}
-                  placeholder={intl.formatMessage({
-                    id: "start_date",
-                  })}
-                  customClass="custom-input"
-                />
-              </div>
-
-              <div className="flexbox-item" style={{ flex: "0 0 12.5%" }}>
-                <GenericInput
-                  onChangeFunction={(event) => setEndDate(event?.target.value)}
-                  type="date"
-                  name="end_date"
-                  value={endDate}
-                  placeholder={intl.formatMessage({
-                    id: "end_date",
-                  })}
-                  disabled={startDate === ""}
-                  customClass="custom-input"
-                />
+                <div>
+                  <GenericInput
+                    onChangeFunction={(event) => setDateMaxToday(event?.target.value, "end_date")}
+                    selectDateMaxToday={true}
+                    type="date"
+                    name="end_date"
+                    value={endDate}
+                    placeholder={intl.formatMessage({
+                      id: "end_date",
+                    })}
+                    disabled={startDate === ""}
+                    customClass="custom-input"
+                    hideErrorContent={true}
+                  />
+                </div>
               </div>
             </div>
             <div className="flex justify-between">
