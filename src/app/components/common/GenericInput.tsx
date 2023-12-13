@@ -29,6 +29,7 @@ type GenericInputProps = {
   minValue?: number;
   hideErrorContent?: boolean;
   selectDateMinToday?: boolean;
+  selectDateMaxToday?: boolean;
   onChangeFunction?: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   getValueChangeFn?: (value: any)=>void;
   isMulti?: boolean;
@@ -51,6 +52,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
   isMulti=false,
   minValue=undefined,
   selectDateMinToday=false,
+  selectDateMaxToday=false,
   getValueChangeFn,
   ...props
 }) => {
@@ -187,6 +189,13 @@ const GenericInput: React.FC<GenericInputProps> = ({
         const currentDate = new Date();
 
         if (selectDateMinToday && selectedDate < currentDate) {
+          const year = currentDate.getFullYear();
+          const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+          const day = String(currentDate.getDate()).padStart(2, '0');
+          
+          const formattedDate = `${year}-${month}-${day}`;
+          formik.setFieldValue(String(props.name), formattedDate);
+        } else if (selectDateMaxToday && selectedDate > currentDate) {
           const year = currentDate.getFullYear();
           const month = String(currentDate.getMonth() + 1).padStart(2, '0');
           const day = String(currentDate.getDate()).padStart(2, '0');
