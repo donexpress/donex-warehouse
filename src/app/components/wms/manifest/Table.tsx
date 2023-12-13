@@ -561,6 +561,7 @@ const ManifestTable = () => {
                     selectedKeys={visibleColumns}
                     selectionMode="multiple"
                     onSelectionChange={setVisibleColumns}
+                    className="custom-dropdown-menu"
                   >
                     {getColumns.map((column) => (
                       <DropdownItem key={column.uid} className="capitalize">
