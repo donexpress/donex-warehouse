@@ -205,7 +205,7 @@ export const downloadTemplateCreateManifest = () => {
       "MWB": '',
       "bag code": '',
       "Bag ID": '',
-      "TRACKING NUMBER(AWB)": '',
+      "TRACKING NUMBER": '',
       "CLIENT REF.NO": '',
       "SHIPPER": '',
       "SHIPPER ADDRESS": '',
@@ -228,6 +228,7 @@ export const downloadTemplateCreateManifest = () => {
       "PRODUCT DESCRIPTION": '',
       "TOTAL QTY": '',
       "SALE PRICE": '',
+      "REMARK": '',
     }
   ];
 
@@ -264,7 +265,7 @@ export const downloadTemplateUpdateCustomer = () => {
   const dataToExport: object[] = [
     {
       "MWB": '',
-      "TRACKING NUMBER(AWB)": '',
+      "TRACKING NUMBER": '',
       "SALE PRICE": ''
     }
   ];
