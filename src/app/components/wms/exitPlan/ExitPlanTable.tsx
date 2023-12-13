@@ -114,6 +114,12 @@ const ExitPlanTable = () => {
       initialValue: '',
       placeholder: intl.formatMessage({ id: "customer_order_number_search" }),
       type: 'text'
+    },
+    {
+      key: 'user_id',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "user" }),
+      type: 'text'
     }
   ]);
   const [shouldResetFields, setShouldResetFields] = React.useState(false);

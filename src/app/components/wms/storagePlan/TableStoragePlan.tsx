@@ -135,6 +135,12 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       initialValue: '',
       placeholder: intl.formatMessage({ id: "reference_number" }),
       type: 'text'
+    },
+    {
+      key: 'user_id',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "user" }),
+      type: 'text'
     }
   ]);
   const [shouldResetFields, setShouldResetFields] = React.useState(false);

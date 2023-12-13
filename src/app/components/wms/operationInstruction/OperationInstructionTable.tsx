@@ -110,6 +110,18 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
       placeholder: intl.formatMessage({ id: "number_delivery_search" }),
       type: 'text'
     },
+    {
+      key: 'user_id',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "user" }),
+      type: 'text'
+    },
+    {
+      key: 'output_plan_id',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "exitPlan" }),
+      type: 'text'
+    },
   ]);
   const [shouldResetFields, setShouldResetFields] = useState(false);
   const [filterValue, setFilterValue] = useState("");
