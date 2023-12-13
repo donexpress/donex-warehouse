@@ -456,5 +456,12 @@
 	"generate_shipping_invoice": "Generate shipping invoice",
 	"arrival_date": "Arrival date",
 	"start_date": "Start date",
-	"end_date": "End date"
+	"end_date": "End date",
+	"summary": "Summary",
+	"quantity_package": "Packages",
+	"quantity_kilograms": "Kilograms",
+	"quantity_shipping_cost": "Shipping cost",
+	"quantity_sale_price": "Sales price",
+	"earnings": "Earning",
+	"date": "Date"
 }
