@@ -102,7 +102,7 @@ const FilterExitPlan = ({ onFinish, setParentFinalDate, setParentInitialDate, se
           style={{ border: "none" }}
           type="date"
           className="search-input"
-          startContent={<FaClock />}
+          //startContent={<FaClock />}
           value={date}
           onValueChange={(value: string)=> {
             setDate(value),
@@ -116,7 +116,7 @@ const FilterExitPlan = ({ onFinish, setParentFinalDate, setParentInitialDate, se
           style={{ border: "none" }}
           type="date"
           className="search-input"
-          startContent={<FaClock />}
+          //startContent={<FaClock />}
           value={finalDate}
           onValueChange={(value: string) => {
             setFinalDate(value),
