@@ -227,8 +227,8 @@ export const downloadTemplateCreateManifest = () => {
       "CURRENCY(USD)": '',
       "PRODUCT DESCRIPTION": '',
       "TOTAL QTY": '',
-      "SALE PRICE": '',
       "REMARK": '',
+      "SALE PRICE": '',
     }
   ];
 
