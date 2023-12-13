@@ -495,37 +495,36 @@ const ManifestTable = () => {
                   </DropdownMenu>
                 </Dropdown>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '10px' }}>
-                <div>
-                  <GenericInput
-                    onChangeFunction={(event) => setDateMaxToday(event?.target.value, "start_date")}
-                    selectDateMaxToday={true}
-                    type="date"
-                    name="start_date"
-                    value={startDate}
-                    placeholder={intl.formatMessage({
-                      id: "start_date",
-                    })}
-                    customClass="custom-input"
-                    hideErrorContent={true}
-                  />
-                </div>
-
-                <div>
-                  <GenericInput
-                    onChangeFunction={(event) => setDateMaxToday(event?.target.value, "end_date")}
-                    selectDateMaxToday={true}
-                    type="date"
-                    name="end_date"
-                    value={endDate}
-                    placeholder={intl.formatMessage({
-                      id: "end_date",
-                    })}
-                    disabled={startDate === ""}
-                    customClass="custom-input"
-                    hideErrorContent={true}
-                  />
-                </div>
+              <div>
+                <GenericInput
+                  onChangeFunction={(event) => setDateMaxToday(event?.target.value, "start_date")}
+                  selectDateMaxToday={true}
+                  type="date"
+                  name="start_date"
+                  value={startDate}
+                  placeholder={intl.formatMessage({
+                    id: "start_date",
+                  })}
+                  customClass="custom-input"
+                  hideErrorContent={true}
+                  hasRepresentativeDateTimeIcon={true}
+                />
+              </div>
+              <div>
+                <GenericInput
+                  onChangeFunction={(event) => setDateMaxToday(event?.target.value, "end_date")}
+                  selectDateMaxToday={true}
+                  type="date"
+                  name="end_date"
+                  value={endDate}
+                  placeholder={intl.formatMessage({
+                    id: "end_date",
+                  })}
+                  disabled={startDate === ""}
+                  customClass="custom-input"
+                  hideErrorContent={true}
+                  hasRepresentativeDateTimeIcon={true}
+                />
               </div>
             </div>
             <div className="flex justify-between">
