@@ -81,3 +81,23 @@ export const splitLastOccurrence = (str: string, substring:string) => {
   const after = str.slice(lastIndex + 1);
   return [before, after];
 }
+
+export const text_date_format = (date: string):string => {
+  let valid_date:string = date.split('T')[0]
+  const arr: string[] = valid_date.split('-')
+  const months = [
+   "Ene",
+    "Feb",
+    "Mar",
+    "Abr",
+    "May",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dic",
+  ];
+  return `${months[Number(arr[1])-1]} ${arr[2]}, ${arr[0]}`
+}

@@ -17,7 +17,7 @@ import {
 } from "@nextui-org/react";
 import Select from 'react-select';
 import { SearchIcon } from "../../common/SearchIcon";
-import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
+import { capitalize, text_date_format, getHourFormat } from "../../../../helpers/utils";
 import { showMsg } from "../../../../helpers";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
@@ -223,7 +223,7 @@ const ManifestTable = () => {
             cellValue === "collected" ? "Cobrado" : "Pendiente"
           );
         case "created_at":
-          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+          return cellValue !== null ? (<span>{text_date_format(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         case "tracking_number":
           return (
             <CopyColumnToClipboard
