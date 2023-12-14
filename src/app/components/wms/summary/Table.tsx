@@ -22,6 +22,7 @@ import GenericInput from "../../common/GenericInput";
 import { FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import { SearchIcon } from "../../common/SearchIcon";
 import { showMsg } from "@/helperserege1992";
+import PaginationTable from "../../common/Pagination";
 
 const SummaryTable = () => {
   const intl = useIntl();
@@ -33,8 +34,11 @@ const SummaryTable = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [filtered, setFiltered] = useState<boolean>(true);
   const [filters, setFilters] = React.useState<string>("");
+
+  const [page, setPage] = useState(1);
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -117,6 +121,13 @@ const SummaryTable = () => {
     },
     []
   );
+
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
 
   useEffect(() => {
     loadsummary();
@@ -269,6 +280,14 @@ const SummaryTable = () => {
     setFiltered(true);
   }
 
+  const onRowsPerPageChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setRowsPerPage(Number(e.target.value));
+      setPage(1);
+    },
+    []
+  );
+
   const topContent = React.useMemo(() => {
     return (
       <Formik initialValues={initialValues} onSubmit={() => { }}>
@@ -358,6 +377,7 @@ const SummaryTable = () => {
                 {intl.formatMessage({ id: "rows_page" })}
                 <select
                   className="outline-none text-default-400 text-small m-1"
+                  onChange={onRowsPerPageChange}
                 >
                   <option value="25">25</option>
                   <option value="50">50</option>
@@ -375,6 +395,26 @@ const SummaryTable = () => {
     billCodeValue,
     startDate,
     endDate,
+  ]);
+
+  const bottomContent = React.useMemo(() => {
+    return (
+      <div className="py-2 px-2 flex justify-between items-center">
+        <PaginationTable
+          totalRecords={filteredItems.slice(0, summary.length).length}
+          pageLimit={rowsPerPage}
+          pageNeighbours={1}
+          page={page}
+          onPageChanged={setPage}
+        />
+      </div>
+    );
+  }, [
+    items.length,
+    page,
+    summary.length,
+    rowsPerPage,
+    intl,
   ]);
 
   return (
@@ -414,6 +454,7 @@ const SummaryTable = () => {
             )}
           </TableBody>
         </Table>
+        {bottomContent}
       </Loading>
     </>
   );
