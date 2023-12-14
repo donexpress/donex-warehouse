@@ -170,7 +170,8 @@ const SummaryTable = () => {
       arrayFilters.push(`end_date=${endDate}`);
     }
     setFilters(arrayFilters.join("&"));
-    await reloadData(arrayFilters.join("&"), page, rowsPerPage);
+    setPage(1);
+    await reloadData(arrayFilters.join("&"), 1, rowsPerPage);
   }
 
   const reloadData = async (queryFilters: string, currentP: number, currentRowsPerPage: number) => {
@@ -192,7 +193,8 @@ const SummaryTable = () => {
     setEndDate("");
     setFilters("");
     setFiltered(true);
-    await reloadData("", page, rowsPerPage);
+    setPage(1);
+    await reloadData("", 1, rowsPerPage);
   };
 
   const validateBillCodeIncomplete = (cadena: string): boolean => {
