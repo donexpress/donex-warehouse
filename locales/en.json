@@ -439,6 +439,7 @@
 	"reupload": "Reupload",
 	"reupload_note": "Note: If you want to update the manifest, click on the Update button.",
 	"number_of_shipments": "Number of shipments",
+	"bill_details": "Bill",
 	"bill_code": "Bill code",
 	"bill_code_ex": "Ex: {year}_{month}_Q_RedPack",
 	"year": "Year",
