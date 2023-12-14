@@ -90,10 +90,10 @@ export const barCodePath = () => {
 export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number, query?: string) => {
   let params = status !== '' ? `?state=${status}` : "";
   if (page && rowsPerPage) {
-    params += `${params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+    params += `${ params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
   if (query && query !== '') {
-    params += `${params === "" ? '?' : '&'}query=${query}`;
+    params += `${ params === "" ? '?' : '&'}filter=${query}`;
   }
   return getBaseUrl() + "/api/v1/storage_plan" + params;
 };
@@ -105,7 +105,7 @@ export const storagePlanStatePath = () => {
 export const storagePlanCountPath = (query: string = "") => {
   let params = "";
   if (query && query !== "") {
-    params += `?query=${query}`;
+    params += `?filter=${query}`;
   }
   return getBaseUrl() + "/api/v1/storage_plan/count" + params;
 };
@@ -215,7 +215,7 @@ export const countsPath = () => {
 };
 
 export const operationInstructionPath = () => {
-  return getBaseUrl() + '/api/v1/operation_instruction'
+  return getBaseUrl() +  '/api/v1/operation_instruction'
 }
 
 export const linePath = (page?: number, rowsPerPage?: number) => {

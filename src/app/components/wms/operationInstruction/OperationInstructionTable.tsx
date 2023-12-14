@@ -56,7 +56,9 @@ import {
 import PaginationTable from "../../common/Pagination";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "./ExportTable";
-import { FaFileExcel, FaFilePdf } from "react-icons/fa";
+import { FaFileExcel, FaFilePdf, FaFilter, FaTimes } from "react-icons/fa";
+import { InputData } from "../../../../types/general_search";
+import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { getAppendagesByOperationInstructionId } from "@/services/api.appendixerege1992";
 import { getExitPlansById } from "@/services/api.exit_planerege1992";
@@ -101,6 +103,15 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     direction: "descending",
   });
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [searchInputs, setSearchInputs] = useState<InputData[]>([
+    {
+      key: 'number_delivery',
+      initialValue: '',
+      placeholder: intl.formatMessage({ id: "number_delivery_search" }),
+      type: 'text'
+    },
+  ]);
+  const [shouldResetFields, setShouldResetFields] = useState(false);
   const [filterValue, setFilterValue] = useState("");
   const [queryFilter, setQueryFilter] = React.useState("");
   const hasSearchFilter = Boolean(filterValue);
@@ -742,6 +753,8 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   }
 
   const searchValues = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
     if (filterValue && filterValue !== "") {
       await setQueryFilter(filterValue);
     } else {
@@ -946,9 +959,25 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     return "";
   };
 
+  const getQuery = (q: string) => {
+    setFilterValue(q);
+  };
+
+  const handleClearAll = async() => {
+    await setSelectedItems([]);
+    await setSelectedKeys(new Set([]));
+    setShouldResetFields(!shouldResetFields);
+    await onClear();
+  }
+
   return (
     <div style={{ marginTop: "20px" }}>
       <div className="bg-gray-200 pt-1">
+        {exit_plan_id === undefined && (
+          <div className="mb-3">
+            <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery} shouldResetFields={shouldResetFields} isMajorFields={true} />
+          </div>
+        )}
         <div
           className={`flex gap-3 ${
             exit_plan_id ? "" : "justify-between items-end"
@@ -965,8 +994,8 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
           }
         >
           {exit_plan_id === undefined && (
-            <div className="w-full sm:max-w-[33%]" style={{ position: 'relative' }}>
-              <Input
+            <div className="w-full sm:max-w-[33%] flex justify-start gap-3 items-start" style={{ position: 'relative' }}>
+              {/* <Input
                 isClearable
                 className="search-input input-search-list"
                 placeholder=""
@@ -977,7 +1006,20 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
               />
               <div style={{ position: 'absolute', top: '0px', right: '0px', bottom: '0px', width: '40px', background: '#37446b', borderRadius: '0 5px 5px 0', cursor: 'pointer' }} className="elements-center" onClick={() => searchValues()}>
                 <SearchIcon />
-              </div>
+              </div> */}
+              <Button
+                color="primary"
+                onClick={(e) => searchValues()}
+              >
+                <FaFilter />
+              </Button>
+
+              <Button
+                color="primary"
+                onClick={handleClearAll}
+              >
+                <FaTimes />
+              </Button>
             </div>
           )}
           <div className="flex gap-3">

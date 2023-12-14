@@ -7,6 +7,7 @@ import dontShowPasswordIcon from '../../../assets/icons/dont_see_passwd.svg';
 import showPasswordIcon from '../../../assets/icons/see_passwd.svg';
 import passwordIcon from '../../../assets/icons/login/password.svg';
 import userIcon from '../../../assets/icons/login/user.svg';
+import { FaClock } from "react-icons/fa";
 import { useIntl } from 'react-intl';
 import Select from 'react-select';
 import { useFormikContext } from 'formik';
@@ -23,12 +24,14 @@ type GenericInputProps = {
   options?: OptionType[];
   customClass?: string;
   hasRepresentativeIcon?: boolean;
+  hasRepresentativeDateTimeIcon?: boolean;
   isUserField?: boolean;
   isPasswordField?: boolean;
   disabled?: boolean;
   minValue?: number;
   hideErrorContent?: boolean;
   selectDateMinToday?: boolean;
+  selectDateMaxToday?: boolean;
   onChangeFunction?: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   getValueChangeFn?: (value: any)=>void;
   isMulti?: boolean;
@@ -43,6 +46,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
   options,
   customClass,
   hasRepresentativeIcon,
+  hasRepresentativeDateTimeIcon=false,
   isUserField,
   isPasswordField,
   disabled = false,
@@ -51,6 +55,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
   isMulti=false,
   minValue=undefined,
   selectDateMinToday=false,
+  selectDateMaxToday=false,
   getValueChangeFn,
   ...props
 }) => {
@@ -65,7 +70,7 @@ const GenericInput: React.FC<GenericInputProps> = ({
 
   const inputClassName = `generic-input${
     type === "password" ? " input-with-right-icon" : ""
-  }${hasRepresentativeIcon ? " input-with-left-icon" : ""} ${customClass} ${
+  }${(hasRepresentativeIcon || hasRepresentativeDateTimeIcon) ? " input-with-left-icon" : ""} ${customClass} ${
     meta.touched && meta.error ? "input-error" : ""
   }`;
 
@@ -193,6 +198,13 @@ const GenericInput: React.FC<GenericInputProps> = ({
           
           const formattedDate = `${year}-${month}-${day}`;
           formik.setFieldValue(String(props.name), formattedDate);
+        } else if (selectDateMaxToday && selectedDate > currentDate) {
+          const year = currentDate.getFullYear();
+          const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+          const day = String(currentDate.getDate()).padStart(2, '0');
+          
+          const formattedDate = `${year}-${month}-${day}`;
+          formik.setFieldValue(String(props.name), formattedDate);
         } else {
           formik.handleChange(event);
         }
@@ -301,6 +313,13 @@ const GenericInput: React.FC<GenericInputProps> = ({
                 className='icon-left'
               />
             }
+          </div>
+        )
+      }
+      {
+        hasRepresentativeDateTimeIcon && (
+          <div className='container-icon-left elements-center'>
+              <FaClock style={{ height: '12px', color: 'white', marginTop: '4px' }}/>
           </div>
         )
       }

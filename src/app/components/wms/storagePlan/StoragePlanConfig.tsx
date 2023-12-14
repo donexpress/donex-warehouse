@@ -10,9 +10,9 @@ import { showMsg, isOMS, isWMS, packingListDataToExcel } from '../../../../helpe
 import { useRouter } from 'next/router'
 import { useIntl } from 'react-intl';
 import { updatePackingListById, removePackingListById } from '../../../../services/api.packing_list';
-import { updateStoragePlanById, createStoragePlan, getStoragePlanById } from '../../../../services/api.storage_plan';
+import { updateStoragePlanById, createStoragePlan, getStoragePlanById, getEmptyLocationsPlan } from '../../../../services/api.storage_plan';
 import { autoAssignLocation } from '../../../../services/api.package_shelf';
-import { StoragePlanConfigProps, PackingList, StoragePlan } from '../../../../types/storage_plan';
+import { StoragePlanConfigProps, PackingList, StoragePlan, EmptyLocation } from '../../../../types/storage_plan';
 import { User } from '../../../../types/user';
 import { Response } from '../../../../types/index';
 import { Warehouse } from '../../../../types/warehouse';
@@ -21,6 +21,7 @@ import RowStoragePlanHeader from '../../common/RowStoragePlanHeader';
 import { Formik, Form } from 'formik';
 import PackingListDialog from '../../common/PackingListDialog';
 import BatchOnShelvesDialog from '../../common/BatchOnShelvesDialog';
+import BatchOnShelvesSADialog from '../../common/BatchOnShelvesSADialog';
 import ReceiptPDF from '../../common/ReceiptPDF';
 import LocationSPLabelsPDF from '../../common/LocationSPLabelsPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -49,6 +50,8 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
     const [showRemoveBoxDialog, setShowRemoveBoxDialog] = useState<boolean>(false);
     const [showSplitBillDialog, setShowSplitBillDialog] = useState<boolean>(false);
     const [showBatchOnShelvesDialog, setShowBatchOnShelvesDialog] = useState<boolean>(false);
+    const [showBatchOnShelvesSADialog, setShowBatchOnShelvesSADialog] = useState<boolean>(false);
+    const [emptyLocationItems, setEmptyLocationItems] = useState<EmptyLocation[]>([]);
     const [confirmationBatchOnShelvesDialog, setConfirmationBatchOnShelvesDialog] = useState<boolean>(false);
     const [showForceEntryDialog, setShowForceEntryDialog] = useState<boolean>(false);
     const [showAssignAutoDialog, setShowAssignAutoDialog] = useState<boolean>(false);
@@ -221,6 +224,25 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
         setShowRemoveBoxDialog(false);
       }
 
+      const semiautomaticAssignFn = async() => {
+        setLoading(true);
+        const response: Response = await getEmptyLocationsPlan(id);
+        setLoading(false);
+        if (response.status >= 200 && response.status <= 299) {
+          const data = response.data;
+          if (data.available && (data.available.length > 0)) {
+            const items: EmptyLocation[] = data.available;
+            await setEmptyLocationItems(items);
+            setShowBatchOnShelvesSADialog(true);
+          } else {
+            showMsg(intl.formatMessage({ id: 'no_suggestions_to_show_sl' }), { type: "warning" })
+            openConfirmationBatchOnShelvesDialog();
+          }
+        } else {
+          showMsg(intl.formatMessage({ id: 'unknownStatusErrorMsg' }), { type: "error" })
+        }
+      }
+
       const formatBodyPackingList = (pl: PackingList, storagePlanId: number): PackingList => {
         return  {
           storage_plan_id: storagePlanId,
@@ -278,8 +300,12 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
         setShowSplitBillDialog(false);
       }
 
-      const batchOnShelvesAction = (packingListItems: PackingList[]) => {
-        setShowBatchOnShelvesDialog(false);
+      const batchOnShelvesAction = (packingListItems: PackingList[], isSemiautomatic: boolean = false) => {
+        if (!isSemiautomatic) {
+          setShowBatchOnShelvesDialog(false);
+        } else {
+          closeBatchOnShelvesSADialog();
+        }
         const elements = changeRowsAfterBatchOnShelves(packingListItems);
         setRows(elements);
         setSelectedRows([]);
@@ -321,6 +347,11 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
 
       const closeBatchOnShelvesDialog = () => {
         setShowBatchOnShelvesDialog(false);
+      }
+
+      const closeBatchOnShelvesSADialog = () => {
+        setShowBatchOnShelvesSADialog(false);
+        setEmptyLocationItems([]);
       }
 
       const openConfirmationBatchOnShelvesDialog = () => {
@@ -610,6 +641,9 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
                           <DropdownItem className={(selectedRows.length === 0 || !inWMS || (storagePlan && (stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => handleAction(5)}>
                             {intl.formatMessage({ id: "batch_on_shelves" })}
                           </DropdownItem>
+                          <DropdownItem className={(selectedRows.length === 0 || !inWMS || (storagePlan && (stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => semiautomaticAssignFn()}>
+                            {intl.formatMessage({ id: "batch_on_shelves_semiauto" })}
+                          </DropdownItem>
                           <DropdownItem className={(!inWMS || (storagePlan && (stateStoragePlan === 'cancelled'))) ? 'do-not-show-dropdown-item' : ''} onClick={() => openAssignAutoDialog()}>
                             {intl.formatMessage({ id: "batch_on_shelves_auto" })}
                           </DropdownItem>
@@ -760,6 +794,7 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
             { showRemoveBoxDialog && <PackingListDialog close={closeRemoveBoxesDialog} confirm={removeBoxes} title={intl.formatMessage({ id: 'remove_box' })} packingLists={selectedRows} /> }
             { showSplitBillDialog && <PackingListDialog close={closeSplitBillDialog} confirm={splitBill} title={intl.formatMessage({ id: 'split_bill' })} packingLists={selectedRows} /> }
             { showBatchOnShelvesDialog && <BatchOnShelvesDialog close={closeBatchOnShelvesDialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves' })} packingLists={selectedRows.length > 0 ? selectedRows : rows} warehouse={storagePlan?.warehouse} /> }
+            { showBatchOnShelvesSADialog && <BatchOnShelvesSADialog close={closeBatchOnShelvesSADialog} confirm={batchOnShelvesAction} title={intl.formatMessage({ id: 'batch_on_shelves_semiauto' })} packingLists={selectedRows} warehouse={storagePlan?.warehouse} emptyLocations={emptyLocationItems} /> }
             { showForceEntryDialog && <ConfirmationDialog close={closeForceEntryStoragePlanDialog} confirm={handleForceEntry} />}
             { showAssignAutoDialog && <ConfirmationDialog close={closeAssignAutoDialog} confirm={autoAssignLocationAction} content={selectedRows.length > 0 ? intl.formatMessage({ id: "confirmation_partial_location_text" }) : intl.formatMessage({ id: "confirmation_location_text" })} />}
             { confirmationBatchOnShelvesDialog && <ConfirmationDialog close={closeConfirmationBatchOnShelvesDialog} confirm={handleConfirmationBatchOnShelvesDialog} content={intl.formatMessage({ id: "want_package_location_manual" })} />}
