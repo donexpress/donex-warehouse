@@ -10,6 +10,11 @@ export type Summary = {
     earnings: number;
 }
 
+export type SummaryResponse = {
+    count: number;
+    data: Summary[];
+}
+
 export type SummaryFilters = {
     waybill_id: string;
     date_rage: string;

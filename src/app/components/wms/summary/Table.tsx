@@ -23,12 +23,15 @@ import { FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import { SearchIcon } from "../../common/SearchIcon";
 import { showMsg } from "@/helperserege1992";
 import PaginationTable from "../../common/Pagination";
+import SpinnerIconButton from "../../common/SpinnerIconButton";
 
 const SummaryTable = () => {
   const intl = useIntl();
   const [summary, setSummary] = useState<Summary[]>([]);
+  const [summaryCount, setSummaryCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
+  const [showPagination, setShowPagination] = useState<boolean>(true);
 
   const [billCodeValue, setBillCodeValue] = React.useState("");
   const [startDate, setStartDate] = useState<string>("");
@@ -122,12 +125,12 @@ const SummaryTable = () => {
     []
   );
 
-  const items = React.useMemo(() => {
+  /* const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
+  }, [page, filteredItems, rowsPerPage]); */
 
   useEffect(() => {
     loadsummary();
@@ -143,8 +146,14 @@ const SummaryTable = () => {
 
   const loadsummary = async () => {
     setLoading(true);
-    const _summary = await getSummary(filters);
-    setSummary(_summary);
+    const _summary = await getSummary(filters, page, rowsPerPage);
+    if (_summary !== null) {
+      setSummary(_summary.data);
+      setSummaryCount(_summary.count);
+    } else {
+      setSummary([]);
+      setSummaryCount(0);
+    }
     setLoading(false);
   };
 
@@ -161,13 +170,20 @@ const SummaryTable = () => {
       arrayFilters.push(`end_date=${endDate}`);
     }
     setFilters(arrayFilters.join("&"));
-    await reloadData(arrayFilters.join("&"));
+    setPage(1);
+    await reloadData(arrayFilters.join("&"), 1, rowsPerPage);
   }
 
-  const reloadData = async (queryFilters: string) => {
+  const reloadData = async (queryFilters: string, currentP: number, currentRowsPerPage: number) => {
     setLoadingItems(true);
-    const _summary = await getSummary(queryFilters);
-    setSummary(_summary);
+    const _summary = await getSummary(queryFilters, currentP, currentRowsPerPage);
+    if (_summary !== null) {
+      setSummary(_summary.data);
+      setSummaryCount(_summary.count);
+    } else {
+      setSummary([]);
+      setSummaryCount(0);
+    }
     setLoadingItems(false);
   };
 
@@ -177,7 +193,8 @@ const SummaryTable = () => {
     setEndDate("");
     setFilters("");
     setFiltered(true);
-    await reloadData("");
+    setPage(1);
+    await reloadData("", 1, rowsPerPage);
   };
 
   const validateBillCodeIncomplete = (cadena: string): boolean => {
@@ -280,13 +297,15 @@ const SummaryTable = () => {
     setFiltered(true);
   }
 
-  const onRowsPerPageChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onRowsPerPageChange = async(e: React.ChangeEvent<HTMLSelectElement>) => {
       setRowsPerPage(Number(e.target.value));
       setPage(1);
-    },
-    []
-  );
+      if (Number(e.target.value) !== rowsPerPage) {
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
+        await reloadData(filters, 1, Number(e.target.value))
+      }
+  }
 
   const topContent = React.useMemo(() => {
     return (
@@ -371,7 +390,7 @@ const SummaryTable = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-default-400 text-small">
-                {intl.formatMessage({ id: "total_results" }, { in: summary.length })}
+                {intl.formatMessage({ id: "total_results" }, { in: summaryCount })}
               </span>
               <label className="flex items-center text-default-400 text-small">
                 {intl.formatMessage({ id: "rows_page" })}
@@ -395,36 +414,56 @@ const SummaryTable = () => {
     billCodeValue,
     startDate,
     endDate,
+    rowsPerPage,
+    page,
   ]);
+
+  const changePage = async (newPage: number) => {
+    if (page !== newPage) {
+      setPage(newPage);
+      await setShowPagination(false);
+      await reloadData(filters, newPage, rowsPerPage);
+      await setShowPagination(true);
+    }
+  };
 
   const bottomContent = React.useMemo(() => {
     return (
-      <div className="py-2 px-2 flex justify-between items-center">
-        <PaginationTable
-          totalRecords={filteredItems.slice(0, summary.length).length}
-          pageLimit={rowsPerPage}
-          pageNeighbours={1}
-          page={page}
-          onPageChanged={setPage}
-        />
+      <div className="py-2 px-2 flex elements-row-end">
+        {showPagination && (
+          <PaginationTable
+            totalRecords={summaryCount}
+            pageLimit={rowsPerPage}
+            pageNeighbours={1}
+            page={page}
+            onPageChanged={changePage}
+          />
+        )}
+        {!showPagination && (
+          <div className="elements-center" style={{ height: "61px" }}>
+            <SpinnerIconButton style={{ width: "20px", height: "20px" }} />
+          </div>
+        )}
       </div>
     );
   }, [
-    items.length,
+    filteredItems,
     page,
     summary.length,
     rowsPerPage,
     intl,
+    summaryCount,
+    showPagination,
   ]);
 
   return (
     <>
       <Loading loading={loading}>
+        {topContent}
+        <div className="overflow-x-auto tab-system-table">
         <Table
           aria-label="SUMMARY"
           isHeaderSticky
-          topContent={topContent}
-          topContentPlacement="outside"
           classNames={{
             wrapper: "max-h-[auto]",
           }}
@@ -454,6 +493,7 @@ const SummaryTable = () => {
             )}
           </TableBody>
         </Table>
+        </div>
         {bottomContent}
       </Loading>
     </>
