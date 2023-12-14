@@ -38,6 +38,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
 
   const [loading, setLoading] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [selectedOption, setSelectedOption] = useState<'template' | 'bill_details'>('bill_details');
 
 
   useEffect(() => {
@@ -70,7 +71,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
         response = await createManifest(data, carrierValue, trackingNumberValue, clientReferenceValue, forceUpload, willCharge);
       } else if (where === "customer") {
         setLoading(true);
-        response = await updateCustomerManifest(data, willCharge);
+        response = await updateCustomerManifest(data, willCharge, selectedOption);
       } else {
         setLoading(true);
         response = await updateSupplierManifest(data, currentChangeValue, billCodeValue, willPaid);
@@ -112,6 +113,10 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
   const onClear = React.useCallback((filter: string) => {
     eval(`set${filter}("")`);
   }, []);
+
+  const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedOption(event.target.value as ('template' | 'bill_details'));
+  };
 
   const validateBillCode = (cadena: string): boolean => {
     const regex = /^\d{4}_\d{2}_[QMT]_[a-zA-Z\d]+$/;
@@ -309,7 +314,29 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                     </div>)
                     : (where === "customer" ? (
                       <>
-                        <div className='flex'>
+                        <div className='flex elements-center-start'>
+                          <div className="elements-row-start w-full mb-4" style={{ gap: '20px' }}>
+                            <label>
+                              <input
+                                type="radio"
+                                value="bill_details"
+                                checked={selectedOption === 'bill_details'}
+                                onChange={(e) => handleOptionChange(e)}
+                              />
+                              {"  "}
+                              {intl.formatMessage({ id: "bill_details" })}
+                            </label>
+                            <label>
+                              <input
+                                type="radio"
+                                value="template"
+                                checked={selectedOption === 'template'}
+                                onChange={(e) => handleOptionChange(e)}
+                              />
+                              {"  "}
+                              {intl.formatMessage({ id: "template" })}
+                            </label>
+                          </div>
                           <div className="mr-2" style={{ width: "100%" }}>
                             <div className='elements-row-start'>
                               <input type="checkbox" name="willCharge" style={{ marginRight: '10px' }} checked={willCharge} onChange={() => { setWillCharge(!willCharge); }} />

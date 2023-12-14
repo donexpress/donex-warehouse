@@ -445,6 +445,7 @@
   "reupload": "重新上傳",
   "reupload_note": "注意：如果您想更新清單，請點選更新按鈕。",
   "number_of_shipments": "出貨數量",
+  "bill_details": "帳單",
 	"bill_code": "发票号",
   "bill_code_ex": "例子: {year}_{month}_Q_RedPack",
   "year": "年",
