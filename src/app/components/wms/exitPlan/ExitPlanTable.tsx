@@ -33,6 +33,8 @@ import {
   removeExitPlan,
   updateExitPlan,
 } from "../../../../services/api.exit_plan";
+import { getUsers } from '../../../../services/api.users';
+import { ValueSelect } from "../../../../types";
 import {
   ExitPlan,
   ExitPlanState,
@@ -97,31 +99,9 @@ const ExitPlanTable = () => {
   const [exitPlanState, setExitPlanState] = useState<ExitPlanState | null>(
     null
   );
+  const [usersValues, setUsersValues] = useState<ValueSelect[]>([]);
 
-  const [searchInputs, setSearchInputs] = useState<InputData[]>([
-    {
-      key: 'output_number',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "delivery_number" }),
-      type: 'text'
-    },{
-      key: 'reference_number',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "reference_number" }),
-      type: 'text'
-    },{
-      key: 'client_box_number',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "customer_order_number_search" }),
-      type: 'text'
-    },
-    {
-      key: 'user_id',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "user" }),
-      type: 'text'
-    }
-  ]);
+  const [searchInputs, setSearchInputs] = useState<InputData[]>([]);
   const [shouldResetFields, setShouldResetFields] = React.useState(false);
   const [filterValue, setFilterValue] = useState("");
   const [queryFilter, setQueryFilter] = React.useState("");
@@ -160,6 +140,38 @@ const ExitPlanTable = () => {
     "private_address",
     "amazon",
   ]);
+
+  useEffect(() => {
+    setSearchInputs([
+      {
+        key: 'output_number',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "delivery_number" }),
+        type: 'text'
+      },{
+        key: 'reference_number',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "reference_number" }),
+        type: 'text'
+      },{
+        key: 'client_box_number',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "customer_order_number_search" }),
+        type: 'text'
+      },{
+        key: 'user_id',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "user" }),
+        type: 'select',
+        selectionItems: usersValues,
+      },
+    ]);
+  }, [usersValues, intl]);
+
+  const getFilterData = async() => {
+    const users = await getUsers();
+    setUsersValues(users ? users.map((user) => { return {value: Number(user.id), label: user.username }}) : []);
+  }
 
   const getColumns = React.useMemo(() => {
     const columns = [
@@ -901,11 +913,11 @@ const ExitPlanTable = () => {
               alignItems: "end",
             }}
           >
-            <div className="flex gap-3">
+            <div className="flex gap-3 search-container-generic">
               <Dropdown>
                 <DropdownTrigger className="hidden sm:flex">
                   <Button
-                    className="bnt-select"
+                    className="bnt-select bnt-dropdown"
                     endContent={<ChevronDownIcon className="text-small" />}
                     variant="flat"
                   >
@@ -1134,6 +1146,7 @@ const ExitPlanTable = () => {
       false,
       true
     );
+    getFilterData();
   }, []);
 
   useEffect(() => {

@@ -58,12 +58,15 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTable from "./ExportTable";
 import { FaFileExcel, FaFilePdf, FaFilter, FaTimes } from "react-icons/fa";
 import { InputData } from "../../../../types/general_search";
+import { ValueSelect } from "../../../../types";
 import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { getAppendagesByOperationInstructionId } from "@/services/api.appendixerege1992";
 import { getExitPlansById } from "@/services/api.exit_planerege1992";
 import { ParsedUrlQueryInput } from "querystring";
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
+import { getUsers } from '../../../../services/api.users';
+import { getCleanExitPlans } from "@/services/api.exit_planerege1992";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -103,26 +106,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
     direction: "descending",
   });
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [searchInputs, setSearchInputs] = useState<InputData[]>([
-    {
-      key: 'number_delivery',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "number_delivery_search" }),
-      type: 'text'
-    },
-    {
-      key: 'user_id',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "user" }),
-      type: 'text'
-    },
-    {
-      key: 'output_plan_id',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "exitPlan" }),
-      type: 'text'
-    },
-  ]);
+  const [searchInputs, setSearchInputs] = useState<InputData[]>([]);
   const [shouldResetFields, setShouldResetFields] = useState(false);
   const [filterValue, setFilterValue] = useState("");
   const [queryFilter, setQueryFilter] = React.useState("");
@@ -146,6 +130,33 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [count, setCount] = useState<OperationInstructionCount | null>(null);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
+  const [exitPlansValues, setExitPlansValues] = useState<ValueSelect[]>([]);
+  const [usersValues, setUsersValues] = useState<ValueSelect[]>([]);
+
+  useEffect(() => {
+    setSearchInputs([
+      {
+        key: 'number_delivery',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "number_delivery_search" }),
+        type: 'text'
+      },
+      {
+        key: 'user_id',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "user" }),
+        type: 'select',
+        selectionItems: usersValues,
+      },
+      {
+        key: 'output_plan_id',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "exitPlan" }),
+        type: 'select',
+        selectionItems: exitPlansValues,
+      },
+    ]);
+  }, [usersValues, exitPlansValues, intl]);
 
   useEffect(() => {
     const tab = getCookie("tabIO");
@@ -153,7 +164,15 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
       setStatusSelected(tab);
     }
     loadStates(tab ? tab : statusSelected, page, rowsPerPage, "", true, true);
+    getFilterData();
   }, []);
+
+  const getFilterData = async() => {
+    const users = await getUsers();
+    setUsersValues(users ? users.map((user) => { return {value: Number(user.id), label: user.username }}) : []);
+    const ePlans = await getCleanExitPlans();
+    setExitPlansValues(ePlans ? ePlans.map((ep) => { return {value: Number(ep.id), label: ep.output_number ? ep.output_number : ''}}) : []);
+  }
 
   const loadStates = async (status: string = "pending", pageSP: number = -1, rowsPerPageSP: number = -1, querySP: string = "", loadCount: boolean = false, isFirstLoad: boolean = false) => {
     setLoadingItems(true);
@@ -984,7 +1003,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
 
   return (
     <div style={{ marginTop: "20px" }}>
-      <div className="bg-gray-200 pt-1">
+      <div className="bg-gray-200 pt-1 search-container-generic">
         {exit_plan_id === undefined && (
           <div className="mb-3">
             <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery} shouldResetFields={shouldResetFields} isMajorFields={true} />
@@ -1038,7 +1057,7 @@ const OperationInstructionTable = ({ exit_plan_id, exit_plan }: Props) => {
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
-                  className="bnt-select"
+                  className="bnt-select bnt-dropdown"
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >

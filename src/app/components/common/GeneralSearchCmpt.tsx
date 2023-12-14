@@ -19,7 +19,7 @@ interface Params {
 };
 
 interface SearchFields {
-    [key: string]: string;
+    [key: string]: string | number;
 };
 
 const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields, isMajorFields = false }: Params) => {
@@ -49,7 +49,7 @@ const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields, isMajorFields 
       return resetFields;
     }
 
-    const handleFieldChange = (key: string, value: string) => {
+    const handleFieldChange = (key: string, value: string | number) => {
         const response: SearchFields = {
             ...searchFields,
             [key]: value
@@ -87,7 +87,7 @@ const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields, isMajorFields 
         getQueryFn(queryString);
     };
 
-    const getLabel = (inputData: InputData, value: string) => {
+    const getLabel = (inputData: InputData, value: string | number) => {
         const element = inputData.selectionItems ? inputData.selectionItems.find(si => si.value === value) : undefined;
         return element ? element.label : "";
     };
@@ -102,7 +102,7 @@ const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields, isMajorFields 
                           className="search-input"
                           placeholder={inputData.placeholder}
                           startContent={<SearchIcon />}
-                          value={searchFields[inputData.key]}
+                          value={searchFields[inputData.key] ? searchFields[inputData.key].toString() : ''}
                           onClear={() => onClear(inputData.key)}
                           onChange={(e) => handleFieldChange(inputData.key, e.target.value)}
                         />
@@ -112,9 +112,9 @@ const GeneralSearchCmpt = ({ data, getQueryFn, shouldResetFields, isMajorFields 
                           isSearchable
                           options={inputData.selectionItems ? inputData.selectionItems.map((column) => ({
                             value: column.value,
-                            label: capitalize(column.label)
+                            label: column.label
                           })) : []}
-                          value={searchFields[inputData.key].trim() !== "" ? { value: searchFields[inputData.key], label: getLabel(inputData, searchFields[inputData.key]) } : null}
+                          value={(searchFields[inputData.key] && searchFields[inputData.key].toString().trim() !== "") ? { value: searchFields[inputData.key], label: getLabel(inputData, searchFields[inputData.key]) } : null}
                           onChange={(selectedOption) => {
                             if (selectedOption) {
                                 handleFieldChange(inputData.key, selectedOption.value);
