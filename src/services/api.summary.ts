@@ -3,7 +3,7 @@ import { excelSummaryPath, summaryPath } from "../backend";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
 import { BASE_URL } from "@/configerege1992";
-import { Summary } from "@/types/summaryerege1992";
+import { Summary, SummaryResponse } from "@/types/summaryerege1992";
 
 const getBaseUrl = () => {
   if (process.env.WAREHOUSE_ENV && (process.env.WAREHOUSE_ENV === 'staging' || process.env.WAREHOUSE_ENV === 'prod')) {
@@ -12,13 +12,13 @@ const getBaseUrl = () => {
   return BASE_URL;
 }
 
-export const getSummary = async (filters: string = "", context?: GetServerSidePropsContext): Promise<Summary[]> => {
-  const path = summaryPath(filters);
+export const getSummary = async (filters: string = "", page?: number, rowsPerPage?: number, context?: GetServerSidePropsContext): Promise<SummaryResponse | null> => {
+  const path = summaryPath(filters, page, rowsPerPage);
   try {
     const response = await axios.get(path, getHeaders(context));
     return response.data;
   } catch (error) {
-    return [];
+    return null;
   }
 }
 
