@@ -469,5 +469,14 @@
   "generate_shipping_invoice": "Generar factura de envío",
   "arrival_date": "Fecha de llegada",
   "start_date": "Fecha de inicio",
-	"end_date": "Fecha fin"
+	"end_date": "Fecha fin",
+  "summary": "Resumen",
+  "quantity_package": "Paquetes",
+  "quantity_kilograms": "Kilogramos",
+  "quantity_shipping_cost": "Costo de envío",
+  "quantity_sale_price": "Precio de venta",
+  "earnings": "Ganancia",
+  "date": "Fecha",
+  "not_paid": "No pagado",
+	"pending": "Pendiente"
 }
