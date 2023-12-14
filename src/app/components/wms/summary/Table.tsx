@@ -9,7 +9,7 @@ import {
   Button,
   Input,
 } from "@nextui-org/react";
-import { getDateFormat, getHourFormat } from "../../../../helpers/utils";
+import { getDateFormat, getHourFormat, text_date_format } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
 import "./../../../../styles/generic.input.scss";
@@ -114,7 +114,7 @@ const SummaryTable = () => {
       const cellValue = summary[columnKey];
       switch (columnKey) {
         case "created_at":
-          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+          return cellValue !== null ? (<span>{text_date_format(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         default:
           return cellValue;
       }
