@@ -7,6 +7,6 @@ export type InputData = {
 };
 
 export type SelectionItem = {
-    value: string;
+    value: string | number;
     label: string;
 };

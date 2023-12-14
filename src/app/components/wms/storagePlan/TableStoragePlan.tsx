@@ -32,6 +32,8 @@ import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
 import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount, barCodePdf } from '../../../../services/api.storage_plan';
 import { autoAssignLocation } from '../../../../services/api.package_shelf';
+import { getUsers } from '../../../../services/api.users';
+import { ValueSelect } from "../../../../types";
 import { PackingList, StoragePlan, StoragePlanListProps, BarCode } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import { InputData } from "../../../../types/general_search";
@@ -112,31 +114,10 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
 
   const [showBarCodeDialog, setShowBarCodeDialog] = useState<boolean>(false);
   const [barCodeValue, setBarCodeValue] = useState<any>("");
+  const [usersValues, setUsersValues] = useState<ValueSelect[]>([]);
 
   /** start*/
-  const [searchInputs, setSearchInputs] = useState<InputData[]>([
-    {
-      key: 'customer_order_number',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "customer_order_number_search" }),
-      type: 'text'
-    },{
-      key: 'order_number',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "warehouse_order_number_search" }),
-      type: 'text'
-    },{
-      key: 'pr_number',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "pr_number" }),
-      type: 'text'
-    },{
-      key: 'reference_number',
-      initialValue: '',
-      placeholder: intl.formatMessage({ id: "reference_number" }),
-      type: 'text'
-    }
-  ]);
+  const [searchInputs, setSearchInputs] = useState<InputData[]>([]);
   const [shouldResetFields, setShouldResetFields] = React.useState(false);
   const [filterValue, setFilterValue] = React.useState("");
   const [queryFilter, setQueryFilter] = React.useState("");
@@ -156,6 +137,43 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
   const [isLoadCounts, setIsLoadCounts] = React.useState<boolean>(false);
 
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setSearchInputs([
+      {
+        key: 'customer_order_number',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "customer_order_number_search" }),
+        type: 'text'
+      },{
+        key: 'order_number',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "warehouse_order_number_search" }),
+        type: 'text'
+      },{
+        key: 'pr_number',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "pr_number" }),
+        type: 'text'
+      },{
+        key: 'reference_number',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "reference_number" }),
+        type: 'text'
+      },{
+        key: 'user_id',
+        initialValue: '',
+        placeholder: intl.formatMessage({ id: "user" }),
+        type: 'select',
+        selectionItems: usersValues,
+      },
+    ]);
+  }, [usersValues, intl]);
+
+  const getFilterData = async() => {
+    const users = await getUsers();
+    setUsersValues(users ? users.map((user) => { return {value: Number(user.id), label: user.username }}) : []);
+  }
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -800,11 +818,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               <FaTimes />
             </Button>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 search-container-generic">
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
-                  className="bnt-select"
+                  className="bnt-select bnt-dropdown"
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
@@ -829,7 +847,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
-                  className="bnt-select"
+                  className="bnt-select bnt-dropdown"
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
@@ -1061,6 +1079,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       }
     }
     loadStoragePlans(tab ? tab : statusSelected);
+    getFilterData();
   }, []);
 
   useEffect(() => {

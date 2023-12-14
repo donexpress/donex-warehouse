@@ -16,6 +16,10 @@
     .container-search-inputs {
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     }
+
+    .container-search-inputs-major {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
 }
 
 @media only screen and (max-width: 1150px) {
