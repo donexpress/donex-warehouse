@@ -265,10 +265,13 @@ export const guidePath = (page?: number, rowsPerPage?: number, filters?: string)
   return getBaseUrl() + "/api/v1/manifest" + params;
 };
 
-export const summaryPath = (filters: string = "") => {
+export const summaryPath = (filters: string = "", page?: number, rowsPerPage?: number) => {
   let params = "";
   if (filters && filters !== "") {
     params += `?${filters}`;
+  }
+  if (page && rowsPerPage) {
+    params += `${params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
   return getBaseUrl() + "/api/v1/summary" + params;
 };
