@@ -1,5 +1,5 @@
 import axios from "axios";
-import { summaryPath } from "../backend";
+import { excelSummaryPath, summaryPath } from "../backend";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
 import { BASE_URL } from "@/configerege1992";
@@ -22,3 +22,26 @@ export const getSummary = async (filters: string = "", context?: GetServerSidePr
   }
 }
 
+export const exportExcelSummary = async (queryFilters: string, context?: GetServerSidePropsContext): Promise<any> => {
+  const path = `${excelSummaryPath()}?${queryFilters}`;
+  const response = await exportExcelSummaryFn(path, context);
+  return response;
+}
+
+export const exportExcelSummaryFn = async (path: string, context?: GetServerSidePropsContext): Promise<any> => {
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    if (response.status && (response.status >= 200 && response.status <= 299)) {
+      const link = document.createElement('a');
+      link.href = response.data.url;
+      link.setAttribute('download', response.data.name);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return { data: response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
+  }
+};
