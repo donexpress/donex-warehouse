@@ -54,8 +54,9 @@ export const createManifest = async (formData: FormData, carrier?: string, mwb?:
   }
 };
 
-export const updateCustomerManifest = async (formData: FormData, willCharge: boolean): Promise<any> => {
+export const updateCustomerManifest = async (formData: FormData, willCharge: boolean, delivery: string): Promise<any> => {
   let params = willCharge ? `?collected=true` : '';
+  params += `${params === '' ? '?' : '&'}delivery=${delivery}`;
   const path = getBaseUrl() + `/api/v1/manifest_customer${params}`;
 
   try {

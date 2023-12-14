@@ -99,6 +99,11 @@ export const menuWMS = (intl: IntlShape) => {
           label: intl.formatMessage({ id: "airGuide" }),
           route: RouteMenu.LIST_AIR_GUIDE,
         },
+        {
+          id: 4.2,
+          label: intl.formatMessage({ id: "summary" }),
+          route: RouteMenu.LIST_SUMMARY,
+        },
       ],
     },
     {

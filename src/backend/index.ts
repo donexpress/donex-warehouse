@@ -143,6 +143,10 @@ export const excelPath = () => {
   return getBaseUrl() + "/api/v1/excel";
 };
 
+export const excelSummaryPath = () => {
+  return getBaseUrl() + "/api/v1/download/summary";
+};
+
 export const shippingInvoicePath = () => {
   return getBaseUrl() + "/api/v1/shipping_invoice";
 };
@@ -259,6 +263,14 @@ export const guidePath = (page?: number, rowsPerPage?: number, filters?: string)
     params += `${params === "" ? '?' : '&'}${filters}`;
   }
   return getBaseUrl() + "/api/v1/manifest" + params;
+};
+
+export const summaryPath = (filters: string = "") => {
+  let params = "";
+  if (filters && filters !== "") {
+    params += `?${filters}`;
+  }
+  return getBaseUrl() + "/api/v1/summary" + params;
 };
 
 export const GuideCountPath = (filters: string = "") => {

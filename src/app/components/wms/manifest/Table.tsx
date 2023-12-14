@@ -17,7 +17,7 @@ import {
 } from "@nextui-org/react";
 import Select from 'react-select';
 import { SearchIcon } from "../../common/SearchIcon";
-import { capitalize, getDateFormat, getHourFormat } from "../../../../helpers/utils";
+import { capitalize, text_date_format, getHourFormat } from "../../../../helpers/utils";
 import { showMsg } from "../../../../helpers";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
@@ -223,7 +223,7 @@ const ManifestTable = () => {
             cellValue === "collected" ? "Cobrado" : "Pendiente"
           );
         case "created_at":
-          return cellValue !== null ? (<span>{getDateFormat(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
+          return cellValue !== null ? (<span>{text_date_format(cellValue)}, {getHourFormat(cellValue)}</span>) : '';
         case "tracking_number":
           return (
             <CopyColumnToClipboard
@@ -378,14 +378,14 @@ const ManifestTable = () => {
     return (
       <Formik initialValues={initialValues} onSubmit={() => { }}>
         <Form>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 search-container-manifest">
             <div className="container-search-inputs">
               <div>
                 <Select
                   isSearchable
                   options={waybillIDS ? waybillIDS.map((column) => ({
                     value: column.waybill_id,
-                    label: capitalize(column.waybill_id)
+                    label: capitalize(column.waybill_id + (column.carrier ? ` (${column.carrier})` : ''))
                   })) : []}
                   value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
                   onChange={(selectedOption) => {
@@ -561,6 +561,7 @@ const ManifestTable = () => {
                     selectedKeys={visibleColumns}
                     selectionMode="multiple"
                     onSelectionChange={setVisibleColumns}
+                    className="custom-dropdown-menu"
                   >
                     {getColumns.map((column) => (
                       <DropdownItem key={column.uid} className="capitalize">
@@ -625,7 +626,7 @@ const ManifestTable = () => {
                   </DropdownMenu>
                 </Dropdown>
 
-                <Button
+                {/* <Button
                   color="primary"
                   style={{ width: "120px" }}
                   endContent={
@@ -634,7 +635,7 @@ const ManifestTable = () => {
                   onClick={() => openProfitDialog()}
                 >
                   {intl.formatMessage({ id: "profit" })}
-                </Button>
+                </Button> */}
 
                 <Button
                   color="primary"
