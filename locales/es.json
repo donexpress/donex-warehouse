@@ -469,5 +469,7 @@
   "quantity_shipping_cost": "Costo de envío",
   "quantity_sale_price": "Precio de venta",
   "earnings": "Ganancia",
-  "date": "Fecha"
+  "date": "Fecha",
+  "not_paid": "No pagado",
+	"pending": "Pendiente"
 }

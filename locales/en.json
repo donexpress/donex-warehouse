@@ -463,5 +463,7 @@
 	"quantity_shipping_cost": "Shipping cost",
 	"quantity_sale_price": "Sales price",
 	"earnings": "Earning",
-	"date": "Date"
+	"date": "Date",
+	"not_paid": "Not paid",
+	"pending": "Pending"
 }

@@ -469,6 +469,8 @@
   "quantity_shipping_cost": "運輸費",
   "quantity_sale_price": "銷售價格",
   "earnings": "效益",
-  "date": "日期"
+  "date": "日期",
+  "not_paid": "未支付",
+	"pending": "待辦的"
 
 }
