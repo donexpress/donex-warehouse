@@ -169,6 +169,7 @@ export type Carrier = {
 
 export type MWB = {
   waybill_id: string;
+  carrier?: string;
 }
 
 export type CargoStationWarehouseResponse = {

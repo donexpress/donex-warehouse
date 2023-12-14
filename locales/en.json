@@ -439,6 +439,7 @@
 	"reupload": "Reupload",
 	"reupload_note": "Note: If you want to update the manifest, click on the Update button.",
 	"number_of_shipments": "Number of shipments",
+	"bill_details": "Bill",
 	"bill_code": "Bill code",
 	"bill_code_ex": "Ex: {year}_{month}_Q_RedPack",
 	"year": "Year",
@@ -462,5 +463,14 @@
 	"generate_shipping_invoice": "Generate shipping invoice",
 	"arrival_date": "Arrival date",
 	"start_date": "Start date",
-	"end_date": "End date"
+	"end_date": "End date",
+	"summary": "Summary",
+	"quantity_package": "Packages",
+	"quantity_kilograms": "Kilograms",
+	"quantity_shipping_cost": "Shipping cost",
+	"quantity_sale_price": "Sales price",
+	"earnings": "Earning",
+	"date": "Date",
+	"not_paid": "Not paid",
+	"pending": "Pending"
 }

@@ -54,10 +54,14 @@ const GenerateDialog = ({ close, title }: Params) => {
   const handleSubmit = async () => {
     try {
       setDisableConfirm(true);
+      const parts = waybillIDValue.split('(');
+      const waybillId = parts[0].trim();
+      const carrier = parts.length > 1 ? parts[1].replace(')', '').trim() : '';
+      
       let response: any = null;
       const data = {
-        waybill_id: waybillIDValue,
-        carrier: carrierValue,
+        waybill_id: waybillId,
+        carrier: carrier,
         eta: date
       };
       response = await generateShippingInvoice(data);
@@ -194,8 +198,8 @@ const GenerateDialog = ({ close, title }: Params) => {
                         <Select
                           isSearchable
                           options={waybillIDS ? waybillIDS.map((column) => ({
-                            value: column.waybill_id,
-                            label: capitalize(column.waybill_id)
+                            value: column.waybill_id + (column.carrier ? ` (${column.carrier})` : ''),
+                            label: capitalize(column.waybill_id + (column.carrier ? ` (${column.carrier})` : ''))
                           })) : []}
                           value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
                           onChange={(selectedOption) => {
@@ -244,7 +248,17 @@ const GenerateDialog = ({ close, title }: Params) => {
                         />
                       </div>
                       <div className="ml-2" style={{ width: "100%" }}>
-                        <Dropdown>
+                        <GenericInput
+                          onChangeFunction={(event) => setDate(event?.target.value)}
+                          type="date"
+                          name="arrival_date"
+                          value={date}
+                          placeholder={intl.formatMessage({
+                            id: "arrival_date",
+                          })}
+                          customClass="custom-input"
+                        />
+                        {/* <Dropdown>
                           <DropdownTrigger>
                             <Button
                               className="bnt-dropdown"
@@ -267,10 +281,10 @@ const GenerateDialog = ({ close, title }: Params) => {
                               </DropdownItem>
                             )) : []}
                           </DropdownMenu>
-                        </Dropdown>
+                        </Dropdown> */}
                       </div>
                     </div>)}
-                  <div className="w-full mt-5">
+                  {/* <div className="w-full mt-5">
                     <GenericInput
                       onChangeFunction={(event) => setDate(event?.target.value)}
                       type="date"
@@ -281,7 +295,7 @@ const GenerateDialog = ({ close, title }: Params) => {
                       })}
                       customClass="custom-input"
                     />
-                  </div>
+                  </div> */}
                 </Form>
               </Formik>
               {/* {selectedOption === 'bill_code' && (
@@ -311,7 +325,7 @@ const GenerateDialog = ({ close, title }: Params) => {
                   className="px-4"
                   style={{ marginRight: '15px' }}
                   onClick={handleSubmit}
-                  disabled={waybillIDValue === "" || date === "" || carrierValue === "" || disableConfirm}
+                  disabled={waybillIDValue === "" || date === "" || disableConfirm}
                 >
                   {intl.formatMessage({ id: "confirmation_header" })}
                 </Button>

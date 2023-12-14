@@ -378,14 +378,14 @@ const ManifestTable = () => {
     return (
       <Formik initialValues={initialValues} onSubmit={() => { }}>
         <Form>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 search-container-manifest">
             <div className="container-search-inputs">
               <div>
                 <Select
                   isSearchable
                   options={waybillIDS ? waybillIDS.map((column) => ({
                     value: column.waybill_id,
-                    label: capitalize(column.waybill_id)
+                    label: capitalize(column.waybill_id + (column.carrier ? ` (${column.carrier})` : ''))
                   })) : []}
                   value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
                   onChange={(selectedOption) => {
@@ -626,7 +626,7 @@ const ManifestTable = () => {
                   </DropdownMenu>
                 </Dropdown>
 
-                <Button
+                {/* <Button
                   color="primary"
                   style={{ width: "120px" }}
                   endContent={
@@ -635,7 +635,7 @@ const ManifestTable = () => {
                   onClick={() => openProfitDialog()}
                 >
                   {intl.formatMessage({ id: "profit" })}
-                </Button>
+                </Button> */}
 
                 <Button
                   color="primary"

@@ -445,6 +445,7 @@
   "reupload": "重新上傳",
   "reupload_note": "注意：如果您想更新清單，請點選更新按鈕。",
   "number_of_shipments": "出貨數量",
+  "bill_details": "帳單",
 	"bill_code": "发票号",
   "bill_code_ex": "例子: {year}_{month}_Q_RedPack",
   "year": "年",
@@ -468,6 +469,15 @@
   "generate_shipping_invoice": "產生運輸發票",
   "arrival_date": "到達日期",
   "start_date": "開始日期",
-	"end_date": "結束日期"
+	"end_date": "結束日期",
+  "summary": "概括",
+  "quantity_package": "套餐",
+  "quantity_kilograms": "公斤",
+  "quantity_shipping_cost": "運輸費",
+  "quantity_sale_price": "銷售價格",
+  "earnings": "效益",
+  "date": "日期",
+  "not_paid": "未支付",
+	"pending": "待辦的"
 
 }

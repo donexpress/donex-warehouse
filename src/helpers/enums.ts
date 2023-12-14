@@ -21,4 +21,5 @@ export enum RouteMenu {
     LIST_REGIONAL_DIVISION = 'regional_division',
     LIST_ORGANIZATION = 'users',
     LIST_AIR_GUIDE = 'manifest',
+    LIST_SUMMARY = 'summary',
 };
