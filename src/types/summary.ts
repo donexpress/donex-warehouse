@@ -9,3 +9,8 @@ export type Summary = {
     quantity_sale_price: number;
     earnings: number;
 }
+
+export type SummaryFilters = {
+    waybill_id: string;
+    date_rage: string;
+}
