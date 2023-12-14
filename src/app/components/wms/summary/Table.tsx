@@ -13,13 +13,15 @@ import { getDateFormat, getHourFormat } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
 import "./../../../../styles/generic.input.scss";
+import "../../../../styles/general.search.scss";
 import { Loading } from "../../common/Loading";
 import { Summary, SummaryFilters } from "@/types/summaryerege1992";
-import { getSummary } from "@/services/api.summaryerege1992";
+import { exportExcelSummary, getSummary } from "@/services/api.summaryerege1992";
 import { Form, Formik } from "formik";
 import GenericInput from "../../common/GenericInput";
 import { FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import { SearchIcon } from "../../common/SearchIcon";
+import { showMsg } from "@/helperserege1992";
 
 const SummaryTable = () => {
   const intl = useIntl();
@@ -162,6 +164,7 @@ const SummaryTable = () => {
     setBillCodeValue("");
     setStartDate("");
     setEndDate("");
+    setFilters("");
     setFiltered(true);
     await reloadData("");
   };
@@ -224,13 +227,55 @@ const SummaryTable = () => {
     eval(`set${filter}("")`);
   }, []);
 
+  const setDateMaxToday = (value: string, type: 'start_date' | 'end_date') => {
+    let newValue = value;
+    const selectedDate = new Date(value);
+    const currentDate = new Date();
+
+    const startDateDef = (startDate && startDate !== '') ? new Date(startDate) : new Date();
+
+    if ((selectedDate > currentDate) || (type === 'end_date' && (startDateDef > selectedDate))) {
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+
+      newValue = `${year}-${month}-${day}`;
+    }
+
+    if (type === 'end_date') {
+      setEndDate(newValue)
+    } else if (type === 'start_date') {
+      setStartDate(newValue)
+    }
+  }
+
+  const handleExport = async () => {
+    try {
+      let response: any = null;
+      response = await exportExcelSummary(filters);
+      if (response.status && response.status >= 200 && response.status <= 299) {
+        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+      } else {
+        let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+        if (response.status && (response.status === 404)) {
+          message = intl.formatMessage({ id: 'billNotFoundMsg' });
+        }
+        showMsg(message, { type: "error" });
+      }
+    } catch (error) {
+      let message = intl.formatMessage({ id: "unknownStatusErrorMsg" });
+      showMsg(message, { type: "error" });
+    }
+    setFiltered(true);
+  }
+
   const topContent = React.useMemo(() => {
     return (
       <Formik initialValues={initialValues} onSubmit={() => { }}>
         <Form>
-          <div className="flex flex-col gap-4">
-            <div className="flexbox-container search-container-manifest">
-              <div className="flexbox-item" style={{ paddingLeft: 0 }}>
+          <div className="flex flex-col gap-3">
+            <div className="container-search-inputs">
+              <div>
                 <Input
                   isClearable
                   className="search-input"
@@ -242,9 +287,10 @@ const SummaryTable = () => {
                 />
               </div>
 
-              <div className="flexbox-item" style={{ flex: "0 0 12.5%" }}>
+              <div>
                 <GenericInput
-                  onChangeFunction={(event) => setStartDate(event?.target.value)}
+                  onChangeFunction={(event) => setDateMaxToday(event?.target.value, "start_date")}
+                  selectDateMaxToday={true}
                   type="date"
                   name="start_date"
                   value={startDate}
@@ -252,29 +298,32 @@ const SummaryTable = () => {
                     id: "start_date",
                   })}
                   customClass="custom-input"
+                  hideErrorContent={true}
+                  hasRepresentativeDateTimeIcon={true}
                 />
               </div>
-
-              <div className="flexbox-item" style={{ flex: "0 0 12.5%" }}>
+              <div>
                 <GenericInput
-                  onChangeFunction={(event) => setEndDate(event?.target.value)}
+                  onChangeFunction={(event) => setDateMaxToday(event?.target.value, "end_date")}
+                  selectDateMaxToday={true}
                   type="date"
                   name="end_date"
                   value={endDate}
                   placeholder={intl.formatMessage({
                     id: "end_date",
                   })}
-                  disabled={startDate === ""}
                   customClass="custom-input"
+                  hideErrorContent={true}
+                  hasRepresentativeDateTimeIcon={true}
                 />
               </div>
             </div>
-
             <div className="flex justify-between">
               <div className="flex justify-start gap-3 items-start">
                 <Button
                   color="primary"
                   onClick={(e) => handleSelectedFilters(e)}
+                  disabled={(startDate !== "" && endDate === "") || startDate === "" && endDate !== ""}
                 >
                   <FaFilter />
                 </Button>
@@ -287,33 +336,35 @@ const SummaryTable = () => {
                 </Button>
               </div>
 
-              <Button
-                color="primary"
-                style={{ width: "140px" }}
-                endContent={
-                  <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
-                }
-                disabled={filtered || filteredItems.length === 0}
-              // onClick={() => handleExport()}
-              >
-                {intl.formatMessage({ id: "export_xlsx" })}
-              </Button>
+              <div className="flex justify-end gap-3 items-end">
+                <Button
+                  color="primary"
+                  style={{ width: "140px" }}
+                  endContent={
+                    <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
+                  }
+                  disabled={filteredItems.length === 0}
+                  onClick={() => handleExport()}
+                >
+                  {intl.formatMessage({ id: "export_xlsx" })}
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-default-400 text-small">
-              {intl.formatMessage({ id: "total_results" }, { in: summary.length })}
-            </span>
-            <label className="flex items-center text-default-400 text-small">
-              {intl.formatMessage({ id: "rows_page" })}
-              <select
-                className="outline-none text-default-400 text-small m-1"
-              >
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
+            <div className="flex justify-between items-center">
+              <span className="text-default-400 text-small">
+                {intl.formatMessage({ id: "total_results" }, { in: summary.length })}
+              </span>
+              <label className="flex items-center text-default-400 text-small">
+                {intl.formatMessage({ id: "rows_page" })}
+                <select
+                  className="outline-none text-default-400 text-small m-1"
+                >
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+            </div>
           </div>
         </Form>
       </Formik >
