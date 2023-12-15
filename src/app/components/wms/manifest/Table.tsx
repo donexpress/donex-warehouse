@@ -337,7 +337,7 @@ const ManifestTable = () => {
       let response: any = null;
       response = await exportExcelManifest(filters);
       if (response.status && response.status >= 200 && response.status <= 299) {
-        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+        showMsg(intl.formatMessage({ id: 'please_wait_file_being_generated' }), { type: "success" });
       } else {
         let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
         if (response.status && (response.status === 404)) {
