@@ -15,6 +15,9 @@ import {
   getLanguage,
   splitLastOccurrence,
 } from "@/helpers/utilserege1992";
+import {
+  getOperationInstructionsLabel
+} from "@/helperserege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { PackingList } from "@/types/storage_planerege1992";
@@ -99,9 +102,10 @@ interface Props {
   intl: IntlShape;
   columns: string[];
   data: ExitPlan[];
+  locale?: string;
 }
 
-const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
+const ExportExitPlanTable = ({ intl, columns, data, locale = 'es' }: Props) => {
   const packageShelfFormat = (
     packageShelfs: PackageShelf[] | undefined, warehouse?: Warehouse
   ): string => {
@@ -294,13 +298,22 @@ const ExportExitPlanTable = ({ intl, columns, data }: Props) => {
                     return (
                       <Text
                         key={index}
-                        style={[styles.tableCell, styles.minorCell]}
+                        style={[styles.tableCell]}
                       >
                         {/* @ts-ignore */}
                         {oi.operation_instructions &&
                         oi.operation_instructions.length > 0
                           ? oi.operation_instructions.length
                           : 0}
+                      </Text>
+                    );
+                  case "operation_instruction_type":
+                    return (
+                      <Text
+                        key={index}
+                        style={[styles.tableCell]}
+                      >
+                        { getOperationInstructionsLabel(oi, locale) }
                       </Text>
                     );
                   default:

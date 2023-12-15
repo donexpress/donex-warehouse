@@ -1071,10 +1071,52 @@ const getCustomerOrderNumber = (exitPlan: ExitPlan): string => {
   return numbers.join(", ");
 };
 
+export const getOperationInstructionsLabel = (exitPlan: any, locale: string): string => {
+  if (!exitPlan.operation_instructions || exitPlan.operation_instructions.length === 0) {
+    return '';
+  }
+  // @ts-ignore
+  const operationInstructionType = exitPlan.operation_instructions.map(op => (op.operation_instruction_type?.instruction_type?.map(it => it)));
+  let planeArray: any[] = [];
+  operationInstructionType.forEach((op: any) => {
+    if (op && op.length > 0) {
+      planeArray = planeArray.concat(op)
+    }
+  })
+  
+  const result: { count: number; value: string; data: any; }[] = [];
+  planeArray.forEach(opt => {
+    if (opt) {
+      const searchOpt = result.find(opt2 => opt2.value === opt.value);
+      if (!searchOpt) {
+        result.push({
+          count: planeArray.filter((element) => element.value === opt.value).length,
+          value: opt.value,
+          data: opt
+        })
+      }
+    }
+  })
+
+  return result.length > 0 ? (result.map(
+    element => `${element.count} ${getLabelByOIT(element.data, locale)}`
+  ).join(', ')) : '';
+}
+
+const getLabelByOIT = (oit: any, locale: string) => {
+  if (locale === 'es') {
+    return oit.es_name;
+  } else if (locale === 'zh') {
+    return oit.zh_name;
+  }
+  return oit.name;
+};
+
 export const exitPlanDataToExcel = (
   exiPlan: ExitPlan[],
   intl: IntlShape,
-  visibleColumn: string[]
+  visibleColumn: string[],
+  locale: string = 'es'
 ) => {
   let dataToExport: object[] = [];
   const packageShelfFormat = (
@@ -1140,6 +1182,16 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
         case "customer_order_number":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = oi.client_box_number ? oi.client_box_number : "";
+          break;
+        case "operation_instructions":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = (oi.operation_instructions && oi.operation_instructions.length > 0)
+            ? oi.operation_instructions.length
+            : 0;
+          break;
+        case "operation_instruction_type":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = getOperationInstructionsLabel(oi, locale as string);
           break;
         case "updated_at":
         case "created_at":
