@@ -6,6 +6,7 @@ import {
   Document,
   StyleSheet,
   Image,
+  Font,
 } from "@react-pdf/renderer";
 import { IntlShape } from "react-intl";
 import {
@@ -18,11 +19,18 @@ import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
 import { PackingList } from "@/types/storage_planerege1992";
 import { Warehouse } from "@/types/warehouseerege1992";
+
+Font.register({
+  family: 'NotoSans',
+  src: '/fonts/NotoSans/NotoSansTC-Regular.ttf'
+});
+
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
     alignItems: "center",
     padding: 10,
+    fontFamily: 'NotoSans',
   },
   title: {
     fontSize: 15,
