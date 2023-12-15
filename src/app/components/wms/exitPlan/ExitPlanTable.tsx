@@ -83,6 +83,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "observations",
   "customer_order_number",
   "reference_number",
+  "operation_instruction_type",
 ];
 
 const ExitPlanTable = () => {
