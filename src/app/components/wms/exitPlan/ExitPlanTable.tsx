@@ -55,6 +55,7 @@ import {
   isOMS,
   showMsg,
   inventoryOfExitPlan,
+  getOperationInstructionsLabel,
 } from "../../../../helpers";
 import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import FilterExitPlan from "./FilterExitPlan";
@@ -175,107 +176,133 @@ const ExitPlanTable = () => {
 
   const getColumns = React.useMemo(() => {
     const columns = [
-      { name: "ID", uid: "id", sortable: true },
+      { name: "ID", uid: "id", sortable: true, position: 1 },
       {
         name: intl.formatMessage({ id: "delivery_number" }),
         uid: "output_number",
         sortable: true,
+        position: 2,
       },
       {
         name: intl.formatMessage({ id: "customer_order_number" }),
         uid: "customer_order_number",
         sortable: true,
+        position: 3,
       },
       {
         name: intl.formatMessage({ id: "number_of_output_boxes" }),
         uid: "output_boxes",
         sortable: true,
+        position: 4,
       },
       {
         name: intl.formatMessage({ id: "reference_number" }),
         uid: "reference_number",
         sortable: true,
+        position: 5,
       },
       {
         name: intl.formatMessage({ id: "location" }),
         uid: "location",
         sortable: true,
+        position: 6,
       },
       {
         name: intl.formatMessage({ id: "delivery_time" }),
         uid: "delivered_time",
         sortable: true,
+        position: 7,
       },
       {
         name: intl.formatMessage({ id: "destination" }),
         uid: "destination",
         sortable: true,
+        position: 8,
       },
       {
         name: intl.formatMessage({ id: "address" }),
         uid: "address",
         sortable: true,
+        position: 9,
       },
       {
         name: intl.formatMessage({ id: "delivered_amount_boxes" }),
         uid: "delivered_quantity",
         sortable: true,
+        position: 10,
       },
       {
         name: intl.formatMessage({ id: "box_numbers" }),
         uid: "box_amount",
         sortable: true,
+        position: 11,
       },
       {
         name: intl.formatMessage({ id: "warehouse" }),
         uid: "warehouse",
         sortable: true,
+        position: 12,
       },
       {
         name: intl.formatMessage({ id: "user" }),
         uid: "user",
         sortable: true,
+        position: 13,
       },
       {
         name: intl.formatMessage({ id: "palets_numbers" }),
         uid: "palets_amount",
         sortable: true,
+        position: 14,
       },
       {
         name: intl.formatMessage({ id: "amount" }),
         uid: "amount",
         sortable: true,
+        position: 15,
       },
       {
         name: intl.formatMessage({ id: "country" }),
         uid: "country",
         sortable: true,
+        position: 16,
       },
       {
         name: intl.formatMessage({ id: "city" }),
         uid: "city",
         sortable: true,
+        position: 17,
       },
       {
         name: intl.formatMessage({ id: "operation_instructions" }),
         uid: "operation_instructions",
         sortable: false,
+        position: 18,
+      },
+      {
+        name: intl.formatMessage({ id: "operation_instruction_type" }),
+        uid: "operation_instruction_type",
+        sortable: false,
+        position: 19,
       },
       {
         name: intl.formatMessage({ id: "observations" }),
         uid: "observations",
         sortable: true,
+        position: 20,
       },
       {
         name: intl.formatMessage({ id: "created_at" }),
         uid: "created_at",
         sortable: true,
+        position: 21,
       },
 
       {
         name: intl.formatMessage({ id: "updated_at" }),
         uid: "updated_at",
         sortable: true,
+        position: 22,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -581,10 +608,11 @@ const ExitPlanTable = () => {
               : 0}
           </span>
         );
+      case "operation_instruction_type": return (getOperationInstructionsLabel(user, locale as string));
       default:
         return cellValue;
     }
-  }, []);
+  }, [locale]);
 
   const getLocation = (ep: ExitPlan): string => {
     const locations: string[] = [];
@@ -798,12 +826,19 @@ const ExitPlanTable = () => {
   };
 
   const getVisibleColumns = (): string[] => {
-    const t = Array.from(visibleColumns) as string[];
-    return t.filter((el) => el !== "actions");
+    let t = Array.from(visibleColumns) as string[];
+    t = t.filter((el) => el !== "actions");
+
+    const sortedSelectedArray = (t.map(uid => getColumns.find(item => item.uid === uid))
+      .filter(item => item !== undefined)) as { name: string; uid: string; position?: number}[];
+    
+    sortedSelectedArray.sort((a, b) => (a.position || 100) - (b.position || 100));
+
+    return sortedSelectedArray.map(col => col.uid);
   };
 
   const handleExportExcel = () => {
-    exitPlanDataToExcel(getSelectedExitPlans(), intl, getVisibleColumns());
+    exitPlanDataToExcel(getSelectedExitPlans(), intl, getVisibleColumns(), locale as string);
   };
 
   const displayCancelAll = () => {
@@ -969,6 +1004,7 @@ const ExitPlanTable = () => {
                       intl={intl}
                       data={getSelectedExitPlans()}
                       columns={getVisibleColumns()}
+                      locale={locale as string}
                     />
                   }
                   fileName="exit_plan_pdf.pdf"
