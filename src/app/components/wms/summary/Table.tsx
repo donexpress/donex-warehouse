@@ -29,8 +29,8 @@ const SummaryTable = () => {
   const intl = useIntl();
   const [summary, setSummary] = useState<Summary[]>([]);
   const [summaryCount, setSummaryCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
+  const [noResults, setNoResults] = useState<boolean>(false);
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
   const [billCodeValue, setBillCodeValue] = React.useState("");
@@ -137,24 +137,26 @@ const SummaryTable = () => {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
+    setLoadingItems(true);
     const timer = setTimeout(() => {
-      setLoading(false);
+      setLoadingItems(false);
     }, 500);
     return () => clearTimeout(timer);
   }, [intl]);
 
   const loadsummary = async () => {
-    setLoading(true);
+    setLoadingItems(true);
     const _summary = await getSummary(filters, page, rowsPerPage);
     if (_summary !== null) {
       setSummary(_summary.data);
       setSummaryCount(_summary.count);
+      _summary.count === 0 && setNoResults(true);
     } else {
       setSummary([]);
       setSummaryCount(0);
+      setNoResults(true);
     }
-    setLoading(false);
+    setLoadingItems(false);
   };
 
   const handleSelectedFilters = async (event: any) => {
@@ -180,9 +182,11 @@ const SummaryTable = () => {
     if (_summary !== null) {
       setSummary(_summary.data);
       setSummaryCount(_summary.count);
+      _summary.count === 0 && setNoResults(true);
     } else {
       setSummary([]);
       setSummaryCount(0);
+      setNoResults(true);
     }
     setLoadingItems(false);
   };
@@ -282,7 +286,7 @@ const SummaryTable = () => {
       let response: any = null;
       response = await exportExcelSummary(filters);
       if (response.status && response.status >= 200 && response.status <= 299) {
-        showMsg(intl.formatMessage({ id: 'successfullyActionMsg' }), { type: "success" });
+        showMsg(intl.formatMessage({ id: 'please_wait_file_being_generated' }), { type: "success" });
       } else {
         let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
         if (response.status && (response.status === 404)) {
@@ -297,14 +301,14 @@ const SummaryTable = () => {
     setFiltered(true);
   }
 
-  const onRowsPerPageChange = async(e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onRowsPerPageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+    if (Number(e.target.value) !== rowsPerPage) {
       setRowsPerPage(Number(e.target.value));
       setPage(1);
-      if (Number(e.target.value) !== rowsPerPage) {
-        setRowsPerPage(Number(e.target.value));
-        setPage(1);
-        await reloadData(filters, 1, Number(e.target.value))
-      }
+      await reloadData(filters, 1, Number(e.target.value))
+    }
   }
 
   const topContent = React.useMemo(() => {
@@ -458,41 +462,41 @@ const SummaryTable = () => {
 
   return (
     <>
-      <Loading loading={loading}>
+      <Loading loading={loadingItems}>
         {topContent}
         <div className="overflow-x-auto tab-system-table">
-        <Table
-          aria-label="SUMMARY"
-          isHeaderSticky
-          classNames={{
-            wrapper: "max-h-[auto]",
-          }}
-          selectionMode="none"
-        >
-          <TableHeader columns={headerColumns}>
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
-                allowsSorting={column.sortable}
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody
-            emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
-            items={loadingItems ? [] : filteredItems}
+          <Table
+            aria-label="SUMMARY"
+            isHeaderSticky
+            classNames={{
+              wrapper: "max-h-[auto]",
+            }}
+            selectionMode="none"
           >
-            {(item) => (
-              <TableRow key={item.MWB}>
-                {(columnKey) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            <TableHeader columns={headerColumns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid === "actions" ? "center" : "start"}
+                  allowsSorting={column.sortable}
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody
+              emptyContent={`${!noResults ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
+              items={loadingItems ? [] : filteredItems}
+            >
+              {(item) => (
+                <TableRow key={item.MWB}>
+                  {(columnKey) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
         {bottomContent}
       </Loading>
