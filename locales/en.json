@@ -472,5 +472,6 @@
 	"earnings": "Earning",
 	"date": "Date",
 	"not_paid": "Not paid",
-	"pending": "Pending"
+	"pending": "Pending",
+	"please_wait_file_being_generated": "Please wait. A file is being generated with the data."
 }
