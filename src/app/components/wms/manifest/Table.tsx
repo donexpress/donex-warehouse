@@ -32,7 +32,7 @@ import { getGuides, guidesCount, paidBill, exportBill, chargeWaybill, exportExce
 import { Guide, GuidesCount, ManifestFilters, ManifestResponse } from "@/types/guideerege1992";
 import { indexCarriers } from "@/services/api.carrierserege1992";
 import { Carrier, MWB } from "@/typeserege1992";
-import { FaCalculator, FaFile, FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
+import { FaFile, FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
 import ManifestTableDialog from "../../common/ManifestTableDialog";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
@@ -682,6 +682,8 @@ const ManifestTable = () => {
                   <option value="25">25</option>
                   <option value="50">50</option>
                   <option value="100">100</option>
+                  <option value="200">200</option>
+                  <option value="400">400</option>
                 </select>
               </label>
             </div>
