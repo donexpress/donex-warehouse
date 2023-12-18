@@ -90,10 +90,10 @@ export const barCodePath = () => {
 export const storagePlanPath = (status: string = '', page?: number, rowsPerPage?: number, query?: string) => {
   let params = status !== '' ? `?state=${status}` : "";
   if (page && rowsPerPage) {
-    params += `${ params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+    params += `${params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
   }
   if (query && query !== '') {
-    params += `${ params === "" ? '?' : '&'}filter=${query}`;
+    params += `${params === "" ? '?' : '&'}filter=${query}`;
   }
   return getBaseUrl() + "/api/v1/storage_plan" + params;
 };
@@ -219,7 +219,7 @@ export const countsPath = () => {
 };
 
 export const operationInstructionPath = () => {
-  return getBaseUrl() +  '/api/v1/operation_instruction'
+  return getBaseUrl() + '/api/v1/operation_instruction'
 }
 
 export const linePath = (page?: number, rowsPerPage?: number) => {
@@ -265,13 +265,13 @@ export const guidePath = (page?: number, rowsPerPage?: number, filters?: string)
   return getBaseUrl() + "/api/v1/manifest" + params;
 };
 
-export const summaryPath = (filters: string = "", page?: number, rowsPerPage?: number) => {
+export const summaryPath = (page?: number, rowsPerPage?: number, filters?: string) => {
   let params = "";
-  if (filters && filters !== "") {
-    params += `?${filters}`;
-  }
   if (page && rowsPerPage) {
     params += `${params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
+  }
+  if (filters && filters !== "") {
+    params += `${params === "" ? '?' : '&'}${filters}`;
   }
   return getBaseUrl() + "/api/v1/summary" + params;
 };
