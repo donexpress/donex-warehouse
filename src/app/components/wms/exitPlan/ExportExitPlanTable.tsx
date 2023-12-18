@@ -70,6 +70,10 @@ const styles = StyleSheet.create({
     fontSize: 8,
     backgroundColor: "#f6f6f6",
     color: "#333333",
+    flexDirection: 'column',
+  },
+  text: {
+    overflow: 'hidden',
   },
   headerCell: {
     backgroundColor: "#37446b",
@@ -176,6 +180,14 @@ const ExportExitPlanTable = ({ intl, columns, data, locale = 'es' }: Props) => {
   };
   const existOITColumn = (columnsParam: string[]): boolean => {
     return !!columnsParam.find(col => col === 'operation_instruction_type');
+  };
+
+  const getObservations = (observations: string): string => {
+    if (observations && (observations !== '')) {
+      observations = observations.replace(new RegExp('，', 'g'), ', ')
+      return observations;
+    }
+    return '';
   };
 
   return (
@@ -327,6 +339,15 @@ const ExportExitPlanTable = ({ intl, columns, data, locale = 'es' }: Props) => {
                       >
                         { getOperationInstructionsLabel(oi, locale) }
                       </Text>
+                    );
+                  case "observations":
+                    return (
+                      <View key={index} style={[styles.tableCell]}>
+                        <Text key={index} style={styles.text}>
+                          {/* @ts-ignore */}
+                          {getObservations(oi[column])}
+                        </Text>
+                      </View>
                     );
                   default:
                     return (
