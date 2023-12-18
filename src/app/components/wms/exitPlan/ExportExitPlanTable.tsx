@@ -171,6 +171,12 @@ const ExportExitPlanTable = ({ intl, columns, data, locale = 'es' }: Props) => {
     });
     return numbers.join(", ");
   };
+  const getColumns = (columnsParam: string[]): string[] => {
+    return columnsParam.filter(col => col !== 'operation_instruction_type');
+  };
+  const existOITColumn = (columnsParam: string[]): boolean => {
+    return !!columnsParam.find(col => col === 'operation_instruction_type');
+  };
 
   return (
     <Document>
@@ -185,7 +191,7 @@ const ExportExitPlanTable = ({ intl, columns, data, locale = 'es' }: Props) => {
 
         <View style={styles.table}>
           <View style={styles.tableRow}>
-            {columns.map((column, index) => (
+            {getColumns(columns).map((column, index) => (
               <Text
                 style={
                   column === "output_number"
@@ -200,7 +206,7 @@ const ExportExitPlanTable = ({ intl, columns, data, locale = 'es' }: Props) => {
           </View>
           {data.map((oi, index) => (
             <View style={styles.tableRow} key={index}>
-              {columns.map((column, index) => {
+              {getColumns(columns).map((column, index) => {
                 switch (column) {
                   case "warehouse":
                     return (
@@ -286,13 +292,19 @@ const ExportExitPlanTable = ({ intl, columns, data, locale = 'es' }: Props) => {
                   }
                   case "output_number":
                     return (
-                      <Text
-                        key={index}
-                        style={[styles.tableCell, styles.minorCell]}
-                      >
-                        {/* @ts-ignore */}
-                        {oi[column]}
-                      </Text>
+                      <View key={index} style={[styles.tableCell, styles.minorCell]}>
+                        <Text
+                          style={styles.locationCell}
+                        >
+                          {/* @ts-ignore */}
+                          {oi[column]}
+                        </Text>
+                        {oi && oi.operation_instructions && (oi.operation_instructions.length > 0) && existOITColumn(columns) && (
+                          <Text>
+                            { getOperationInstructionsLabel(oi, locale) }
+                          </Text>
+                        )}
+                      </View>
                     );
                   case "operation_instructions":
                     return (
