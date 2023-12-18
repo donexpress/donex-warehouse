@@ -8,8 +8,9 @@ import {
   TableCell,
   Button,
   Input,
+  SortDescriptor,
 } from "@nextui-org/react";
-import { getDateFormat, getHourFormat, text_date_format } from "../../../../helpers/utils";
+import { getHourFormat, text_date_format } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
 import "./../../../../styles/generic.input.scss";
@@ -30,6 +31,7 @@ const SummaryTable = () => {
   const [summary, setSummary] = useState<Summary[]>([]);
   const [summaryCount, setSummaryCount] = useState<number>(0);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [noResults, setNoResults] = useState<boolean>(false);
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
@@ -40,6 +42,15 @@ const SummaryTable = () => {
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [filtered, setFiltered] = useState<boolean>(true);
   const [filters, setFilters] = React.useState<string>("");
+
+  const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+    column: "id",
+    direction: "descending",
+  });
+  const [sortDescriptorPrev, setSortDescriptorPrev] = useState<SortDescriptor>({
+    column: "",
+    direction: "ascending",
+  });
 
   const [page, setPage] = useState(1);
 
@@ -125,28 +136,21 @@ const SummaryTable = () => {
     []
   );
 
-  /* const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]); */
-
   useEffect(() => {
     loadsummary();
   }, []);
 
   useEffect(() => {
-    setLoadingItems(true);
+    setLoading(true);
     const timer = setTimeout(() => {
-      setLoadingItems(false);
+      setLoading(false);
     }, 500);
     return () => clearTimeout(timer);
   }, [intl]);
 
   const loadsummary = async () => {
-    setLoadingItems(true);
-    const _summary = await getSummary(filters, page, rowsPerPage);
+    setLoading(true);
+    const _summary = await getSummary(1, 25, filters);
     if (_summary !== null) {
       setSummary(_summary.data);
       setSummaryCount(_summary.count);
@@ -156,7 +160,7 @@ const SummaryTable = () => {
       setSummaryCount(0);
       setNoResults(true);
     }
-    setLoadingItems(false);
+    setLoading(false);
   };
 
   const handleSelectedFilters = async (event: any) => {
@@ -173,12 +177,12 @@ const SummaryTable = () => {
     }
     setFilters(arrayFilters.join("&"));
     setPage(1);
-    await reloadData(arrayFilters.join("&"), 1, rowsPerPage);
+    await reloadData(-1, -1, arrayFilters.join("&"));
   }
 
-  const reloadData = async (queryFilters: string, currentP: number, currentRowsPerPage: number) => {
+  const reloadData = async (newPage: number = -1, rowsPerPageSP: number = -1, queryFilters: string) => {
     setLoadingItems(true);
-    const _summary = await getSummary(queryFilters, currentP, currentRowsPerPage);
+    const _summary = await getSummary(newPage !== -1 ? newPage : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, queryFilters);
     if (_summary !== null) {
       setSummary(_summary.data);
       setSummaryCount(_summary.count);
@@ -198,7 +202,61 @@ const SummaryTable = () => {
     setFilters("");
     setFiltered(true);
     setPage(1);
-    await reloadData("", 1, rowsPerPage);
+    await reloadData(-1, -1, "");
+  };
+
+  const handleSortChange = (sortDescriptor: SortDescriptor) => {
+    if (
+      sortDescriptor.column === sortDescriptorPrev.column &&
+      sortDescriptor.direction === sortDescriptorPrev.direction
+    ) {
+      sortDescriptor.direction = sortDescriptor.direction === "ascending" ? "descending" : "ascending";
+    }
+    setSortDescriptor(sortDescriptor);
+    setSortDescriptorPrev(sortDescriptor);
+
+    const sortedItems = sort(sortDescriptor, filteredItems);
+    setSummary(sortedItems.items);
+  };
+
+  const sort = (sortDescriptor: SortDescriptor | undefined, filteredItems: Summary[]) => {
+    if (!sortDescriptor) {
+      return {
+        items: filteredItems,
+      };
+    }
+    return {
+      items: filteredItems.sort((a, b) => {
+        let first: string | number = a[sortDescriptor.column as keyof Summary];
+        let second: string | number = b[sortDescriptor.column as keyof Summary];
+        if (sortDescriptor.column === "created_at") {
+          first = new Date(first) as any;
+          second = new Date(second) as any;
+          return sortDescriptor.direction === "ascending"
+            ? compareDates(first, second)
+            : compareDates(second, first);
+        } else {
+          let cmp =
+            (parseInt(first.toString()) || first) < (parseInt(second.toString()) || second)
+              ? -1
+              : 1;
+          if (sortDescriptor.direction === "descending") {
+            cmp *= -1;
+          }
+          return cmp;
+        }
+      }),
+    };
+  };
+
+  const compareDates = (date1: string | number, date2: string | number) => {
+    if (date1 < date2) {
+      return -1;
+    } else if (date1 > date2) {
+      return 1;
+    } else {
+      return 0;
+    }
   };
 
   const validateBillCodeIncomplete = (cadena: string): boolean => {
@@ -302,12 +360,10 @@ const SummaryTable = () => {
   }
 
   const onRowsPerPageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
     if (Number(e.target.value) !== rowsPerPage) {
       setRowsPerPage(Number(e.target.value));
       setPage(1);
-      await reloadData(filters, 1, Number(e.target.value))
+      await reloadData(1, Number(e.target.value), filters);
     }
   }
 
@@ -405,6 +461,8 @@ const SummaryTable = () => {
                   <option value="25">25</option>
                   <option value="50">50</option>
                   <option value="100">100</option>
+                  <option value="200">200</option>
+                  <option value="400">400</option>
                 </select>
               </label>
             </div>
@@ -414,6 +472,7 @@ const SummaryTable = () => {
     );
   }, [
     summary.length,
+    onRowsPerPageChange,
     intl,
     billCodeValue,
     startDate,
@@ -425,11 +484,11 @@ const SummaryTable = () => {
   const changePage = async (newPage: number) => {
     if (page !== newPage) {
       setPage(newPage);
-      await setShowPagination(false);
-      await reloadData(filters, newPage, rowsPerPage);
-      await setShowPagination(true);
+      setShowPagination(false);
+      await reloadData(newPage, rowsPerPage, filters);
+      setShowPagination(true);
     }
-  };
+  }
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -462,7 +521,7 @@ const SummaryTable = () => {
 
   return (
     <>
-      <Loading loading={loadingItems}>
+      <Loading loading={loading}>
         {topContent}
         <div className="overflow-x-auto tab-system-table">
           <Table
@@ -472,6 +531,8 @@ const SummaryTable = () => {
               wrapper: "max-h-[auto]",
             }}
             selectionMode="none"
+            sortDescriptor={sortDescriptor}
+            onSortChange={handleSortChange}
           >
             <TableHeader columns={headerColumns}>
               {(column) => (
@@ -485,7 +546,7 @@ const SummaryTable = () => {
               )}
             </TableHeader>
             <TableBody
-              emptyContent={`${!noResults ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
+              emptyContent={`${!noResults && loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
               items={loadingItems ? [] : filteredItems}
             >
               {(item) => (
