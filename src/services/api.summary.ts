@@ -12,8 +12,8 @@ const getBaseUrl = () => {
   return BASE_URL;
 }
 
-export const getSummary = async (page: number | undefined = undefined, rowsPerPage: number | undefined = undefined, filters: string | undefined = undefined, context?: GetServerSidePropsContext): Promise<SummaryResponse | null> => {
-  const path = summaryPath(page, rowsPerPage, filters);
+export const getSummary = async (is_carrier: boolean, page: number | undefined = undefined, rowsPerPage: number | undefined = undefined, filters: string | undefined = undefined, context?: GetServerSidePropsContext): Promise<SummaryResponse | null> => {
+  const path = summaryPath(is_carrier, page, rowsPerPage, filters);
   try {
     const response = await axios.get(path, getHeaders(context));
     return response.data;
