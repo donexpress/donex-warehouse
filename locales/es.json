@@ -479,5 +479,8 @@
   "date": "Fecha",
   "not_paid": "No pagado",
 	"pending": "Pendiente",
-	"please_wait_file_being_generated": "Espere por favor. Se está generando un archivo con los datos."
+	"please_wait_file_being_generated": "Espere por favor. Se está generando un archivo con los datos.",
+  "summary_type": "Tipo de resumen",
+  "general": "General",
+  "by_carrier": "Por transportista"
 }
