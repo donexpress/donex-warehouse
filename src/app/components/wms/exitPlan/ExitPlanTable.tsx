@@ -637,7 +637,9 @@ const ExitPlanTable = () => {
     })
     if(short === larger) {
       storage_time = `${short} ${intl.formatMessage({id: 'days'})}`
-    } else {
+    } else if(short === Infinity && larger === 0) {
+      storage_time = `0 ${intl.formatMessage({id: 'days'})}` 
+    }else {
       storage_time = `${short} - ${larger} ${intl.formatMessage({id: 'days'})}`
 
     }
