@@ -36,6 +36,7 @@ export type PackingList = {
   dispatched_time?: string;
   created_at?: string;
   updated_at?: string;
+  storage_time?: number | string
 };
 
 export type StoragePlan = {

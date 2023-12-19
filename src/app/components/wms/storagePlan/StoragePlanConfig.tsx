@@ -759,7 +759,7 @@ const StoragePlanConfig = ({ id, inWMS }: StoragePlanConfigProps) => {
                               ) : '--'
                             }
                             </div>
-                            <div>{'--'}</div>
+                            <div>{row.storage_time ? `${row.storage_time} ${intl.formatMessage({id: 'days'})}` : "--"}</div>
                             <div>{(storagePlan && storagePlan.delivered_time) ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '--'}</div>
                           </div>
                         ))}
