@@ -270,6 +270,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
         uid: "updated_at",
         sortable: false,
       },
+      {
+        name: intl.formatMessage({ id: "storage_time" }),
+        uid: "storage_time",
+        sortable: false,
+      },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ] :  [
       { name: "ID", uid: "id", sortable: false },
@@ -356,6 +361,11 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
       {
         name: intl.formatMessage({ id: "updated_at" }),
         uid: "updated_at",
+        sortable: false,
+      },
+      {
+        name: intl.formatMessage({ id: "storage_time" }),
+        uid: "storage_time",
         sortable: false,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
@@ -570,12 +580,36 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               {getLocationPackages(storageP)}
             </span>
           );
-        default:
+        case "storage_time":
+          return getStorageTime(storageP)
+          default:
           return cellValue;
       }
     },
     [intl, statusSelected]
   );
+
+  const getStorageTime = (storageP: any): string => {
+    let min = Infinity
+    let max = 0
+    let storage_time: string = ""
+    storageP.packing_list.forEach((pl: any) => {
+      if(pl.storage_time < min) {
+        min = pl.storage_time
+      }
+      if(pl.storage_time > max) {
+        max = pl.storage_time
+      }
+    })
+    if(min === max) {
+      storage_time = `${min} ${intl.formatMessage({id: 'days'})}`
+    } else if(min === Infinity && max === 0) {
+      storage_time = `0 ${intl.formatMessage({id: 'days'})}` 
+    }else {
+      storage_time = `${min} - ${max} ${intl.formatMessage({id: 'days'})}`
+    }
+    return storage_time;
+  }
 
   const onRowsPerPageChange = async(e: React.ChangeEvent<HTMLSelectElement>) => {
       if (Number(e.target.value) !== rowsPerPage) {

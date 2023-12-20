@@ -309,7 +309,7 @@ const ExitPlanTable = () => {
         name: intl.formatMessage({ id: "storage_time" }),
         uid: "storage_time",
         sortable: true,
-        position: 22,
+        position: 23,
       },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
@@ -641,7 +641,6 @@ const ExitPlanTable = () => {
       storage_time = `0 ${intl.formatMessage({id: 'days'})}` 
     }else {
       storage_time = `${short} - ${larger} ${intl.formatMessage({id: 'days'})}`
-
     }
     return storage_time;
   }

@@ -686,7 +686,7 @@ export const packingListDataToExcel = (
             : ""
           } `
           : "--";
-      pList[key9] = "--";
+      pList[key9] = storagePlan.packing_list ? `${storagePlan.packing_list[0].storage_time} ${intl.formatMessage({ id: 'days' })}` : '--';
       pList[key10] = storagePlan.delivered_time
         ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(
           storagePlan.delivered_time
