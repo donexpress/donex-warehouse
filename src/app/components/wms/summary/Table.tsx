@@ -190,7 +190,7 @@ const SummaryTable = () => {
     }
     setFilters(arrayFilters.join("&"));
     setPage(1);
-    await reloadData(-1, -1, arrayFilters.join("&"));
+    await reloadData(-1, rowsPerPage, arrayFilters.join("&"));
   }
 
   const reloadData = async (newPage: number = -1, rowsPerPageSP: number = -1, queryFilters: string, is_carrier: boolean = type !== "General" && type !== "" ? true : false) => {
@@ -215,7 +215,7 @@ const SummaryTable = () => {
     setFilters("");
     setFiltered(true);
     setPage(1);
-    await reloadData(-1, -1, "");
+    await reloadData(-1, rowsPerPage, "");
   };
 
   const handleSortChange = (sortDescriptor: SortDescriptor) => {
@@ -388,7 +388,7 @@ const SummaryTable = () => {
   const handleSelectSummaryType = (value: number) => {
     setType(value === 0 ? "General" : "Por transportista");
     setSelectedSummaryType(value);
-    reloadData(1, 25, "", value !== 0 ? true : false);
+    reloadData(1, rowsPerPage, "", value !== 0 ? true : false);
   }
 
   const topContent = React.useMemo(() => {
@@ -397,58 +397,6 @@ const SummaryTable = () => {
         <Form>
           <div className="flex flex-col gap-3">
             <div className="container-search-inputs">
-              {/* <div>
-                <Select
-                  isSearchable={false}
-                  options={types}
-                  value={type.trim() !== "" ? { value: type, label: type } : null}
-                  onChange={(selectedOption) => {
-                    if (selectedOption) {
-                      setType(selectedOption.label);
-                      reloadData(1, 25, "", selectedOption.value !== "0" ? true : false);
-                    } else {
-                      setType("");
-                    }
-                  }}
-                  styles={{
-                    control: (provided) => ({
-                      ...provided,
-                      backgroundColor: "#212c4d !important",
-                      border: "1px solid #37446b !important",
-                      borderRadius: "4px !important",
-                      height: "40px",
-                    }),
-                    option: (provided) => ({
-                      ...provided,
-                      color: "#aeb9e1",
-                      backgroundColor: "#212c4d !important",
-                    }), placeholder: (provided) => ({
-                      ...provided,
-                      color: "#aeb9e1",
-                      fontWeight: 400,
-                      fontSize: "var(--nextui-font-size-small)"
-                    }), input: (provided) => ({
-                      ...provided,
-                      color: "#aeb9e1",
-                      fontWeight: 400,
-                      fontSize: "var(--nextui-font-size-small)"
-                    }), singleValue: (provided) => ({
-                      ...provided,
-                      color: "#aeb9e1",
-                      fontWeight: 400,
-                      fontSize: "var(--nextui-font-size-small)"
-                    }), menu: (provided) => ({
-                      ...provided,
-                      color: "#aeb9e1",
-                      backgroundColor: "#212c4d !important",
-                      fontWeight: 400,
-                      fontSize: "var(--nextui-font-size-small)"
-                    }),
-                  }}
-                  placeholder={intl.formatMessage({ id: "summary_type" })}
-                />
-              </div> */}
-
               <div>
                 <Input
                   isClearable
