@@ -305,6 +305,12 @@ const ExitPlanTable = () => {
         sortable: true,
         position: 22,
       },
+      {
+        name: intl.formatMessage({ id: "storage_time" }),
+        uid: "storage_time",
+        sortable: true,
+        position: 23,
+      },
       { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
 
@@ -610,10 +616,34 @@ const ExitPlanTable = () => {
           </span>
         );
       case "operation_instruction_type": return (getOperationInstructionsLabel(user, locale as string));
+      case "storage_time":
+        return getStorageTime(user)
       default:
         return cellValue;
     }
   }, [locale]);
+
+  const getStorageTime = (outputPlan: any): string => {
+    let short = Infinity
+    let larger = 0;
+    let storage_time = ""
+    outputPlan.packing_lists.forEach((pl: any) => {
+      if(pl.storage_time < short) {
+        short = pl.storage_time
+      }
+      if(pl.storage_time > larger) {
+        larger = pl.storage_time
+      }
+    })
+    if(short === larger) {
+      storage_time = `${short} ${intl.formatMessage({id: 'days'})}`
+    } else if(short === Infinity && larger === 0) {
+      storage_time = `0 ${intl.formatMessage({id: 'days'})}` 
+    }else {
+      storage_time = `${short} - ${larger} ${intl.formatMessage({id: 'days'})}`
+    }
+    return storage_time;
+  }
 
   const getLocation = (ep: ExitPlan): string => {
     const locations: string[] = [];
