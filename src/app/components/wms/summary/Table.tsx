@@ -9,8 +9,12 @@ import {
   Button,
   Input,
   SortDescriptor,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
-import { getHourFormat, text_date_format } from "../../../../helpers/utils";
+import { capitalize, getHourFormat, text_date_format } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
 import "./../../../../styles/generic.input.scss";
@@ -20,12 +24,12 @@ import { Summary, SummaryFilters } from "@/types/summaryerege1992";
 import { exportExcelSummary, getSummary } from "@/services/api.summaryerege1992";
 import { Form, Formik } from "formik";
 import GenericInput from "../../common/GenericInput";
-import { FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
+import { FaFileExcel, FaFilter, FaTimes, FaCheck } from "react-icons/fa";
 import { SearchIcon } from "../../common/SearchIcon";
 import { showMsg } from "@/helperserege1992";
 import PaginationTable from "../../common/Pagination";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
-import Select from 'react-select';
+import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 
 const SummaryTable = () => {
   const intl = useIntl();
@@ -44,6 +48,8 @@ const SummaryTable = () => {
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [filtered, setFiltered] = useState<boolean>(true);
   const [filters, setFilters] = React.useState<string>("");
+
+  const [selectedSummaryType, setSelectedSummaryType] = useState<number>(0);
 
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "id",
@@ -374,10 +380,16 @@ const SummaryTable = () => {
     }
   }
 
-  const types = [
-    { value: "0", label: intl.formatMessage({ id: "general" }) },
-    { value: "1", label: intl.formatMessage({ id: "by_carrier" }) }
+  const arrayTypes = [
+    { value: intl.formatMessage({ id: "general" }), id: 0 },
+    { value: intl.formatMessage({ id: "by_carrier" }), id: 1 },
   ]
+
+  const handleSelectSummaryType = (value: number) => {
+    setType(value === 0 ? "General" : "Por transportista");
+    setSelectedSummaryType(value);
+    reloadData(1, 25, "", value !== 0 ? true : false);
+  }
 
   const topContent = React.useMemo(() => {
     return (
@@ -385,7 +397,7 @@ const SummaryTable = () => {
         <Form>
           <div className="flex flex-col gap-3">
             <div className="container-search-inputs">
-              <div>
+              {/* <div>
                 <Select
                   isSearchable={false}
                   options={types}
@@ -435,7 +447,7 @@ const SummaryTable = () => {
                   }}
                   placeholder={intl.formatMessage({ id: "summary_type" })}
                 />
-              </div>
+              </div> */}
 
               <div>
                 <Input
@@ -499,12 +511,42 @@ const SummaryTable = () => {
               </div>
 
               <div className="flex justify-end gap-3 items-end">
+                <Dropdown>
+                  <DropdownTrigger className="hidden sm:flex">
+                    <Button
+                      color="primary"
+                      className="bnt-select"
+                      endContent={<ChevronDownIcon className="text-small" />}
+                    >
+                      {intl.formatMessage({ id: "summary_type" })}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    disallowEmptySelection
+                    aria-label="Carrier"
+                    closeOnSelect={true}
+                    selectionMode="single"
+                  >
+                    {arrayTypes.map((column) => (
+                      <DropdownItem
+                        key={column.id}
+                        onClick={(e) => handleSelectSummaryType(column.id)}
+                        className="capitalize"
+                      >
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          {column.value}
+                          {selectedSummaryType === column.id && (
+                            <FaCheck size={13} className="text-small ml-2"/>
+                          )}
+                        </div>
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
                 <Button
                   color="primary"
                   style={{ width: "140px" }}
-                  endContent={
-                    <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
-                  }
+                  endContent={<FaFileExcel style={{ fontSize: "22px", color: "white" }} />}
                   disabled={filteredItems.length === 0}
                   onClick={() => handleExport()}
                 >
