@@ -22,8 +22,14 @@ export const getSummary = async (is_carrier: boolean, page: number | undefined =
   }
 }
 
-export const exportExcelSummary = async (queryFilters: string, context?: GetServerSidePropsContext): Promise<any> => {
-  const path = `${excelSummaryPath()}?${queryFilters}`;
+export const exportExcelSummary = async (is_carrier: boolean, queryFilters: string, context?: GetServerSidePropsContext): Promise<any> => {
+  let path = "";
+  if (queryFilters.length === 0) {
+    path = `${excelSummaryPath()}?is_carrier=${is_carrier}`;
+  } else {
+    path = `${excelSummaryPath()}?${queryFilters}&is_carrier=${is_carrier}`;
+
+  }
   const response = await exportExcelSummaryFn(path, context);
   return response;
 }
