@@ -59,6 +59,11 @@ const SummaryTable = () => {
   const getColumns = React.useMemo(() => {
     const columns = [
       { name: intl.formatMessage({ id: "waybill_id" }), uid: "MWB", sortable: true },
+      (type !== "General" && type !== "" && {
+        name: intl.formatMessage({ id: "carrier" }),
+        uid: "carrier",
+        sortable: true,
+      }),
       {
         name: intl.formatMessage({ id: "quantity_package" }),
         uid: "quantity_package",
@@ -113,10 +118,10 @@ const SummaryTable = () => {
     ];
 
     return columns;
-  }, [intl]);
+  }, [filtered, intl, type]);
 
   const headerColumns = React.useMemo(() => {
-    const columns = getColumns;
+    const columns = getColumns.filter(column => column !== false);
     return columns;
   }, [getColumns]);
 
@@ -152,8 +157,7 @@ const SummaryTable = () => {
 
   const loadsummary = async () => {
     setLoading(true);
-    const is_carrier = type !== "General" && type !== "" ? true : false;
-    const _summary = await getSummary(is_carrier, 1, 25, filters);
+    const _summary = await getSummary(false, 1, 25, filters);
     if (_summary !== null) {
       setSummary(_summary.data);
       setSummaryCount(_summary.count);
@@ -183,9 +187,8 @@ const SummaryTable = () => {
     await reloadData(-1, -1, arrayFilters.join("&"));
   }
 
-  const reloadData = async (newPage: number = -1, rowsPerPageSP: number = -1, queryFilters: string) => {
+  const reloadData = async (newPage: number = -1, rowsPerPageSP: number = -1, queryFilters: string, is_carrier: boolean = type !== "General" && type !== "" ? true : false) => {
     setLoadingItems(true);
-    const is_carrier = type !== "General" && type !== "" ? true : false;
     const _summary = await getSummary(is_carrier, newPage !== -1 ? newPage : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, queryFilters);
     if (_summary !== null) {
       setSummary(_summary.data);
@@ -346,7 +349,7 @@ const SummaryTable = () => {
   const handleExport = async () => {
     try {
       let response: any = null;
-      response = await exportExcelSummary(filters);
+      response = await exportExcelSummary(type !== "General" && type !== "" ? true : false, filters);
       if (response.status && response.status >= 200 && response.status <= 299) {
         showMsg(intl.formatMessage({ id: 'please_wait_file_being_generated' }), { type: "success" });
       } else {
@@ -390,6 +393,7 @@ const SummaryTable = () => {
                   onChange={(selectedOption) => {
                     if (selectedOption) {
                       setType(selectedOption.label);
+                      reloadData(1, 25, "", selectedOption.value !== "0" ? true : false);
                     } else {
                       setType("");
                     }
