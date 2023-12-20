@@ -30,10 +30,11 @@ import { showMsg, storagePlanDataToExcel, packingListDataToExcel, getLocationPac
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount, barCodePdf } from '../../../../services/api.storage_plan';
+import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount, barCodePdf, exportStoragePlan } from '../../../../services/api.storage_plan';
 import { autoAssignLocation } from '../../../../services/api.package_shelf';
 import { getUsers } from '../../../../services/api.users';
 import { ValueSelect } from "../../../../types";
+import { ExportPayload } from '../../../../types/export';
 import { PackingList, StoragePlan, StoragePlanListProps, BarCode } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import { InputData } from "../../../../types/general_search";
@@ -467,15 +468,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl, visibleColumns)}>
+                  <DropdownItem onClick={() => exportFile('xlsx', [storageP.id])}>
                     {intl.formatMessage({ id: "export_xlsx" })}
                   </DropdownItem>
-                  <DropdownItem>
-                    <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={[storageP]} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
+                  <DropdownItem onClick={() => exportFile('pdf', [storageP.id])}>
+                    {/* <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={[storageP]} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
                       {({ blob, url, loading, error }) =>
                         intl.formatMessage({ id: "export_pdf" })
                       }
-                    </PDFDownloadLink>
+                    </PDFDownloadLink> */}
+                    { intl.formatMessage({ id: "export_pdf" }) }
                   </DropdownItem>
                   <DropdownItem onClick={() => generateBarCode(storageP)}>
                     {intl.formatMessage({ id: "generate_labels" })}
@@ -764,6 +766,32 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     }
   }
 
+  const exportFile = async (type: 'pdf' | 'xlsx', itemsId: number[]) => {
+    setLoading(true);
+    let t = Array.from(visibleColumns) as string[];
+    t = t.filter((el) => el !== "actions");
+    const body: ExportPayload = {
+      type: type,
+      ids: itemsId,
+      display_columns: t,
+    }
+    const response = await exportStoragePlan(body);
+    if (response.status >= 200 && response.status <= 299) {
+      console.log(response.data)
+      
+      /* const link = document.createElement('a');
+      link.href = response.data.url;
+      link.setAttribute('download', response.data.name);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link); */
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
+    setLoading(false);
+  };
+
   const getSelectedStoragePlans = (): StoragePlan[] => {
     let its: StoragePlan[] = [];
     for (let i = 0; i < selectedItems.length; i++) {
@@ -918,19 +946,21 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               style={{ width: '140px', marginLeft: '10px' }}
               endContent={<FaFilePdf style={{ fontSize: '22px', color: 'white' }} />}
               isDisabled={selectedItems.length === 0}
+              onClick={() => exportFile('pdf', selectedItems)}
             >
-              <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={getSelectedStoragePlans()} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
+              {/* <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={getSelectedStoragePlans()} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
                 {({ blob, url, loading, error }) =>
                   intl.formatMessage({ id: "export_pdf" })
                 }
-              </PDFDownloadLink>
+              </PDFDownloadLink> */}
+              { intl.formatMessage({ id: "export_pdf" }) }
             </Button>
 
             <Button
               color="primary"
               style={{ width: '140px', marginLeft: '10px' }}
               endContent={<FaFileExcel style={{ fontSize: '22px', color: 'white' }} />}
-              onClick={() => handleExportStoragePlanData()}
+              onClick={() => exportFile('xlsx', selectedItems)}
               isDisabled={selectedItems.length === 0}
             >
               {intl.formatMessage({ id: "export_xlsx" })}

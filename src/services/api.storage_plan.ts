@@ -1,10 +1,12 @@
 import axios from 'axios';
-import { countStoragePlanPath, barCodePath, storagePlanByOrderNumberPath, storagePlanPath, storagePlanStatePath, storagePlanCountPath } from '../backend';
+import { countStoragePlanPath, exportEntryPlanPath, barCodePath, storagePlanByOrderNumberPath, storagePlanPath, storagePlanStatePath, storagePlanCountPath } from '../backend';
 import { GetServerSidePropsContext } from 'next';
 import { getHeaders } from '../helpers';
 import { Response, BatchStoragePlans } from '../types/index';
 import { StoragePlan, StoragePlanState, StoragePlanCount, BarCode } from '../types/storage_plan';
+import { ExportPayload } from "../types/export";
 import { StateCount } from '@/types/exit_planerege1992';
+import ExportStoragePlansPDF from '@/app/components/common/ExportStoragePlansPDFerege1992';
 
 export const countStoragePlan = async ():Promise<StateCount> => {
     const response = await axios.get(countStoragePlanPath())
@@ -136,6 +138,23 @@ export const getStoragePlansState = async (context?: GetServerSidePropsContext):
     return null;
   }
 }
+
+export const exportStoragePlan = async (values: ExportPayload): Promise<Response> => {
+  const path = exportEntryPlanPath();
+  try {
+    const response = await axios.post(path, values, getHeaders());
+
+    if (response.status && response.status >= 200 && response.status <= 299) {
+      return { data: response.data, status: response.status };
+    }
+    return { status: response.status ? response.status : 0 };
+  } catch (error: any) {
+    return {
+      status:
+        error.response && error.response.status ? error.response.status : 0,
+    };
+  }
+};
 
 export const barCodePdf = async (code: string[]): Promise<Response> => {
   const path = barCodePath();

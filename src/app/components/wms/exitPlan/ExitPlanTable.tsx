@@ -32,9 +32,11 @@ import {
   getExitPlansState,
   removeExitPlan,
   updateExitPlan,
+  exportExitPlan,
 } from "../../../../services/api.exit_plan";
 import { getUsers } from '../../../../services/api.users';
 import { ValueSelect } from "../../../../types";
+import { ExportPayload } from '../../../../types/export';
 import {
   ExitPlan,
   ExitPlanState,
@@ -810,20 +812,32 @@ const ExitPlanTable = () => {
       if (item.length > 0) {
         its.push(item[0]);
       }
-      /* if (filterValue && filterValue !== "") {
-        const isSearchable = item[0].output_number
-          ?.toLowerCase()
-          ?.includes(filterValue.toLowerCase());
-        if (isSearchable) {
-          its.push(item[0]);
-        }
-      } else {
-        if (item[0]) {
-          its.push(item[0]);
-        }
-      } */
     }
     return its;
+  };
+
+  const exportFile = async (type: 'pdf' | 'xlsx', itemsId: number[]) => {
+    setLoading(true);
+    const body: ExportPayload = {
+      type: type,
+      ids: itemsId,
+      display_columns: getVisibleColumns(),
+    }
+    const response = await exportExitPlan(body);
+    if (response.status >= 200 && response.status <= 299) {
+      console.log(response.data)
+      
+      /* const link = document.createElement('a');
+      link.href = response.data.url;
+      link.setAttribute('download', response.data.name);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link); */
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
+    setLoading(false);
   };
 
   const getVisibleColumns = (): string[] => {
@@ -998,8 +1012,9 @@ const ExitPlanTable = () => {
                 endContent={
                   <FaFilePdf style={{ fontSize: "22px", color: "white" }} />
                 }
+                onClick={() => exportFile('pdf', selectedItems)}
               >
-                <PDFDownloadLink
+                {/* <PDFDownloadLink
                   document={
                     <ExportExitPlanTable
                       intl={intl}
@@ -1013,7 +1028,8 @@ const ExitPlanTable = () => {
                   {({ blob, url, loading, error }) =>
                     intl.formatMessage({ id: "export_pdf" })
                   }
-                </PDFDownloadLink>
+                </PDFDownloadLink> */}
+                { intl.formatMessage({ id: "export_pdf" }) }
               </Button>
               <Button
                 color="primary"
@@ -1021,7 +1037,7 @@ const ExitPlanTable = () => {
                 endContent={
                   <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
                 }
-                onClick={() => handleExportExcel()}
+                onClick={() => exportFile('xlsx', selectedItems)}
                 isDisabled={selectedItems.length === 0}
               >
                 {intl.formatMessage({ id: "export_xlsx" })}
