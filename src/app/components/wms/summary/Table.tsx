@@ -117,11 +117,11 @@ const SummaryTable = () => {
       // { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
 
-    return columns;
-  }, [filtered, intl, type]);
+    return columns.filter(column => column !== false);
+  }, [intl, type]);
 
   const headerColumns = React.useMemo(() => {
-    const columns = getColumns.filter(column => column !== false);
+    const columns = getColumns as any[];
     return columns;
   }, [getColumns]);
 
