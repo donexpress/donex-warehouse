@@ -11,10 +11,13 @@ import { capitalize, getLanguage } from "@/helpers/utilserege1992";
 import "../../../../styles/wms/exit.plan.config.scss";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 interface Props {
-  onFinish: () => any;
+  date: string;
+  finalDate: string;
+  visibleColumns: Selection;
   setParentInitialDate: (date: string) => any;
   setParentFinalDate: (date: string) => any;
-  setParentLocations: (locations: string[]) => any
+  setParentLocations: (locations: string[]) => any;
+  setVisibleColumnsLocations: (locations: Selection) => any;
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -23,17 +26,12 @@ const INITIAL_VISIBLE_COLUMNS = [
   "private_address",
 ];
 
-const FilterExitPlan = ({ onFinish, setParentFinalDate, setParentInitialDate, setParentLocations }: Props) => {
-  const [date, setDate] = useState<string>("");
-  const [finalDate, setFinalDate] = useState<string>("");
-  const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
-    new Set(INITIAL_VISIBLE_COLUMNS)
-  );
+const FilterExitPlan = ({ date, finalDate, visibleColumns, setParentFinalDate, setParentInitialDate, setParentLocations, setVisibleColumnsLocations }: Props) => {
   const intl = useIntl();
 
-  const handleFilter = async () => {
-    onFinish();
-  };
+  //const handleFilter = async () => {
+  //  onFinish();
+  //};
 
   const getVisibleColumns = (): string[] => {
     const t = Array.from(visibleColumns) as string[];
@@ -64,14 +62,13 @@ const FilterExitPlan = ({ onFinish, setParentFinalDate, setParentInitialDate, se
 
   return (
     <div
-      className="flex justify-between items-center"
-      style={{ marginTop: 10, gap: '10px' }}
+      className="container-search-inputs"
     >
-      <div className="w-full">
+      <div className="w-full search-container-generic">
         <Dropdown>
           <DropdownTrigger className="hidden sm:flex">
             <Button
-              className="bnt-select"
+              className="bnt-select bnt-dropdown"
               endContent={<ChevronDownIcon className="text-small" />}
               variant="flat"
             >
@@ -85,7 +82,7 @@ const FilterExitPlan = ({ onFinish, setParentFinalDate, setParentInitialDate, se
             selectedKeys={visibleColumns}
             selectionMode="multiple"
             onSelectionChange={(value) => {
-              setVisibleColumns(value)
+              setVisibleColumnsLocations(value)
               setParentLocations(Array.from(value) as string[])
             }}
           >
@@ -105,7 +102,6 @@ const FilterExitPlan = ({ onFinish, setParentFinalDate, setParentInitialDate, se
           startContent={<FaClock />}
           value={date}
           onValueChange={(value: string)=> {
-            setDate(value),
             setParentInitialDate(value)
           }}
         />
@@ -119,15 +115,10 @@ const FilterExitPlan = ({ onFinish, setParentFinalDate, setParentInitialDate, se
           startContent={<FaClock />}
           value={finalDate}
           onValueChange={(value: string) => {
-            setFinalDate(value),
             setParentFinalDate(value)
           }}
         />
       </div>
-
-      <Button color="primary" onClick={handleFilter}>
-        <FaFilter />
-      </Button>
     </div>
   );
 };

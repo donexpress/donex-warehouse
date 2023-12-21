@@ -135,13 +135,18 @@ const ExitPlanTable = () => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [cancelALl, setCancellAll] = useState<boolean>(false);
 
-  const [filterInitialDate, setFilterInitialDate] = useState<string>("");
-  const [filterFinalDate, setFilterFinalDate] = useState<string>("");
-  const [filterLocation, setFilterLocation] = useState<string[]>([
+
+  const INITIAL_VISIBLE_COLUMNS_LOCATION = [
+    "amazon",
     "meli",
     "private_address",
-    "amazon",
-  ]);
+  ];
+  const [filterInitialDate, setFilterInitialDate] = useState<string>("");
+  const [filterFinalDate, setFilterFinalDate] = useState<string>("");
+  const [filterLocation, setFilterLocation] = useState<string[]>(INITIAL_VISIBLE_COLUMNS_LOCATION);
+  const [visibleColumnsLocation, setVisibleColumnsLocations] = React.useState<Selection>(
+    new Set(INITIAL_VISIBLE_COLUMNS_LOCATION)
+  );
 
   useEffect(() => {
     setSearchInputs([
@@ -915,6 +920,10 @@ const ExitPlanTable = () => {
   const handleClearAll = async() => {
     await setSelectedItems([]);
     await setSelectedKeys(new Set([]));
+    await setFilterInitialDate("");
+    await setFilterFinalDate("");
+    await setFilterLocation(INITIAL_VISIBLE_COLUMNS_LOCATION);
+    await setVisibleColumnsLocations(new Set(INITIAL_VISIBLE_COLUMNS_LOCATION));
     setShouldResetFields(!shouldResetFields);
     await onClear();
   }
@@ -923,34 +932,18 @@ const ExitPlanTable = () => {
     return (
       <div className="flex flex-col gap-3 mb-2">
         <GeneralSearchCmpt data={searchInputs} getQueryFn={getQuery} shouldResetFields={shouldResetFields} />
+        <FilterExitPlan
+          setParentFinalDate={setFilterFinalDate}
+          setParentInitialDate={setFilterInitialDate}
+          setParentLocations={setFilterLocation}
+          setVisibleColumnsLocations={setVisibleColumnsLocations}
+          date={filterInitialDate}
+          finalDate={filterFinalDate}
+          visibleColumns={visibleColumnsLocation}
+        />
         <div className="flex justify-between gap-3">
           <div>
             <div className="w-full flex justify-start gap-3 items-start" style={{ position: "relative" }}>
-              {/* <Input
-                isClearable
-                className="w-full search-input input-search-list"
-                placeholder=""
-                value={filterValue}
-                onClear={() => onClear()}
-                onValueChange={onSearchChange}
-                onKeyPress={handleKeyPress}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  top: "0px",
-                  right: "0px",
-                  bottom: "0px",
-                  width: "40px",
-                  background: "#37446b",
-                  borderRadius: "0 5px 5px 0",
-                  cursor: "pointer",
-                }}
-                className="elements-center"
-                onClick={() => searchValues()}
-              >
-                <SearchIcon />
-              </div> */}
               <Button
                 color="primary"
                 onClick={(e) => searchValues()}
@@ -965,12 +958,6 @@ const ExitPlanTable = () => {
                 <FaTimes />
               </Button>
             </div>
-            <FilterExitPlan
-              onFinish={onFinishFilter}
-              setParentFinalDate={setFilterFinalDate}
-              setParentInitialDate={setFilterInitialDate}
-              setParentLocations={setFilterLocation}
-            />
           </div>
           <div
             style={{

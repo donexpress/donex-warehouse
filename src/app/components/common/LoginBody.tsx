@@ -7,7 +7,7 @@ import { Formik, Form } from "formik";
 import GenericInput from "./GenericInput";
 import { useIntl } from "react-intl";
 import { AppProps, LoginBody, LoginResponse } from "../../../types";
-import { Profile } from '../../../types/profile';
+import { Profile, ProfileAdmin } from '../../../types/profile';
 import "../../../styles/common.scss";
 import SelectLanguage from "./SelectLanguage";
 import generateValidationSchema from "../../../validation/generateValidationSchema";
@@ -47,8 +47,13 @@ const LoginBody = ({ inWMS, inOMS }: AppProps) => {
         });
   
         if (inWMS) {
+          const role = (profile as ProfileAdmin).role.type;
           setCookie("profileWMS", profile);
-          router.push(`/${locale}/wms`);
+          if (role === 'FINANCE') {
+            router.push(`/${locale}/wms/manifest`);
+          } else {
+            router.push(`/${locale}/wms`);
+          }
         } else {
           setCookie("profileOMS", profile);
           router.push(`/${locale}/oms`);
