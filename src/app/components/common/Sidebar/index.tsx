@@ -11,7 +11,7 @@ import { FaAngleLeft, FaList } from "react-icons/fa6";
 import { MenuOption } from "../../../../types";
 import { menuWMS, menuOMS } from "./../../../../config/menu";
 import Icons from "./Icons";
-import { removeCookie } from "../../../../helpers/cookieUtils";
+import { removeCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const Index = () => {
   const [toggleCollapse, setToggleCollapse] = useState(false);
@@ -20,6 +20,7 @@ const Index = () => {
     typeof window !== "undefined" ? window.innerWidth : 1024
   );
   const [options, setOptions] = useState<MenuOption[]>([]);
+  const [role, setRole] = useState<string>("");
   const router = useRouter();
   const intl = useIntl();
   const { locale } = router.query;
@@ -32,6 +33,10 @@ const Index = () => {
   };
 
   useEffect(() => {
+    const profile = getCookie("profileWMS");
+    if (!!profile) {
+      setRole(profile.role.name);
+    }
     if (isWMS()) {
       setOptions(menuWMS(intl));
     }
@@ -126,22 +131,24 @@ const Index = () => {
           </button>
         </div>
         <div className="flex flex-col items-start mt-4 scroll scrollable-hidden">
-          <div
-            className="group-nav flex flex-col items-start pb-3 cursor-pointer"
-            key="HOME"
-            onClick={() =>
-              router.push(
-                `/${locale}/${isOMS() ? "oms" : ""}${isWMS() ? "wms" : ""}`
-              )
-            }
-          >
-            <div className="flex py-3 px-4">
-              <div className="mr-1 text-xl flex items-center">
-                <Icons icons="BiHome" />
+          {(role !== "Finanzas") && (
+            <div
+              className="group-nav flex flex-col items-start pb-3 cursor-pointer"
+              key="HOME"
+              onClick={() =>
+                router.push(
+                  `/${locale}/${isOMS() ? "oms" : ""}${isWMS() ? "wms" : ""}`
+                )
+              }
+            >
+              <div className="flex py-3 px-4">
+                <div className="mr-1 text-xl flex items-center">
+                  <Icons icons="BiHome" />
+                </div>
+                <span className="text-base font-medium text-sidebar">{intl.formatMessage({ id: "home" })}</span>
               </div>
-              <span className="text-base font-medium text-sidebar">{intl.formatMessage({ id: "home" })}</span>
             </div>
-          </div>
+          )}
 
           {options.map((option, index) => (
             <div
