@@ -3,7 +3,7 @@ import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/render
 import { StoragePlan, PackingList } from "../../../types/storage_plan";
 import { PackageShelf } from "../../../types/package_shelf";
 import { IntlShape } from 'react-intl';
-import { getDateFromStr, getHourFromStr, getLocationPackages, getOutputNumbers } from '../../../helpers'
+import { getDateFromStr, getHourFromStr, getLocationPackages, getOutputNumbers, getStorageTimeSP } from '../../../helpers'
 import { getDateFormat, getHourFormat } from '../../../helpers/utils'
 import { Selection } from "@nextui-org/react";
 
@@ -109,6 +109,7 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     const key12: string = intl.formatMessage({ id: 'observations' });
     const key13: string = intl.formatMessage({ id: "created_at" });
     const key14: string = intl.formatMessage({ id: "updated_at" });
+    const key15: string = intl.formatMessage({ id: "storage_time" });
     
     if (selection === "all" || selection.has("order_number")) {
         titles.push(key1);
@@ -163,6 +164,9 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
     }
     if (selection === "all" || selection.has("updated_at")) {
         titles.push(key14);
+    }
+    if (selection === "all" || selection.has("storage_time")) {
+        titles.push(key15);
     }
     return titles;
   }
@@ -333,6 +337,15 @@ const ExportStoragePlansPDF = ({ storagePlans, intl, selection }: Params) => {
         if (selection === "all" || selection.has("updated_at")) {
           const keyWord: string = "updated_at";
           const value: string = `${sp.updated_at ? getDateFormat(sp.updated_at) : ''} ${sp.updated_at ? getHourFormat(sp.updated_at) : ''}`;
+          values[index][i] = {
+            keyWord,
+            value
+          };
+          i++;
+        }
+        if (selection === "all" || selection.has("storage_time")) {
+          const keyWord: string = "updated_at";
+          const value: string = getStorageTimeSP(sp, intl);
           values[index][i] = {
             keyWord,
             value
