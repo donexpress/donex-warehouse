@@ -16,7 +16,8 @@ import {
   splitLastOccurrence,
 } from "@/helpers/utilserege1992";
 import {
-  getOperationInstructionsLabel
+  getOperationInstructionsLabel,
+  getStorageTimeOP,
 } from "@/helperserege1992";
 import { ExitPlan } from "@/types/exit_planerege1992";
 import { PackageShelf } from "@/types/package_shelferege1992";
@@ -338,6 +339,15 @@ const ExportExitPlanTable = ({ intl, columns, data, locale = 'es' }: Props) => {
                         style={[styles.tableCell]}
                       >
                         { getOperationInstructionsLabel(oi, locale) }
+                      </Text>
+                    );
+                  case "storage_time":
+                    return (
+                      <Text
+                        key={index}
+                        style={[styles.tableCell]}
+                      >
+                        { getStorageTimeOP(oi, intl) }
                       </Text>
                     );
                   case "observations":
