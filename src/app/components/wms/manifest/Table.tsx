@@ -30,8 +30,7 @@ import { Loading } from "../../common/Loading";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 import { getGuides, guidesCount, paidBill, exportBill, chargeWaybill, exportExcelManifest } from "@/services/api.manifesterege1992";
 import { Guide, GuidesCount, ManifestFilters, ManifestResponse } from "@/types/guideerege1992";
-import { indexCarriers } from "@/services/api.carrierserege1992";
-import { Carrier, MWB } from "@/typeserege1992";
+import { MWB } from "@/typeserege1992";
 import { FaFile, FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
 import ImportManifestDialog from "../../common/ImportManifestDialog";
 import ManifestTableDialog from "../../common/ManifestTableDialog";
@@ -57,7 +56,6 @@ const INITIAL_VISIBLE_COLUMNS = [
 const ManifestTable = () => {
   const intl = useIntl();
   const [guides, setGuides] = useState<Guide[]>([]);
-  const [carriers, setCarriers] = useState<Carrier[] | null>([]);
   const [waybillIDS, setWaybillIDS] = useState<MWB[] | null>([]);
   const [guidesTotal, setGuidesTotal] = useState<GuidesCount | null>();
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -363,10 +361,10 @@ const ManifestTable = () => {
       const year = currentDate.getFullYear();
       const month = String(currentDate.getMonth() + 1).padStart(2, '0');
       const day = String(currentDate.getDate()).padStart(2, '0');
-      
+
       newValue = `${year}-${month}-${day}`;
     }
-    
+
     if (type === 'end_date') {
       setEndDate(newValue)
     } else if (type === 'start_date') {
@@ -384,13 +382,14 @@ const ManifestTable = () => {
                 <Select
                   isSearchable
                   options={waybillIDS ? waybillIDS.map((column) => ({
-                    value: column.waybill_id,
+                    value: `${column.waybill_id}|${column.carrier}`,
                     label: capitalize(column.waybill_id + (column.carrier ? ` (${column.carrier})` : ''))
                   })) : []}
                   value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
                   onChange={(selectedOption) => {
                     if (selectedOption) {
-                      setWaybillIDValue(selectedOption.value);
+                      setWaybillIDValue(selectedOption.label);
+                      setCarrierValue(selectedOption.value.split("|")[1]);
                     } else {
                       setWaybillIDValue("");
                     }
@@ -469,32 +468,7 @@ const ManifestTable = () => {
                   onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
                 />
               </div>
-
-              <div>
-                <Dropdown>
-                  <DropdownTrigger>
-                    <Button
-                      className="bnt-dropdown"
-                      style={{ width: "100%" }}
-                      endContent={<ChevronDownIcon className="text-small" />}
-                    >
-                      {carrierValue.trim() !== "" ? carrierValue : intl.formatMessage({ id: "carrier" })}
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    disallowEmptySelection
-                    aria-label="Carrier"
-                    closeOnSelect={true}
-                    selectionMode="single"
-                  >
-                    {carriers ? carriers.map((column) => (
-                      <DropdownItem onClick={(e) => setCarrierValue(column.name)} key={column.position} className="capitalize">
-                        {capitalize(column.name)}
-                      </DropdownItem>
-                    )) : []}
-                  </DropdownMenu>
-                </Dropdown>
-              </div>
+              
               <div>
                 <GenericInput
                   onChangeFunction={(event) => setDateMaxToday(event?.target.value, "start_date")}
@@ -625,17 +599,6 @@ const ManifestTable = () => {
                     ))}
                   </DropdownMenu>
                 </Dropdown>
-
-                {/* <Button
-                  color="primary"
-                  style={{ width: "120px" }}
-                  endContent={
-                    <FaCalculator style={{ fontSize: "22px", color: "white" }} />
-                  }
-                  onClick={() => openProfitDialog()}
-                >
-                  {intl.formatMessage({ id: "profit" })}
-                </Button> */}
 
                 <Button
                   color="primary"
@@ -776,11 +739,9 @@ const ManifestTable = () => {
   const loadGuides = async () => {
     setLoading(true);
     const _guides = await getGuides(1, 25, filters);
-    const _carriers = await indexCarriers();
     const _waybillIDS = await indexWaybillIDS();
     const _guidesCount = await guidesCount(filters);
     setGuides(_guides);
-    setCarriers(_carriers);
     setWaybillIDS(_waybillIDS);
     setGuidesTotal(_guidesCount);
     setLoading(false);
@@ -802,7 +763,7 @@ const ManifestTable = () => {
       setCurrentBillCodeRequest("");
     }
     if (waybillIDValue.trim() !== "") {
-      arrayFilters.push(`waybill_id=${waybillIDValue}`);
+      arrayFilters.push(`waybill_id=${waybillIDValue.split(" ")[0]}`);
       setCurrentWaybillCodeRequest(waybillIDValue);
     } else if (currentWaybillCodeRequest !== "") {
       setCurrentWaybillCodeRequest("");
@@ -978,46 +939,46 @@ const ManifestTable = () => {
     <>
       <Loading loading={loading}>
         <div className="overflow-x-auto tab-system-table">
-        <Table
-          aria-label="GUIDE"
-          isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="outside"
-          classNames={{
-            wrapper: "max-h-[auto]",
-          }}
-          selectedKeys={selectedKeys}
-          selectionMode="none"
-          sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
-          onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
-        >
-          <TableHeader columns={headerColumns}>
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
-                allowsSorting={column.sortable}
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody
-            emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
-            items={loadingItems ? [] : filteredItems}
+          <Table
+            aria-label="GUIDE"
+            isHeaderSticky
+            bottomContent={bottomContent}
+            bottomContentPlacement="outside"
+            classNames={{
+              wrapper: "max-h-[auto]",
+            }}
+            selectedKeys={selectedKeys}
+            selectionMode="none"
+            sortDescriptor={sortDescriptor}
+            topContent={topContent}
+            topContentPlacement="outside"
+            onSelectionChange={setSelectedKeys}
+            onSortChange={setSortDescriptor}
           >
-            {(item) => (
-              <TableRow key={item.id}>
-                {(columnKey) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            <TableHeader columns={headerColumns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid === "actions" ? "center" : "start"}
+                  allowsSorting={column.sortable}
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody
+              emptyContent={`${loadingItems ? intl.formatMessage({ id: "loading_items" }) : intl.formatMessage({ id: "no_results_found" })}`}
+              items={loadingItems ? [] : filteredItems}
+            >
+              {(item) => (
+                <TableRow key={item.id}>
+                  {(columnKey) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
         {showConfirm && <ConfirmationDialog close={close} confirm={confirm} />}
         {showGenerateShippingInvoice && <GenerateDialog close={closeGenerateShippingInvoiceDialog} title={intl.formatMessage({ id: "generate_shipping_invoice" })} />}

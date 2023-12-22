@@ -170,7 +170,7 @@ const ReceiptPDF = ({ storagePlan, intl }: Params) => {
                       <Text style={[styles.tableCell, styles.majorCell]}>{ pl.output_plan_delivered_number ? pl.output_plan_delivered_number : '--' }</Text>
                     )
                   }
-                  <Text style={[styles.tableCell, styles.minorCell]}>{ '--' }</Text>
+                  <Text style={[styles.tableCell, styles.minorCell]}>{ `${pl.storage_time} ${intl.formatMessage({ id: 'days' })}` }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ storagePlan.delivered_time ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(storagePlan.delivered_time)}` : '' }</Text>
                   <Text style={[styles.tableCell, styles.minorCell]}>{ pl.dispatched_time ? `${getDateFormat(pl.dispatched_time)}, ${getHourFormat(pl.dispatched_time)}` : '' }</Text>
                 </View>

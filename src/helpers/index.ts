@@ -369,6 +369,7 @@ export const storagePlanDataToExcel = (
   const key12: string = intl.formatMessage({ id: "observations" });
   const key13: string = intl.formatMessage({ id: "created_at" });
   const key14: string = intl.formatMessage({ id: "updated_at" });
+  const key15: string = intl.formatMessage({ id: "storage_time" });
 
   storagePlans.forEach((sp: StoragePlan) => {
     const sPlan: { [key: string]: string } = {};
@@ -448,6 +449,9 @@ export const storagePlanDataToExcel = (
     if (selection === "all" || selection.has("updated_at")) {
       sPlan[key14] = `${sp.updated_at ? getDateFormat(sp.updated_at) : ""
         } ${sp.updated_at ? getHourFormat(sp.updated_at) : ""}`;
+    }
+    if (selection === "all" || selection.has("storage_time")) {
+      sPlan[key15] = getStorageTimeSP(sp, intl);
     }
 
     dataToExport.push(sPlan);
@@ -686,7 +690,7 @@ export const packingListDataToExcel = (
             : ""
           } `
           : "--";
-      pList[key9] = "--";
+      pList[key9] = `${pl.storage_time ? pl.storage_time : 0} ${intl.formatMessage({ id: 'days' })}`;
       pList[key10] = storagePlan.delivered_time
         ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(
           storagePlan.delivered_time
@@ -768,7 +772,7 @@ export const packingListDataToExcel = (
               : ""
             } `
             : "--";
-        pList[key3_2] = "--";
+        pList[key3_2] = `${pl.storage_time ? pl.storage_time : 0} ${intl.formatMessage({ id: 'days' })}`;
         pList[key3_3] = storagePlan.delivered_time
           ? `${getDateFormat(storagePlan.delivered_time)}, ${getHourFormat(
             storagePlan.delivered_time
@@ -1112,6 +1116,50 @@ const getLabelByOIT = (oit: any, locale: string) => {
   return oit.name;
 };
 
+export const getStorageTimeSP = (storagePlan: StoragePlan, intl: IntlShape): string => {
+  let short = Infinity
+  let larger = 0;
+  let storage_time = ""
+  storagePlan.packing_list?.forEach((pl: any) => {
+    if(pl.storage_time < short) {
+      short = pl.storage_time
+    }
+    if(pl.storage_time > larger) {
+      larger = pl.storage_time
+    }
+  })
+  if(short === larger) {
+    storage_time = `${short} ${intl.formatMessage({id: 'days'})}`
+  } else if(short === Infinity && larger === 0) {
+    storage_time = `0 ${intl.formatMessage({id: 'days'})}` 
+  }else {
+    storage_time = `${short} - ${larger} ${intl.formatMessage({id: 'days'})}`
+  }
+  return storage_time;
+}
+
+export const getStorageTimeOP = (outputPlan: ExitPlan, intl: IntlShape): string => {
+  let short = Infinity
+  let larger = 0;
+  let storage_time = ""
+  outputPlan.packing_lists?.forEach((pl: any) => {
+    if(pl.storage_time < short) {
+      short = pl.storage_time
+    }
+    if(pl.storage_time > larger) {
+      larger = pl.storage_time
+    }
+  })
+  if(short === larger) {
+    storage_time = `${short} ${intl.formatMessage({id: 'days'})}`
+  } else if(short === Infinity && larger === 0) {
+    storage_time = `0 ${intl.formatMessage({id: 'days'})}` 
+  }else {
+    storage_time = `${short} - ${larger} ${intl.formatMessage({id: 'days'})}`
+  }
+  return storage_time;
+}
+
 export const exitPlanDataToExcel = (
   exiPlan: ExitPlan[],
   intl: IntlShape,
@@ -1192,6 +1240,10 @@ ${intl.formatMessage({ id: "column" })}: ${packageShelf.column}
         case "operation_instruction_type":
           // @ts-ignore
           oInst[intl.formatMessage({ id: column })] = getOperationInstructionsLabel(oi, locale as string);
+          break;
+        case "storage_time":
+          // @ts-ignore
+          oInst[intl.formatMessage({ id: column })] = getStorageTimeOP(oi, intl);
           break;
         case "updated_at":
         case "created_at":

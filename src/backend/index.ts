@@ -265,7 +265,7 @@ export const guidePath = (page?: number, rowsPerPage?: number, filters?: string)
   return getBaseUrl() + "/api/v1/manifest" + params;
 };
 
-export const summaryPath = (page?: number, rowsPerPage?: number, filters?: string) => {
+export const summaryPath = (is_carrier: boolean, page?: number, rowsPerPage?: number, filters?: string) => {
   let params = "";
   if (page && rowsPerPage) {
     params += `${params === "" ? '?' : '&'}current_page=${page}&number_of_rows=${rowsPerPage}`;
@@ -273,7 +273,7 @@ export const summaryPath = (page?: number, rowsPerPage?: number, filters?: strin
   if (filters && filters !== "") {
     params += `${params === "" ? '?' : '&'}${filters}`;
   }
-  return getBaseUrl() + "/api/v1/summary" + params;
+  return getBaseUrl() + "/api/v1/summary" + params + `&is_carrier=${is_carrier}`;
 };
 
 export const GuideCountPath = (filters: string = "") => {

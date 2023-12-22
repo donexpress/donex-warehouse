@@ -9,8 +9,12 @@ import {
   Button,
   Input,
   SortDescriptor,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
-import { getHourFormat, text_date_format } from "../../../../helpers/utils";
+import { capitalize, getHourFormat, text_date_format } from "../../../../helpers/utils";
 import { useIntl } from "react-intl";
 import "../../../../styles/wms/user.table.scss";
 import "./../../../../styles/generic.input.scss";
@@ -20,11 +24,12 @@ import { Summary, SummaryFilters } from "@/types/summaryerege1992";
 import { exportExcelSummary, getSummary } from "@/services/api.summaryerege1992";
 import { Form, Formik } from "formik";
 import GenericInput from "../../common/GenericInput";
-import { FaFileExcel, FaFilter, FaTimes } from "react-icons/fa";
+import { FaFileExcel, FaFilter, FaTimes, FaCheck } from "react-icons/fa";
 import { SearchIcon } from "../../common/SearchIcon";
 import { showMsg } from "@/helperserege1992";
 import PaginationTable from "../../common/Pagination";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
+import { ChevronDownIcon } from "../../common/ChevronDownIcon";
 
 const SummaryTable = () => {
   const intl = useIntl();
@@ -35,6 +40,7 @@ const SummaryTable = () => {
   const [noResults, setNoResults] = useState<boolean>(false);
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
+  const [type, setType] = React.useState("");
   const [billCodeValue, setBillCodeValue] = React.useState("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -42,6 +48,8 @@ const SummaryTable = () => {
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [filtered, setFiltered] = useState<boolean>(true);
   const [filters, setFilters] = React.useState<string>("");
+
+  const [selectedSummaryType, setSelectedSummaryType] = useState<number>(0);
 
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "id",
@@ -57,6 +65,11 @@ const SummaryTable = () => {
   const getColumns = React.useMemo(() => {
     const columns = [
       { name: intl.formatMessage({ id: "waybill_id" }), uid: "MWB", sortable: true },
+      (type !== "General" && type !== "" && {
+        name: intl.formatMessage({ id: "carrier" }),
+        uid: "carrier",
+        sortable: true,
+      }),
       {
         name: intl.formatMessage({ id: "quantity_package" }),
         uid: "quantity_package",
@@ -110,11 +123,11 @@ const SummaryTable = () => {
       // { name: intl.formatMessage({ id: "actions" }), uid: "actions" },
     ];
 
-    return columns;
-  }, [intl]);
+    return columns.filter(column => column !== false);
+  }, [intl, type]);
 
   const headerColumns = React.useMemo(() => {
-    const columns = getColumns;
+    const columns = getColumns as any[];
     return columns;
   }, [getColumns]);
 
@@ -150,7 +163,7 @@ const SummaryTable = () => {
 
   const loadsummary = async () => {
     setLoading(true);
-    const _summary = await getSummary(1, 25, filters);
+    const _summary = await getSummary(false, 1, 25, filters);
     if (_summary !== null) {
       setSummary(_summary.data);
       setSummaryCount(_summary.count);
@@ -177,12 +190,12 @@ const SummaryTable = () => {
     }
     setFilters(arrayFilters.join("&"));
     setPage(1);
-    await reloadData(-1, -1, arrayFilters.join("&"));
+    await reloadData(-1, rowsPerPage, arrayFilters.join("&"));
   }
 
-  const reloadData = async (newPage: number = -1, rowsPerPageSP: number = -1, queryFilters: string) => {
+  const reloadData = async (newPage: number = -1, rowsPerPageSP: number = -1, queryFilters: string, is_carrier: boolean = type !== "General" && type !== "" ? true : false) => {
     setLoadingItems(true);
-    const _summary = await getSummary(newPage !== -1 ? newPage : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, queryFilters);
+    const _summary = await getSummary(is_carrier, newPage !== -1 ? newPage : page, rowsPerPageSP !== -1 ? rowsPerPageSP : rowsPerPage, queryFilters);
     if (_summary !== null) {
       setSummary(_summary.data);
       setSummaryCount(_summary.count);
@@ -202,7 +215,7 @@ const SummaryTable = () => {
     setFilters("");
     setFiltered(true);
     setPage(1);
-    await reloadData(-1, -1, "");
+    await reloadData(-1, rowsPerPage, "");
   };
 
   const handleSortChange = (sortDescriptor: SortDescriptor) => {
@@ -342,7 +355,7 @@ const SummaryTable = () => {
   const handleExport = async () => {
     try {
       let response: any = null;
-      response = await exportExcelSummary(filters);
+      response = await exportExcelSummary(type !== "General" && type !== "" ? true : false, filters);
       if (response.status && response.status >= 200 && response.status <= 299) {
         showMsg(intl.formatMessage({ id: 'please_wait_file_being_generated' }), { type: "success" });
       } else {
@@ -365,6 +378,17 @@ const SummaryTable = () => {
       setPage(1);
       await reloadData(1, Number(e.target.value), filters);
     }
+  }
+
+  const arrayTypes = [
+    { value: intl.formatMessage({ id: "general" }), id: 0 },
+    { value: intl.formatMessage({ id: "by_carrier" }), id: 1 },
+  ]
+
+  const handleSelectSummaryType = (value: number) => {
+    setType(value === 0 ? "General" : "Por transportista");
+    setSelectedSummaryType(value);
+    reloadData(1, rowsPerPage, "", value !== 0 ? true : false);
   }
 
   const topContent = React.useMemo(() => {
@@ -435,12 +459,42 @@ const SummaryTable = () => {
               </div>
 
               <div className="flex justify-end gap-3 items-end">
+                <Dropdown>
+                  <DropdownTrigger className="hidden sm:flex">
+                    <Button
+                      color="primary"
+                      className="bnt-select"
+                      endContent={<ChevronDownIcon className="text-small" />}
+                    >
+                      {intl.formatMessage({ id: "summary_type" })}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    disallowEmptySelection
+                    aria-label="Carrier"
+                    closeOnSelect={true}
+                    selectionMode="single"
+                  >
+                    {arrayTypes.map((column) => (
+                      <DropdownItem
+                        key={column.id}
+                        onClick={(e) => handleSelectSummaryType(column.id)}
+                        className="capitalize"
+                      >
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          {column.value}
+                          {selectedSummaryType === column.id && (
+                            <FaCheck size={13} className="text-small ml-2"/>
+                          )}
+                        </div>
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
                 <Button
                   color="primary"
                   style={{ width: "140px" }}
-                  endContent={
-                    <FaFileExcel style={{ fontSize: "22px", color: "white" }} />
-                  }
+                  endContent={<FaFileExcel style={{ fontSize: "22px", color: "white" }} />}
                   disabled={filteredItems.length === 0}
                   onClick={() => handleExport()}
                 >

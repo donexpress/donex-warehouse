@@ -28,7 +28,7 @@ const RootOMS = () => {
     })
     countExitPlans().then(ePLan => {
       if (ePLan !== null) {
-        setExitPlans(ePLan.total);
+        setExitPlans(ePLan.pending + ePLan.to_be_processed + ePLan.processing + ePLan.dispatched + ePLan.cancelled);
       }
     })
   }
