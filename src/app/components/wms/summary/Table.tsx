@@ -30,6 +30,9 @@ import { showMsg } from "@/helperserege1992";
 import PaginationTable from "../../common/Pagination";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 import { ChevronDownIcon } from "../../common/ChevronDownIcon";
+import { MWB } from "@/typeserege1992";
+import { indexWaybillIDS } from "@/services/api.waybillerege1992";
+import Select from 'react-select';
 
 const SummaryTable = () => {
   const intl = useIntl();
@@ -40,6 +43,8 @@ const SummaryTable = () => {
   const [noResults, setNoResults] = useState<boolean>(false);
   const [showPagination, setShowPagination] = useState<boolean>(true);
 
+  const [waybillIDS, setWaybillIDS] = useState<MWB[] | null>([]);
+  const [waybillIDValue, setWaybillIDValue] = React.useState("");
   const [type, setType] = React.useState("");
   const [billCodeValue, setBillCodeValue] = React.useState("");
   const [startDate, setStartDate] = useState<string>("");
@@ -167,6 +172,8 @@ const SummaryTable = () => {
     if (_summary !== null) {
       setSummary(_summary.data);
       setSummaryCount(_summary.count);
+      const _waybillIDS = await indexWaybillIDS();
+      setWaybillIDS(_waybillIDS);
       _summary.count === 0 && setNoResults(true);
     } else {
       setSummary([]);
@@ -179,6 +186,9 @@ const SummaryTable = () => {
   const handleSelectedFilters = async (event: any) => {
     setFiltered(false);
     let arrayFilters = [];
+    if (waybillIDValue.trim() !== "") {
+      arrayFilters.push(`waybill_id=${waybillIDValue.split(" ")[0]}`);
+    }
     if (billCodeValue.trim() !== "") {
       arrayFilters.push(`bill_code=${billCodeValue}`);
     }
@@ -210,6 +220,7 @@ const SummaryTable = () => {
 
   const handleClearAll = async () => {
     setBillCodeValue("");
+    setWaybillIDValue("");
     setStartDate("");
     setEndDate("");
     setFilters("");
@@ -398,6 +409,61 @@ const SummaryTable = () => {
           <div className="flex flex-col gap-3">
             <div className="container-search-inputs">
               <div>
+                <Select
+                  isSearchable
+                  options={waybillIDS ? waybillIDS.map((column) => ({
+                    value: `${column.waybill_id}|${column.carrier}`,
+                    label: capitalize(column.waybill_id + (column.carrier ? ` (${column.carrier})` : ''))
+                  })) : []}
+                  value={waybillIDValue.trim() !== "" ? { value: waybillIDValue, label: waybillIDValue } : null}
+                  onChange={(selectedOption) => {
+                    if (selectedOption) {
+                      setWaybillIDValue(selectedOption.label);
+                      // setCarrierValue(selectedOption.value.split("|")[1]);
+                    } else {
+                      setWaybillIDValue("");
+                    }
+                  }}
+                  styles={{
+                    control: (provided) => ({
+                      ...provided,
+                      backgroundColor: "#212c4d !important",
+                      border: "1px solid #37446b !important",
+                      borderRadius: "4px !important",
+                      height: "40px",
+                    }),
+                    option: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      backgroundColor: "#212c4d !important",
+                    }), placeholder: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      fontWeight: 400,
+                      fontSize: "var(--nextui-font-size-small)"
+                    }), input: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      fontWeight: 400,
+                      fontSize: "var(--nextui-font-size-small)"
+                    }), singleValue: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      fontWeight: 400,
+                      fontSize: "var(--nextui-font-size-small)"
+                    }), menu: (provided) => ({
+                      ...provided,
+                      color: "#aeb9e1",
+                      backgroundColor: "#212c4d !important",
+                      fontWeight: 400,
+                      fontSize: "var(--nextui-font-size-small)"
+                    }),
+                  }}
+                  placeholder={intl.formatMessage({ id: "waybill_id" })}
+                />
+              </div>
+
+              <div>
                 <Input
                   isClearable
                   className="search-input"
@@ -484,7 +550,7 @@ const SummaryTable = () => {
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                           {column.value}
                           {selectedSummaryType === column.id && (
-                            <FaCheck size={13} className="text-small ml-2"/>
+                            <FaCheck size={13} className="text-small ml-2" />
                           )}
                         </div>
                       </DropdownItem>
