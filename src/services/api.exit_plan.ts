@@ -1,8 +1,9 @@
 import axios from "axios";
-import { exitPlanPath } from "../backend";
+import { exitPlanPath, exportOutputPlanPath } from "../backend";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
 import { ExitPlan, State, StateCount } from "../types/exit_plan";
+import { ExportPayload } from "../types/export";
 import { Response } from "../types/index";
 
 export const getExitPlans = async (
@@ -254,6 +255,32 @@ export const getNonBoxesOnExitPlans = async (
       status:
         error.response && error.response.status ? error.response.status : 0,
     };
+  }
+};
+
+export const exportExitPlan = async (values: ExportPayload): Promise<Response> => {
+  const path = exportOutputPlanPath();
+  const headers = getHeaders(null, undefined, values.type === 'pdf' ? 'application/pdf' : undefined);
+  try {
+    const response = await fetch(path, {
+      method: 'POST',
+      headers: headers.headers as any,
+      body: JSON.stringify(values),
+    });
+
+    let data: any = null;
+    if (values.type === 'pdf') {
+      data = await response.blob();
+    } else {
+      data = await response.json();
+    }
+    
+    if (response.ok && response.status && (response.status >= 200 && response.status <= 299)) {
+      return { data: data, status: response.status };
+    }
+    return { status: response && response.status ? response.status : 0 };
+  } catch (error: any) {
+    return { status: error.response && error.response.status ? error.response.status : 0 };
   }
 };
 

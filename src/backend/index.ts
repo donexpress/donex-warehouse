@@ -284,6 +284,14 @@ export const GuideCountPath = (filters: string = "") => {
   return getBaseUrl() + "/api/v1/count" + params;
 };
 
+export const exportOutputPlanPath = () => {
+  return getBaseUrl() + "/api/v1/output_plan/export";
+};
+
+export const exportEntryPlanPath = () => {
+  return getBaseUrl() + "/api/v1/storage_plan/export";
+};
+
 export const self = () => {
   return getBaseUrl() + "/api/v1/self";
 };

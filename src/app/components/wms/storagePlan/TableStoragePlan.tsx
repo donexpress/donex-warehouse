@@ -30,10 +30,11 @@ import { showMsg, storagePlanDataToExcel, packingListDataToExcel, getLocationPac
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import "../../../../styles/wms/user.table.scss";
-import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount, barCodePdf } from '../../../../services/api.storage_plan';
+import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storagePlanCount, barCodePdf, exportStoragePlan } from '../../../../services/api.storage_plan';
 import { autoAssignLocation } from '../../../../services/api.package_shelf';
 import { getUsers } from '../../../../services/api.users';
 import { ValueSelect } from "../../../../types";
+import { ExportPayload, DisplayColumns } from '../../../../types/export';
 import { PackingList, StoragePlan, StoragePlanListProps, BarCode } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import { InputData } from "../../../../types/general_search";
@@ -54,6 +55,7 @@ import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
 import { FaFileExcel, FaFilePdf, FaTrashAlt, FaFilter, FaTimes } from 'react-icons/fa';
 import { FaBarcode } from 'react-icons/fa6';
+import { saveAs } from 'file-saver';
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
@@ -477,15 +479,16 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                       }
                     </PDFDownloadLink>
                   </DropdownItem>
-                  <DropdownItem onClick={() => storagePlanDataToExcel([storageP], intl, visibleColumns)}>
+                  <DropdownItem onClick={() => exportFile('xlsx', [storageP.id])}>
                     {intl.formatMessage({ id: "export_xlsx" })}
                   </DropdownItem>
-                  <DropdownItem>
-                    <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={[storageP]} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
+                  <DropdownItem onClick={() => exportFile('pdf', [storageP.id])}>
+                    {/* <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={[storageP]} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
                       {({ blob, url, loading, error }) =>
                         intl.formatMessage({ id: "export_pdf" })
                       }
-                    </PDFDownloadLink>
+                    </PDFDownloadLink> */}
+                    { intl.formatMessage({ id: "export_pdf" }) }
                   </DropdownItem>
                   <DropdownItem onClick={() => generateBarCode(storageP)}>
                     {intl.formatMessage({ id: "generate_labels" })}
@@ -798,6 +801,40 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     }
   }
 
+  const exportFile = async (type: 'pdf' | 'xlsx', itemsId: number[]) => {
+    setLoading(true);
+    let t = Array.from(visibleColumns) as string[];
+    t = t.filter((el) => el !== "actions");
+    const displayColumnsP: DisplayColumns[] = getColumns.map(item => {
+      return { key: item.uid, value: item.name}
+    });
+    const body: ExportPayload = {
+      type: type,
+      ids: itemsId,
+      display_columns: displayColumnsP,
+    }
+    const response = await exportStoragePlan(body);
+    if (response.status >= 200 && response.status <= 299) {
+      const time = (new Date()).getTime();
+      if (type === 'pdf') {
+        const blob = new Blob([response.data], { type: type === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8' });
+        const url = URL.createObjectURL(blob);
+        saveAs(url, `entry_plan_${type}_${time}.${type}`);
+      } else if (type === 'xlsx') {
+        const link = document.createElement('a');
+        link.href = response.data.url.url;
+        link.setAttribute('download', `entry_plan_${type}_${time}.${type}`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } else {
+      let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
+      showMsg(message, { type: "error" });
+    }
+    setLoading(false);
+  };
+
   const getSelectedStoragePlans = (): StoragePlan[] => {
     let its: StoragePlan[] = [];
     for (let i = 0; i < selectedItems.length; i++) {
@@ -952,19 +989,21 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
               style={{ width: '140px', marginLeft: '10px' }}
               endContent={<FaFilePdf style={{ fontSize: '22px', color: 'white' }} />}
               isDisabled={selectedItems.length === 0}
+              onClick={() => exportFile('pdf', selectedItems)}
             >
-              <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={getSelectedStoragePlans()} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
+              {/* <PDFDownloadLink document={<ExportStoragePlansPDF storagePlans={getSelectedStoragePlans()} intl={intl} selection={visibleColumns} />} fileName="entry_plans_data_pdf.pdf">
                 {({ blob, url, loading, error }) =>
                   intl.formatMessage({ id: "export_pdf" })
                 }
-              </PDFDownloadLink>
+              </PDFDownloadLink> */}
+              { intl.formatMessage({ id: "export_pdf" }) }
             </Button>
 
             <Button
               color="primary"
               style={{ width: '140px', marginLeft: '10px' }}
               endContent={<FaFileExcel style={{ fontSize: '22px', color: 'white' }} />}
-              onClick={() => handleExportStoragePlanData()}
+              onClick={() => exportFile('xlsx', selectedItems)}
               isDisabled={selectedItems.length === 0}
             >
               {intl.formatMessage({ id: "export_xlsx" })}

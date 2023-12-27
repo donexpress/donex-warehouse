@@ -95,7 +95,7 @@ export const getHeaders = (context?: any, isFile = false, accept?: string) => {
   };
 
   if (accept) {
-    if (accept === 'application/pdf') {
+    if (accept === 'application/pdf' || accept === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8') {
       configs = {
         headers: {
           ...configs.headers,
