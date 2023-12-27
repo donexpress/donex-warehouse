@@ -141,18 +141,27 @@ export const getStoragePlansState = async (context?: GetServerSidePropsContext):
 
 export const exportStoragePlan = async (values: ExportPayload): Promise<Response> => {
   const path = exportEntryPlanPath();
+  const headers = getHeaders(null, undefined, values.type === 'pdf' ? 'application/pdf' : undefined);
   try {
-    const response = await axios.post(path, values, getHeaders());
+    const response = await fetch(path, {
+      method: 'POST',
+      headers: headers.headers as any,
+      body: JSON.stringify(values),
+    });
 
-    if (response.status && response.status >= 200 && response.status <= 299) {
-      return { data: response.data, status: response.status };
+    let data: any = null;
+    if (values.type === 'pdf') {
+      data = await response.blob();
+    } else {
+      data = await response.json();
     }
-    return { status: response.status ? response.status : 0 };
+    
+    if (response.ok && response.status && (response.status >= 200 && response.status <= 299)) {
+      return { data: data, status: response.status };
+    }
+    return { status: response && response.status ? response.status : 0 };
   } catch (error: any) {
-    return {
-      status:
-        error.response && error.response.status ? error.response.status : 0,
-    };
+    return { status: error.response && error.response.status ? error.response.status : 0 };
   }
 };
 

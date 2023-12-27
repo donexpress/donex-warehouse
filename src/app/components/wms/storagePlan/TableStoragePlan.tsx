@@ -34,7 +34,7 @@ import { getStoragePlans, removeStoragePlanById, updateStoragePlanById, storageP
 import { autoAssignLocation } from '../../../../services/api.package_shelf';
 import { getUsers } from '../../../../services/api.users';
 import { ValueSelect } from "../../../../types";
-import { ExportPayload } from '../../../../types/export';
+import { ExportPayload, DisplayColumns } from '../../../../types/export';
 import { PackingList, StoragePlan, StoragePlanListProps, BarCode } from "../../../../types/storage_plan";
 import { Response } from "../../../../types";
 import { InputData } from "../../../../types/general_search";
@@ -55,6 +55,7 @@ import CopyColumnToClipboard from "../../common/CopyColumnToClipboard";
 import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
 import { FaFileExcel, FaFilePdf, FaTrashAlt, FaFilter, FaTimes } from 'react-icons/fa';
 import { FaBarcode } from 'react-icons/fa6';
+import { saveAs } from 'file-saver';
 import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
@@ -804,21 +805,29 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
     setLoading(true);
     let t = Array.from(visibleColumns) as string[];
     t = t.filter((el) => el !== "actions");
+    const displayColumnsP: DisplayColumns[] = getColumns.map(item => {
+      return { key: item.uid, value: item.name}
+    });
     const body: ExportPayload = {
       type: type,
       ids: itemsId,
-      display_columns: t,
+      display_columns: displayColumnsP,
     }
     const response = await exportStoragePlan(body);
     if (response.status >= 200 && response.status <= 299) {
-      console.log(response.data)
-      
-      /* const link = document.createElement('a');
-      link.href = response.data.url;
-      link.setAttribute('download', response.data.name);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link); */
+      const time = (new Date()).getTime();
+      if (type === 'pdf') {
+        const blob = new Blob([response.data], { type: type === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8' });
+        const url = URL.createObjectURL(blob);
+        saveAs(url, `entry_plan_${type}_${time}.${type}`);
+      } else if (type === 'xlsx') {
+        const link = document.createElement('a');
+        link.href = response.data.url.url;
+        link.setAttribute('download', `entry_plan_${type}_${time}.${type}`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
       showMsg(message, { type: "error" });

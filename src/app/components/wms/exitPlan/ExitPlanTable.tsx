@@ -36,7 +36,7 @@ import {
 } from "../../../../services/api.exit_plan";
 import { getUsers } from '../../../../services/api.users';
 import { ValueSelect } from "../../../../types";
-import { ExportPayload } from '../../../../types/export';
+import { ExportPayload, DisplayColumns } from '../../../../types/export';
 import {
   ExitPlan,
   ExitPlanState,
@@ -72,6 +72,7 @@ import { setCookie, getCookie } from "../../../../helpers/cookieUtils";
 import { getAppendagesByExitPlanId } from "@/services/api.appendixerege1992";
 import SpinnerIconButton from "../../common/SpinnerIconButton";
 import { InputData } from "../../../../types/general_search";
+import { saveAs } from 'file-saver';
 import GeneralSearchCmpt from "../../common/GeneralSearchCmpt";
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -856,23 +857,42 @@ const ExitPlanTable = () => {
     const body: ExportPayload = {
       type: type,
       ids: itemsId,
-      display_columns: getVisibleColumns(),
+      display_columns: getVisibleColumnsToExport(),
     }
     const response = await exportExitPlan(body);
     if (response.status >= 200 && response.status <= 299) {
-      console.log(response.data)
-      
-      /* const link = document.createElement('a');
-      link.href = response.data.url;
-      link.setAttribute('download', response.data.name);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link); */
+      const time = (new Date()).getTime();
+      if (type === 'pdf') {
+        const blob = new Blob([response.data], { type: type === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8' });
+        const url = URL.createObjectURL(blob);
+        saveAs(url, `exit_plan_${type}_${time}.${type}`);
+      } else if (type === 'xlsx') {
+        const link = document.createElement('a');
+        link.href = response.data.url.url;
+        link.setAttribute('download', `exit_plan_${type}_${time}.${type}`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     } else {
       let message = intl.formatMessage({ id: 'unknownStatusErrorMsg' });
       showMsg(message, { type: "error" });
     }
     setLoading(false);
+  };
+
+  const getVisibleColumnsToExport = (): DisplayColumns[] => {
+    let t = Array.from(visibleColumns) as string[];
+    t = t.filter((el) => el !== "actions");
+
+    const sortedSelectedArray = (t.map(uid => getColumns.find(item => item.uid === uid))
+      .filter(item => item !== undefined)) as { name: string; uid: string; position?: number}[];
+    
+    sortedSelectedArray.sort((a, b) => (a.position || 100) - (b.position || 100));
+
+    return sortedSelectedArray.map(col => {
+      return { key: col.uid, value: col.name }
+    });
   };
 
   const getVisibleColumns = (): string[] => {
