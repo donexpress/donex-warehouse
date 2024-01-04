@@ -72,7 +72,7 @@ const FilterExitPlan = ({ date, finalDate, visibleColumns, setParentFinalDate, s
               endContent={<ChevronDownIcon className="text-small" />}
               variant="flat"
             >
-              {intl.formatMessage({ id: "columns" })}
+              {intl.formatMessage({ id: "destination" })}
             </Button>
           </DropdownTrigger>
           <DropdownMenu
