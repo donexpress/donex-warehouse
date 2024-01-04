@@ -331,7 +331,7 @@ const StaffTable = ({ role, staffStates }: StaffListProps) => {
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  {intl.formatMessage({ id: "filters" })}
+                  {intl.formatMessage({ id: "state" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
