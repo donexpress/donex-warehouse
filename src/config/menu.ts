@@ -116,11 +116,11 @@ export const menuWMS = (intl: IntlShape) => {
           label: intl.formatMessage({ id: "staff" }),
           route: RouteMenu.LIST_STAFF,
         },
-        {
-          id: 5.2,
-          label: intl.formatMessage({ id: "organization" }),
-          route: RouteMenu.LIST_ORGANIZATION,
-        },
+        // {
+        //   id: 5.2,
+        //   label: intl.formatMessage({ id: "organization" }),
+        //   route: RouteMenu.LIST_ORGANIZATION,
+        // },
         /* {
           id: 5.3,
           label: intl.formatMessage({ id: "employeeRole" }),

@@ -324,7 +324,7 @@ const UserTable = ({ role, userStateList }: UserListProps) => {
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  {intl.formatMessage({ id: "filters" })}
+                  {intl.formatMessage({ id: "state" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
