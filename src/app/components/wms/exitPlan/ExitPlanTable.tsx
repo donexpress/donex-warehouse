@@ -1061,7 +1061,7 @@ const ExitPlanTable = () => {
           <span className="text-default-400 text-small">
             {intl.formatMessage(
               { id: "total_results" },
-              { in: getCount(statusSelected) }
+              { in: count?.total }
             )}
           </span>
           <label className="flex items-center text-default-400 text-small">
