@@ -860,7 +860,7 @@ const TableStoragePlan = ({ storagePlanStates, storagePCount, inWMS }: StoragePl
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  {intl.formatMessage({ id: "filters" })}
+                  {intl.formatMessage({ id: "state" })}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
