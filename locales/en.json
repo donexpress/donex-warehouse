@@ -166,6 +166,7 @@
 	"select_user_level": "Select user level",
 	"select_financial_representative": "Select financial representative",
 	"select_customer_service_representative": "Select customer service representative",
+	"select_customer": "Select customer",
 	"select_sales_representative": "Select sales representative",
 	"select_source_sales": "Select the source of sales",
 	"select_subsidiary": "Select the subsidiary",

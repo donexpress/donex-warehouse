@@ -175,6 +175,10 @@ export const staffStatePath = () => {
   return getBaseUrl() + "/api/v1/staff/states";
 };
 
+export const manifestCustomerPath = () => {
+  return getBaseUrl() + "/api/v1/byManifestCustomer";
+};
+
 export const organizationPath = () => {
   return getBaseUrl() + "/api/v1/organization";
 };

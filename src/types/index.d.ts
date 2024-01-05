@@ -189,7 +189,12 @@ export type StaffFormProps = {
   roles: Role[];
   organizations: Organization[];
   affiliations: CargoStationWarehouseForm[];
+  customers: ManifestCustomer[];
 };
+
+export type ManifestCustomer = {
+  manifest_name: string;
+}
 
 export type StaffForm = {
     username: string;
@@ -207,6 +212,8 @@ export type StaffForm = {
     default_cargo_station_id: number | null;
     change_password_on_login: boolean;
     allow_search: boolean;
+    client?: string | null;
+    meta?: any;
 };
 
 export type StaffFormProps = {
