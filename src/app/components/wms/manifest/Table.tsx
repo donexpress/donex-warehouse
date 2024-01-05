@@ -455,7 +455,7 @@ const ManifestTable = () => {
                 <Input
                   isClearable
                   className="search-input"
-                  placeholder={intl.formatMessage({ id: "clientReference" })}
+                  placeholder={intl.formatMessage({ id: "client_code" })}
                   startContent={<SearchIcon />}
                   value={clientReferenceValue}
                   onClear={() => onClear("ClientReferenceValue")}
