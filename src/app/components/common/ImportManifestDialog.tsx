@@ -269,7 +269,7 @@ const ImportManifestDialog = ({ close, confirm, title, where, onClose }: Params)
                           <div className="ml-2" style={{ width: "100%" }}>
                             <Input
                               className="search-input"
-                              placeholder={intl.formatMessage({ id: "clientReference" })}
+                              placeholder={intl.formatMessage({ id: "client_code" })}
                               value={clientReferenceValue}
                               // onClear={() => onClear("ClientReferenceValue")}
                               onChange={(e) => setClientReferenceValue(e.target.value)}
