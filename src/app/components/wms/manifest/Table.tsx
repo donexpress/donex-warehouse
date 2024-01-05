@@ -41,6 +41,7 @@ import ProfitDialog from "../../common/ProfitDialog";
 import GenerateDialog from "../../common/GenerateDialog";
 import GenericInput from "../../common/GenericInput";
 import { Form, Formik } from "formik";
+import { getCookie } from "@/helpers/cookieUtilserege1992";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "waybill_id",
@@ -54,6 +55,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 const ManifestTable = () => {
+  const userName = getCookie("profileWMS").username;
   const intl = useIntl();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [waybillIDS, setWaybillIDS] = useState<MWB[] | null>([]);
@@ -372,6 +374,10 @@ const ManifestTable = () => {
     }
   }
 
+  const filteredArray = arrayBillCode.filter((column) => {
+    return !(userName === "SY" && column.id === 2);
+  });
+
   const topContent = React.useMemo(() => {
     return (
       <Formik initialValues={initialValues} onSubmit={() => { }}>
@@ -468,7 +474,7 @@ const ManifestTable = () => {
                   onChange={(e) => setBillCodeValue(formatBillCode(e.target.value))}
                 />
               </div>
-              
+
               <div>
                 <GenericInput
                   onChangeFunction={(event) => setDateMaxToday(event?.target.value, "start_date")}
@@ -545,7 +551,7 @@ const ManifestTable = () => {
                   </DropdownMenu>
                 </Dropdown>
 
-                {(currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
+                {userName !== "SY" && (currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
                   color="primary"
                   onClick={() => openChargeWaybillDialog()}
                 >
@@ -568,7 +574,7 @@ const ManifestTable = () => {
                     closeOnSelect={true}
                     selectionMode="single"
                   >
-                    {arrayBillCode.map((column) => (
+                    {filteredArray.map((column) => (
                       <DropdownItem key={column.id} onClick={(e) => handleActionBillCode(column.id)} className="capitalize">
                         {capitalize(column.value)}
                       </DropdownItem>
@@ -577,28 +583,32 @@ const ManifestTable = () => {
                 </Dropdown>
                 )}
 
-                <Dropdown>
-                  <DropdownTrigger className="hidden sm:flex">
-                    <Button
-                      color="primary"
-                      endContent={<ChevronDownIcon className="text-small" />}
-                    >
-                      {intl.formatMessage({ id: "create" })}
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    disallowEmptySelection
-                    aria-label="Carrier"
-                    closeOnSelect={true}
-                    selectionMode="single"
-                  >
-                    {arrayUpdateManifest.map((column) => (
-                      <DropdownItem key={column.id} onClick={(e) => (column.id !== 2) ? openUpdateManifestDialog(column.id) : openImportManifestDialog()} className="capitalize">
-                        {capitalize(column.value)}
-                      </DropdownItem>
-                    ))}
-                  </DropdownMenu>
-                </Dropdown>
+                {
+                  userName !== "SY" && (
+                    <Dropdown>
+                      <DropdownTrigger className="hidden sm:flex">
+                        <Button
+                          color="primary"
+                          endContent={<ChevronDownIcon className="text-small" />}
+                        >
+                          {intl.formatMessage({ id: "create" })}
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        disallowEmptySelection
+                        aria-label="Carrier"
+                        closeOnSelect={true}
+                        selectionMode="single"
+                      >
+                        {arrayUpdateManifest.map((column) => (
+                          <DropdownItem key={column.id} onClick={(e) => (column.id !== 2) ? openUpdateManifestDialog(column.id) : openImportManifestDialog()} className="capitalize">
+                            {capitalize(column.value)}
+                          </DropdownItem>
+                        ))}
+                      </DropdownMenu>
+                    </Dropdown>
+                  )
+                }
 
                 <Button
                   color="primary"
