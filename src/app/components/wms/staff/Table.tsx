@@ -45,6 +45,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "email",
   "phone",
   "state",
+  "role_id",
   "actions",
 ];
 
