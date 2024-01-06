@@ -477,5 +477,6 @@
 	"please_wait_file_being_generated": "Please wait. A file is being generated with the data.",
 	"summary_type": "Summary type",
 	"general": "General",
-  	"by_carrier": "By carrier"
+  	"by_carrier": "By carrier",
+	"client_code": "Client code"
 }

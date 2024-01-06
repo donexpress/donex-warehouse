@@ -483,6 +483,7 @@
   "please_wait_file_being_generated": "請稍等。 正在使用數據生成文件",
   "summary_type": "摘要類型",
   "general": "一般的",
-  "by_carrier": "按承運人"
+  "by_carrier": "按承運人",
+  "client_code": "客戶端程式碼"
 
 }

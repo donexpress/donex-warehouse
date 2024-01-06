@@ -82,6 +82,7 @@ const ManifestTable = () => {
   const [whereUpdate, setWhereUpdate] = useState<string>("");
 
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
+  const [clientCodeValue, setClientCodeValue] = React.useState("");
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
   const [billCodeValue, setBillCodeValue] = React.useState("");
   const [currentBillCodeRequest, setCurrentBillCodeRequest] = React.useState("");
@@ -253,6 +254,7 @@ const ManifestTable = () => {
   }, []);
 
   const handleClearAll = async () => {
+    setClientCodeValue("");
     setClientReferenceValue("");
     setBillCodeValue("");
     setCurrentBillCodeRequest("");
@@ -452,16 +454,30 @@ const ManifestTable = () => {
               </div>
 
               <div>
-                <Input
-                  isClearable
-                  className="search-input"
-                  placeholder={intl.formatMessage({ id: "clientReference" })}
-                  startContent={<SearchIcon />}
-                  value={clientReferenceValue}
-                  onClear={() => onClear("ClientReferenceValue")}
-                  onChange={(e) => setClientReferenceValue(e.target.value)}
-                />
-              </div>
+                  <Input
+                    isClearable
+                    className="search-input"
+                    placeholder={intl.formatMessage({ id: "clientReference" })}
+                    startContent={<SearchIcon />}
+                    value={clientReferenceValue}
+                    onClear={() => onClear("clientReferenceValue")}
+                    onChange={(e) => setClientReferenceValue(e.target.value)}
+                  />
+                </div>
+
+              {userName !== "SY" &&
+                (<div>
+                  <Input
+                    isClearable
+                    className="search-input"
+                    placeholder={intl.formatMessage({ id: "client_code" })}
+                    startContent={<SearchIcon />}
+                    value={clientCodeValue}
+                    onClear={() => onClear("clientCodeValue")}
+                    onChange={(e) => setClientCodeValue(e.target.value)}
+                  />
+                </div>)
+              }
 
               <div>
                 <Input
@@ -670,7 +686,7 @@ const ManifestTable = () => {
     guides.length,
     intl,
     trackingNumberValue,
-    clientReferenceValue,
+    clientCodeValue,
     billCodeValue,
     waybillIDValue,
     carrierValue,
@@ -762,6 +778,9 @@ const ManifestTable = () => {
     let arrayFilters = [];
     if (trackingNumberValue.trim() !== "") {
       arrayFilters.push(`tracking_number=${trackingNumberValue}`);
+    }
+    if (clientCodeValue.trim() !== "") {
+      arrayFilters.push(`manifest_name=${clientCodeValue}`);
     }
     if (clientReferenceValue.trim() !== "") {
       arrayFilters.push(`client_reference=${clientReferenceValue}`);
