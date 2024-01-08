@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import { Button } from "@nextui-org/react";
 import "../../../../styles/wms/user.form.scss";
 import { showMsg } from "../../../../helpers";
@@ -6,13 +6,14 @@ import { useRouter } from "next/router";
 import { Formik, Form } from "formik";
 import GenericInput from "../../common/GenericInput";
 import { useIntl } from "react-intl";
-import { StaffForm, Response } from "../../../../types";
+import { StaffForm, Response, ManifestCustomer } from "../../../../types";
 import { StaffFormProps, CargoStationWarehouseForm, ValueSelect } from "../../../../types";
-import { StaffState } from '../../../../types/staff';
+import { StaffState, } from '../../../../types/staff';
 import { Role } from '../../../../types/role';
 import { Organization } from '../../../../types/organization';
 import { generateValidationStaff, generateValidationStaffModify } from "../../../../validation/generateValidationStaff";
 import { createStaff, getStaffStates, updateStaff } from "@/services/api.stafferege1992";
+import { ContactsOutlined } from "@material-ui/icons";
 
 const getAffiliationsFormatted = (affiliationsAll: CargoStationWarehouseForm[]): ValueSelect[] => {
   let response: ValueSelect[] = [];
@@ -25,12 +26,19 @@ const getAffiliationsFormatted = (affiliationsAll: CargoStationWarehouseForm[]):
   return response;
 };
 
-const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizations, affiliations }: StaffFormProps) => {
+const getRole = (roles: Role[], roleId: number | number) => {
+  const roleP = roles.find(roleParam => roleParam.id === roleId);
+  // @ts-ignore
+  return roleP ? roleP.type : '';
+}
+
+const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizations, affiliations, customers }: StaffFormProps) => {
   const router = useRouter();
   const { locale } = router.query;
   const intl = useIntl();
   const [filterAffiliations, setFilterAffiliations] = useState<ValueSelect[]>(id && staff ? ((staff.warehouses !== null && staff.warehouses !== undefined) ? getAffiliationsFormatted(staff.warehouses) : []) : []);
-
+  const [role, setRole] = useState<string | null>((id && staff) ? getRole(roles, staff.role_id) : null);
+  
   let initialValues: StaffForm = {
     username: id && staff ? staff.username : "",
     password: "",
@@ -53,6 +61,7 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
     default_cargo_station_id: id && staff ? (staff.default_cargo_station_id !== null ? staff.default_cargo_station_id : null) : null,
     change_password_on_login: id && staff ? staff.change_password_on_login : true,
     allow_search: id && staff ? staff.allow_search : true,
+    client: (id && staff && staff.meta && staff.meta.finances && staff.meta.finances.customer && (role === 'FINANCE')) ? staff.meta.finances.customer : null,
   };
 
   const getStaffStatesFormatted = (staffStatesAll: StaffState[]): ValueSelect[] => {
@@ -81,6 +90,17 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
       response.push({
         value: role.id,
         label: role.name,
+      });
+    });
+    return response;
+  };
+
+  const getManifestCustomerFormatted = (manifestC: ManifestCustomer[]): ValueSelect[] => {
+    let response: ValueSelect[] = [];
+    manifestC.forEach((mc) => {
+      response.push({
+        value: mc.manifest_name,
+        label: mc.manifest_name,
       });
     });
     return response;
@@ -126,7 +146,12 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
       affiliations: values.affiliations,
       default_cargo_station_id: values.default_cargo_station_id,
       change_password_on_login: values.change_password_on_login,
-      allow_search: values.allow_search
+      allow_search: values.allow_search,
+      meta: {
+        finances: {
+          customer: ((role === 'FINANCE') && values.client) ? values.client : null
+        }
+      }
     };
   };
 
@@ -172,6 +197,20 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
   const goBack = () => {
     router.back();
   };
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    // @ts-ignore
+    const { name, value, type, checked } = event.target;
+    const fieldValue = type === "checkbox" ? checked : value;
+
+    if (name === 'role_id') {
+      const roleP = roles.find(roleParam => roleParam.id === Number(fieldValue));
+      if (roleP) {
+        // @ts-ignore
+        setRole(roleP.type);
+      }
+    }
+  }
 
   return (
     <div className="user-form-body shadow-small">
@@ -292,8 +331,21 @@ const StaffFormBody = ({ id, staff, isFromDetails, staffStates, roles, organizat
                     options={getRolesFormatted(roles)}
                     customClass="custom-input"
                     disabled={isFromDetails}
+                    onChangeFunction={handleInputChange}
                   />
                 </div>
+                {role === 'FINANCE' && (
+                  <div className="w-full sm:w-[49%]">
+                    <GenericInput
+                      type="select"
+                      name="client"
+                      selectLabel={intl.formatMessage({ id: "select_customer" })}
+                      options={getManifestCustomerFormatted(customers)}
+                      customClass="custom-input"
+                      disabled={isFromDetails}
+                    />
+                  </div>
+                )}
                 <div className="w-full sm:w-[49%]">
                   <GenericInput
                     type="select-filter"

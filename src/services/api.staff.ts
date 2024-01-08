@@ -1,5 +1,5 @@
 import axios from "axios";
-import { countStaffPath, removeStaffPath, self, staffPath, staffStatePath } from "../backend";
+import { countStaffPath, removeStaffPath, self, staffPath, staffStatePath, manifestCustomerPath } from "../backend";
 import { Staff } from "@/types/stafferege1992";
 import { GetServerSidePropsContext } from "next";
 import { getHeaders } from "../helpers";
@@ -75,6 +75,16 @@ export const getSelf = async(context?: GetServerSidePropsContext): Promise<Staff
 
 export const getStaffStates = async (context?: GetServerSidePropsContext):Promise<StaffStateDefault | null> => {
   const path = staffStatePath();
+  try {
+    const response = await axios.get(path, getHeaders(context));
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export const getManifestCustomers = async (context?: GetServerSidePropsContext):Promise<StaffStateDefault | null> => {
+  const path = manifestCustomerPath();
   try {
     const response = await axios.get(path, getHeaders(context));
     return response.data;

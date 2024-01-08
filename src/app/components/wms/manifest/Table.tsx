@@ -55,7 +55,8 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 const ManifestTable = () => {
-  const userName = getCookie("profileWMS").username;
+  const meta = getCookie("profileWMS").meta;
+  console.log(meta);
   const intl = useIntl();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [waybillIDS, setWaybillIDS] = useState<MWB[] | null>([]);
@@ -82,6 +83,7 @@ const ManifestTable = () => {
   const [whereUpdate, setWhereUpdate] = useState<string>("");
 
   const [trackingNumberValue, setTrackingNumberValue] = React.useState("");
+  const [clientCodeValue, setClientCodeValue] = React.useState("");
   const [clientReferenceValue, setClientReferenceValue] = React.useState("");
   const [billCodeValue, setBillCodeValue] = React.useState("");
   const [currentBillCodeRequest, setCurrentBillCodeRequest] = React.useState("");
@@ -232,6 +234,14 @@ const ManifestTable = () => {
               }
             />
           );
+        case "client_reference":
+          return (
+            <CopyColumnToClipboard
+              value={
+                cellValue
+              }
+            />
+          );
         default:
           return cellValue;
       }
@@ -253,6 +263,7 @@ const ManifestTable = () => {
   }, []);
 
   const handleClearAll = async () => {
+    setClientCodeValue("");
     setClientReferenceValue("");
     setBillCodeValue("");
     setCurrentBillCodeRequest("");
@@ -374,9 +385,11 @@ const ManifestTable = () => {
     }
   }
 
-  const filteredArray = arrayBillCode.filter((column) => {
-    return !(userName === "SY" && column.id === 2);
-  });
+  const filteredArray = !meta || !meta.finances.customer
+    ? arrayBillCode
+    : arrayBillCode.filter((column) => {
+      return column.id !== 2;
+    });
 
   const topContent = React.useMemo(() => {
     return (
@@ -455,13 +468,27 @@ const ManifestTable = () => {
                 <Input
                   isClearable
                   className="search-input"
-                  placeholder={intl.formatMessage({ id: "client_code" })}
+                  placeholder={intl.formatMessage({ id: "clientReference" })}
                   startContent={<SearchIcon />}
                   value={clientReferenceValue}
                   onClear={() => onClear("ClientReferenceValue")}
                   onChange={(e) => setClientReferenceValue(e.target.value)}
                 />
               </div>
+
+              {!(meta && meta.finances.customer) &&
+                (<div>
+                  <Input
+                    isClearable
+                    className="search-input"
+                    placeholder={intl.formatMessage({ id: "client_code" })}
+                    startContent={<SearchIcon />}
+                    value={clientCodeValue}
+                    onClear={() => onClear("ClientCodeValue")}
+                    onChange={(e) => setClientCodeValue(e.target.value)}
+                  />
+                </div>)
+              }
 
               <div>
                 <Input
@@ -551,7 +578,7 @@ const ManifestTable = () => {
                   </DropdownMenu>
                 </Dropdown>
 
-                {userName !== "SY" && (currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
+                {!(meta && meta.finances.customer) && (currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
                   color="primary"
                   onClick={() => openChargeWaybillDialog()}
                 >
@@ -584,7 +611,7 @@ const ManifestTable = () => {
                 )}
 
                 {
-                  userName !== "SY" && (
+                  !(meta && meta.finances.customer) && (
                     <Dropdown>
                       <DropdownTrigger className="hidden sm:flex">
                         <Button
@@ -670,7 +697,7 @@ const ManifestTable = () => {
     guides.length,
     intl,
     trackingNumberValue,
-    clientReferenceValue,
+    clientCodeValue,
     billCodeValue,
     waybillIDValue,
     carrierValue,
@@ -762,6 +789,9 @@ const ManifestTable = () => {
     let arrayFilters = [];
     if (trackingNumberValue.trim() !== "") {
       arrayFilters.push(`tracking_number=${trackingNumberValue}`);
+    }
+    if (clientCodeValue.trim() !== "") {
+      arrayFilters.push(`manifest_name=${clientCodeValue}`);
     }
     if (clientReferenceValue.trim() !== "") {
       arrayFilters.push(`client_reference=${clientReferenceValue}`);
