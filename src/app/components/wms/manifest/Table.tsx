@@ -55,7 +55,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 const ManifestTable = () => {
-  const userName = getCookie("profileWMS").username;
+  const meta = getCookie("profileWMS").meta;
   const intl = useIntl();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [waybillIDS, setWaybillIDS] = useState<MWB[] | null>([]);
@@ -233,6 +233,14 @@ const ManifestTable = () => {
               }
             />
           );
+        case "client_reference":
+          return (
+            <CopyColumnToClipboard
+              value={
+                cellValue
+              }
+            />
+          );
         default:
           return cellValue;
       }
@@ -377,7 +385,7 @@ const ManifestTable = () => {
   }
 
   const filteredArray = arrayBillCode.filter((column) => {
-    return !(userName === "SY" && column.id === 2);
+    return !(meta && column.id === 2);
   });
 
   const topContent = React.useMemo(() => {
@@ -454,18 +462,18 @@ const ManifestTable = () => {
               </div>
 
               <div>
-                  <Input
-                    isClearable
-                    className="search-input"
-                    placeholder={intl.formatMessage({ id: "clientReference" })}
-                    startContent={<SearchIcon />}
-                    value={clientReferenceValue}
-                    onClear={() => onClear("clientReferenceValue")}
-                    onChange={(e) => setClientReferenceValue(e.target.value)}
-                  />
-                </div>
+                <Input
+                  isClearable
+                  className="search-input"
+                  placeholder={intl.formatMessage({ id: "clientReference" })}
+                  startContent={<SearchIcon />}
+                  value={clientReferenceValue}
+                  onClear={() => onClear("ClientReferenceValue")}
+                  onChange={(e) => setClientReferenceValue(e.target.value)}
+                />
+              </div>
 
-              {userName !== "SY" &&
+              {!meta &&
                 (<div>
                   <Input
                     isClearable
@@ -473,7 +481,7 @@ const ManifestTable = () => {
                     placeholder={intl.formatMessage({ id: "client_code" })}
                     startContent={<SearchIcon />}
                     value={clientCodeValue}
-                    onClear={() => onClear("clientCodeValue")}
+                    onClear={() => onClear("ClientCodeValue")}
                     onChange={(e) => setClientCodeValue(e.target.value)}
                   />
                 </div>)
@@ -567,7 +575,7 @@ const ManifestTable = () => {
                   </DropdownMenu>
                 </Dropdown>
 
-                {userName !== "SY" && (currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
+                {!meta && (currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
                   color="primary"
                   onClick={() => openChargeWaybillDialog()}
                 >
@@ -600,7 +608,7 @@ const ManifestTable = () => {
                 )}
 
                 {
-                  userName !== "SY" && (
+                  !meta && (
                     <Dropdown>
                       <DropdownTrigger className="hidden sm:flex">
                         <Button
