@@ -56,6 +56,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 
 const ManifestTable = () => {
   const meta = getCookie("profileWMS").meta;
+  console.log(meta);
   const intl = useIntl();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [waybillIDS, setWaybillIDS] = useState<MWB[] | null>([]);
@@ -384,9 +385,11 @@ const ManifestTable = () => {
     }
   }
 
-  const filteredArray = arrayBillCode.filter((column) => {
-    return !(meta && column.id === 2);
-  });
+  const filteredArray = !meta || !meta.finances.customer
+    ? arrayBillCode
+    : arrayBillCode.filter((column) => {
+      return column.id !== 2;
+    });
 
   const topContent = React.useMemo(() => {
     return (
@@ -473,7 +476,7 @@ const ManifestTable = () => {
                 />
               </div>
 
-              {!meta &&
+              {!(meta && meta.finances.customer) &&
                 (<div>
                   <Input
                     isClearable
@@ -575,7 +578,7 @@ const ManifestTable = () => {
                   </DropdownMenu>
                 </Dropdown>
 
-                {!meta && (currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
+                {!(meta && meta.finances.customer) && (currentWaybillCodeRequest !== "") && !loadingItems && !!guidesTotal?.count && (guidesTotal?.count > 0) && (<Button
                   color="primary"
                   onClick={() => openChargeWaybillDialog()}
                 >
@@ -608,7 +611,7 @@ const ManifestTable = () => {
                 )}
 
                 {
-                  !meta && (
+                  !(meta && meta.finances.customer) && (
                     <Dropdown>
                       <DropdownTrigger className="hidden sm:flex">
                         <Button
