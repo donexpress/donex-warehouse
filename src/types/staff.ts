@@ -36,6 +36,7 @@ export type Staff = {
     default_cargo_station_id: number;
     change_password_on_login: boolean;
     allow_search: boolean;
+    meta?: any;
 }
 
 export type StaffState = {
